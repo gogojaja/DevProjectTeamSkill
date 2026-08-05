@@ -1,0 +1,123 @@
+﻿---
+name: "project-init-skill"
+description: "Project initiation skill covering startup foundations: charter & business case, stakeholder registration, scope preliminary definition, feasibility check, kickoff readiness, and baseline initialization (ProjectMonitorSkill create_baseline) before requirements phase. Aligned with PMBOK initiating process group. Invoke when starting a new project, creating project charter, registering stakeholders, or initializing project baseline."
+---
+
+# ProjectInitSkill 项目启动技能
+
+> 版权声明详见 `../../shared/references/COPYRIGHT.md`
+
+## 1. 基础元数据
+
+- **技能唯一标识**：ProjectInitSkill
+- **技能版本**：v21.0.0
+- **定位**：项目启动前置哨兵（Front-Gate），是六阶段全生命周期的「第 0 阶段」，对齐 PMBOK 启动过程组。
+- **调用主体**：DevProjectTeamSkill（标准模式入口）/ 用户直接指令
+- **依赖工具**：ProjectMonitorSkill（`create_baseline` 台账初始化、`change_audit` 变更审计）
+- **核心约束**：
+  1. 启动完成后必须调用 ProjectMonitorSkill `create_baseline` 生成台账基线，未初始化禁止进入需求阶段；
+  2. 项目章程未经干系人确认，禁止固化范围初定义；
+  3. 本技能只做启动准备与决策，需求收集由需求分析师接续执行；
+  4. 启动决策为「Go / No-Go / 暂缓」，未批准不消耗开发资源。
+
+---
+
+## 2. 统一入参标准
+
+统一入参：`action`（七指令之一）+ `content`（背景/章程/干系人/范围/可行性/就绪/基线信息）+ `stage`（当前环节）+ `user_confirm`（无/同意/拒绝/查错）。
+
+#### action 指令清单
+
+| action | 作用 | 前置条件 |
+|--------|------|----------|
+| `init_kickoff` | 启动登记 | 无 |
+| `create_charter` | 输出项目章程 | init_kickoff |
+| `register_stakeholder` | 干系人登记册 | create_charter |
+| `define_scope_prelim` | 范围初定义 | register_stakeholder |
+| `assess_feasibility` | 五维可行性评估 | define_scope_prelim |
+| `check_ready` | 就绪检查（Go 判定） | assess_feasibility |
+| `init_baseline` | create_baseline 初始化台账 | check_ready=Go |
+
+---
+
+## 3. 项目启动流程
+
+流程主线：`init_kickoff → create_charter → register_stakeholder → define_scope_prelim → assess_feasibility → check_ready → (Go) → init_baseline → 需求阶段入场`；No-Go/暂缓 → 阻塞清单 + 建议行动，停止。
+
+- **门禁**：每环节产出经用户确认后进入下一环节；
+- **刹车**：章程确认连续 2 次未通过 → 停止并推送人工决策；
+- **No-Go 后重启**：阻塞消除后从对应环节恢复，不需从头重跑。
+
+### 环节 1：启动登记（init_kickoff）
+处理：生成项目编号（PRJ-XXX）与名称；登记 SMART 目标、背景、预期收益；判定项目类型，联动 RequirementsAnalysisSkill dimensions。
+输出：项目登记记录（写入台账「01_启动组.csv」候选行）。
+
+### 环节 2：项目章程（create_charter）
+处理：章程含立项授权、目标（业务+交付）、约束、预算上限、关键里程碑；须经干系人确认；目标不清晰时输出「章程缺陷清单」，不强行通过。
+输出：《项目章程》（Markdown 或 CSV），经干系人确认。
+
+### 环节 3：干系人登记（register_stakeholder）
+处理：登记册字段（角色/组织/影响/参与度/沟通需求/频率/联系方式）；**权力-利益矩阵**四象限（高权高利→重点管理、高权低利→使其满意、低权高利→保持知会、低权低利→监督）；识别项目经理/需求方/测试方；变更增量更新不重写整册。
+输出：《干系人登记册》（写入「01_启动组.csv」）。
+
+### 环节 4：范围初定义（define_scope_prelim）
+处理：输出交付边界（做什么）、排除项（不做什么）、假设与制约；范围为「初步」，细则由需求阶段细化；变更走 ProjectMonitorSkill `change_audit`。
+输出：《范围初定义说明书》（范围/排除项/假设/制约），写入「02_范围基准.csv」。
+
+### 环节 5：可行性评估（assess_feasibility）
+五维矩阵，任一项"不可行"则 No-Go：
+
+| 维度 | 通过标准 |
+|------|---------|
+| 技术可行性 | 无不可逾越障碍 |
+| 资源可行性 | 资源缺口可填补 |
+| 进度可行性 | 排期无硬性冲突 |
+| 成本可行性 | 成本 ≤ 预算上限 |
+| 风险可行性 | 风险可控或可接受 |
+
+输出：《可行性评估报告》（五维结论 + Go/No-Go 建议）。
+
+### 环节 6：启动就绪检查（check_ready）
+处理：Gate 清单——章程确认 / 干系人登记（含权力-利益分析）/ 范围初定义 / 可行性通过 / 预算里程碑明确 / 需求入场条件识别。判定 **Go**（全过）/ **No-Go**（任一不满足且无法调整）/ **暂缓**（条件暂缺，补足重查）；No-Go/暂缓输出阻塞清单与建议行动。
+输出：《启动就绪检查单》（Go/No-Go/暂缓 + 阻塞清单）。
+
+### 环节 7：基线初始化（init_baseline）
+处理：调用 ProjectMonitorSkill `create_baseline` 创建全套台账（17 个 CSV）；启动产物写入对应 CSV（「01_启动组」编号/目标/相关方/沟通、「02_范围基准」范围/边界/禁止项、「03_进度基准」初步里程碑、「04_成本基准」预算/阈值、「12_风险问题台账」初始风险登记册）；固化后输出《项目启动完成报告》，移交需求分析阶段。
+输出：`台账/`（17 个 CSV，已初始化）+ 《项目启动完成报告》。
+
+---
+
+## 4. 触发规则
+
+- 用户启动新项目（"启动一个项目"、"开始一个新项目"）；需求分析前的初始化准备；项目基线创建/干系人变动。
+
+---
+
+## 5. 输出规范
+
+- 每环节产出须经用户确认后方可进入下一环节；
+- 启动就绪后必须初始化台账基线，未初始化禁止进入需求分析阶段；
+- 台账（17 个 CSV）读写由 ProjectMonitorSkill `create_baseline` 执行，本技能只做启动准备与决策；范围/基线变更经 `change_audit` 审计。
+
+---
+
+## 6. 边界（安全铁律）
+
+1. **基线铁律**：未经 `create_baseline` 初始化，禁止进入需求分析阶段；
+2. **章程铁律**：章程未经干系人确认，禁止固化范围初定义；
+3. **决策铁律**：No-Go/暂缓必须停止推进并输出阻塞清单，不得强行开工；
+4. **边界铁律**：不做需求细化、架构设计、写代码——范围初定义不等于需求规格说明书；
+5. **权限铁律**：范围/基线变更经 ProjectMonitorSkill 审计。
+
+**禁用**：需求收集与规格编写（由 RequirementsAnalysisSkill 执行）；架构/开发/测试/部署等后续阶段；跳过就绪检查直接固化基线。
+
+**技能关系**：DevProjectTeamSkill=第 0 阶段入口；ProjectMonitorSkill=台账读写与变更审计；RequirementsAnalysisSkill=启动→需求衔接；SkillAuthoringSkill=无业务依赖。
+
+---
+
+> 协作接口详见各宿主技能元数据及 `../../shared/references/api_contracts.md`；目录规范详见 `../../shared/references/directory_structure.md`
+
+---
+
+**文档版本**：v21.0.0
+**知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
