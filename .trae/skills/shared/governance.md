@@ -5,7 +5,7 @@ description: "Project governance skill covering baseline initialization (17-shee
 
 # ProjectGovernanceSkill 项目治理技能
 
-> 版权声明详见 `../../shared/references/COPYRIGHT.md`
+> 版权声明详见 `./references/COPYRIGHT.md`
 
 ## 1. 基础元数据
 
@@ -57,13 +57,13 @@ description: "Project governance skill covering baseline initialization (17-shee
 
 ## 4. 治理流程
 
-> 各环节详细执行内容详见 `.//project_governance_details.md` 对应章节。
+> 各环节详细执行内容详见 `../role-governance/domain/project-governance-skill__resources/project_governance_details.md` 对应章节。
 
 ### 环节 1：台账与项目基准初始化（create_baseline）
 
 **DoR**：项目启动就绪=Go ✅ · 启动产物已具备（章程/干系人/范围初定/可行性）✅
 
-**执行内容**：创建 `台账/`（17 个 NN_ 前缀 CSV：01_启动组.csv … 17_收尾归档.csv 全量初始化）、录入项目基准（目标/边界/干系人/质量验收标准/初始风险）、基线版本 v0.1，详见 `.//project_governance_details.md` §1。
+**执行内容**：创建 `台账/`（17 个 NN_ 前缀 CSV：01_启动组.csv … 17_收尾归档.csv 全量初始化）、录入项目基准（目标/边界/干系人/质量验收标准/初始风险）、基线版本 v0.1，详见 `../role-governance/domain/project-governance-skill__resources/project_governance_details.md` §1。
 
 **DoD**：台账 17 个 CSV 全部创建 ✅ · 项目基准写入「范围基准」CSV ✅ · 初始风险写入「风险&问题台账」CSV ✅ · 基线 v0.1 记录 ✅
 
@@ -73,7 +73,7 @@ description: "Project governance skill covering baseline initialization (17-shee
 
 **DoR**：本阶段评审通过 ✅ · 门禁校验通过 ✅ · 阻断级缺陷 0 遗留 ✅
 
-**执行内容**：备份核心文件、更新台账基线版本号、记录验收结论、生成产出物基准清单追加「范围跟踪台账」CSV、自动备份台账，详见 `.//project_governance_details.md` §2。
+**执行内容**：备份核心文件、更新台账基线版本号、记录验收结论、生成产出物基准清单追加「范围跟踪台账」CSV、自动备份台账，详见 `../role-governance/domain/project-governance-skill__resources/project_governance_details.md` §2。
 
 **DoD**：核心文件已备份 ✅ · 基线版本号已递增 ✅ · 产出物基准清单已追加 ✅ · `台账/` 备份 CSV 已生成 ✅
 
@@ -83,7 +83,7 @@ description: "Project governance skill covering baseline initialization (17-shee
 
 **DoR**：全部阶段已固化 ✅ · 台账数据完整 ✅
 
-**执行内容**：整合台账 CSV、交付物、评审记录、变更审计日志，生成归档文档包与归档清单，详见 `.//project_governance_details.md` §3。
+**执行内容**：整合台账 CSV、交付物、评审记录、变更审计日志，生成归档文档包与归档清单，详见 `../role-governance/domain/project-governance-skill__resources/project_governance_details.md` §3。
 
 **DoD**：归档文档包（zip）完成 ✅ · 归档清单完成 ✅ · 收尾归档 CSV 已写入 ✅
 
@@ -93,7 +93,7 @@ description: "Project governance skill covering baseline initialization (17-shee
 
 **DoR**：台账可读 ✅ · 当前阶段与待办可梳理 ✅
 
-**执行内容**：拉取全套台账、生成交接话术、打包台账快照、更新 `跨会话交接文档.md`（25/100 轮强制归档），详见 `.//project_governance_details.md` §4。
+**执行内容**：拉取全套台账、生成交接话术、打包台账快照、更新 `跨会话交接文档.md`（25/100 轮强制归档），详见 `../role-governance/domain/project-governance-skill__resources/project_governance_details.md` §4。
 
 **DoD**：交接话术生成 ✅ · 台账快照打包 ✅ · 跨会话交接文档已更新 ✅ · 归档总结确认 ✅
 
@@ -107,13 +107,13 @@ description: "Project governance skill covering baseline initialization (17-shee
 2. **固化类**：备份文件、`台账/` 备份 CSV、验收结论；
 3. **归档类**：归档文档包、归档清单；
 4. **交接类**：交接话术、台账快照、跨会话交接文档；
-> 目录规范详见 `../../shared/references/directory_structure.md`
+> 目录规范详见 `./references/directory_structure.md`
 
-> 协作接口详见 `../../shared/references/api_contracts.md`
+> 协作接口详见 `./references/api_contracts.md`
 
 ## 6. 技能版本管理规范
 
-> 版本号规则、升级触发条件、升级评审机制统一见 `../../shared/references/common_standards.md`。
+> 版本号规则、升级触发条件、升级评审机制统一见 `./references/common_standards.md`。
 > 当前版本：v21.0.0。
 
 ---
