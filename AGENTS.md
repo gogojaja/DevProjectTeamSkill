@@ -20,11 +20,12 @@ opencode.json         opencode 技能注册
 
 ## 核心规则（违反即返工）
 
-1. **源码单源**：共享内容只存 `shared/`，角色包用 `../shared/...` 相对引用；**禁止手工复制** shared/references 进角色包（打包时自动内嵌）。
-2. **新增/修改技能**：必须同步 `SKILL_INDEX.md` + `references/api_contracts.md`；description 150~250 字符（`做什么。<触发词>。Load when...`）。
-3. **输出格式**：>4K token 或 >20 列 → CSV（UTF-8 with BOM）；仅回显首 5 行 + 行数。禁止 .xlsx。
-4. **改动后固化**：任务完成执行 `tools/solidify.sh "<说明>"` 并刷新 `交接文档.md` 断点区，然后 git commit。
-5. **文件保护**：无明确指令禁止删除/移动/重命名文件。
+1. **源码单源**：`.trae/skills/` 是唯一事实来源，`tools/deploy_skills.py`/`solidify.py` 均以它为源；共享内容只存 `shared/`，角色包用 `../shared/...` 相对引用；**禁止手工复制** shared/references 进角色包（打包时自动内嵌）。
+2. **源码不备覆盖**：deploy 目标是 `.github/skills/`、`.claude/skills/`、`.agents/skills/` 及全局库 `C:\Users\gogoj\.config\opencode\skills`，**永不覆盖 `.trae/skills/`**；改技能只在 `.trae/skills/` 源操作，改完即跑 `solidify` 部署到目标目录。
+3. **新增/修改技能**：必须同步 `SKILL_INDEX.md` + `references/api_contracts.md`；description 150~250 字符（`做什么。<触发词>。Load when...`）。
+4. **输出格式**：>4K token 或 >20 列 → CSV（UTF-8 with BOM）；仅回显首 5 行 + 行数。禁止 .xlsx。
+5. **改动后固化**：任务完成执行 `tools/solidify.sh "<说明>"` 并刷新 `交接文档.md` 断点区，然后 git commit。
+6. **文件保护**：无明确指令禁止删除/移动/重命名文件。
 
 ## 命令
 

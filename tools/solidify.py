@@ -1,7 +1,7 @@
 import os, sys, shutil, re, glob, datetime
 sys.stdout.reconfigure(encoding='utf-8')
 
-SKILLS_DIR = r'C:/Users/gogoj/.config/opencode/skills'
+SKILLS_DIR = r'D:\trae\DevProjectTeamSkill\.trae\skills'
 ROOT = r'D:\trae\DevProjectTeamSkill'
 HANDOFF = os.path.join(ROOT, '交接文档.md')
 ALL_ROLES = ['dev-project-team-skill','role-project-init','role-requirements-analysis',

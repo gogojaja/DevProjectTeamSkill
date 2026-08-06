@@ -10,7 +10,7 @@ description: "Project initiation skill covering startup foundations: charter & b
 ## 1. 基础元数据
 
 - **技能唯一标识**：ProjectInitSkill
-- **技能版本**：v21.0.0
+- **技能版本**：v21.0.1
 - **定位**：项目启动前置哨兵（Front-Gate），是六阶段全生命周期的「第 0 阶段」，对齐 PMBOK 启动过程组。
 - **调用主体**：DevProjectTeamSkill（标准模式入口）/ 用户直接指令
 - **依赖工具**：ProjectMonitorSkill（`create_baseline` 台账初始化、`change_audit` 变更审计）
@@ -34,7 +34,8 @@ description: "Project initiation skill covering startup foundations: charter & b
 | `create_charter` | 输出项目章程 | init_kickoff |
 | `register_stakeholder` | 干系人登记册 | create_charter |
 | `define_scope_prelim` | 范围初定义 | register_stakeholder |
-| `assess_feasibility` | 五维可行性评估 | define_scope_prelim |
+| `init_tailor` | 阶段/活动裁剪决策 | define_scope_prelim |
+| `assess_feasibility` | 五维可行性评估 | init_tailor |
 | `check_ready` | 就绪检查（Go 判定） | assess_feasibility |
 | `init_baseline` | create_baseline 初始化台账 | check_ready=Go |
 
@@ -42,7 +43,7 @@ description: "Project initiation skill covering startup foundations: charter & b
 
 ## 3. 项目启动流程
 
-流程主线：`init_kickoff → create_charter → register_stakeholder → define_scope_prelim → assess_feasibility → check_ready → (Go) → init_baseline → 需求阶段入场`；No-Go/暂缓 → 阻塞清单 + 建议行动，停止。
+流程主线：`init_kickoff → create_charter → register_stakeholder → define_scope_prelim → init_tailor → assess_feasibility → check_ready → (Go) → init_baseline → 需求阶段入场`；No-Go/暂缓 → 阻塞清单 + 建议行动，停止。
 
 - **门禁**：每环节产出经用户确认后进入下一环节；
 - **刹车**：章程确认连续 2 次未通过 → 停止并推送人工决策；
@@ -64,7 +65,18 @@ description: "Project initiation skill covering startup foundations: charter & b
 处理：输出交付边界（做什么）、排除项（不做什么）、假设与制约；范围为「初步」，细则由需求阶段细化；变更走 ProjectMonitorSkill `change_audit`。
 输出：《范围初定义说明书》（范围/排除项/假设/制约），写入「02_范围基准.csv」。
 
-### 环节 5：可行性评估（assess_feasibility）
+### 环节 5：阶段/活动裁剪（init_tailor）
+处理：依据项目特点（范围/类型/资源/团队分工/合规要求）裁剪本项目生命周期阶段与阶段内活动，输出裁剪配置并写入台账「00_阶段配置.csv」。
+
+**裁剪规则**：
+- **强制保留**：第 0 阶段（项目启动）与总控保障（role-governance）不可裁剪——裁剪决策在启动阶段作出，评审/门禁/台账/基线固化由总控贯穿全周期；
+- **可裁剪阶段**（默认按全生命周期，依据项目特点逐项确认）：需求 / 架构 / 开发 / 测试 / 投产，任一阶段可整体裁剪（如「纯外包开发+内部测试」项目可裁掉开发阶段）；
+- **活动级裁剪**：保留阶段内的活动可进一步裁剪（如裁剪架构阶段中的 ADR/ATAM、投产中的金丝雀发布/DORA 指标），裁剪项须记录原因与责任方；
+- **裁剪确认**：裁剪配置须经用户逐项确认（保留/裁剪/理由），未确认不得生效；裁剪后项目仅执行保留阶段，编排器据此调度（见 dev-project-team-skill §5）。
+
+输出：《阶段配置单》（00_阶段配置.csv：阶段/保留或裁剪/裁剪理由/责任方），由 role-governance 写入台账。
+
+### 环节 6：可行性评估（assess_feasibility）
 五维矩阵，任一项"不可行"则 No-Go：
 
 | 维度 | 通过标准 |
@@ -77,19 +89,19 @@ description: "Project initiation skill covering startup foundations: charter & b
 
 输出：《可行性评估报告》（五维结论 + Go/No-Go 建议）。
 
-### 环节 6：启动就绪检查（check_ready）
-处理：Gate 清单——章程确认 / 干系人登记（含权力-利益分析）/ 范围初定义 / 可行性通过 / 预算里程碑明确 / 需求入场条件识别。判定 **Go**（全过）/ **No-Go**（任一不满足且无法调整）/ **暂缓**（条件暂缺，补足重查）；No-Go/暂缓输出阻塞清单与建议行动。
+### 环节 7：启动就绪检查（check_ready）
+处理：Gate 清单——章程确认 / 干系人登记（含权力-利益分析）/ 范围初定义 / 裁剪配置确认 / 可行性通过 / 预算里程碑明确 / 需求入场条件识别。判定 **Go**（全过）/ **No-Go**（任一不满足且无法调整）/ **暂缓**（条件暂缺，补足重查）；No-Go/暂缓输出阻塞清单与建议行动。
 输出：《启动就绪检查单》（Go/No-Go/暂缓 + 阻塞清单）。
 
-### 环节 7：基线初始化（init_baseline）
-处理：调用 ProjectMonitorSkill `create_baseline` 创建全套台账（17 个 CSV）；启动产物写入对应 CSV（「01_启动组」编号/目标/相关方/沟通、「02_范围基准」范围/边界/禁止项、「03_进度基准」初步里程碑、「04_成本基准」预算/阈值、「12_风险问题台账」初始风险登记册）；固化后输出《项目启动完成报告》，移交需求分析阶段。
-输出：`台账/`（17 个 CSV，已初始化）+ 《项目启动完成报告》。
+### 环节 8：基线初始化（init_baseline）
+处理：调用 ProjectMonitorSkill `create_baseline` 创建全套台账（18 个 CSV，含「00_阶段配置」）；启动产物写入对应 CSV（「01_启动组」编号/目标/相关方/沟通、「02_范围基准」范围/边界/禁止项、「03_进度基准」初步里程碑、「04_成本基准」预算/阈值、「00_阶段配置」阶段/活动裁剪清单、「12_风险问题台账」初始风险登记册）；依据裁剪配置确定后续保留阶段，固化后输出《项目启动完成报告》，移交首个保留阶段入场。
+输出：`台账/`（18 个 CSV，已初始化）+ 《项目启动完成报告》。
 
 ---
 
 ## 4. 触发规则
 
-- 用户启动新项目（"启动一个项目"、"开始一个新项目"）；需求分析前的初始化准备；项目基线创建/干系人变动。
+- 用户启动新项目（"启动一个项目"、"开始一个新项目"）；需求分析前的初始化准备；项目基线创建/干系人变动；**裁剪生命周期阶段/活动**（"只要需求+测试阶段"、"裁掉开发阶段"）。
 
 ---
 
@@ -97,7 +109,7 @@ description: "Project initiation skill covering startup foundations: charter & b
 
 - 每环节产出须经用户确认后方可进入下一环节；
 - 启动就绪后必须初始化台账基线，未初始化禁止进入需求分析阶段；
-- 台账（17 个 CSV）读写由 ProjectMonitorSkill `create_baseline` 执行，本技能只做启动准备与决策；范围/基线变更经 `change_audit` 审计。
+- 台账（18 个 CSV）读写由 ProjectMonitorSkill `create_baseline` 执行，本技能只做启动准备与决策；范围/基线变更经 `change_audit` 审计。
 
 ---
 
@@ -119,5 +131,5 @@ description: "Project initiation skill covering startup foundations: charter & b
 
 ---
 
-**文档版本**：v21.0.0
+**文档版本**：v21.0.1（新增 init_tailor 阶段/活动裁剪环节，2026-08-06）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

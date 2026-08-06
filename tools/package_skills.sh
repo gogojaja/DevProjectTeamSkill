@@ -18,9 +18,9 @@
 set -euo pipefail
 
 # ---- 路径 ----
-# SKILLS_DIR 可用环境变量覆盖（默认为全局技能库，即本库根）
-SKILLS_DIR="${SKILLS_DIR:-C:/Users/gogoj/.config/opencode/skills}"
+# SKILLS_DIR 可用环境变量覆盖（默认为仓库源码 .trae/skills，唯一事实来源）
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SKILLS_DIR="${SKILLS_DIR:-$ROOT/.trae/skills}"
 DIST="$ROOT/dist"
 HANDOFF="$ROOT/交接文档.md"
 

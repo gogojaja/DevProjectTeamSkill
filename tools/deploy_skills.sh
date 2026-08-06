@@ -10,19 +10,21 @@
 #   - 注入型工具（TRAE 等递归读目录）推荐 --roles 只放需要的包
 #
 # 用法:
-#   bash tools/deploy_skills.sh --target .trae/skills --roles role-testing
-#   bash tools/deploy_skills.sh                         # 全量到默认 4 目录
+#   bash tools/deploy_skills.sh --target .agents/skills --roles role-testing
+#   bash tools/deploy_skills.sh                         # 全量到默认目标（.github/.claude/.agents + 全局库）
+# 说明: 源库固定为 .trae/skills（唯一事实来源），永不写入 .trae/skills。
 # =============================================================================
 set -euo pipefail
 
-SKILLS_DIR="${SKILLS_DIR:-C:/Users/gogoj/.config/opencode/skills}"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SKILLS_DIR="${SKILLS_DIR:-$ROOT/.trae/skills}"
+GLOBAL_SKILLS="C:/Users/gogoj/.config/opencode/skills"
 
 DEFAULT_TARGETS=(
-  "$ROOT/.trae/skills"
   "$ROOT/.github/skills"
   "$ROOT/.claude/skills"
   "$ROOT/.agents/skills"
+  "$GLOBAL_SKILLS"
 )
 
 usage() {

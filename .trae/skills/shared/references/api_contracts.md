@@ -75,7 +75,7 @@ DevProjectTeamSkill（总控）
 
 | action | 用途 | 典型调用时机 |
 |--------|------|-------------|
-| `create_baseline` | 创建全套台账 CSV 与项目基准（17 个 NN_ 前缀 CSV） | 项目初始化 |
+| `create_baseline` | 创建全套台账 CSV 与项目基准（18 个 NN_ 前缀 CSV） | 项目初始化 |
 | `stage_close` | 阶段固化基线（备份+版本+产出物清单） | 评审通过、门禁放行 |
 | `project_archive` | 全项目归档（台账+交付物+审计日志） | 所有阶段完工 |
 | `handover_export` | 跨会话交接打包（话术+台账快照+交接文档） | 周期复盘、新建对话 |
@@ -533,7 +533,8 @@ DevProjectTeamSkill（总控）
 | `create_charter` | 输出项目章程（授权/目标/约束/预算） | 立项登记后 |
 | `register_stakeholder` | 干系人登记册（角色/权力-利益/沟通需求） | 章程确认后 |
 | `define_scope_prelim` | 范围初定义（边界/排除项/假设/制约） | 干系人确认后 |
-| `assess_feasibility` | 五维可行性评估 | 范围初定后 |
+| `init_tailor` | 阶段/活动裁剪决策（依据项目特点裁剪生命周期阶段与活动） | 范围初定后 |
+| `assess_feasibility` | 五维可行性评估 | 裁剪确认后 |
 | `check_ready` | 启动就绪检查（Go/No-Go/暂缓） | 可行性通过后 |
 | `init_baseline` | 调用 role-governance `create_baseline` 初始化台账 | 就绪=Go 后 |
 

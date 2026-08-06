@@ -1,7 +1,7 @@
 import os, sys, re, zipfile, shutil, glob
 sys.stdout.reconfigure(encoding='utf-8')
 
-SKILLS_DIR = os.environ.get('SKILLS_DIR', r'C:/Users/gogoj/.config/opencode/skills')
+SKILLS_DIR = os.environ.get('SKILLS_DIR', r'D:\trae\DevProjectTeamSkill\.trae\skills')
 ROOT = r'D:\trae\DevProjectTeamSkill'
 DIST = os.path.join(ROOT, 'dist')
 HANDOFF = os.path.join(ROOT, '交接文档.md')

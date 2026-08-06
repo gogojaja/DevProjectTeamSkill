@@ -14,8 +14,8 @@
 # =============================================================================
 set -euo pipefail
 
-SKILLS_DIR="${SKILLS_DIR:-C:/Users/gogoj/.config/opencode/skills}"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SKILLS_DIR="${SKILLS_DIR:-$ROOT/.trae/skills}"
 HANDOFF="$ROOT/交接文档.md"
 STAMP="$(date '+%Y-%m-%d %H:%M:%S')"
 CUSTOM_NOTE="${1:-}"
