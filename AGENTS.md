@@ -37,6 +37,27 @@ python tools/excel_to_csv.py            # 迁移存量 xlsx→csv
 git commit                              # 每原子改动一次提交
 ```
 
+## GitHub 网络与提交（win32，PowerShell 环境）
+
+本机访问 `github.com:443` 偶发 DNS 解析到坏 IP 导致 push 超时。故障时（`Failed to connect` / `Could not connect`）：
+
+1. **验证候选 IP 连通性**（已测可达 IP 列表）：
+   ```
+   140.82.112.4 -> 200   140.82.114.4 -> 200
+   140.82.121.4 -> 200   20.205.243.166 -> 200
+   ```
+   先用 `curl.exe --connect-timeout 8 --resolve github.com:443:<ip> https://github.com` 逐个测试。
+2. **push 需带凭据 token**（fine-grained PAT，Contents read/write；token 由用户提供，勿硬编码入库）：
+   ```powershell
+   $url="https://gogojaja:<token>@github.com/gogojaja/DevProjectTeamSkill.git"
+   git remote set-url origin $url        # 临时带凭据
+   git push origin main
+   git remote set-url origin "https://github.com/gogojaja/DevProjectTeamSkill.git"  # 用完还原
+   ```
+   > PowerShell 拼接 `https://user:token@host/path` 直传会损坏 URL，必须经 `git remote set-url` 传参。
+3. `api.github.com` 偶发 CRL 离线（`CRYPT_E_REVOCATION_OFFLINE`）为瞬时网络问题，重试即可。
+4. 推送成功后 `git rev-parse HEAD origin/main` 应一致（领先/落后 0）。
+
 ## 效率约定
 
 - 先读根 `SKILL.md` 路由表 → 命中后只读目标文件，**禁止**一次性 Read 全部文件。
