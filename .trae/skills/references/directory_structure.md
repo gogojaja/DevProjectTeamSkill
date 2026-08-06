@@ -23,7 +23,7 @@
 │   ├── 16_开发追溯.csv            需求-模块-文件-函数-测试用例开发追溯矩阵
 │   └── 17_收尾归档.csv            交付物清单、全周期复盘、交接资料、经验总结
 ├── requirements/                  需求工程工作目录（role-requirements-analysis 路由壳 → 4 子域读写）
-│   ├── 需求收集清单.csv            需求清单、来源映射两区（elicitation 读写）
+│   ├── 需求收集清单_<对象>_<版本>_v2.csv  需求编号/来源载体/原子行为描述/MoSCoW/分类/验收标准/约束依据/状态（elicitation 读写）
 │   ├── 需求分析报告/              7 维度 7 个 CSV（dimension-analysis 读写）
 │   │   ├── 功能分析.csv
 │   │   ├── 非功能分析.csv

@@ -38,7 +38,7 @@ description: "软件研发多角色编排器：按阶段渐进加载角色包（
 1. 输出技术方案固定双栏模板：✅可稳定达成效果 / ⚠️理论最优效果与当前限制；
 2. 单线串行推进：当前任务未完成评审、台账未更新、未获用户确认，不插入其他阶段任务；
 3. 文件基础保护：无用户明确指令禁止删除/移动/重命名项目文件；高危操作转发总控安全审计；
-4. **评审结果输出（改 CSV）**：`stage_review` 评审结果按 `../references/token_standard.md` §3 规则输出 CSV（UTF-8 with BOM），保存至项目根；命名 `评审报告_<对象>_<版本>_<数据|缺陷|逐原则|范围|角色>.csv`；导出仅回显首 5 行预览 + 行数，禁止回显全文。不再产出 `.xlsx`。
+4. **评审结果输出（改 CSV）**：`stage_review` 评审结果按 `references/token_standard.md` §3 规则输出 CSV（UTF-8 with BOM），保存至项目根；命名 `评审报告_<对象>_<版本>_<数据|缺陷|逐原则|范围|角色>.csv`；导出仅回显首 5 行预览 + 行数，禁止回显全文。不再产出 `.xlsx`。
 
 ### 2.3 内置工具调度
 
@@ -69,7 +69,7 @@ description: "软件研发多角色编排器：按阶段渐进加载角色包（
 | 6 | role-deployment | 投产 | 投产策略/计划/Go-Live/发布/回滚/交接 | role-deployment/ |
 | 7 | role-governance | 总控保障 | 台账/评审/门禁/基线固化/变更/归档/交接 | role-governance/ |
 
-- **元技能自省**：`../shared/evolution.md`（SkillEvolutionSkill）按需触发，执行完毕即卸载；
+- **元技能自省**：`shared/evolution.md`（SkillEvolutionSkill）按需触发，执行完毕即卸载；
 - **角色隔离**：各角色任务必须在对应角色包内完成，禁止跨角色执行；§2 公共底座对全角色强制生效；
 - 角色明细读取：命中后 Read 对应包 `SKILL.md` 路由表 → 只读目标 `domain/*.md`。
 

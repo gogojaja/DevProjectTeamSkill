@@ -111,6 +111,22 @@ deploy_target() {
     done < <(find "$SKILLS_DIR/references" -type f 2>/dev/null)
   fi
 
+  # 同步 shared/ 单源（角色包 ../shared/ 引用目标解析依赖此目录）
+  if [[ -d "$SKILLS_DIR/shared" ]]; then
+    mkdir -p "$target/shared"
+    while IFS= read -r f; do
+      base="$(basename "$f")"
+      cp "$f" "$target/shared/$base"
+    done < <(find "$SKILLS_DIR/shared" -type f 2>/dev/null)
+    if [[ -d "$SKILLS_DIR/shared/references" ]]; then
+      mkdir -p "$target/shared/references"
+      while IFS= read -r f; do
+        base="$(basename "$f")"
+        cp "$f" "$target/shared/references/$base"
+      done < <(find "$SKILLS_DIR/shared/references" -type f 2>/dev/null)
+    fi
+  fi
+
   # 同步 SKILL_INDEX.md
   if [[ -f "$SKILLS_DIR/SKILL_INDEX.md" ]]; then
     cp "$SKILLS_DIR/SKILL_INDEX.md" "$target/SKILL_INDEX.md"

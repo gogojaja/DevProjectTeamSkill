@@ -29,8 +29,8 @@ description: "总控保障角色包：台账与基线初始化、五维评审与
 | 质量门禁 | check_gate / 缺陷 | `domain/quality-gate.md` |
 | 风险扫描 | risk_scan | `domain/risk.md` |
 | 安全审计 | security_audit | `domain/security-audit.md`（高危操作/审计链/回滚） |
-| 基线固化 | solidify_baseline | `../shared/governance.md`（固化/快照/归档） |
-| 交接归档 | handover_export | `../shared/governance.md`（交接文档优先） |
+| 基线固化 | solidify_baseline | `domain/governance.md`（固化/快照/归档） |
+| 交接归档 | handover_export | `domain/governance.md`（交接文档优先） |
 | 技能自省 | evolve_start / ctx_health_check | `../shared/evolution.md` |
 | 技能维护 | skill-authoring | `../shared/authoring.md` |
 

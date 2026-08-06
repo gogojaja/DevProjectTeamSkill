@@ -157,7 +157,7 @@ DevProjectTeamSkill（总控）
 | action | 用途 | 典型调用时机 |
 |--------|------|-------------|
 | `create_requirements_baseline` | 初始化需求工作目录与 CSV 模板 | 项目初始化 |
-| `gather_requirements` | 结构化收集需求（来源映射/MoSCoW/盲区校验） | 需求收集环节 |
+| `gather_requirements` | 结构化收集需求（来源载体提炼/EARS 原子化/MoSCoW+验收标准） | 需求收集环节 |
 
 ### 2.2 dimension-analysis（需求七维度分析子域）
 

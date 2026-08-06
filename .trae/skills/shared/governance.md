@@ -1,123 +1,34 @@
-﻿---
-name: "project-governance-skill"
-description: "Project governance skill covering baseline initialization (17-sheet CSV ledger), stage close (baseline finalization with backup), project archive, and cross-session handover. Invoke when creating project baselines, finalizing stage baselines, archiving projects, or exporting handover."
----
+# governance.md — 总控保障（台账/评审/门禁/固化/审计）（单源共享）
 
-# ProjectGovernanceSkill 项目治理技能
+> 源：原 project-monitor-skill + project-governance-skill。被 role-governance 引用。
+> 全体系唯一台账读写中枢；所有评审/变更/门禁/基线/归档/交接统一经此执行。
 
-> 版权声明详见 `./references/COPYRIGHT.md`
+## 1. action 指令
 
-## 1. 基础元数据
+| action | 作用 | 触发 |
+|--------|------|------|
+| `create_baseline` | 台账基线初始化 | 项目启动阶段 |
+| `stage_review` | 五维阶段评审（输出 CSV） | 各阶段门禁前 |
+| `check_gate` | 门禁校验 | 阶段结束 |
+| `change_audit` | 变更审计（五维影响评估） | 范围/内容变更 |
+| `register_change` | 变更登记 | 审计通过后 |
+| `risk_scan` | 风险扫描 | 定期/阶段切换 |
+| `progress_update` | 里程碑/EVM 更新 | 周期 |
+| `security_audit` | 高危操作预审计 + 审计链 | 高危文件操作 |
+| `solidify_baseline` | 基线固化 + 快照 | 阶段门禁通过 |
+| `handover_export` | 交接/归档导出 | 项目收尾 |
 
-- **技能唯一标识**：ProjectGovernanceSkill
-- **技能版本**：v21.0.0
-- **版本发布日期**：2026-08-02
-- **版本变更记录**：v1.0.0 由 project-monitor-skill v2.7.0 拆分而来（PMBOK 7th 整合管理 · ISO 21500 · ITIL v4 配置管理）
-- **定位**：项目治理中枢子技能，负责台账与项目基准初始化（create_baseline）、阶段基线固化（stage_close）、全项目归档（project_archive）、跨会话交接（handover_export）。
-- **调用主体**：ProjectMonitorSkill（薄路由壳按 action 分发）
-- **触发时机**：项目初始化、阶段评审门禁通过后、全项目完工、跨会话交接、25/100 轮强制归档。
-- **依赖工具**：project-quality-gate-skill · project-scope-change-skill
-- **核心约束**：仅由 ProjectMonitorSkill 路由分发；固化前评审/门禁必须通过；未完成归档总结不得开始新会话；台账版本号独立管理。
+## 2. 台账与评审输出
 
----
+- 主台账 CSV（UTF-8 with BOM）按 `../shared/references/directory_structure.md` 布局；禁止新 .xlsx；
+- `stage_review` 输出 CSV：`评审报告_<对象>_<版本>_<数据|缺陷|逐原则|范围|角色>.csv`，仅回显首 5 行 + 行数；
+- 评审五维：范围/进度/质量/风险/安全；门禁逐阶段特殊检查按各角色包约定。
 
-## 2. 统一入参标准
+## 3. 铁律
 
-```json
-{
-  "action": "create_baseline / stage_close / project_archive / handover_export",
-  "current_stage": "需求分析/架构设计/开发编码/测试验收/部署运维/文档归档",
-  "content": "对应操作内容",
-  "user_confirm": "无/同意/拒绝/查错"
-}
-```
-
-### action 指令清单
-
-| action | 作用 | 触发场景 | 前置条件 |
-|--------|------|----------|----------|
-| `create_baseline` | 创建全套台账 CSV 与项目基准（17 个 NN_ 前缀 CSV） | 项目初始化 | 启动就绪=Go |
-| `stage_close` | 阶段固化基线（备份+更新版本+产出物清单） | 评审通过、门禁放行 | 评审/门禁通过 |
-| `project_archive` | 全项目归档（台账+交付物+审计日志） | 所有阶段完工 | 全部阶段固化 |
-| `handover_export` | 跨会话交接打包（话术+台账快照+交接文档） | 周期复盘、新建对话 | 台账可读 |
+评审/变更/门禁/固化/归档禁止子角色自主处理，一律经总控包；高危文件操作先 `security_audit`；审计链非删除；固化前 `交接文档.md` 断点区必须刷新（solidify.sh）。
 
 ---
 
-## 3. 治理原则
-
-| 原则 | 要求 |
-|------|------|
-| 基线独立 | 台账基线版本号独立于技能/项目版本 |
-| 固化前置 | 评审与门禁通过后方可固化基线 |
-| 备份铁律 | 每次 stage_close 自动备份台账（CSV） |
-| 交接完整 | 新对话可完整读取历史数据，无信息遗漏 |
-| 归档必检 | 未完成归档总结不得开始新会话 |
-
----
-
-## 4. 治理流程
-
-> 各环节详细执行内容详见 `../role-governance/domain/project-governance-skill__resources/project_governance_details.md` 对应章节。
-
-### 环节 1：台账与项目基准初始化（create_baseline）
-
-**DoR**：项目启动就绪=Go ✅ · 启动产物已具备（章程/干系人/范围初定/可行性）✅
-
-**执行内容**：创建 `台账/`（17 个 NN_ 前缀 CSV：01_启动组.csv … 17_收尾归档.csv 全量初始化）、录入项目基准（目标/边界/干系人/质量验收标准/初始风险）、基线版本 v0.1，详见 `../role-governance/domain/project-governance-skill__resources/project_governance_details.md` §1。
-
-**DoD**：台账 17 个 CSV 全部创建 ✅ · 项目基准写入「范围基准」CSV ✅ · 初始风险写入「风险&问题台账」CSV ✅ · 基线 v0.1 记录 ✅
-
-**规则**：台账存放于 `.trae/` 目录；未初始化禁止进入需求阶段。
-
-### 环节 2：阶段基线固化（stage_close）
-
-**DoR**：本阶段评审通过 ✅ · 门禁校验通过 ✅ · 阻断级缺陷 0 遗留 ✅
-
-**执行内容**：备份核心文件、更新台账基线版本号、记录验收结论、生成产出物基准清单追加「范围跟踪台账」CSV、自动备份台账，详见 `../role-governance/domain/project-governance-skill__resources/project_governance_details.md` §2。
-
-**DoD**：核心文件已备份 ✅ · 基线版本号已递增 ✅ · 产出物基准清单已追加 ✅ · `台账/` 备份 CSV 已生成 ✅
-
-**规则**：固化前置检查（评审/门禁/缺陷）不通过禁止固化；产出物清单作为下阶段比对基准。
-
-### 环节 3：全项目归档（project_archive）
-
-**DoR**：全部阶段已固化 ✅ · 台账数据完整 ✅
-
-**执行内容**：整合台账 CSV、交付物、评审记录、变更审计日志，生成归档文档包与归档清单，详见 `../role-governance/domain/project-governance-skill__resources/project_governance_details.md` §3。
-
-**DoD**：归档文档包（zip）完成 ✅ · 归档清单完成 ✅ · 收尾归档 CSV 已写入 ✅
-
-**规则**：归档含全部审计日志；归档后标记项目收尾。
-
-### 环节 4：跨会话交接（handover_export）
-
-**DoR**：台账可读 ✅ · 当前阶段与待办可梳理 ✅
-
-**执行内容**：拉取全套台账、生成交接话术、打包台账快照、更新 `跨会话交接文档.md`（25/100 轮强制归档），详见 `../role-governance/domain/project-governance-skill__resources/project_governance_details.md` §4。
-
-**DoD**：交接话术生成 ✅ · 台账快照打包 ✅ · 跨会话交接文档已更新 ✅ · 归档总结确认 ✅
-
-**规则**：25 轮对话强制归档动作；100 轮输出全量复盘与交接话术；未完成归档不得开始新会话。
-
----
-
-## 5. 标准化输出结构
-
-1. **基线类**：`台账/`（17 个 NN_ 前缀 CSV）、基线版本号、产出物基准清单；
-2. **固化类**：备份文件、`台账/` 备份 CSV、验收结论；
-3. **归档类**：归档文档包、归档清单；
-4. **交接类**：交接话术、台账快照、跨会话交接文档；
-> 目录规范详见 `./references/directory_structure.md`
-
-> 协作接口详见 `./references/api_contracts.md`
-
-## 6. 技能版本管理规范
-
-> 版本号规则、升级触发条件、升级评审机制统一见 `./references/common_standards.md`。
-> 当前版本：v21.0.0。
-
----
-
-**文档版本**：v21.0.0
-**最后更新**：2026-08-02
+**文档版本**：v21.0.0　**最后更新**：2026-08-04
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

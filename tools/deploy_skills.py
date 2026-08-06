@@ -59,6 +59,10 @@ def deploy_target(target, roles):
     ref = os.path.join(SKILLS_DIR, 'references')
     if os.path.isdir(ref):
         shutil.copytree(ref, os.path.join(target, 'references'))
+    # 同步 shared/ 单源（角色包 ../shared/ 引用目标解析依赖此目录）
+    shared = os.path.join(SKILLS_DIR, 'shared')
+    if os.path.isdir(shared):
+        shutil.copytree(shared, os.path.join(target, 'shared'))
     idx = os.path.join(SKILLS_DIR, 'SKILL_INDEX.md')
     if os.path.isfile(idx):
         shutil.copy(idx, os.path.join(target, 'SKILL_INDEX.md'))
