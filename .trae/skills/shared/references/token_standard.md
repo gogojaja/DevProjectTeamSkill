@@ -87,6 +87,31 @@
 
 ---
 
-**文档版本**：v21.0.1
-**最后更新**：2026-08-04
+## 6. 双平台兼容规则（Windows + macOS 强制）
+
+本技能库所有启用项目**必须同时支持 Windows 与 macOS 双平台**（编排器 §2.2-5 / iron_rules §6）。
+
+### 6.1 路径规则
+
+1. 禁止硬编码单一平台绝对路径（`C:\...`、`D:\trae\...`、`/Users/...`、`/Volumes/...`）；
+2. 脚本/配置统一用**相对路径**（脚本自定位：`os.path.dirname(os.path.dirname(__file__))` / `$(dirname "$0")/..`）或**平台自适应**；
+3. Python 用 `os.path`/`pathlib` 拼接路径；bash 用 `$HOME`（macOS/Linux）与 `%USERPROFILE%`（Windows）分支；
+4. 全局配置路径双平台对照：`~/.config/opencode/skills` ↔ `%USERPROFILE%\.config\opencode\skills`。
+
+### 6.2 命令规则
+
+1. 禁止依赖 Windows 专属命令（`py -3.11`、`curl.exe` 等）或 macOS/Linux 专属假设（`bash` 缺失场景需说明）；
+2. 跨平台调用子脚本统一用 `sys.executable`（Python）或平台自适应 shell；
+3. 可执行脚本（`.sh`/`.py`）行尾必须 LF（shebang 才可执行），配 `.gitattributes` 强制。
+
+### 6.3 交付物规则
+
+1. 技术方案、文档、命令说明中涉及路径/命令时，**同时标注双平台写法**；
+2. 打包/部署目标路径平台自适应（Windows→`%USERPROFILE%\.config\opencode\skills`；macOS/Linux→`~/.config/opencode/skills`）；
+3. 项目脚本若无法双平台通用，须显式标注运行平台并给出替代方案，不得默认单平台。
+
+---
+
+**文档版本**：v21.0.2
+**最后更新**：2026-08-07（新增 §6 双平台兼容规则）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

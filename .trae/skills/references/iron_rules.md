@@ -41,7 +41,18 @@
 
 - `.trae/skills/` 是唯一事实来源；deploy/solidify 不覆盖源码；shared 单源不手工复制。
 
-## 6. 上下文压缩流程（触发即执行）
+## 6. 平台兼容铁律（双平台强制，不可压缩忽略）
+
+本技能库所有启用项目**必须同时支持 Windows 与 macOS 双平台**：
+
+1. **路径**：禁止硬编码单一平台绝对路径（`C:\...`、`D:\trae\...`、`/Users/...`、`/Volumes/...`）；脚本/配置统一用相对路径或平台自适应（Python `os.path`/`pathlib`、bash `$HOME`/`%USERPROFILE%`）；
+2. **命令**：禁止依赖 Windows 专属命令（`py -3.11` 等）或 macOS 专属假设；Python 用 `sys.executable` 跨平台调用子脚本；
+3. **行尾**：文本文件统一 LF（配 `.gitattributes`），防 Windows 检出 CRLF 导致反复 diff；
+4. **文档**：涉及路径/命令时同时标注双平台写法（如 `~/.config/opencode/skills` vs `%USERPROFILE%\.config\opencode\skills`）。
+
+> 细则见 `../references/token_standard.md` §6。
+
+## 7. 上下文压缩流程（触发即执行）
 
 1. 压缩（compaction）后，**第一步重新 Read 本文件**，作为新上下文的铁律锚点；
 2. 压缩前将未固化的护栏产出先 `solidify.sh` 固化 + git commit；
@@ -49,4 +60,4 @@
 
 ---
 
-**文档版本**：v21.3.0　**拟定日期**：2026-08-07
+**文档版本**：v21.3.1　**拟定日期**：2026-08-07　**更新**：2026-08-07（新增 §6 平台兼容铁律）
