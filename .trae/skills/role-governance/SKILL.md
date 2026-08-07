@@ -9,8 +9,8 @@ description: "总控保障角色包：台账与基线初始化、五维评审与
 
 ## 1. 元数据
 
-- **技能版本**：v21.0.0　**发布日期**：2026-08-04
-- **变更记录**：v21.0.0 由 project-monitor-skill + 6 子技能 + project-governance-skill 重组为角色包；SkillEvolution/SkillAuthoring 迁至 `shared/`
+- **技能版本**：v21.2.1　**发布日期**：2026-08-06
+- **变更记录**：v21.2.1 新增发布级门禁（release_gate 自动化质量阈值）+ 迭代评审/回顾（iteration_review），门禁分级/防绕过见 `../shared/governance.md`；v21.0.0 由 project-monitor-skill + 6 子技能 + project-governance-skill 重组为角色包；SkillEvolution/SkillAuthoring 迁至 `shared/`
 - **参考标准**：PMBOK（十大过程组/领域管控）· ISO 31000 风险
 
 ## 2. 触发规则
@@ -30,6 +30,8 @@ description: "总控保障角色包：台账与基线初始化、五维评审与
 | 风险扫描 | risk_scan | `domain/risk.md` |
 | 安全审计 | security_audit | `domain/security-audit.md`（高危操作/审计链/回滚） |
 | 基线固化 | solidify_baseline | `domain/governance.md`（固化/快照/归档） |
+| 发布级门禁 | release_gate | `../shared/governance.md`（含自动化质量阈值，敏捷 发布点=Y） |
+| 迭代评审/回顾 | iteration_review | `../shared/governance.md`（迭代末轻量评审+回顾） |
 | 交接归档 | handover_export | `domain/governance.md`（交接文档优先） |
 | 技能自省 | evolve_start / ctx_health_check | `../shared/evolution.md` |
 | 技能维护 | skill-authoring | `../shared/authoring.md` |
@@ -46,5 +48,5 @@ description: "总控保障角色包：台账与基线初始化、五维评审与
 
 ---
 
-**文档版本**：v21.0.0　**最后更新**：2026-08-04
+**文档版本**：v21.2.1　**最后更新**：2026-08-06
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

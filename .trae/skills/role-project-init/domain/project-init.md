@@ -10,7 +10,7 @@ description: "Project initiation skill covering startup foundations: charter & b
 ## 1. 基础元数据
 
 - **技能唯一标识**：ProjectInitSkill
-- **技能版本**：v21.0.1
+- **技能版本**：v21.2.1
 - **定位**：项目启动前置哨兵（Front-Gate），是六阶段全生命周期的「第 0 阶段」，对齐 PMBOK 启动过程组。
 - **调用主体**：DevProjectTeamSkill（标准模式入口）/ 用户直接指令
 - **依赖工具**：ProjectMonitorSkill（`create_baseline` 台账初始化、`change_audit` 变更审计）
@@ -76,6 +76,21 @@ description: "Project initiation skill covering startup foundations: charter & b
 
 输出：《阶段配置单》（00_阶段配置.csv：阶段/保留或裁剪/裁剪理由/责任方），由 role-governance 写入台账。
 
+**敏捷迭代模式扩展（可选）**：若项目采用敏捷迭代/快速上线，`init_tailor` 额外产出 `01_迭代配置.csv`（由 role-governance 写入台账）：
+
+| 列 | 说明 |
+|----|------|
+| 迭代编号 | IT-01、IT-02… |
+| 周期（天） | 5~10（1~2 周） |
+| 吸收容量 | 迭代承诺规模 = 上期 Velocity × 可用人日（容量规划，P0-1） |
+| MVP 范围 | 本迭代吸收的 PBI 清单（MoSCoW 优先，S/M/L 规模估算） |
+| 技术债登记 | 技术债登记 + 偿还迭代计划（每 N 迭代 ~20% 容量，P1-2） |
+| DoR / DoD | 进入迭代前置条件 / 完成标准（缺陷关闭+文档+预生产/金丝雀+冒烟，P1-3） |
+| 发布点 | Y/N，仅 Y 触发发布级强门禁 |
+| 角色包范围 | 本迭代启用的角色包（通常需求+开发+测试，可选部署） |
+
+迭代模式下保留阶段通常为需求+开发+测试（+备选投产），架构随迭代演进（P1-4：首迭代可选、每发布点 ADR 评审），测试左移（P1-6：开发内联单测+迭代级集成测试，发布点才全量回归）。
+
 ### 环节 6：可行性评估（assess_feasibility）
 五维矩阵，任一项"不可行"则 No-Go：
 
@@ -94,14 +109,14 @@ description: "Project initiation skill covering startup foundations: charter & b
 输出：《启动就绪检查单》（Go/No-Go/暂缓 + 阻塞清单）。
 
 ### 环节 8：基线初始化（init_baseline）
-处理：调用 ProjectMonitorSkill `create_baseline` 创建全套台账（18 个 CSV，含「00_阶段配置」）；启动产物写入对应 CSV（「01_启动组」编号/目标/相关方/沟通、「02_范围基准」范围/边界/禁止项、「03_进度基准」初步里程碑、「04_成本基准」预算/阈值、「00_阶段配置」阶段/活动裁剪清单、「12_风险问题台账」初始风险登记册）；依据裁剪配置确定后续保留阶段，固化后输出《项目启动完成报告》，移交首个保留阶段入场。
-输出：`台账/`（18 个 CSV，已初始化）+ 《项目启动完成报告》。
+处理：调用 ProjectMonitorSkill `create_baseline` 创建全套台账（20 个 CSV，含「00_阶段配置」「01_迭代配置」「02_迭代回顾」）；启动产物写入对应 CSV（「01_启动组」编号/目标/相关方/沟通、「02_范围基准」范围/边界/禁止项、「03_进度基准」初步里程碑、「04_成本基准」预算/阈值、「00_阶段配置」阶段/活动裁剪清单、「01_迭代配置」敏捷迭代配置、「12_风险问题台账」初始风险登记册）；依据裁剪配置确定后续保留阶段，固化后输出《项目启动完成报告》，移交首个保留阶段入场。
+输出：`台账/`（20 个 CSV，已初始化）+ 《项目启动完成报告》。
 
 ---
 
 ## 4. 触发规则
 
-- 用户启动新项目（"启动一个项目"、"开始一个新项目"）；需求分析前的初始化准备；项目基线创建/干系人变动；**裁剪生命周期阶段/活动**（"只要需求+测试阶段"、"裁掉开发阶段"）。
+- 用户启动新项目（"启动一个项目"、"开始一个新项目"）；需求分析前的初始化准备；项目基线创建/干系人变动；**裁剪生命周期阶段/活动**（"只要需求+测试阶段"、"裁掉开发阶段"）；**开启敏捷迭代/快速上线**（"用敏捷/迭代/快速上线"）。
 
 ---
 
@@ -109,7 +124,7 @@ description: "Project initiation skill covering startup foundations: charter & b
 
 - 每环节产出须经用户确认后方可进入下一环节；
 - 启动就绪后必须初始化台账基线，未初始化禁止进入需求分析阶段；
-- 台账（18 个 CSV）读写由 ProjectMonitorSkill `create_baseline` 执行，本技能只做启动准备与决策；范围/基线变更经 `change_audit` 审计。
+- 台账（20 个 CSV）读写由 ProjectMonitorSkill `create_baseline` 执行，本技能只做启动准备与决策；范围/基线变更经 `change_audit` 审计。
 
 ---
 
@@ -131,5 +146,5 @@ description: "Project initiation skill covering startup foundations: charter & b
 
 ---
 
-**文档版本**：v21.0.1（新增 init_tailor 阶段/活动裁剪环节，2026-08-06）
+**文档版本**：v21.2.1（新增 init_tailor 阶段/活动裁剪环节 + 敏捷迭代配置，2026-08-06）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

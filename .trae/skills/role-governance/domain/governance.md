@@ -10,7 +10,7 @@ description: "Project governance skill covering baseline initialization (17-shee
 ## 1. 基础元数据
 
 - **技能唯一标识**：ProjectGovernanceSkill
-- **技能版本**：v21.0.0
+- **技能版本**：v21.2.1
 - **版本发布日期**：2026-08-02
 - **版本变更记录**：v1.0.0 由 project-monitor-skill v2.7.0 拆分而来（PMBOK 7th 整合管理 · ISO 21500 · ITIL v4 配置管理）
 - **定位**：项目治理中枢子技能，负责台账与项目基准初始化（create_baseline）、阶段基线固化（stage_close）、全项目归档（project_archive）、跨会话交接（handover_export）。
@@ -36,7 +36,7 @@ description: "Project governance skill covering baseline initialization (17-shee
 
 | action | 作用 | 触发场景 | 前置条件 |
 |--------|------|----------|----------|
-| `create_baseline` | 创建全套台账 CSV 与项目基准（18 个 NN_ 前缀 CSV） | 项目初始化 | 启动就绪=Go |
+| `create_baseline` | 创建全套台账 CSV 与项目基准（20 个 NN_ 前缀 CSV） | 项目初始化 | 启动就绪=Go |
 | `stage_close` | 阶段固化基线（备份+更新版本+产出物清单） | 评审通过、门禁放行 | 评审/门禁通过 |
 | `project_archive` | 全项目归档（台账+交付物+审计日志） | 所有阶段完工 | 全部阶段固化 |
 | `handover_export` | 跨会话交接打包（话术+台账快照+交接文档） | 周期复盘、新建对话 | 台账可读 |
@@ -63,9 +63,9 @@ description: "Project governance skill covering baseline initialization (17-shee
 
 **DoR**：项目启动就绪=Go ✅ · 启动产物已具备（章程/干系人/范围初定/可行性）✅
 
-**执行内容**：创建 `台账/`（18 个 NN_ 前缀 CSV：00_阶段配置.csv … 17_收尾归档.csv 全量初始化）、录入项目基准（目标/边界/干系人/质量验收标准/初始风险）、基线版本 v0.1，详见 `.//project_governance_details.md` §1。
+**执行内容**：创建 `台账/`（20 个 NN_ 前缀 CSV：00_阶段配置.csv … 02_迭代回顾.csv 等全量初始化）、录入项目基准（目标/边界/干系人/质量验收标准/初始风险）、基线版本 v0.1，详见 `.//project_governance_details.md` §1。
 
-**DoD**：台账 18 个 CSV 全部创建 ✅ · 项目基准写入「范围基准」CSV ✅ · 初始风险写入「风险&问题台账」CSV ✅ · 基线 v0.1 记录 ✅
+**DoD**：台账 20 个 CSV 全部创建 ✅ · 项目基准写入「范围基准」CSV ✅ · 初始风险写入「风险&问题台账」CSV ✅ · 基线 v0.1 记录 ✅
 
 **规则**：台账存放于 `.trae/` 目录；未初始化禁止进入需求阶段。
 
@@ -103,7 +103,7 @@ description: "Project governance skill covering baseline initialization (17-shee
 
 ## 5. 标准化输出结构
 
-1. **基线类**：`台账/`（18 个 NN_ 前缀 CSV）、基线版本号、产出物基准清单；
+1. **基线类**：`台账/`（20 个 NN_ 前缀 CSV）、基线版本号、产出物基准清单；
 2. **固化类**：备份文件、`台账/` 备份 CSV、验收结论；
 3. **归档类**：归档文档包、归档清单；
 4. **交接类**：交接话术、台账快照、跨会话交接文档；
@@ -118,6 +118,6 @@ description: "Project governance skill covering baseline initialization (17-shee
 
 ---
 
-**文档版本**：v21.0.0
+**文档版本**：v21.2.1
 **最后更新**：2026-08-02
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
