@@ -45,7 +45,18 @@ opencode 通过 `skills.paths` 配置指向技能源码目录（本仓库 `.trae
 > 注意：本仓库位于 USB 卷（`/Volumes/BR256G/...`），拔盘后全局配置失效；
 > 如需脱离源码常驻，改用 `bash tools/deploy_skills.sh` 部署到 `~/.config/opencode/skills/`。
 
-### 2.3 验证
+### 2.3 双平台注意事项
+
+| 平台 | 全局配置路径 | 说明 |
+|------|-------------|------|
+| macOS/Linux | `~/.config/opencode/opencode.jsonc` | 可用 `"paths"` 指向源码目录；或 `deploy_skills.sh` 部署到 `~/.config/opencode/skills/` |
+| Windows | `%USERPROFILE%\.config\opencode\opencode.jsonc` | `"paths"` 指向源码目录时，盘符/路径须改为 Windows 绝对路径（如 `D:\...\.trae\skills`） |
+
+- `tools/deploy_skills.sh` 与 `.py` 均已平台自适应：Windows 自动部署到 `%USERPROFILE%\.config\opencode\skills`，macOS/Linux 自动部署到 `~/.config/opencode/skills`，无需手改脚本。
+- **Windows 上推荐用部署方式**（`bash tools/deploy_skills.sh`）而非手写全局 `"paths"`，避免盘符/反斜杠转义差异导致反复修改配置文件。
+- 源码变更后重跑 `solidify` 即自动重新部署，保证全局库与 `.trae/skills/` 一致。
+
+### 2.4 验证
 
 ```sh
 opencode                      # 进入会话后输入：
