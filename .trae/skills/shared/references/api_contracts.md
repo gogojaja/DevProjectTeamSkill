@@ -72,6 +72,7 @@ DevProjectTeamSkill（总控）
 | `record_env_config` | §1.1 governance | 环境配置抽取到 20_环境配置.csv | 开发/测试/部署环境准备 |
 | `retrospect_harvest` | §1.1 governance | 阶段末复盘收割（22_阶段复盘.csv + 23_复用资产.csv） | 每阶段末 |
 | `select_model` | §1.1 governance | 阶段开始模型选型（21_模型选型.csv） | 每阶段开始 |
+| `register_auth` | §1.1 governance | 授权登记（14_授权登记.csv + 13 留痕）+ 阶段末时效检查提醒 | 系统/外部文件授权、每阶段末 |
 
 ### 1.1 governance（项目治理子域）
 

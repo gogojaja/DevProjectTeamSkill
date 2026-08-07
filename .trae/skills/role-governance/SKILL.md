@@ -9,8 +9,8 @@ description: "总控保障角色包：台账与基线初始化、五维评审与
 
 ## 1. 元数据
 
-- **技能版本**：v21.3.0　**发布日期**：2026-08-07
-- **变更记录**：v21.3.0 新增 record_env_config/retrospect_harvest/select_model 三 action（环境配置抽取/阶段复盘收割/模型选型）；v21.2.1 新增发布级门禁（release_gate 自动化质量阈值）+ 迭代评审/回顾（iteration_review），门禁分级/防绕过见 `../shared/governance.md`；v21.0.0 由 project-monitor-skill + 6 子技能 + project-governance-skill 重组为角色包；SkillEvolution/SkillAuthoring 迁至 `shared/`
+- **技能版本**：v21.3.2　**发布日期**：2026-08-07
+- **变更记录**：v21.3.2 新增 register_auth 授权登记 + 阶段末授权时效检查（14_授权登记/13 留痕入 git）；v21.3.0 新增 record_env_config/retrospect_harvest/select_model 三 action（环境配置抽取/阶段复盘收割/模型选型）；v21.2.1 新增发布级门禁（release_gate 自动化质量阈值）+ 迭代评审/回顾（iteration_review），门禁分级/防绕过见 `../shared/governance.md`；v21.0.0 由 project-monitor-skill + 6 子技能 + project-governance-skill 重组为角色包；SkillEvolution/SkillAuthoring 迁至 `shared/`
 - **参考标准**：PMBOK（十大过程组/领域管控）· ISO 31000 风险
 
 ## 2. 触发规则
@@ -35,6 +35,7 @@ description: "总控保障角色包：台账与基线初始化、五维评审与
 | 环境配置抽取 | record_env_config | `../shared/governance.md`（20_环境配置.csv，密钥别名） |
 | 阶段末复盘收割 | retrospect_harvest | `../shared/governance.md`（22_阶段复盘 + 23_复用资产） |
 | 模型选型 | select_model | `../shared/governance.md`（21_模型选型，四级规则） |
+| 授权登记/时效 | register_auth / 授权检查 | `../shared/governance.md`（14_授权登记 + 13 留痕 + 阶段末时效检查） |
 | 交接归档 | handover_export | `domain/governance.md`（交接文档优先） |
 | 技能自省 | evolve_start / ctx_health_check | `../shared/evolution.md` |
 | 技能维护 | skill-authoring | `../shared/authoring.md` |
@@ -51,5 +52,5 @@ description: "总控保障角色包：台账与基线初始化、五维评审与
 
 ---
 
-**文档版本**：v21.3.0　**最后更新**：2026-08-07
+**文档版本**：v21.3.2　**最后更新**：2026-08-07（register_auth 授权登记 + 阶段末时效检查）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

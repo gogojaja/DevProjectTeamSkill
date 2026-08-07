@@ -1,0 +1,2 @@
+﻿操作ID,操作类型,对象,风险等级,授权人,是否备份,备份路径,留痕时间,结果
+OP-AUDIT-001,系统文件恢复,C:\Windows\System32\drivers\etc\hosts,高,用户明确授权,是,D:\trae\DevProjectTeamSkill\.backup\hosts_restore_20260807_114448\hosts_standard_template.txt,2026-08-07 11:46:00,成功

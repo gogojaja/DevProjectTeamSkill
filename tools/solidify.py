@@ -10,6 +10,12 @@ ALL_ROLES = ['dev-project-team-skill','role-project-init','role-requirements-ana
 def run_package():
     os.system(f'py -3.11 "{os.path.join(ROOT, "tools", "package_skills.py")}" > "{os.path.join(ROOT, "_solidify_pkg.log")}" 2>&1')
 
+def run_version_check():
+    """硬门禁：版本一致性校验，失败中止固化。"""
+    rc = os.system(f'py -3.11 "{os.path.join(ROOT, "tools", "check_version_consistency.py")}" > "{os.path.join(ROOT, "_solidify_version.log")}" 2>&1')
+    print('   ✓ 版本一致性校验执行完毕' if rc == 0 else '   ✗ 版本一致性校验失败（见 _solidify_version.log）')
+    return rc
+
 def run_deploy():
     os.system(f'py -3.11 "{os.path.join(ROOT, "tools", "deploy_skills.py")}" > "{os.path.join(ROOT, "_solidify_deploy.log")}" 2>&1')
 
@@ -75,6 +81,10 @@ if __name__ == '__main__':
         if os.path.isfile(p):
             m = re.search(r'技能版本\*\*[：:]\s*(v[0-9]+\.[0-9]+\.[0-9]+)', open(p, encoding='utf-8').read())
             print(f'   {r:<40} {m.group(1) if m else "v?"}')
+    print('[1a/5] 版本一致性校验（硬门禁）')
+    if run_version_check() != 0:
+        print('❌ 版本一致性校验未通过，中止固化。请先统一各包元数据/页脚版本。')
+        sys.exit(1)
     print('[2/5] 刷新交接文档断点区')
     refresh_handoff(stamp, note)
     print('[3/5] 快照')
