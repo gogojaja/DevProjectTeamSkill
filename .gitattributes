@@ -1,0 +1,15 @@
+# 统一行尾：所有文本文件强制 LF（防 Windows/macOS 检出时 CRLF 反复 diff）
+* text=auto eol=lf
+
+# 脚本显式 LF（含 shebang 的 sh/py 必须 LF 才能在 macOS/Linux 执行）
+*.sh text eol=lf
+*.py text eol=lf
+
+# 二进制与不可文本归一化类型
+*.zip binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary

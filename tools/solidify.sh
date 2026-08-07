@@ -83,10 +83,18 @@ EOF
 fi
 
 python3 - "$HANDOFF" "$STAMP" "$SKILL_COUNT" "$CUSTOM_NOTE" <<'PYEOF'
-import sys
+import sys, re
 p, stamp, n, note = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
-MARK_HEAD = "## 1. 工作断点"
-BLOCK = f"""## 1. 工作断点
+with open(p, encoding='utf-8') as f:
+    c = f.read()
+# 只刷新元数据行（固化时间/角色包数/固化备注），保留既有的已完成/进行中/待办/阻塞内容
+updated = re.sub(r'(\*\*最近固化时间\*\*：).*', lambda m: m.group(1) + stamp, c)
+updated = re.sub(r'(\*\*角色包数\*\*：).*', lambda m: m.group(1) + str(n), updated)
+updated = re.sub(r'(\*\*固化备注\*\*：).*', lambda m: m.group(1) + (note if note else '—'), updated)
+if updated == c:
+    # 元数据行缺失时按模板追加完整断点区
+    BLOCK = f"""
+## 1. 工作断点
 
 > 本区由 `tools/solidify.sh` 每次任务完成后自动覆写。
 > **新模型/新会话启动，第一步必须先读 `交接文档.md` 全文**，从本区定位上一模型已完成/待办，未读交接文档前禁止读其他项目文档。
@@ -110,17 +118,9 @@ BLOCK = f"""## 1. 工作断点
 ### 台账指针
 主台账 CSV 路径：待填　最近变更号：待填
 """
-with open(p, encoding='utf-8') as f:
-    c = f.read()
-i = c.find(MARK_HEAD)
-if i != -1:
-    j = c.find("\n## ", i + len(MARK_HEAD))
-    after = c[j:] if j != -1 else ""
-    block = c[:i] + BLOCK.rstrip("\n") + "\n" + after
-else:
-    block = c.rstrip("\n") + "\n\n---\n\n" + BLOCK
+    updated = c.rstrip('\n') + BLOCK
 with open(p, 'w', encoding='utf-8') as f:
-    f.write(block)
+    f.write(updated)
 PYEOF
 echo "   ✅ 交接文档断点区已刷新（固化后必须反映磁盘最新状态）"
 

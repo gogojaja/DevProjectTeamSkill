@@ -1,8 +1,8 @@
 import os, sys, re, zipfile, shutil, glob
 sys.stdout.reconfigure(encoding='utf-8')
 
-SKILLS_DIR = os.environ.get('SKILLS_DIR', r'D:\trae\DevProjectTeamSkill\.trae\skills')
-ROOT = r'D:\trae\DevProjectTeamSkill'
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SKILLS_DIR = os.environ.get('SKILLS_DIR', os.path.join(ROOT, '.trae', 'skills'))
 DIST = os.path.join(ROOT, 'dist')
 HANDOFF = os.path.join(ROOT, '交接文档.md')
 ALL_ROLES = ['dev-project-team-skill','role-project-init','role-requirements-analysis',
@@ -81,8 +81,23 @@ def pack_role(role):
     print(f'  ✓ {out} ({n} files, 首项含 00_交接文档.md)')
     return True
 
+def parse_roles(argv):
+    """对齐 package_skills.sh：--role <name> 可多次；无参=全部角色包。"""
+    roles = []
+    i = 0
+    while i < len(argv):
+        a = argv[i]
+        if a == '--role':
+            roles.append(argv[i+1]); i += 2
+        elif a in ('-h', '--help'):
+            print('用法: package_skills.py [--role <role-name>]...   # 无参=全部 8 包')
+            sys.exit(0)
+        else:
+            print(f'未知参数: {a}'); sys.exit(1)
+    return roles or ALL_ROLES
+
 if __name__ == '__main__':
-    roles = sys.argv[1:] or ALL_ROLES
+    roles = parse_roles(sys.argv[1:])
     print('角色包打包发布 (v21, Python port)')
     print(f'技能库源: {SKILLS_DIR}')
     for r in roles:

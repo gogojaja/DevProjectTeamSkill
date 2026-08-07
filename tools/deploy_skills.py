@@ -1,9 +1,13 @@
 import os, sys, shutil, glob
 sys.stdout.reconfigure(encoding='utf-8')
 
-SKILLS_DIR = os.environ.get('SKILLS_DIR', r'D:\trae\DevProjectTeamSkill\.trae\skills')
-ROOT = r'D:\trae\DevProjectTeamSkill'
-GLOBAL_SKILLS = r'C:/Users/gogoj/.config/opencode/skills'
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SKILLS_DIR = os.environ.get('SKILLS_DIR', os.path.join(ROOT, '.trae', 'skills'))
+# 全局 opencode 技能库：平台自适应（Windows -> %USERPROFILE%/.config/...；macOS/Linux -> ~/.config/...）
+if sys.platform.startswith('win'):
+    GLOBAL_SKILLS = os.path.join(os.environ.get('USERPROFILE', 'C:/Users/gogoj'), '.config', 'opencode', 'skills')
+else:
+    GLOBAL_SKILLS = os.path.join(os.environ.get('HOME', ''), '.config', 'opencode', 'skills')
 DEFAULT_TARGETS = [os.path.join(ROOT, t) for t in
                    ('.github/skills', '.claude/skills', '.agents/skills')] + [GLOBAL_SKILLS]
 ALL_ROLES = ['dev-project-team-skill','role-project-init','role-requirements-analysis',

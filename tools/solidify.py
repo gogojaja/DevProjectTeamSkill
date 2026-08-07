@@ -1,23 +1,30 @@
-import os, sys, shutil, re, glob, datetime
+import os, sys, shutil, re, glob, datetime, subprocess
 sys.stdout.reconfigure(encoding='utf-8')
 
-SKILLS_DIR = r'D:\trae\DevProjectTeamSkill\.trae\skills'
-ROOT = r'D:\trae\DevProjectTeamSkill'
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SKILLS_DIR = os.environ.get('SKILLS_DIR', os.path.join(ROOT, '.trae', 'skills'))
 HANDOFF = os.path.join(ROOT, '交接文档.md')
+TOOLS_DIR = os.path.join(ROOT, 'tools')
 ALL_ROLES = ['dev-project-team-skill','role-project-init','role-requirements-analysis',
              'role-architecture','role-development','role-testing','role-deployment','role-governance']
 
+def _run_script(script, *args):
+    """跨平台运行 tools/ 下脚本：使用当前 Python 解释器（Windows/macOS/Linux 通用）。"""
+    cmd = [sys.executable, os.path.join(TOOLS_DIR, script), *args]
+    return subprocess.run(cmd, cwd=ROOT)
+
 def run_package():
-    os.system(f'py -3.11 "{os.path.join(ROOT, "tools", "package_skills.py")}" > "{os.path.join(ROOT, "_solidify_pkg.log")}" 2>&1')
+    r = _run_script('package_skills.py')
+    return r.returncode
 
 def run_version_check():
     """硬门禁：版本一致性校验，失败中止固化。"""
-    rc = os.system(f'py -3.11 "{os.path.join(ROOT, "tools", "check_version_consistency.py")}" > "{os.path.join(ROOT, "_solidify_version.log")}" 2>&1')
-    print('   ✓ 版本一致性校验执行完毕' if rc == 0 else '   ✗ 版本一致性校验失败（见 _solidify_version.log）')
-    return rc
+    r = _run_script('check_version_consistency.py')
+    print('   ✓ 版本一致性校验执行完毕' if r.returncode == 0 else '   ✗ 版本一致性校验失败')
+    return r.returncode
 
 def run_deploy():
-    os.system(f'py -3.11 "{os.path.join(ROOT, "tools", "deploy_skills.py")}" > "{os.path.join(ROOT, "_solidify_deploy.log")}" 2>&1')
+    return _run_script('deploy_skills.py').returncode
 
 def refresh_handoff(stamp, note):
     MARK = '## 1. 工作断点'
@@ -88,13 +95,17 @@ if __name__ == '__main__':
     print('[2/5] 刷新交接文档断点区')
     refresh_handoff(stamp, note)
     print('[3/5] 快照')
-    v = 'v21.0.0'
+    m = re.search(r'技能版本\*\*[：:]\s*(v[0-9]+\.[0-9]+\.[0-9]+)',
+                  open(os.path.join(SKILLS_DIR, 'dev-project-team-skill', 'SKILL.md'), encoding='utf-8').read())
+    v = m.group(1) if m else 'v21.0.0'
     snapshot(v)
     print('[4/5] 打包 dist')
-    run_package()
+    if run_package() != 0:
+        print('   ✗ package_skills.py 失败'); sys.exit(1)
     print('   ✓ package_skills.py 完成')
     print('[5/5] 部署四目录')
-    run_deploy()
+    if run_deploy() != 0:
+        print('   ✗ deploy_skills.py 失败'); sys.exit(1)
     print('   ✓ deploy_skills.py 完成')
     print('==============================================')
     print(' 固化完成。请执行: git add -A && git commit -m "<说明>"')
