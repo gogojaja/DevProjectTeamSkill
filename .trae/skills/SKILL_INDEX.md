@@ -6,7 +6,7 @@
 
 | # | 角色包 | 域 | 触发词 | 加载路径 |
 |---|--------|-----|--------|----------|
-| 0 | dev-project-team-skill | 编排器 | 全生命周期 / 多角色联合 / 切换角色 | dev-project-team-skill/ |
+| 0 | dev-project-team-skill | 编排器 | 全生命周期 / 角色组合加载 / 切换角色 / 技能维护 | dev-project-team-skill/ |
 | 1 | role-project-init | 项目启动 | 启动项目 / 立项 / 章程 / 干系人 / 基线初始化 | role-project-init/ |
 | 2 | role-requirements-analysis | 需求 | 收集需求 / 分析需求 / 编写 SRS / 需求变更 / 需求追溯 | role-requirements-analysis/ |
 | 3 | role-architecture | 架构 | 架构策略 / 架构设计 / 数据安全 / ADR / 架构评审 | role-architecture/ |
