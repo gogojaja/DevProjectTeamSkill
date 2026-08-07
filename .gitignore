@@ -19,3 +19,24 @@ skill-evolution-plan/
 requirements-analysis-skill-modification-plan/
 SkillEvolutionSkill/
 .DS_Store
+
+# ===== 账号/密钥安全隔离（R5：不入库，防误提交）=====
+.secrets/
+secrets/
+secrets-example/
+!security/secrets-example/
+*.env
+*.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.crt
+*.cer
+*.der
+*credential*
+*credentials*.json
+service-account*.json
