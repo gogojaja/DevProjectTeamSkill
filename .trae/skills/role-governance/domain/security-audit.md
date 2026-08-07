@@ -51,6 +51,7 @@ description: "Project security audit skill covering high-risk operation pre-audi
 | 留痕铁律 | 全操作不可删除留痕，唯一操作 ID 永久追溯 |
 | 回滚优先 | 服务故障自动调取备份优先一键回滚 |
 | 拒绝终止 | 用户连续 2 次拒绝同一操作永久终止 |
+| **系统/项目外铁律** | 修改、删除**系统文件（%windir%\System32、hosts、注册表等）或项目外部文件（仓库之外路径）必须：①先获用户明确授权；②备份到项目内 `.backup/`（含时间戳）；③留痕至 `13_安全审计台账.csv`；否则禁止执行，经 `security_audit` 前置审计 |
 
 ---
 
@@ -113,6 +114,6 @@ description: "Project security audit skill covering high-risk operation pre-audi
 
 ---
 
-**文档版本**：v21.0.0
-**最后更新**：2026-08-02
+**文档版本**：v21.3.0
+**最后更新**：2026-08-07（新增系统/项目外文件修改删除铁律：授权+备份+留痕）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

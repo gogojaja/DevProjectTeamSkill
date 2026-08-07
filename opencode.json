@@ -2,5 +2,36 @@
   "$schema": "https://opencode.ai/config.json",
   "skills": {
     "paths": [".trae/skills"]
+  },
+  "permission": {
+    "edit": [
+      "allow"
+    ],
+    "bash": [
+      "allow"
+    ],
+    "webfetch": [
+      "allow"
+    ],
+    "rules": [
+      {
+        "pattern": ["*.md", "*.csv", "*.json"],
+        "allow": true
+      },
+      {
+        "pattern": ["$HOME/.config/opencode/**", "C:/Users/gogoj/.config/opencode/**", ".trae/**", ".git/**"],
+        "allow": true
+      },
+      {
+        "pattern": ["/System", "C:/Windows/**", "C:/Windows/System32/**", "**/hosts", "**/System32/**"],
+        "allow": false,
+        "ask": true
+      },
+      {
+        "pattern": ["**/*"],
+        "allow": false,
+        "ask": true
+      }
+    ]
   }
 }
