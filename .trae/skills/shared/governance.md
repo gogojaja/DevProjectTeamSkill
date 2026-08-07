@@ -19,6 +19,9 @@
 | `release_gate` | 发布级门禁（含自动化质量阈值） | 迭代配置 发布点=Y |
 | `iteration_review` | 迭代末轻量评审 + 回顾 | 每迭代末 |
 | `handover_export` | 交接/归档导出 | 项目收尾 |
+| `record_env_config` | 环境配置抽取/核对到 20_环境配置.csv | 开发/测试/部署环境准备 |
+| `retrospect_harvest` | 阶段末复盘收割（可固化流程/复用工具/降Token） | 每阶段末 |
+| `select_model` | 阶段开始大模型选型（21_模型选型.csv） | 每阶段开始 |
 
 ## 2. 门禁分级（标准 + 敏捷迭代）
 
@@ -29,6 +32,8 @@
 | **发布级（任何模式不可裁剪）** | 敏捷 `发布点=Y` | 完整 `stage_review` + `check_gate` + 自动化质量阈值 + 全套产出 | `solidify_baseline` |
 
 **发布级 check_gate 自动化质量阈值（P1-1）**：自动化测试通过率 ≥95%；关键路径用例全绿（阻断级 0 遗留）；SAST/SCAN 无高危；安全审计（高危操作）通过。
+
+**环境核对（R3）**：`check_gate` 前比对 `台账/20_环境配置.csv`（dev/test/prod）与测试/部署实际配置，配置不一致或密钥出现明文即阻断（依据 `../references/environment_standard.md`）。
 
 **门禁防绕过机制（P2-4）**：`release_gate` 由 role-governance 独立执行；`18_迭代配置.csv` 无 `发布点=Y` 记录时禁止进入投产（role-deployment），杜绝无门禁发布。
 
@@ -46,5 +51,5 @@
 
 ---
 
-**文档版本**：v21.2.1　**最后更新**：2026-08-06（新增门禁分级/发布级阈值/防绕过/迭代回顾）
+**文档版本**：v21.3.0　**最后更新**：2026-08-07（新增 record_env_config/retrospect_harvest/select_model action、环境核对）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

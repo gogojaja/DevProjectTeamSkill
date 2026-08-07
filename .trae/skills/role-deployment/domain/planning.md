@@ -25,7 +25,7 @@ description: "Release plan writing sub-skill for the DeploymentManagementSkill r
 | 4 变更分类 | 标准/普通/紧急变更、CAB 审批路径 |
 | 5 部署步骤 | 前置检查→执行→验证→后置确认 |
 | 6 回滚方案 | 触发条件、步骤、数据回退、决策人 |
-| 7 环境要求 | 生产配置、资源清单、网络/防火墙变更 |
+| 7 环境要求 | 生产配置、资源清单、网络/防火墙变更；配置项经 `台账/20_环境配置.csv`（`../../shared/references/environment_standard.md`）核对，密钥以别名引用 |
 | 8 数据迁移 | DB 变更脚本、迁移计划、数据回退方案 |
 | 9 监控告警 | RED 指标+业务指标、阈值、值班、升级路径 |
 | 10 风险与预案 | 环境/依赖/数据/性能/安全风险及应对 |

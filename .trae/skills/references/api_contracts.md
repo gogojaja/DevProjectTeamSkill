@@ -69,6 +69,9 @@ DevProjectTeamSkill（总控）
 | `iteration_review` | §1.1 governance | 迭代末轻量评审 + 回顾记录 CSV | 每迭代末 |
 | `project_archive` | §1.1 governance | 全项目归档 | 所有阶段完工 |
 | `handover_export` | §1.1 governance | 跨会话交接打包 | 周期复盘、新建对话 |
+| `record_env_config` | §1.1 governance | 环境配置抽取到 20_环境配置.csv | 开发/测试/部署环境准备 |
+| `retrospect_harvest` | §1.1 governance | 阶段末复盘收割（22_阶段复盘.csv + 23_复用资产.csv） | 每阶段末 |
+| `select_model` | §1.1 governance | 阶段开始模型选型（21_模型选型.csv） | 每阶段开始 |
 
 ### 1.1 governance（项目治理子域）
 
@@ -77,12 +80,15 @@ DevProjectTeamSkill（总控）
 
 | action | 用途 | 典型调用时机 |
 |--------|------|-------------|
-| `create_baseline` | 创建全套台账 CSV 与项目基准（20 个 NN_ 前缀 CSV） | 项目初始化 |
+| `create_baseline` | 创建全套台账 CSV 与项目基准（24 个 NN_ 前缀 CSV） | 项目初始化 |
 | `stage_close` | 阶段固化基线（备份+版本+产出物清单） | 评审通过、门禁放行 |
 | `release_gate` | 发布级门禁（自动化质量阈值：测试通过率≥95%/关键路径全绿/SAST 无高危） | 敏捷 发布点=Y |
 | `iteration_review` | 迭代末轻量评审 + 回顾记录（02_迭代回顾.csv） | 每迭代末 |
 | `project_archive` | 全项目归档（台账+交付物+审计日志） | 所有阶段完工 |
 | `handover_export` | 跨会话交接打包（话术+台账快照+交接文档） | 周期复盘、新建对话 |
+| `record_env_config` | 环境配置抽取到 `台账/20_环境配置.csv`（dev/test/prod 三列，密钥别名引用） | 环境准备 |
+| `retrospect_harvest` | 阶段末复盘收割：输出 `22_阶段复盘.csv`（可固化流程/复用工具/降Token）与 `23_复用资产.csv` | 每阶段末 |
+| `select_model` | 阶段开始模型选型：输出 `21_模型选型.csv`（四级规则：免费→低价→国内稳定→排除不可访问） | 每阶段开始 |
 
 ### 1.2 scope-change（项目范围与变更管理子域）
 

@@ -38,11 +38,13 @@ description: "Test environment preparation skill for deploying environments, pre
 - 测试环境已部署并验证可用；测试数据覆盖正常/边界/异常三类
 - 第三方依赖/Mock、测试工具已配置验证；CI 流水线已配置（如有接口自动化）
 - 冒烟测试已通过
+- 测试环境配置项已写入 `台账/20_环境配置.csv`（`../../shared/references/environment_standard.md`），与生产隔离且密钥以别名引用
 
 ### 3.4 规则
 1. 测试环境尽量接近生产配置，须与生产隔离
 2. 数据涉及敏感信息按脱敏规则处理
 3. 环境就绪后执行冒烟测试；冒烟不通过则退回开发，不进入正式执行
+4. test 环境配置经 `20_环境配置.csv` 维护，变更走 `register_change` + `change_audit`
 
 ## 4. 标准化输出结构
 
