@@ -1,4 +1,4 @@
-﻿---
+---
 name: "project-init-skill"
 description: "Project initiation skill covering startup foundations: charter & business case, stakeholder registration, scope preliminary definition, feasibility check, kickoff readiness, and baseline initialization (ProjectMonitorSkill create_baseline) before requirements phase. Aligned with PMBOK initiating process group. Invoke when starting a new project, creating project charter, registering stakeholders, or initializing project baseline."
 ---
@@ -76,7 +76,7 @@ description: "Project initiation skill covering startup foundations: charter & b
 
 输出：《阶段配置单》（00_阶段配置.csv：阶段/保留或裁剪/裁剪理由/责任方），由 role-governance 写入台账。
 
-**敏捷迭代模式扩展（可选）**：若项目采用敏捷迭代/快速上线，`init_tailor` 额外产出 `01_迭代配置.csv`（由 role-governance 写入台账）：
+**敏捷迭代模式扩展（可选）**：若项目采用敏捷迭代/快速上线，`init_tailor` 额外产出 `18_迭代配置.csv`（由 role-governance 写入台账）：
 
 | 列 | 说明 |
 |----|------|
@@ -109,7 +109,7 @@ description: "Project initiation skill covering startup foundations: charter & b
 输出：《启动就绪检查单》（Go/No-Go/暂缓 + 阻塞清单）。
 
 ### 环节 8：基线初始化（init_baseline）
-处理：调用 ProjectMonitorSkill `create_baseline` 创建全套台账（20 个 CSV，含「00_阶段配置」「01_迭代配置」「02_迭代回顾」）；启动产物写入对应 CSV（「01_启动组」编号/目标/相关方/沟通、「02_范围基准」范围/边界/禁止项、「03_进度基准」初步里程碑、「04_成本基准」预算/阈值、「00_阶段配置」阶段/活动裁剪清单、「01_迭代配置」敏捷迭代配置、「12_风险问题台账」初始风险登记册）；依据裁剪配置确定后续保留阶段，固化后输出《项目启动完成报告》，移交首个保留阶段入场。
+处理：调用 ProjectMonitorSkill `create_baseline` 创建全套台账（20 个 CSV，含「00_阶段配置」「18_迭代配置」「19_迭代回顾」）；启动产物写入对应 CSV（「01_启动组」编号/目标/相关方/沟通、「02_范围基准」范围/边界/禁止项、「03_进度基准」初步里程碑、「04_成本基准」预算/阈值、「00_阶段配置」阶段/活动裁剪清单、「18_迭代配置」敏捷迭代配置、「12_风险问题台账」初始风险登记册）；依据裁剪配置确定后续保留阶段，固化后输出《项目启动完成报告》，移交首个保留阶段入场。
 输出：`台账/`（20 个 CSV，已初始化）+ 《项目启动完成报告》。
 
 ---

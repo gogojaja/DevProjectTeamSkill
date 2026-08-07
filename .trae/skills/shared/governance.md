@@ -30,7 +30,7 @@
 
 **发布级 check_gate 自动化质量阈值（P1-1）**：自动化测试通过率 ≥95%；关键路径用例全绿（阻断级 0 遗留）；SAST/SCAN 无高危；安全审计（高危操作）通过。
 
-**门禁防绕过机制（P2-4）**：`release_gate` 由 role-governance 独立执行；`01_迭代配置.csv` 无 `发布点=Y` 记录时禁止进入投产（role-deployment），杜绝无门禁发布。
+**门禁防绕过机制（P2-4）**：`release_gate` 由 role-governance 独立执行；`18_迭代配置.csv` 无 `发布点=Y` 记录时禁止进入投产（role-deployment），杜绝无门禁发布。
 
 **迭代回顾（P0-2）**：`iteration_review` 末输出 `02_迭代回顾.csv`（做得好/需改进/行动项），作下迭代改进输入（PDCA 闭环）。
 

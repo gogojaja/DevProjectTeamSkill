@@ -65,6 +65,8 @@ DevProjectTeamSkill（总控）
 | `update_milestone` | §1.3 progress-cost | 更新里程碑、工时、成本（EVM） | 阶段验收通过后 |
 | `risk_scan` | §1.5 risk | 风险巡检 | 定期、阶段切换 |
 | `stage_close` | §1.1 governance | 阶段固化基线 | 评审通过、门禁放行 |
+| `release_gate` | §1.1 governance | 发布级门禁（含自动化质量阈值：测试通过率≥95%/关键路径全绿/SAST 无高危） | 敏捷 迭代配置 发布点=Y |
+| `iteration_review` | §1.1 governance | 迭代末轻量评审 + 回顾记录 CSV | 每迭代末 |
 | `project_archive` | §1.1 governance | 全项目归档 | 所有阶段完工 |
 | `handover_export` | §1.1 governance | 跨会话交接打包 | 周期复盘、新建对话 |
 
@@ -75,8 +77,10 @@ DevProjectTeamSkill（总控）
 
 | action | 用途 | 典型调用时机 |
 |--------|------|-------------|
-| `create_baseline` | 创建全套台账 CSV 与项目基准（18 个 NN_ 前缀 CSV） | 项目初始化 |
+| `create_baseline` | 创建全套台账 CSV 与项目基准（20 个 NN_ 前缀 CSV） | 项目初始化 |
 | `stage_close` | 阶段固化基线（备份+版本+产出物清单） | 评审通过、门禁放行 |
+| `release_gate` | 发布级门禁（自动化质量阈值：测试通过率≥95%/关键路径全绿/SAST 无高危） | 敏捷 发布点=Y |
+| `iteration_review` | 迭代末轻量评审 + 回顾记录（02_迭代回顾.csv） | 每迭代末 |
 | `project_archive` | 全项目归档（台账+交付物+审计日志） | 所有阶段完工 |
 | `handover_export` | 跨会话交接打包（话术+台账快照+交接文档） | 周期复盘、新建对话 |
 
@@ -148,6 +152,7 @@ DevProjectTeamSkill（总控）
 | `review_requirements` | §2.4 lifecycle | 需求评审准备 | 需求评审环节 |
 | `change_analysis` | §2.4 lifecycle | 需求变更已选维度影响评估 | 需求变更 |
 | `update_traceability` | §2.4 lifecycle | 更新需求双向追溯矩阵 | 需求变更/新增/删除 |
+| `iterate_backlog` | §2.1 elicitation | PBI 原子化入产品待办 + S/M/L 规模估算 + MoSCoW 分级 | 敏捷迭代计划 |
 
 ### 2.1 elicitation（需求启发与收集子域）
 
