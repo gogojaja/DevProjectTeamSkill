@@ -6,6 +6,10 @@
 # 备份与留档（可重新生成，不入库）
 skills_backup_*/
 skills_legacy_*/
+.backup/
+
+# 打包产物（可经 tools/package_skills 重新生成）
+dist/
 
 # 临时产物
 _pkg_tmp/

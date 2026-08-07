@@ -1,18 +1,39 @@
-# DevProjectTeamSkill v20.2.0 发布包
+# DevProjectTeamSkill v21.3.2 技能库
 
-**版本**：v20.2.0 ｜ **打包日期**：见压缩包文件名 ｜ **技能总数**：39
+**版本**：v21.3.2 ｜ **发布日期**：2026-08-07 ｜ **结构**：8 角色包 + 1 编排器
 
 ## 内容结构
-- `skills_源码/`：全部 39 技能 + references 的源库（唯一事实来源）
-- `dist/`：每个技能独立的自包含 zip（可单独解压使用）
-- `tools/`：package_skills.sh / deploy_skills.sh / solidify.sh
-- 顶层 *.md：跨会话交接文档 / TRAE部署与启用指南 / 项目归档报告
 
-## 结构变更（CHG-19，最新）
-运维部署工程师角色四分路由重构：deployment-management-skill 由单体六环节
-重写为薄路由壳 v2.0.0，按 ITIL v4 发布部署子流程分发至
-strategy / planning / release / handover 四子技能 v1.0.0。
+- `.trae/skills/`：技能源码（**唯一事实来源**）
+  - `SKILL_INDEX.md`：8 包路由索引
+  - `dev-project-team-skill/`：编排器（薄壳，含路由表 + 调度/压缩规则）
+  - `role-*/`：7 角色包（启动 / 需求 / 架构 / 开发 / 测试 / 投产 / 总控），各含 SKILL.md + domain/ 流程 + *__resources/ 明细
+  - `references/`：公共标准（token / csv / api 契约 / 环境标准 / 模型选型 / 铁律卡等）
+  - `shared/`：单源共享库（governance / evolution / authoring + references 副本）
+- `tools/`：package_skills.sh / deploy_skills.sh / solidify.sh（另有 .py 双实现）及 excel_to_csv.py / check_version_consistency.py
+- 顶层 *.md：交接文档 / 技能库增强改造方案 / 敏捷迭代模式方案 / opencode 启用指南（docs/）
 
-## 使用
-技能源库安装：将 `skills_源码/references/` 与各技能目录拷贝至工具技能目录。
-详见 `TRAE部署与启用指南.md`。
+## 打包与部署
+
+```sh
+bash tools/package_skills.sh               # 打包全部 8 角色包到 dist/
+bash tools/package_skills.sh --role role-testing
+bash tools/deploy_skills.sh --roles role-a,role-b   # 部署到 .github/.claude/.agents/ 及全局库
+bash tools/solidify.sh "说明"               # 快照→刷新交接断点→打包→部署
+```
+
+部署目标：`.github/skills/`、`.claude/skills/`、`.agents/skills/` 及全局库
+（Windows：`C:\Users\gogoj\.config\opencode\skills`；macOS：`~/.config/opencode/skills`）。
+**永不覆盖 `.trae/skills/` 源**；共享内容经打包自动内嵌，禁止手工复制。
+
+## 启用方式
+
+- **TRAE**：详见 `docs/legacy/TRAE部署与启用指南.md`（v8.0.0 历史版，仅作留档）
+- **opencode**：详见 `docs/opencode启用指南.md`（当前推荐）
+
+## 关键规则（详见 AGENTS.md）
+
+- 源码单源：只在 `.trae/skills/` 改技能，改完即跑 `solidify`
+- 修改技能须同步 `SKILL_INDEX.md` + `references/api_contracts.md`；description 150~250 字符
+- ≥4K token 或 >20 列 → CSV（UTF-8 with BOM），禁止 .xlsx
+- 系统/项目外文件操作：先授权 → 备份到 `.backup/` → 留痕 `台账/13_安全审计台账.csv`
