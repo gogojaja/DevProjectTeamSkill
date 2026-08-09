@@ -1,6 +1,6 @@
 ---
 name: "self-improve"
-description: "自我改进循環技能：對技能庫/流程/工具/標準進行持續診斷與迭代改進，支援偏差偵測、根因分析、改進提案、實驗評估、版本化發布。觸發詞：自我改進、技能迭代、流程優化、改進提案、經驗總結、閉環復盤。Load when user requests self-improvement loops, skill iteration, or process optimization."
+description: "自我改进循环技能：对技能库/流程/工具/标准进行持续诊断与迭代改进，支援自省诊断（PDCA/哈希链/上下文健康）、偏差侦测、根因分析、改进提案、实验评估、版本化发布。触发词：自我改进、技能迭代、流程优化、改进提案、经验总结、闭环复盘、自省、诊断。Load when user requests self-improvement loops, skill iteration, self-diagnosis, or process optimization."
 ---
 
 # Self-Improve 自我改進循環
@@ -29,10 +29,14 @@ description: "自我改进循環技能：對技能庫/流程/工具/標準進行
 | `實驗評估` / `對照` | 實驗 | 設計並執行 A/B 評估 |
 | `經驗總結` / `復盤` | 沉澱 | 沉澱可複用資產 |
 | `閉環復盤` / `收斂` | 收斂 | 確認改進落地並收斂循環 |
+| `自省` / `診斷` / `檢視` | 診斷 | PDCA 五步只讀診斷 + 五層根因 |
+| `evolve_start` / `哈希鏈` | 診斷 | 防篡改校驗 |
+| `ctx_health_check` / `健康` | 診斷 | 上下文健康監控（綠/黃/橙/紅） |
 
 ### 1.3 能力矩陣
 | 能力 | 產物 | 適用場景 |
 |------|------|----------|
+| 自我診斷 | 診斷報告 / 偏差清單 / 哈希鏈 | 技能庫自省、防篡改、健康監控 |
 | 偏差偵測 | 偏差清單 + 根因 | 執行結果不符、流程低效 |
 | 改進提案 | 提案卡（假設/方案/評估） | 任何可改進點 |
 | 實驗評估 | 對照實驗報告 | 方案效果未明 |
@@ -150,6 +154,7 @@ graph LR
 
 | 明細文件 | 說明 |
 |----------|------|
+| `domain/self-diagnosis.md` | 自我診斷：PDCA 五步、五層根因、哈希鏈防篡改、上下文健康監控 |
 | `domain/deviation-detection.md` | 偏差偵測：預期vs實際對比、偏差分類、嚴重度評估 |
 | `domain/root-cause-analysis.md` | 根因分析：5-Why、魚骨圖、優先級排序 |
 | `domain/improvement-proposal.md` | 改進提案：提案卡生成、評估矩陣、風險評審 |

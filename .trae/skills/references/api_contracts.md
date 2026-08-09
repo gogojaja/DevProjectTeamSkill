@@ -45,7 +45,7 @@ DevProjectTeamSkill（总控）
 │   ├── release                 ← 投产执行：准备预演/执行监控/回滚
 │   └── handover                ← 评审总结交接：Go-Live/总结/交接/阶段评审
 └── shared/
-    ├── evolution.md            ← 元技能，只读诊断，按需触发
+    ├── evolution.md            ← 桥接页（已并入 self-improve/self-diagnosis.md）
     └── authoring.md            ← 元技能，Skill 创建/修改，简化模式路由
 ```
 
@@ -501,14 +501,14 @@ DevProjectTeamSkill（总控）
 
 ---
 
-## 7. shared/evolution.md（元技能，诊断侧）
+## 7. self-improve 子技能（诊断+改进侧，含原 shared/evolution.md 能力）
 
-**调用方**：用户手动触发 / 自动条件触发  
+**调用方**：用户手动触发 / 自动条件触发（`dev-project-team-skill/skills/self-improve/SKILL.md`）  
 **核心 action**：
 
 | action | 用途 | 典型调用时机 |
 |--------|------|-------------|
-| `evolve_start` | 五步闭环诊断 | 手动触发或自动条件满足 |
+| `evolve_start` | PDCA 五步闭环诊断 | 手动触发或自动条件满足 |
 | `evolve_check_log` | SHA256 哈希链校验 | 怀疑篡改、定期校验 |
 | `evolve_review` | 定期效果评估 | 月度/季度 |
 | `ctx_health_check` | 上下文健康检查 | 每轮对话后自动执行 |

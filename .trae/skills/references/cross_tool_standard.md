@@ -35,8 +35,6 @@
     ├── api_contracts.md
     ├── common_standards.md
     ├── directory_structure.md
-    ├── dual_role_workflow.md
-    ├── simplified_workflow.md
     └── cross_tool_standard.md   # 本文件
 ```
 

@@ -96,7 +96,7 @@
 ### 3.4 与既有机制的关系
 
 - **项目台账备份**：由 ProjectMonitorSkill `stage_close` 负责（`项目总台账_v<版本号>_backup.xlsx`），与本规范互补——本规范覆盖技能文件本体，ProjectMonitor 覆盖项目数据；
-- **完整性校验**：由 SkillEvolutionSkill `evolve_check_log`（SHA256 哈希链）负责验证快照/基线未被篡改；
+- **完整性校验**：由 self-improve 子技能 `evolve_check_log`（SHA256 哈希链）负责验证快照/基线未被篡改（`dev-project-team-skill/skills/self-improve/domain/self-diagnosis.md` §4）；
 - **跨工具部署**：技能库目录结构与多工具（TRAE/VSCode/Claude Code）同步规范详见 `cross_tool_standard.md`；快照/发布与部署脚本相互配合，部署不改变源库结构。
 - **发布包**：`dist/` zip 作为轻量级可分发快照（仅含 SKILL.md），完整快照以 `skills_backup_<版本号>/` 为准。
 

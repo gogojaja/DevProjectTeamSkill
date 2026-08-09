@@ -15,7 +15,7 @@ description: "总控保障角色包：台账与基线初始化、五维评审与
 
 ## 2. 触发规则
 
-用户表达「台账/评审/门禁/变更审计/进度成本/EVM/风险/安全审计/基线固化/归档/交接」时加载本包。核心能力直接引用 `../shared/governance.md`；自省/技能维护引用 `../shared/evolution.md`、`../shared/authoring.md`。
+用户表达「台账/评审/门禁/变更审计/进度成本/EVM/风险/安全审计/基线固化/归档/交接」时加载本包。核心能力直接引用 `../shared/governance.md`；技能自省/改进引用 `../dev-project-team-skill/skills/self-improve/SKILL.md`（含原 evolution 只读诊断能力）；技能维护引用 `../shared/authoring.md`。
 
 ## 3. 能力路由（总控核心见 shared/governance.md）
 
@@ -37,7 +37,7 @@ description: "总控保障角色包：台账与基线初始化、五维评审与
 | 模型选型 | select_model | `../shared/governance.md`（21_模型选型，四级规则） |
 | 授权登记/时效 | register_auth / 授权检查 | `../shared/governance.md`（14_授权登记 + 13 留痕 + 阶段末时效检查） |
 | 交接归档 | handover_export | `domain/governance.md`（交接文档优先） |
-| 技能自省 | evolve_start / ctx_health_check | `../shared/evolution.md` |
+| 技能自省 | evolve_start / ctx_health_check | `../dev-project-team-skill/skills/self-improve/SKILL.md`（PDCA/哈希链/健康监控） |
 | 技能维护 | skill-authoring | `../shared/authoring.md` |
 
 ## 4. 铁律
