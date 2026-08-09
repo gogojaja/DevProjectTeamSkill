@@ -12,9 +12,10 @@ description: "软件研发多角色编排器：按阶段渐进加载角色包（
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.3.3
+- **技能版本**：v21.3.4
 - **版本发布日期**：2026-08-09
 - **版本变更记录**：
+  - v21.3.4：模型路由增网关策略（2026-08-09）——`references/model_selection.md` §4.5 增网关路由策略（auto/weighted/fallback + auto 分档），衔接档位决策与本地网关，仅约定策略与配置列，不携带网关业务代码；配置列（routing_strategy/model_pool/fallback_chain/cost_per_token）入 `20_环境配置.csv`。
   - v21.3.3：新增模型路由（2026-08-09）——`references/model_selection.md` 增 §4 模型路由：任务分类×复杂度档位×成本档×能力要求四维路由，S0 导航/查询禁止强模型、S3 高危禁止降档，多角色任务按子任务独立路由；台账 `21_模型选型.csv` 增复杂度档位字段。
   - v21.3.2：新增双平台兼容强制约束（2026-08-07）——§2.2-5 所有启用项目必须同时支持 Windows/macOS：禁硬编码单一平台绝对路径、禁 Windows 专属命令、行尾统一 LF、文档标双平台写法；细则入 token_standard §6；iron_rules 加「平台兼容」铁律。
   - v21.3.1：铁律防压缩遗忘（2026-08-07）——新增 `references/iron_rules.md` 铁律集中卡（授权/备份/留痕）；§2.1-6 压缩后强制重读铁律卡；每轮回显锚点 `授权→备份→留痕`；token_standard §1.3 同步。
@@ -109,10 +110,10 @@ description: "软件研发多角色编排器：按阶段渐进加载角色包（
 | 接口契约 | `../references/api_contracts.md` | action 接口清单 |
 | 目录规范 | `../references/directory_structure.md` | 台账/资产目录定义 |
 | 环境标准 | `../references/environment_standard.md` | dev/test/prod 环境配置抽取与检查 |
-| 模型选型 | `../references/model_selection.md` | 阶段开始大模型分级选型 + 任务路由决策（§4） |
+| 模型选型 | `../references/model_selection.md` | 阶段开始大模型分级选型 + 任务路由决策（§4）+ 网关策略（§4.5） |
 | 铁律卡 | `../references/iron_rules.md` | 压缩后重读/新会话锚点（授权/备份/留痕） |
 
 ---
 
-**文档版本**：v21.3.3　**最后更新**：2026-08-09（模型选型新增 §4 模型路由：任务×复杂度×成本×能力四维路由）
+**文档版本**：v21.3.4　**最后更新**：2026-08-09（模型选型 §4.5 增网关路由策略：auto/weighted/fallback + auto 分档）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
