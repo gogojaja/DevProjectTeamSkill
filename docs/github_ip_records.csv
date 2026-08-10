@@ -1,0 +1,53 @@
+domain,record_type,ip_address,source,last_verified_utc,notes
+github.com,A,20.205.243.166,DNS(8.8.8.8/1.1.1.1/208.67.222.222),2026-08-10,主站当前解析IP
+github.com,A,140.82.112.4,hosts-revise/MikroTik,2025-07-03,历史可达IP(AS36459 140.82.112.0/20)
+github.com,A,140.82.114.4,hosts-revise/MikroTik,2025-07-03,历史可达IP(AS36459 140.82.112.0/20)
+github.com,A,140.82.121.4,社区记录,2025-07-03,历史可达IP(AS36459 140.82.112.0/20)
+github.com,A,140.82.113.3,corpus.lantern.io,2026-02-01,GFW绕过文档记录IP
+github.com,A,140.82.113.4,corpus.lantern.io,2026-02-01,GFW绕过文档记录IP
+github.com,A,192.30.253.112,社区历史记录,2022-11-27,旧IP(AS36459 192.30.252.0/22)
+github.com,A,192.30.253.113,David Grayson blog,2026-06-05,旧IP(AS36459 192.30.252.0/22)
+github.com,A,140.82.113.5,fliu2476/gh-hosts,2021-12-03,历史IP
+github.com,A,140.82.112.21,fliu2476/gh-hosts,2021-12-03,central.github.com
+github.com,A,140.82.112.22,hosts-revise,2022-11-27,central.github.com
+api.github.com,A,20.205.243.168,DNS(8.8.8.8),2026-08-10,API当前解析IP
+api.github.com,A,192.30.255.117,社区记录,2022-11-27,旧IP
+api.github.com,A,140.82.113.5,fliu2476/gh-hosts,2021-12-03,历史IP
+ssh.github.com,A,20.205.243.160,DNS(8.8.8.8),2026-08-10,SSH当前解析IP
+gist.github.com,A,159.106.121.75,DNS(8.8.8.8),2026-08-10,gist当前解析IP
+gist.github.com,A,192.30.255.112,hosts-revise,2022-11-27,旧IP
+gist.github.com,A,140.82.114.4,fliu2476/gh-hosts,2021-12-03,历史IP
+codeload.github.com,A,140.82.112.9,hosts-revise,2022-11-27,codeload历史IP
+github.community,A,140.82.112.18,hosts-revise,2022-11-27,community历史IP
+github.io,A,185.199.108.153,DNS(8.8.8.8),2026-08-10,GitHub Pages IP
+github.io,A,185.199.109.153,DNS(8.8.8.8),2026-08-10,GitHub Pages IP
+github.io,A,185.199.110.153,DNS(8.8.8.8),2026-08-10,GitHub Pages IP
+github.io,A,185.199.111.153,DNS(8.8.8.8),2026-08-10,GitHub Pages IP
+raw.githubusercontent.com,A,185.199.108.133,DNS(8.8.8.8),2026-08-10,raw内容CDN
+raw.githubusercontent.com,A,185.199.109.133,DNS(8.8.8.8),2026-08-10,raw内容CDN
+raw.githubusercontent.com,A,185.199.110.133,DNS(8.8.8.8),2026-08-10,raw内容CDN
+raw.githubusercontent.com,A,185.199.111.133,DNS(8.8.8.8),2026-08-10,raw内容CDN
+github.map.fastly.net,A,185.199.108.133,DNS(8.8.8.8),2026-08-10,Fastly CDN入口
+github.map.fastly.net,A,185.199.109.133,DNS(8.8.8.8),2026-08-10,Fastly CDN入口
+github.map.fastly.net,A,185.199.110.133,DNS(8.8.8.8),2026-08-10,Fastly CDN入口
+github.map.fastly.net,A,185.199.111.133,DNS(8.8.8.8),2026-08-10,Fastly CDN入口
+github.global.ssl.fastly.net,A,162.125.34.133,DNS(8.8.8.8),2026-08-10,Fastly全局CDN当前IP
+github.global.ssl.fastly.net,A,151.101.65.194,fliu2476/gh-hosts,2021-12-03,Fastly历史IP
+github.global.ssl.fastly.net,A,151.101.44.249,社区记录,2025-10-14,Fastly历史IP
+github.global.ssl.fastly.net,A,146.75.29.194,fliu2476/gh-hosts,2021-12-03,Fastly历史IP
+github.global.ssl.fastly.net,A,151.101.100.133,社区记录,2022-11-27,Fastly历史IP
+camo.githubusercontent.com,A,185.199.108.133,fliu2476/gh-hosts,2021-12-03,Camo代理CDN
+avatars0.githubusercontent.com,A,185.199.108.133,fliu2476/gh-hosts,2021-12-03,头像CDN
+avatars1.githubusercontent.com,A,185.199.108.133,fliu2476/gh-hosts,2021-12-03,头像CDN
+avatars2.githubusercontent.com,A,185.199.109.133,fliu2476/gh-hosts,2021-12-03,头像CDN
+avatars3.githubusercontent.com,A,185.199.110.133,fliu2476/gh-hosts,2021-12-03,头像CDN
+avatars4.githubusercontent.com,A,185.199.108.133,fliu2476/gh-hosts,2021-12-03,头像CDN
+avatars5.githubusercontent.com,A,185.199.108.133,fliu2476/gh-hosts,2021-12-03,头像CDN
+desktop.githubusercontent.com,A,185.199.108.133,fliu2476/gh-hosts,2021-12-03,Desktop CDN
+favicons.githubusercontent.com,A,185.199.108.133,fliu2476/gh-hosts,2021-12-03,图标CDN
+media.githubusercontent.com,A,185.199.108.133,fliu2476/gh-hosts,2021-12-03,媒体CDN
+user-images.githubusercontent.com,A,185.199.109.133,fliu2476/gh-hosts,2021-12-03,用户图片CDN
+github.githubassets.com,A,185.199.110.154,fliu2476/gh-hosts,2021-12-03,资源CDN
+githubstatus.com,A,185.199.108.153,fliu2476/gh-hosts,2021-12-03,状态页
+assets-cdn.github.com,A,151.101.100.133,社区记录,2022-11-27,旧Fastly CDN IP
+central.github.com,A,140.82.112.21,fliu2476/gh-hosts,2021-12-03,Central服务
