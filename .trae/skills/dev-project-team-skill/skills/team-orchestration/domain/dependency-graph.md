@@ -15,7 +15,7 @@ class TaskNode:
     role: str                  # architect/executor/test-engineer/...
     deps: List[str]            # 上游依賴 task_id 列表
     estimated_duration: int    # 預估分鐘數
-    model_hint: str = "auto"   # haiku/sonnet/opus/auto
+    model_hint: str = "auto"   # s0/s1/s2/s3/auto（model_selection 檔位）
     priority: int = 0          # 數值越大越優先
     metadata: Dict = field(default_factory=dict)
 ```
@@ -46,7 +46,7 @@ def build_dag_from_prd(prd: PRDDocument) -> TaskGraph:
             role="executor",
             deps=dep_ids,
             estimated_duration=impl.estimate_minutes,
-            model_hint=impl.complexity  # simple/standard/complex
+            model_hint=impl.complexity  # s0/s1/s2/s3
         ))
     
     # 3. 測試任務 → TestEngineer
@@ -69,7 +69,7 @@ def build_dag_from_prd(prd: PRDDocument) -> TaskGraph:
             role="writer",
             deps=dep_ids,
             estimated_duration=10,
-            model_hint="haiku"
+            model_hint="s0"
         ))
     
     return TaskGraph(nodes=nodes)
@@ -178,7 +178,7 @@ def compute_levels(graph: TaskGraph) -> Dict[str, int]:
 
 ### 3.2 資源感知調度
 ```python
-def schedule_with_resources(graph, max_parallel=6, model_quota={"haiku": 4, "sonnet": 2, "opus": 1}):
+def schedule_with_resources(graph, max_parallel=6, model_quota={"s0": 4, "s1": 2, "s2": 1}):
     levels = compute_levels(graph)
     running = []
     completed = set()
@@ -262,7 +262,7 @@ graph TD
     "2": ["TEST_API", "TEST_UI"],
     "3": ["DOC_API", "DOC_UI"]
   },
-  "model_quota": {"haiku": 4, "sonnet": 2, "opus": 1}
+  "model_quota": {"s0": 4, "s1": 2, "s2": 1}
 }
 ```
 

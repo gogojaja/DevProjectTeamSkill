@@ -27,14 +27,14 @@ description: "多視角驗證技能：對代碼/架構/文檔/配置進行多角
 | `quality gate` / `質量門禁` | 發布門禁 | 五視角全開 + 簽署門禁 |
 | `architecture review` / `架構評審` | 架構評審 | Architect + SecurityReviewer + PerformanceEngineer |
 
-### 1.3 視角定義
-| 視角 | 角色 | 聚焦維度 | 模型 | 產出 |
+### 1.3 視角定義（檔位見 `../../references/model_selection.md` §3-4）
+| 視角 | 角色 | 聚焦維度 | 檔位 | 產出 |
 |------|------|----------|------|------|
-| **架構一致性** | Architect (Opus) | 設計符合性、接口契約、數據模型、邊界劃分 | Opus | PASS/FAIL + 違規列表 |
-| **代碼質量** | CodeReviewer (Opus) | 風格/複雜度/測試覆蓋/文檔/重複/異味 | Opus | PASS/FAIL + 具體建議 |
-| **安全合規** | SecurityReviewer (Sonnet) | 威脅建模、漏洞掃描、認證授權、數據流、合規 | Sonnet | PASS/FAIL + CVE/風險清單 |
-| **測試完備性** | TestEngineer (Sonnet) | 單元/集成/契約/E2E 覆蓋、斷言質量、測試策略 | Sonnet | PASS/FAIL + 缺口報告 |
-| **性能基準** | PerformanceEngineer (Sonnet) | 延遲/吞吐/資源/併發/擴展性/回歸 | Sonnet | PASS/FAIL + 基準報告 |
+| **架構一致性** | Architect | 設計符合性、接口契約、數據模型、邊界劃分 | S2(強模型) | PASS/FAIL + 違規列表 |
+| **代碼質量** | CodeReviewer | 風格/複雜度/測試覆蓋/文檔/重複/異味 | S1/S2 | PASS/FAIL + 具體建議 |
+| **安全合規** | SecurityReviewer | 威脅建模、漏洞掃描、認證授權、數據流、合規 | S2(強模型) | PASS/FAIL + CVE/風險清單 |
+| **測試完備性** | TestEngineer | 單元/集成/契約/E2E 覆蓋、斷言質量、測試策略 | S1 | PASS/FAIL + 缺口報告 |
+| **性能基準** | PerformanceEngineer | 延遲/吞吐/資源/併發/擴展性/回歸 | S1/S2 | PASS/FAIL + 基準報告 |
 
 ---
 
@@ -171,11 +171,11 @@ def aggregate_results(ctx, raw_results) -> ValidationReport:
 - 其餘視角無阻塞性問題
 
 ## 簽署
-- Architect (Opus): ✅ PASS
-- CodeReviewer (Opus): ✅ PASS  
-- SecurityReviewer (Sonnet): ✅ PASS
-- TestEngineer (Sonnet): ⚠️ CHANGES_REQUESTED
-- PerformanceEngineer (Sonnet): ✅ PASS
+- Architect (S2/強模型): ✅ PASS
+- CodeReviewer (S1/S2): ✅ PASS  
+- SecurityReviewer (S2/強模型): ✅ PASS
+- TestEngineer (S1): ⚠️ CHANGES_REQUESTED
+- PerformanceEngineer (S1/S2): ✅ PASS
 ```
 
 ### 3.3 CSV 導出格式

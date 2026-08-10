@@ -26,10 +26,11 @@
 7. **授权登记/时效**：系统/外部文件授权经 `register_auth` 登记 `14_授权登记.csv`（含有效期），每阶段末检查并提醒续期/撤销；
 8. 单角色任务直接加载对应包；多角色/全生命周期由编排器调度；
 9. 各包辅助能力统一指向 `shared/`（源码单源），打包产物内嵌副本；
-10. **GitHub 访问异常**：`github.com:443` 不可达时，加载 `references/github_access.md`（候选 IP 池 / 连通性验证 / push 带凭据）。
+10. **GitHub 访问异常**：`github.com:443` 不可达时，加载 `references/github_access.md`（候选 IP 池 / 连通性验证 / push 带凭据）；
+11. **嵌套能力（v21.4.0）**：编排器内嵌 `team-orchestration`（并行编排）与 `multi-perspective-validation`（多视角验证），模型档位 S0~S3 + 免费体系（对齐 `references/model_selection.md` §4）。
 
 ---
 
-**文档版本**：v21.3.3
-**最后更新**：2026-08-07（编排器新增双平台兼容强制约束 §2.2-5；token_standard §6 双平台规则；iron_rules §6 平台兼容铁律）
+**文档版本**：v21.4.0
+**最后更新**：2026-08-10（嵌套能力模型体系适配：team-orchestration / multi-perspective-validation 改 S0~S3 + 免费档）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

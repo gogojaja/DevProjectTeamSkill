@@ -10,9 +10,9 @@
 Ultrawork 执行引擎
 ├── DAG 构建器 (Planner)          → 依赖图 JSON
 ├── 工作窃取调度器 (Chase-Lev)    → 就绪队列 + 偷取逻辑
-├── 模型路由器                    → Haiku/Sonnet/Opus 自动选择
+├── 模型路由器                    → S0~S3 档位自动选择（免费→强模型）
 ├── MVCC 状态存储                 → 版本化任务状态、原子提交
-├── 执行器池                      → Haiku/Sonnet/Opus 实例
+├── 执行器池                      → 按档位配置的模型实例
 └── 收敛监控器                    → 叶子任务完成 → 触发下游
 ```
 
@@ -91,28 +91,30 @@ def scheduler_loop(worker_id, local_deque, global_ready):
 
 ## 4. 模型路由表
 
-| 任务特征 | 路由模型 | 理由 |
-|----------|----------|------|
-| 模板代码生成、简单重构、文档 | Haiku | 速度最快、成本最低 |
-| 标准业务逻辑、单测编写、API 实现 | Sonnet | 平衡质量与速度 |
-| 架构设计、复杂算法、安全审查、根因分析 | Opus | 深度推理、上下文大 |
-| 需求澄清、契约评审 | Opus | 需全局视角 |
+> 档位定义见 `../../references/model_selection.md` §3-4：S0 简单 / S1 常规 / S2 复杂 / S3 高危；成本档：免费 / 低价 / 平衡 / 强模型。
+
+| 任务特征 | 档位 | 成本档 | 理由 |
+|----------|------|--------|------|
+| 模板代码生成、简单重构、文档 | S0 | 免费/低价 | 机械操作，最低成本 |
+| 标准业务逻辑、单测编写、API 实现 | S1 | 低价/平衡 | 平衡质量与速度 |
+| 架构设计、复杂算法、安全审查、根因分析 | S2 | 强模型 | 深度推理、上下文大 |
+| 需求澄清、契约评审 | S2/S3 | 强模型 | 需全局视角 |
 
 ### 4.1 自动路由算法
 ```python
 def route_model(task):
     keywords = task.description.lower()
     if any(k in keywords for k in ["architect", "security", "root-cause", "design"]):
-        return "opus"
+        return "S3"
     if any(k in keywords for k in ["template", "boilerplate", "doc", "simple"]):
-        return "haiku"
-    return "sonnet"
+        return "S0"
+    return "S1"
 ```
 
 ### 4.2 成本控制
-- 单流水线 Opus 任务上限：30%
-- Haiku 优先填满，剩余分配 Sonnet/Opus
-- 超预算 → 自动降级 Opus→Sonnet→Haiku
+- 单流水线强模型（S2/S3）任务上限：30%
+- 免费档（S0）优先填满，剩余分配低价/平衡档
+- 超预算 → 自动降档：强模型→平衡→低价→免费（S3 高危任务禁止降档，见 model_selection §6.5）
 
 ---
 

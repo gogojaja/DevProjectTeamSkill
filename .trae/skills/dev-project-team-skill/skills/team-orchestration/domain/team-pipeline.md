@@ -8,9 +8,9 @@
 
 | 阶段 | 代号 | 核心角色 | 产出 | 门禁 |
 |------|------|----------|------|------|
-| 1 | plan | Analyst(Opus) + Planner(Opus) | 任务分解 DAG + 验收标准 | 依赖图无环 + 覆盖率 100% |
-| 2 | prd | Architect(Opus) | 技术设计/接口契约/数据模型 | 契约评审通过 + 无循环依赖 |
-| 3 | exec | Executor(Haiku/Sonnet/Opus) | 代码/测试/文档 | lint/typecheck/test 全绿 |
+| 1 | plan | Analyst(S3) + Planner(S3) | 任务分解 DAG + 验收标准 | 依赖图无环 + 覆盖率 100% |
+| 2 | prd | Architect(S3) | 技术设计/接口契约/数据模型 | 契约评审通过 + 无循环依赖 |
+| 3 | exec | Executor(S0~S2) | 代码/测试/文档 | lint/typecheck/test 全绿 |
 | 4 | verify | Architect + SecurityReviewer + CodeReviewer(并行) | QA 签署报告 | 三视角全通过 |
 | 5 | fix | Executor(按根因分派) | 修复补丁 + 回归测试 | 同一错误 ≤3 轮 |
 
@@ -41,18 +41,18 @@ transition:
 
 ## 3. 角色映射表
 
-| 阶段 | 主角色 | 模型 | 备选 | 并行度 |
+| 阶段 | 主角色 | 档位 | 备选 | 并行度 |
 |------|--------|------|------|--------|
-| plan | Analyst + Planner | Opus | - | 2 |
-| prd | Architect | Opus | Sonnet | 1 |
-| exec | Executor | Haiku/Sonnet/Opus | - | ≤6 |
-| verify | Architect + SecRev + CodeRev | Opus/Sonnet | - | 3 |
-| fix | Executor(按根因) | Haiku/Sonnet/Opus | - | ≤2 |
+| plan | Analyst + Planner | S3(强模型) | - | 2 |
+| prd | Architect | S3(强模型) | S2 | 1 |
+| exec | Executor | S0~S2(免费→平衡) | - | ≤6 |
+| verify | Architect + SecRev + CodeRev | S2/S3 | - | 3 |
+| fix | Executor(按根因) | S0~S2 | - | ≤2 |
 
-**模型路由规则**：
-- 简单/模板化任务 → Haiku（快、省）
-- 标准实现/调试 → Sonnet（平衡）
-- 架构/安全/深度审查 → Opus（深度）
+**模型路由规则**（档位见 `../../references/model_selection.md` §3-4）：
+- 简单/模板化任务 → S0（免费/低价，快、省）
+- 标准实现/调试 → S1（低价/平衡）
+- 架构/安全/深度审查 → S2/S3（强模型，S3 高危禁止降档）
 
 ---
 

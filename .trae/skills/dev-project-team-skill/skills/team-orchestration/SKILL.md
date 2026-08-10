@@ -48,17 +48,17 @@ graph LR
   D -->|通过| F[完成]
 ```
 
-**各阶段职责**：
-- **plan**：Analyst(Opus) 澄清需求 → Planner(Opus) 产出任务分解 + 依赖图
-- **prd**：Architect(Opus) 产出技术设计/接口契约/数据模型
-- **exec**：按依赖图拓扑序调度，Executor(Haiku/Sonnet/Opus) 并行实现
-- **verify**：并行多视角：Architect(功能完整性) + SecurityReviewer(漏洞) + CodeReviewer(质量)
+**各阶段职责**（模型档位按 `../references/model_selection.md` §4.2 决策表）：
+- **plan**：Analyst(S3/强模型) 澄清需求 → Planner(S3/强模型) 产出任务分解 + 依赖图
+- **prd**：Architect(S3/强模型) 产出技术设计/接口契约/数据模型
+- **exec**：按依赖图拓扑序调度，Executor(S0~S2，免费→平衡) 并行实现
+- **verify**：并行多视角：Architect(功能完整性) + SecurityReviewer(漏洞) + CodeReviewer(质量)，评审视角用 S2/S3
 - **fix**：失败项进入有界修复循环（最多 3 轮），修复后回 verify
 
 ### 2.2 Ultrawork 高吞吐并行
 1. **依赖图构建**：Planner 产出 DAG（节点=任务，边=依赖）
 2. **工作窃取队列**：Chase-Lev 双端队列，空闲 Worker 偷取就绪任务
-3. **模型路由**：简单任务→Haiku，标准→Sonnet，复杂→Opus
+3. **模型路由**：按任务复杂度档位路由——S0/S1→免费/低价，S2→平衡，S3→强模型（`../references/model_selection.md` §4）
 4. **状态同步**：MVCC 版本控制，任务完成原子提交
 5. **完成收敛**：所有叶子任务完成触发下游
 

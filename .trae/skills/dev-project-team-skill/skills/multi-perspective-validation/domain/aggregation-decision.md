@@ -108,11 +108,11 @@ def apply_severity_override(decision: Decision, results: Dict) -> Decision:
 ## 視角簽署
 | 視角 | 狀態 | 簽署者 | 信心度 | 關鍵發現 |
 |------|------|--------|--------|----------|
-| 架構一致性 | ✅ PASS | Architect (Opus) | high | 接口契約完全一致 |
-| 代碼質量 | ✅ PASS | CodeReviewer (Opus) | high | 複雜度均<15，覆蓋85% |
-| 安全合規 | ✅ PASS | SecurityReviewer (Sonnet) | high | 0 high/critical 漏洞 |
-| 測試完備性 | ⚠️ CHANGES_REQUESTED | TestEngineer (Sonnet) | medium | 缺少 E2E 測試 2 條 |
-| 性能基準 | ✅ PASS | PerformanceEngineer (Sonnet) | high | P99 延遲 45ms < 200ms |
+| 架構一致性 | ✅ PASS | Architect (S2/強模型) | high | 接口契約完全一致 |
+| 代碼質量 | ✅ PASS | CodeReviewer (S1/S2) | high | 複雜度均<15，覆蓋85% |
+| 安全合規 | ✅ PASS | SecurityReviewer (S2/強模型) | high | 0 high/critical 漏洞 |
+| 測試完備性 | ⚠️ CHANGES_REQUESTED | TestEngineer (S1) | medium | 缺少 E2E 測試 2 條 |
+| 性能基準 | ✅ PASS | PerformanceEngineer (S1/S2) | high | P99 延遲 45ms < 200ms |
 
 ## 決策依據
 - 單一視角 (測試) 發現非阻塞性問題
@@ -126,11 +126,11 @@ def apply_severity_override(decision: Decision, results: Dict) -> Decision:
 | 缺少 checkout 流程 E2E | 發布後可能發現集成問題 | 下一迭代優先補全 | TestEngineer | 2026-08-15 |
 
 ## 簽署
-- Architect (Opus): ✅ PASS
-- CodeReviewer (Opus): ✅ PASS  
-- SecurityReviewer (Sonnet): ✅ PASS
-- TestEngineer (Sonnet): ⚠️ CHANGES_REQUESTED
-- PerformanceEngineer (Sonnet): ✅ PASS
+- Architect (S2/強模型): ✅ PASS
+- CodeReviewer (S1/S2): ✅ PASS  
+- SecurityReviewer (S2/強模型): ✅ PASS
+- TestEngineer (S1): ⚠️ CHANGES_REQUESTED
+- PerformanceEngineer (S1/S2): ✅ PASS
 
 **最終決策**: SIGNED_OFF
 **簽署時間**: 2026-08-08T14:30:00Z
@@ -151,7 +151,7 @@ class SignedReport:
 @dataclass
 class Signature:
     perspective: str
-    model: str           # Opus/Sonnet/Haiku
+    model: str           # s0/s1/s2/s3（model_selection 檔位）
     status: str          # PASS/FAIL/CHANGES_REQUESTED
     confidence: str      # high/medium/low
     signed_at: str
@@ -192,14 +192,14 @@ def resolve_disagreement(perspectives: Dict[str, PerspectiveResult]) -> Resoluti
             if reassessed.consensus:
                 return Resolution(status="resolved", consensus=reassessed)
     
-    # 3. 專家仲裁 (Architect Opus 仲裁)
+    # 3. 專家仲裁 (Architect S2/強模型 仲裁)
     return arbitration(conflicts, perspectives)
 ```
 
 ### 3.3 仲裁規則
 ```python
 def arbitration(conflicts, perspectives) -> Resolution:
-    """Architect (Opus) 仲裁，基於證據權重"""
+    """Architect (S2/強模型) 仲裁，基於證據權重"""
     
     for conflict in conflicts:
         # 收集雙方證據
@@ -257,14 +257,14 @@ def arbitration(conflicts, perspectives) -> Resolution:
 4. **跟蹤**: Issue #456 跟蹤 E2E 補全，預計 2026-08-15 完成
 
 ## 批准
-- **提交人**: TestEngineer (Sonnet)
-- **審批人**: Architect (Opus) ✅
+- **提交人**: TestEngineer (S1)
+- **審批人**: Architect (S2/強模型) ✅
 - **業務負責人**: Product Owner ✅
 - **批准時間**: 2026-08-08T14:30:00Z
 - **有效期**: 至 2026-08-15 (E2E 補全截止)
 
 ## 簽署
-- Architect (Opus): ✅ 批准
+- Architect (S2/強模型): ✅ 批准
 - Product Owner: ✅ 批准
 ```
 

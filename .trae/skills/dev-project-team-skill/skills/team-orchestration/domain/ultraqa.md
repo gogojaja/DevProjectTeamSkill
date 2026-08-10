@@ -50,11 +50,11 @@ graph TD
 - 產出：安全/性能報告
 
 ### 2.4 Cycle 4: 多視角評審
-| 驗證器 | 模型 | 聚焦 | 產出 |
+| 驗證器 | 檔位 | 聚焦 | 產出 |
 |--------|------|------|------|
-| Architect | Opus | 功能完整性、架構一致性 | PASS/FAIL + 證據 |
-| SecurityReviewer | Sonnet | 威脅建模、漏洞、數據流 | PASS/FAIL + CVE 清單 |
-| CodeReviewer | Opus | 代碼質量、測試覆蓋、風格 | PASS/FAIL + 難點標註 |
+| Architect | S2(強模型) | 功能完整性、架構一致性 | PASS/FAIL + 證據 |
+| SecurityReviewer | S2(強模型) | 威脅建模、漏洞、數據流 | PASS/FAIL + CVE 清單 |
+| CodeReviewer | S2/S1 | 代碼質量、測試覆蓋、風格 | PASS/FAIL + 難點標註 |
 
 **決策規則**：三視角全 PASS → 進入 Cycle 5；任一 FAIL → 進入 fix 循環 → 回 Cycle 1
 
@@ -127,16 +127,16 @@ Timestamp: 2026-08-08T14:30:00Z
 - 部署建議: 可發布，建議 1 週內補齊未測項
 
 ## 簽署人
-- Architect: Opus (auto)
-- SecurityReviewer: Sonnet (auto)  
-- CodeReviewer: Opus (auto)
+- Architect: S2 (強模型)
+- SecurityReviewer: S2 (強模型)  
+- CodeReviewer: S1/S2
 ```
 
 ### 4.2 分歧處理
 - 任一驗證器 FAIL → 自動進入 fix 循環
 - 三視角意見分歧（如 2 PASS 1 FAIL）：
   1. 自動協商：失敗方給具體證據，其他方反駁
-  2. 輪次 ≤ 2 → 仍分歧 → Architect (Opus) 仲裁
+  2. 輪次 ≤ 2 → 仍分歧 → Architect (S2/強模型) 仲裁
   3. 仲裁結果為最終決策
 
 ---

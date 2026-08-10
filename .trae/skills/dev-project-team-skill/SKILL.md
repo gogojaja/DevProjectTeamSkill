@@ -12,9 +12,10 @@ description: "软件研发多角色编排器：按阶段渐进加载角色包（
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.3.4
-- **版本发布日期**：2026-08-09
+- **技能版本**：v21.4.0
+- **版本发布日期**：2026-08-10
 - **版本变更记录**：
+  - v21.4.0：嵌套能力模型体系适配（2026-08-10）——内嵌 `skills/team-orchestration`（并行编排）与 `skills/multi-perspective-validation`（多视角验证）模型路由由 Opus/Sonnet/Haiku 改为 S0~S3 四档 + 免费体系（对齐 `../references/model_selection.md` §4），弱推理模型（免费/低价档）可正常运行 S0/S1 任务，S2/S3 高危任务仍要求强模型。
   - v21.3.4：模型路由增网关策略（2026-08-09）——`references/model_selection.md` §4.5 增网关路由策略（auto/weighted/fallback + auto 分档），衔接档位决策与本地网关，仅约定策略与配置列，不携带网关业务代码；配置列（routing_strategy/model_pool/fallback_chain/cost_per_token）入 `20_环境配置.csv`。
   - v21.3.3：新增模型路由（2026-08-09）——`references/model_selection.md` 增 §4 模型路由：任务分类×复杂度档位×成本档×能力要求四维路由，S0 导航/查询禁止强模型、S3 高危禁止降档，多角色任务按子任务独立路由；台账 `21_模型选型.csv` 增复杂度档位字段。
   - v21.3.2：新增双平台兼容强制约束（2026-08-07）——§2.2-5 所有启用项目必须同时支持 Windows/macOS：禁硬编码单一平台绝对路径、禁 Windows 专属命令、行尾统一 LF、文档标双平台写法；细则入 token_standard §6；iron_rules 加「平台兼容」铁律。
@@ -84,6 +85,13 @@ description: "软件研发多角色编排器：按阶段渐进加载角色包（
 - **角色隔离**：各角色任务必须在对应角色包内完成，禁止跨角色执行；§2 公共底座对全角色强制生效；
 - 角色明细读取：命中后 Read 对应包 `SKILL.md` 路由表 → 只读目标 `domain/*.md`。
 
+### 4.1 嵌套能力（编排器内部扩展，v21.4.0）
+
+| 能力 | 位置 | 触发 | 说明 |
+|------|------|------|------|
+| 并行编排 | `./skills/team-orchestration/` | 并行编排/团队流水线/multi-role 并行 | team/ultrawork/ralph/ultraqa 四模式，模型档位 S0~S3 |
+| 多视角验证 | `./skills/multi-perspective-validation/` | 多视角验证/代码审查/质量门禁 | 五视角并行验证，模型档位 S0~S3 |
+
 ---
 
 ## 5. 角色调度执行规则
@@ -115,5 +123,5 @@ description: "软件研发多角色编排器：按阶段渐进加载角色包（
 
 ---
 
-**文档版本**：v21.3.4　**最后更新**：2026-08-09（模型选型 §4.5 增网关路由策略：auto/weighted/fallback + auto 分档）
+**文档版本**：v21.4.0　**最后更新**：2026-08-10（嵌套能力模型体系适配：team-orchestration / multi-perspective-validation 改 S0~S3 + 免费档）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
