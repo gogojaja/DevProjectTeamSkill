@@ -103,7 +103,7 @@ graph TD
 | 列名 | 说明 | 示例值 |
 |------|------|--------|
 | `routing_strategy` | 路由策略 | `auto` / `weighted` / `fallback` |
-| `model_pool` | 多模型池 | `gpt-4o,claude-3.5,deepseek` |
+| `model_pool` | 多模型池 | `qwen2.5-7b-instruct,qwen2.5-coder-7b-instruct,glm-4.7-flash,deepseek-chat` |
 | `fallback_chain` | 回退链 | `priority` |
 | `cost_per_token` | 每 token 成本 | `0.002` |
 
@@ -130,6 +130,16 @@ graph TD
 5. S0 档任务禁止使用强模型（导航/查询/格式化），S3 档任务禁止为省成本降档；
 6. 批量任务优先选稳定模型，不追求单次速度。
 
+## 7. 模型清单（候选模型池）
+
+> 可用候选模型登记，路由仍按 §4 档位/任务联合判定；新增/下线模型须经 `select_model` + 用户确认，走 `register_change` 留痕并同步台账 `21_模型选型.csv`。
+
+| 模型 | 档位 | 成本 | 可访问性 | 适用任务 | 说明 |
+|------|------|------|----------|----------|------|
+| `Qwen2.5-7B-Instruct` | S0/S1 低价 | 免费（本地部署） | 本地/国内稳定 | 常规生成 / 文档 / 台账更新 | 开源 7B 通用模型，可本地离线部署 |
+| `Qwen2.5-Coder-7B-Instruct` | S1 低价 | 免费（本地部署） | 本地/国内稳定 | 代码生成 / 修复 / 审查 | 代码专用 7B，匹配 `auto/coding` |
+| `GLM-4.7-Flash` | S0/S1 免费 | 免费 | 国内稳定 | 常规 / 文档 / 格式化 | Flash 免费档，低成本高频任务优先 |
+
 ---
 
-**文档版本**：v21.3.4　**最后更新**：2026-08-09（§4 增网关路由策略：auto/weighted/fallback + auto 分档，衔接档位决策与本地网关，仅约定不携业务代码）
+**文档版本**：v21.3.5　**最后更新**：2026-08-11（§7 增模型清单：登记 Qwen2.5-7B-Instruct / Qwen2.5-Coder-7B-Instruct / GLM-4.7-Flash 候选模型，同步 §4.5.3 `model_pool` 示例）
