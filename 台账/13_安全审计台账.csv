@@ -11,7 +11,10 @@ OP-AUDIT-009,配置修改,全局opencode.jsonc为本地模型补capabilities(rea
 OP-AUDIT-010,配置删除,全局opencode.jsonc删除dashscope provider(qwen2.5-7b-instruct/qwen2.5-coder-7b-instruct两个API模型),中,用户明确授权,是(.backup/opencode_global_cfg_20260812_141759_before_dashscope_removal.jsonc),-,2026-08-12 14:20,成功(providers仅剩ollama/zhipu)
 OP-AUDIT-011,数据删除,本地Ollama模型deepseek-r1:7b(4.7GB),中,用户明确授权,否(可重新pull恢复),-,2026-08-12 14:20,成功(deleted deepseek-r1:7b)
 OP-AUDIT-012,配置修改,全局opencode.jsonc ollama provider注册qwen2.5-coder:7b(tool_call),中,用户明确授权,是(.backup/opencode_global_cfg_20260812_142547_before_coder_reg.jsonc),-,2026-08-12 14:26,成功
-=======
 OP-AUDIT-004,修改项目外配置文件,~/.config/opencode/opencode.jsonc（新增 ollama 本地双模型 + 智谱 GLM-4.7-Flash provider）,中,用户明确授权,是,DevProjectTeamSkill/.backup/opencode_cfg_20260811_200919/opencode.jsonc,2026-08-11 20:09:00,成功
 OP-AUDIT-005,修改项目外配置文件,~/.config/opencode/opencode.jsonc（全局启用 DevProjectTeamSkill：新增 skills.paths 段指向 .trae/skills 源码目录）,中,用户明确授权（全局启用指令）,是,DevProjectTeamSkill/.backup/opencode.jsonc.bak.20260811_220652,2026-08-11 22:08:05,成功
+<<<<<<< HEAD
 >>>>>>> 5e82dfc (全局启用 DevProjectTeamSkill：全局 opencode.jsonc 添加 skills.paths + 审计留痕 OP-AUDIT-005)
+=======
+OP-AUDIT-006,修改项目外配置文件+目录,~/.trae-cn/skills/（TRAE 全局启用：清理扁平文件+部署 9 包正确目录结构）+ ~/.trae-cn/skill-config.json（注册 7 角色包）,中,用户明确授权（TRAE 全局启用指令）,是,DevProjectTeamSkill/.backup/skill-config.json.bak.20260811_221000,2026-08-11 22:10:00,成功
+>>>>>>> 80a7af3 (TRAE 全局启用：~/.trae-cn/skills/ 部署 9 包正确目录结构 + skill-config.json 注册 7 角色包（OP-AUDIT-006）)
