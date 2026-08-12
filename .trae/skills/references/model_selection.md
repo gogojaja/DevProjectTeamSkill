@@ -103,7 +103,7 @@ graph TD
 | 列名 | 说明 | 示例值 |
 |------|------|--------|
 | `routing_strategy` | 路由策略 | `auto` / `weighted` / `fallback` |
-| `model_pool` | 多模型池 | `qwen2.5-7b-instruct,qwen2.5-coder-7b-instruct,glm-4.7-flash,deepseek-chat` |
+| `model_pool` | 多模型池 | `qwen2.5:7b,qwen2.5-coder:7b,qwen3:4b,qwen3:8b,glm-4.7-flash` |
 | `fallback_chain` | 回退链 | `priority` |
 | `cost_per_token` | 每 token 成本 | `0.002` |
 
@@ -136,10 +136,14 @@ graph TD
 
 | 模型 | 档位 | 成本 | 可访问性 | 适用任务 | 说明 |
 |------|------|------|----------|----------|------|
-| `Qwen2.5-7B-Instruct` | S0/S1 低价 | 免费（本地部署） | 本地/国内稳定 | 常规生成 / 文档 / 台账更新 | 开源 7B 通用模型，可本地离线部署 |
-| `Qwen2.5-Coder-7B-Instruct` | S1 低价 | 免费（本地部署） | 本地/国内稳定 | 代码生成 / 修复 / 审查 | 代码专用 7B，匹配 `auto/coding` |
-| `GLM-4.7-Flash` | S0/S1 免费 | 免费 | 国内稳定 | 常规 / 文档 / 格式化 | Flash 免费档，低成本高频任务优先 |
+| `Qwen2.5-7B-Instruct` | S0/S1 | 免费（本地 `qwen2.5:7b` Q4） | 本地/国内稳定 | 常规生成 / 文档 / 台账更新 | 开源 7B 通用模型，本地离线可用 |
+| `Qwen2.5-Coder-7B-Instruct` | S1 | 免费（本地 `qwen2.5-coder:7b` Q4） | 本地/国内稳定 | 代码生成 / 修复 / 审查 | 代码专用 7B，匹配 `auto/coding`，已本地部署 |
+| `Qwen3-4B` | S1 | 免费（本地 `qwen3:4b` Q4） | 本地/国内稳定 | 常规 + 可切换思维链推理 | Qwen3 轻量版，thinking 可开/关，本地离线可用 |
+| `Qwen3-8B` | S1/S2 | 免费（本地 `qwen3:8b` Q4，下载中） | 本地/国内稳定 | 代码生成 / 复杂分析 + 思维链 | Qwen3 8B，编程与推理兼顾；本机 16GB 仅可单模型驻留（`OLLAMA_MAX_LOADED_MODELS=1`） |
+| `GLM-4.7-Flash` | S0/S1 | 免费 | 国内稳定（智谱 BigModel） | 常规 / 文档 / 格式化 | Flash 免费档，低成本高频任务优先；opencode 远程免费模型 |
+
+> 本地 Ollama 模型默认 `OLLAMA_MAX_LOADED_MODELS=1`：同一时间仅一个模型驻留显存/内存，换模型自动卸载前一个。嵌入模型 `mxbai-embed-large`（669MB，本地）专用于检索/RAG，不计入生成路由池。
 
 ---
 
-**文档版本**：v21.3.5　**最后更新**：2026-08-11（§7 增模型清单：登记 Qwen2.5-7B-Instruct / Qwen2.5-Coder-7B-Instruct / GLM-4.7-Flash 候选模型，同步 §4.5.3 `model_pool` 示例）
+**文档版本**：v21.3.6　**最后更新**：2026-08-12（§7 模型清单扩充：新增本地模型 `qwen3:4b` / `qwen3:8b`，`qwen2.5-coder:7b` 标注已本地部署；同步 §4.5.3 `model_pool` 示例为本地 Ollama 池 + GLM-4.7-Flash 免费远程）

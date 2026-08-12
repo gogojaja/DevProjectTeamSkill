@@ -10,6 +10,7 @@ skills_legacy_*/
 
 # 打包产物（可经 tools/package_skills 重新生成）
 dist/
+_build_global/
 
 # 临时产物
 _pkg_tmp/
