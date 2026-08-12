@@ -141,9 +141,24 @@ graph TD
 | `Qwen3-4B` | S1 | 免费（本地 `qwen3:4b` Q4） | 本地/国内稳定 | 常规 + 可切换思维链推理 | Qwen3 轻量版，thinking 可开/关，本地离线可用 |
 | `Qwen3-8B` | S1/S2 | 免费（本地 `qwen3:8b` Q4，下载中） | 本地/国内稳定 | 代码生成 / 复杂分析 + 思维链 | Qwen3 8B，编程与推理兼顾；本机 16GB 仅可单模型驻留（`OLLAMA_MAX_LOADED_MODELS=1`） |
 | `GLM-4.7-Flash` | S0/S1 | 免费 | 国内稳定（智谱 BigModel） | 常规 / 文档 / 格式化 | Flash 免费档，低成本高频任务优先；opencode 远程免费模型 |
+| `DeepSeek-Chat (V3)` | S1/S2 | 免费(云端) | 国内稳定 | 通用 / 代码 / 复杂分析 | DeepSeek 官方或硅基流动，超低价，匹配 `auto/coding`/`auto/smart` |
+| `Kimi-K2 (Moonshot)` | S2 | 免费(云端) | 国内稳定 | 长上下文 / 复杂分析 | 月之暗面，支持超长上下文，免费档可用 |
+| `Qwen3-Max (百炼)` | S2 | 免费额度(云端) | 国内稳定 | 通用 / 代码 | 阿里云百炼免费额度，强模型档 |
+| `Doubao-Seed-1.6 (火山方舟)` | S1/S2 | 免费额度(云端) | 国内稳定 | 通用 / 代码 | 字节火山方舟免费试用额度 |
+| `Hunyuan (腾讯混元)` | S1 | 免费(云端) | 国内稳定 | 通用 / 文档 | 腾讯混元免费档 |
+| `GLM-4.7 (智谱)` | S1/S2 | 免费档/低成本(云端) | 国内稳定 | 通用 / 推理 | GLM-4.7 非 Flash 档，能力更强 |
+| `DeepSeek V4 Flash` | S1/S2 | 免费(云端) | 国内稳定（硅基流动等免费池） | 通用 / 代码 | DeepSeek V4 Flash，低延迟免费档 |
+| `Hy3` | S1 | 免费(云端) | 国内稳定（硅基流动等免费池） | 通用 / 文档 | Hy3 免费档 |
+| `Laguna S 2.1` | S1/S2 | 免费(云端) | 国内稳定（硅基流动等免费池） | 通用 / 代码 | Laguna S 2.1 免费档 |
+| `Ling-3.0-tiny` | S0/S1 | 免费(云端) | 国内稳定（硅基流动等免费池） | 轻量通用 / 格式化 | Ling-3.0-tiny 小模型，低成本高频 |
+| `MiMo V2.5` | S1/S2 | 免费(云端) | 国内稳定（硅基流动等免费池） | 推理 / 代码 | 小米 MiMo V2.5，支持思维链 |
+| `Nemotron 3 Ultra` | S2 | 免费(云端) | 国内稳定（硅基流动等免费池） | 强通用 / 复杂分析 | NVIDIA Nemotron 3 Ultra 免费档 |
+| `Nemotron 3.5 Lightning` | S1/S2 | 免费(云端) | 国内稳定（硅基流动等免费池） | 通用 / 低延迟 | NVIDIA Nemotron 3.5 Lightning 免费档 |
 
 > 本地 Ollama 模型默认 `OLLAMA_MAX_LOADED_MODELS=1`：同一时间仅一个模型驻留显存/内存，换模型自动卸载前一个。嵌入模型 `mxbai-embed-large`（669MB，本地）专用于检索/RAG，不计入生成路由池。
+> 免费云模型为候选池（国内可稳定访问，多经硅基流动/OpenRouter 等聚合平台免费档）；接入 opencode 前须经 `select_model` + 用户确认 provider 可达性，并补 `references/api_contracts.md` 与 provider 配置、同步台账 `21_模型选型.csv`。
+> 免费云模型为候选池（均为国内可稳定访问），按需经 `select_model` + 用户确认接入 opencode 对应 provider；接入后须补 `references/api_contracts.md` 与 provider 配置并同步台账 `21_模型选型.csv`。
 
 ---
 
-**文档版本**：v21.3.6　**最后更新**：2026-08-12（§7 模型清单扩充：新增本地模型 `qwen3:4b` / `qwen3:8b`，`qwen2.5-coder:7b` 标注已本地部署；同步 §4.5.3 `model_pool` 示例为本地 Ollama 池 + GLM-4.7-Flash 免费远程）
+**文档版本**：v21.3.7　**最后更新**：2026-08-12（§7 模型清单扩充云端免费候选：新增 DeepSeek V4 Flash / Hy3 / Laguna S 2.1 / Ling-3.0-tiny / MiMo V2.5 / Nemotron 3 Ultra / Nemotron 3.5 Lightning 免费档，与既有本地免费 + GLM-4.7-Flash 共同构成免费模型池）
