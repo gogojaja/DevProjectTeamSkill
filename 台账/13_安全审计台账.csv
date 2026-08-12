@@ -11,8 +11,10 @@ OP-AUDIT-009,配置修改,全局opencode.jsonc为本地模型补capabilities(rea
 OP-AUDIT-010,配置删除,全局opencode.jsonc删除dashscope provider(qwen2.5-7b-instruct/qwen2.5-coder-7b-instruct两个API模型),中,用户明确授权,是(.backup/opencode_global_cfg_20260812_141759_before_dashscope_removal.jsonc),-,2026-08-12 14:20,成功(providers仅剩ollama/zhipu)
 OP-AUDIT-011,数据删除,本地Ollama模型deepseek-r1:7b(4.7GB),中,用户明确授权,否(可重新pull恢复),-,2026-08-12 14:20,成功(deleted deepseek-r1:7b)
 OP-AUDIT-012,配置修改,全局opencode.jsonc ollama provider注册qwen2.5-coder:7b(tool_call),中,用户明确授权,是(.backup/opencode_global_cfg_20260812_142547_before_coder_reg.jsonc),-,2026-08-12 14:26,成功
+<<<<<<< HEAD
 OP-AUDIT-013,修改项目外配置文件(macOS),~/.config/opencode/opencode.jsonc（新增 ollama 本地双模型 + 智谱 GLM-4.7-Flash provider）,中,用户明确授权,是,DevProjectTeamSkill/.backup/opencode_cfg_20260811_200919/opencode.jsonc,2026-08-11 20:09:00,成功
 OP-AUDIT-014,修改项目外配置文件(macOS),~/.config/opencode/opencode.jsonc（全局启用 DevProjectTeamSkill：新增 skills.paths 段指向 .trae/skills 源码目录）,中,用户明确授权（全局启用指令）,是,DevProjectTeamSkill/.backup/opencode.jsonc.bak.20260811_220652,2026-08-11 22:08:05,成功
 OP-AUDIT-015,修改项目外配置文件+目录(macOS),~/.trae-cn/skills/（TRAE 全局启用：清理扁平文件+部署 9 包正确目录结构）+ ~/.trae-cn/skill-config.json（注册 7 角色包）,中,用户明确授权（TRAE 全局启用指令）,是,DevProjectTeamSkill/.backup/skill-config.json.bak.20260811_221000,2026-08-11 22:10:00,成功
 OP-AUDIT-016,发布技能到TRAE(macOS),~/.trae-cn/skills/（同步最新源码 v21.4.0：8 角色包+编排器+shared+references+SKILL_INDEX，清理 8 个旧 PascalCase 重复包与 3 个旧文档）+ ~/.trae-cn/skill-config.json（重注册 8 个 kebab-case 技能目录）+ 生成 dist/DevProjectTeamSkill-trae-v21.4.0.zip,中,用户明确授权（发布到 TRAE 指令）,是,DevProjectTeamSkill/.backup/trae_skills_20260812_223121/,2026-08-12 22:31:00,成功
 OP-AUDIT-017,系统文件修改+推送,hosts(C:\Windows\System32\drivers\etc\hosts)追加140.82.114.4 github.com以绕过github.com DNS封锁,高,用户明确授权(github push),是(.backup/hosts_20260812_160116.bak),-,2026-08-12 16:03,成功(git push -u origin main 完成 3221ddb..e54a5c4,远程已还原为https://github.com/...)
+OP-AUDIT-018,配置修改,全局opencode.jsonc为本地与远程模型补齐limit上下文窗口(qwen2.5/qwen3/GLM-4.7-Flash),中,用户明确授权,是(.backup/opencode_global_cfg_20260812_172634_before_limit_add.jsonc),-,2026-08-12 17:28,成功
