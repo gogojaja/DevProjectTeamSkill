@@ -10,3 +10,4 @@ OP-AUDIT-008,软件升级,Ollama 官方安装包(0.6.2->0.32.9),高,用户明确
 OP-AUDIT-009,配置修改,全局opencode.jsonc为本地模型补capabilities(reasoning/tool_call),中,用户明确授权,是(.backup/opencode_global_cfg_20260812_141030_before_capabilities.jsonc),-,2026-08-12 14:12,成功(qwen3:4b加reasoning+tool_call,qwen2.5:7b加tool_call)
 OP-AUDIT-010,配置删除,全局opencode.jsonc删除dashscope provider(qwen2.5-7b-instruct/qwen2.5-coder-7b-instruct两个API模型),中,用户明确授权,是(.backup/opencode_global_cfg_20260812_141759_before_dashscope_removal.jsonc),-,2026-08-12 14:20,成功(providers仅剩ollama/zhipu)
 OP-AUDIT-011,数据删除,本地Ollama模型deepseek-r1:7b(4.7GB),中,用户明确授权,否(可重新pull恢复),-,2026-08-12 14:20,成功(deleted deepseek-r1:7b)
+OP-AUDIT-012,配置修改,全局opencode.jsonc ollama provider注册qwen2.5-coder:7b(tool_call),中,用户明确授权,是(.backup/opencode_global_cfg_20260812_142547_before_coder_reg.jsonc),-,2026-08-12 14:26,成功
