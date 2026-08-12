@@ -7,3 +7,4 @@ OP-AUDIT-005,修改项目外文件(opencode全局配置),C:\Users\gogoj\.config\
 OP-AUDIT-006,修改项目外文件(opencode全局配置),C:\Users\gogoj\.config\opencode\opencode.jsonc,中,用户明确授权,是,D:\trae\DevProjectTeamSkill\.backup\opencode_global_cfg_20260812_101825\opencode.jsonc,2026-08-12 10:18:25,成功(ollama本地模型deepseek-r1:7b替换为qwen3:4b)
 OP-AUDIT-007,清理系统缓存文件,用户Temp与CrashDumps临时文件,中,用户明确授权,是(临时文件免备份),-,2026-08-12 10:30,成功(释放C盘6.03GB:1.64->7.67GB)
 OP-AUDIT-008,软件升级,Ollama 官方安装包(0.6.2->0.32.9),高,用户明确授权,是(模型保留在D盘已验证),-,2026-08-12 12:31,成功(保留runner库D:\JZDSInstallKit\ollama_location\lib\ollama,模型3个均在)
+OP-AUDIT-009,配置修改,全局opencode.jsonc为本地模型补capabilities(reasoning/tool_call),中,用户明确授权,是(.backup/opencode_global_cfg_20260812_141030_before_capabilities.jsonc),-,2026-08-12 14:12,成功(qwen3:4b加reasoning+tool_call,qwen2.5:7b加tool_call)
