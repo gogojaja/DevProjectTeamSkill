@@ -9,8 +9,10 @@ description: "开发管理角色包：开发策略与技术栈、分支编码规
 
 ## 1. 元数据
 
-- **技能版本**：v21.0.0　**发布日期**：2026-08-04
-- **变更记录**：v21.0.0 由 development-management-skill + 5 子技能重组为角色包
+- **技能版本**：v21.5.0　**发布日期**：2026-08-13
+- **变更记录**：
+  - v21.5.0：新增多项目环境隔离最佳实践引用（2026-08-13）——`domain/strategy.md` 引用 `../references/multi_project_isolation.md`（Git/运行时/数据库/Docker 四层隔离）。
+  - v21.0.0：由 development-management-skill + 5 子技能重组为角色包
 - **参考标准**：ISO/IEC/IEEE 12207 · OWASP ASVS · Trunk-Based/Git Flow
 
 ## 2. 触发规则
@@ -22,6 +24,7 @@ description: "开发管理角色包：开发策略与技术栈、分支编码规
 | 环节 | action | 明细 |
 |------|--------|------|
 | 策略确认 | analyze_strategy | `domain/strategy.md`（技术栈/分支/WBS/环境） |
+| 多项目隔离 | setup_isolation | `../references/multi_project_isolation.md`（Git/运行时/数据库/Docker 四层隔离） |
 | 模块编码 | develop_code | `domain/coding.md`（编码规范/安全编码/API/DB/异常） |
 | 代码走查 | walkthrough_code | `domain/review.md`（Fagan Inspection） |
 | PR 评审 | review_pr | `domain/review.md`（12 项清单） |

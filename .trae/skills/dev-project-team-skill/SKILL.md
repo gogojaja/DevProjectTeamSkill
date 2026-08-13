@@ -12,9 +12,10 @@ description: "软件研发多角色编排器：按阶段渐进加载角色包（
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.4.0
-- **版本发布日期**：2026-08-10
+- **技能版本**：v21.5.0
+- **版本发布日期**：2026-08-13
 - **版本变更记录**：
+  - v21.5.0：新增多项目环境隔离最佳实践（2026-08-13）——新增 `references/multi_project_isolation.md`，提供 Git/运行时/数据库/Docker 四层隔离架构；更新 `role-development` 引用隔离方案；更新 `SKILL_INDEX.md` 添加隔离参考。
   - v21.4.0：嵌套能力模型体系适配（2026-08-10）——内嵌 `skills/team-orchestration`（并行编排）与 `skills/multi-perspective-validation`（多视角验证）模型路由由 Opus/Sonnet/Haiku 改为 S0~S3 四档 + 免费体系（对齐 `../references/model_selection.md` §4），弱推理模型（免费/低价档）可正常运行 S0/S1 任务，S2/S3 高危任务仍要求强模型。
   - v21.3.4：模型路由增网关策略（2026-08-09）——`references/model_selection.md` §4.5 增网关路由策略（auto/weighted/fallback + auto 分档），衔接档位决策与本地网关，仅约定策略与配置列，不携带网关业务代码；配置列（routing_strategy/model_pool/fallback_chain/cost_per_token）入 `20_环境配置.csv`。
   - v21.3.3：新增模型路由（2026-08-09）——`references/model_selection.md` 增 §4 模型路由：任务分类×复杂度档位×成本档×能力要求四维路由，S0 导航/查询禁止强模型、S3 高危禁止降档，多角色任务按子任务独立路由；台账 `21_模型选型.csv` 增复杂度档位字段。
