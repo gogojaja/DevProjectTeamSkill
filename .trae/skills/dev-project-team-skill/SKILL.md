@@ -124,5 +124,5 @@ description: "软件研发多角色编排器：按阶段渐进加载角色包（
 
 ---
 
-**文档版本**：v21.4.0　**最后更新**：2026-08-10（嵌套能力模型体系适配：team-orchestration / multi-perspective-validation 改 S0~S3 + 免费档）
+**文档版本**：v21.5.0　**最后更新**：2026-08-13（嵌套能力模型体系适配：team-orchestration / multi-perspective-validation 改 S0~S3 + 免费档）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

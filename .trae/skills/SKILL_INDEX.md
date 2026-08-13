@@ -20,7 +20,7 @@
 1. **编排器**加载时读取本索引，按用户触发词选择角色包；
 2. **阶段裁剪**：项目启动阶段依据项目特点裁剪阶段/活动（`init_tailor`，产出 00_阶段配置.csv），编排器仅加载保留阶段角色包；第 0 阶段与总控保障强制保留；
 3. **敏捷迭代**：`init_tailor` 额外产出 18_迭代配置.csv（容量/技术债/DoR/DoD/发布点），迭代循环 + 发布级强门禁（`release_gate`），新增 `iterate_backlog`/`iteration_review` action；
-4. **技能维护**：新建/修改 SKILL.md 走 role-governance 的 `skill-authoring` 路由（`../shared/authoring.md` 五步流程），非执行项目业务；
+4. **技能维护**：新建/修改 SKILL.md 走 role-governance 的 `skill-authoring` 路由（`../shared/authoring.md` 五步流程，非执行项目业务）；产物目录强制对准该文件 §3（最终产出物落 `.trae/skills/<包名>/`，打包/临时物归 `dist/`、`backup/tmp_migrations/`、`_pkg_tmp/`）;
 5. **增强能力（v21.3.0）**：每阶段开始 `select_model`（21_模型选型）；阶段末 `retrospect_harvest`（22_阶段复盘 + 23_复用资产）；环境准备 `record_env_config`（20_环境配置）；标准见 `references/model_selection.md` 与 `references/environment_standard.md`；
 6. **铁律锚点**：压缩/新会话后重读 `references/iron_rules.md`，每轮回显锚点 `授权→备份→留痕`；
 7. **授权登记/时效**：系统/外部文件授权经 `register_auth` 登记 `14_授权登记.csv`（含有效期），每阶段末检查并提醒续期/撤销；
@@ -32,6 +32,6 @@
 
 ---
 
-**文档版本**：v21.5.0
-**最后更新**：2026-08-13（新增多项目环境隔离最佳实践：multi_project_isolation.md 四层隔离架构）
+**文档版本**：v21.5.1
+**最后更新**：2026-08-13（authoring.md 新增 §3 临时文件与产出物目录强制规则，同步 api_contracts §8）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

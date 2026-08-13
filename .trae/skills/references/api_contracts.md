@@ -530,6 +530,8 @@ DevProjectTeamSkill（总控）
 | `author_test` | 功能验证（正向/反向/边界三触发） | 结构校验通过 |
 | `author_pack` | 打包发布（zip + 快照备份 + 变更登记） | 功能验证通过 |
 
+**产物目录**：最终产出物（SKILL.md/domain/*__resources）落盘 `.trae/skills/<包名>/`；打包产物 `dist/<包名>_v<版本>.zip`；过程临时文件归 `backup/tmp_migrations/`（纳入 git）或 `_pkg_tmp/`（不入库），禁止写入 `.trae/skills/`、系统 `/tmp` 与项目外路径（外部写入须授权+备份+留痕 `13_安全审计台账.csv`），详见 `../shared/authoring.md` §3。
+
 **与 shared/evolution.md 边界**：本文件产出新技能/新版本（写入侧）；shared/evolution.md 诊断已有技能缺陷（只读诊断侧）。
 
 ---
