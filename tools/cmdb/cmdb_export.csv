@@ -2,7 +2,7 @@
 1,gogojajadeMac-mini,model,qwen2.5-coder:7b,DevProjectTeamSkill,occupied,high,2026-08-14 11:42:24
 2,gogojajadeMac-mini,model,qwen2.5:7b,DevProjectTeamSkill,occupied,high,2026-08-14 11:42:24
 3,gogojajadeMac-mini,port,11434,DevProjectTeamSkill,occupied,high,2026-08-14 11:42:24
-4,gogojajadeMac-mini,port,8080,DevProjectTeamSkill,occupied,high,2026-08-14 11:43:50
+4,gogojajadeMac-mini,port,8080,,free,high,2026-08-14 11:43:50
 5,gogojajadeMac-mini,port,5080,DevProjectTeamSkill,occupied,medium,2026-08-14 11:43:50
 6,gogojajadeMac-mini,port,5101,DevProjectTeamSkill,occupied,medium,2026-08-14 11:43:50
 7,gogojajadeMac-mini,port,4040,DevProjectTeamSkill,occupied,low,2026-08-14 11:43:50
