@@ -13,6 +13,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Dict, Optional
 
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stderr.reconfigure(encoding='utf-8')
+except AttributeError:
+    pass
+
 # 配置
 CMDB_DB = Path(__file__).parent / "cmdb.db"
 CMDB_DIR = Path(__file__).parent.parent.parent.parent  # D:\trae\DevProjectTeamSkill

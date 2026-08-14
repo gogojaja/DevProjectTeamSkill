@@ -12,6 +12,10 @@ skills_legacy_*/
 dist/
 _build_global/
 
+# CMDB 本地运行时数据（含本机主机名/IP 等环境信息，不入库）
+tools/cmdb/cmdb.db
+tools/cmdb/cmdb_export.csv
+
 # 临时产物
 _pkg_tmp/
 _solidify_*.log
