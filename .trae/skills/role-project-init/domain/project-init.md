@@ -94,14 +94,36 @@ description: "Project initiation skill covering startup foundations: charter & b
 
 ### 环节 6：环境资产注册（register_env_asset，多项目共享环境必做）
 
-处理：**多项目共享一台服务器时**，在项目启动阶段即登记本项目所需独占资源（端口/容器/Docker 容器名前缀/数据库/大模型运行目标），写入跨项目共享的 `台账/25_环境资源清单.csv`，并做冲突预检（先注册先得 + 冲突人工升阶，详见 `../../references/multi_project_isolation.md` §10）：
+处理：**多项目共享一台服务器时**，在项目启动阶段即登记本项目所需独占资源（端口/容器/Docker 容器名前缀/数据库/大模型运行目标），调用 CMDB CLI 工具注册到 CMDB 数据库（`tools/cmdb/cmdb-cli.py`），并做冲突预检（先注册先得 + 冲突人工升阶，详见 `../../references/multi_project_isolation.md` §10）：
 
 - **登记范围**：本项目规划占用的端口、Docker compose 项目名/容器名（带项目前缀）、数据库实例名、大模型运行目标（本地轻量档或云端别名）；
-- **冲突预检**：查询 `25_环境资源清单.csv`，资源标识命中「已占用」即冲突；独占资源（大模型容器/GPU/Docker 单一运行时/固定端口）冲突自动升阶 `change_audit` 留痕并交用户决策（等待释放/抢占授权/换资源）；
+- **冲突预检**：调用 `cmdb-cli.py query --project <项目名>` 查询当前占用情况，资源标识命中「已占用」即冲突；独占资源（大模型容器/GPU/Docker 单一运行时/固定端口）冲突自动升阶 `change_audit` 留痕并交用户决策（等待释放/抢占授权/换资源）；
 - **单机独占约束**：一台服务器同一时间仅一个生成模型驻留（`OLLAMA_MAX_LOADED_MODELS=1`）、仅一个 Docker daemon 单实例；本地工具/脚本缺省运行目标 = 本地轻量模型档（`model_selection.md` §7.1）；
 - **未注册不放行**：资源未全部登记或存在未裁决冲突，不得进入后续可行性评估。
 
-输出：`台账/25_环境资源清单.csv` 登记/仲裁结果 + 冲突预检清单。
+**CMDB CLI 调用示例**：
+
+```bash
+# 1. 注册主机
+python tools/cmdb/cmdb-cli.py register --host dev-server-01 --type port --identifier 8000 --project backend-api --name "Backend API Server" --operator <用户名>
+
+# 2. 注册端口
+python tools/cmdb/cmdb-cli.py register --host dev-server-01 --type port --identifier 3000 --project frontend-app --name "Frontend Dev Server" --operator <用户名>
+
+# 3. 注册大模型
+python tools/cmdb/cmdb-cli.py register --host dev-server-01 --type model --identifier llama3-8b --project ai-team --name "Llama3 8B Model" --operator <用户名>
+
+# 4. 查询本项目资源占用
+python tools/cmdb/cmdb-cli.py query --project backend-api
+
+# 5. 导出资源为 CSV（用于团队共享）
+python tools/cmdb/cmdb-cli.py export --project backend-api --output backend-api-resources.csv
+
+# 6. 释放资源（项目完成后）
+python tools/cmdb/cmdb-cli.py release --type port --identifier 8000 --project backend-api --operator <用户名>
+```
+
+输出：CMDB 数据库登记/仲裁结果 + 冲突预检清单。
 
 > 单项目独立开发机（无共享冲突风险）可跳过本环节，按需登记即可。
 
@@ -160,5 +182,5 @@ description: "Project initiation skill covering startup foundations: charter & b
 
 ---
 
-**文档版本**：v21.2.2（新增 register_env_asset 环境资产注册环节 + check_ready 冲突预检门禁 + 25_环境资源清单.csv，2026-08-14）
+**文档版本**：v21.2.3（register_env_asset 集成 CMDB CLI 工具，2026-08-14）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

@@ -9,8 +9,8 @@ description: "项目启动角色包：立项、项目章程、干系人登记、
 
 ## 1. 元数据
 
-- **技能版本**：v21.0.1　**发布日期**：2026-08-14
-- **变更记录**：v21.0.1 新增环境资产注册（register_env_asset）路由与 25_环境资源清单；v21.0.0 由 project-init-skill 重组为角色包（标准 SKILL.md + domain/）
+- **技能版本**：v21.0.2　**发布日期**：2026-08-14
+- **变更记录**：v21.0.2 集成 CMDB CLI 工具到 register_env_asset 环节；v21.0.1 新增环境资产注册（register_env_asset）路由与 25_环境资源清单；v21.0.0 由 project-init-skill 重组为角色包（标准 SKILL.md + domain/）
 - **参考标准**：PMBOK 启动过程组（initiating process group）
 
 ## 2. 触发规则
@@ -40,5 +40,5 @@ description: "项目启动角色包：立项、项目章程、干系人登记、
 
 ---
 
-**文档版本**：v21.0.1　**最后更新**：2026-08-14
+**文档版本**：v21.0.2　**最后更新**：2026-08-14
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
