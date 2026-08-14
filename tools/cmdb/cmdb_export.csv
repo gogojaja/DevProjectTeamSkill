@@ -1,0 +1,8 @@
+﻿主机,IP,资源类型,资源标识,资源名称,状态,优先级,占用项目,注册时间
+Douglas,xxx.xxx.xxx.xxx,gpu,Intel-Iris-Xe,Intel Iris Xe 集成显卡,free,medium,,2026-08-14T10:40:59.341263
+Douglas,xxx.xxx.xxx.xxx,model,qwen3:8b,通义千问 3 8B,free,high,,2026-08-14T10:40:59.341263
+Douglas,xxx.xxx.xxx.xxx,model,mxbai-embed-large,mxbai 嵌入模型,free,high,,2026-08-14T10:40:59.341263
+Douglas,xxx.xxx.xxx.xxx,port,11434,Ollama API,free,high,,2026-08-14T10:40:59.341263
+Douglas,xxx.xxx.xxx.xxx,port,60069,OpenCode CLI,free,medium,,2026-08-14T10:40:59.341263
+Douglas,xxx.xxx.xxx.xxx,port,51067,TRAE SOLO,free,medium,,2026-08-14T10:40:59.341263
+Douglas,xxx.xxx.xxx.xxx,port,27015,AppleMobileDeviceService,free,low,,2026-08-14T10:40:59.341263
