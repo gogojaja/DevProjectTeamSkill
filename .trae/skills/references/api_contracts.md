@@ -44,6 +44,8 @@ DevProjectTeamSkill（总控）
 │   ├── planning                ← 投产方案：12 章编写/变更分类审批
 │   ├── release                 ← 投产执行：准备预演/执行监控/回滚
 │   └── handover                ← 评审总结交接：Go-Live/总结/交接/阶段评审
+├── tools/
+│   └── cmdb/                   ← CMDB 轻量级资源管理工具（注册/查询/释放/冲突检测；SQLite 数据库；审计日志；CSV 导出）
 └── shared/
     ├── evolution.md            ← 桥接页（已并入 self-improve/self-diagnosis.md）
     └── authoring.md            ← 元技能，Skill 创建/修改，简化模式路由
@@ -73,6 +75,7 @@ DevProjectTeamSkill（总控）
 | `retrospect_harvest` | §1.1 governance | 阶段末复盘收割（22_阶段复盘.csv + 23_复用资产.csv） | 每阶段末 |
 | `select_model` | §1.1 governance | 阶段开始模型选型（21_模型选型.csv） | 每阶段开始 |
 | `register_auth` | §1.1 governance | 授权登记（14_授权登记.csv + 13 留痕）+ 阶段末时效检查提醒 | 系统/外部文件授权、每阶段末 |
+| `register_env_asset` | tools/cmdb/ | 注册资源到 CMDB 数据库（端口/容器/大模型/GPU/数据库/域名），冲突检测与仲裁 | 项目启动（register_env_asset 环节） |
 
 ### 1.1 governance（项目治理子域）
 

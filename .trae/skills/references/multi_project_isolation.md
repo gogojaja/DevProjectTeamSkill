@@ -660,8 +660,14 @@ services:
 
 为每台服务器建立**全局统一的环境清单库**，统一注册、统一管理，避免各项目各记各账导致隐性冲突：
 
+**工具**：CMDB CLI (`tools/cmdb/cmdb-cli.py`) - 轻量级资源管理工具（SQLite 数据库）
+
+**数据存储**：`tools/cmdb/cmdb.db`（本地 SQLite 数据库，不提交到 Git）
+
+**CSV 导出**：`tools/cmdb/cmdb_export.csv`（按需导出，供团队共享）
+
+**示例数据**：
 ```
-25_环境资源清单.csv（每台服务器一张，跨项目共享）
 主机, 资源类型, 资源标识, 环境, 端口, 容器名, 模型名, 占用项目, 注册日期, 状态, 优先级, 备注
 dev-server, 端口,    3000,   dev,  3000,  -,       -,       project-a, 2026-08-13, 已占用, 高,   Web API
 dev-server, 容器,    api-a,  dev,  -,     api-a,   -,       project-a, 2026-08-13, 已占用, 高,   compose 项目名
@@ -691,11 +697,95 @@ dev-server, 大模型,  ollama, dev,  11434, -,       qwen2.5:7b, project-a, 202
 | 域名/子域 | 域名唯一 | 子域冲突 | 子域带项目前缀（`a.example.com`） |
 
 **裁决流程（先注册先得 + 人工升阶）**：
-1. **注册预检**：`register_env_asset` 申请资源时先查 `25_环境资源清单.csv`，命中「已占用」即判定冲突；
-2. **自动裁决**：`空闲` → 直接占用并登记；可替换资源（如端口）→ 自动改资源标识重新申请；
-3. **人工升阶**：独占资源（大模型容器 / GPU / Docker 运行时）冲突 → 自动升阶 `change_audit` 留痕（冲突描述/占用方/申请方/决策），由用户决策「等待释放 / 抢占（须授权）/ 换资源」；
-4. **更新清单**：占用 / 释放 / 仲裁结果一律回写 `25_环境资源清单.csv`，状态与占用项目保持最新；
-5. **启动门禁**：`check_ready` 校验项目所需资源全部登记且无「冲突」状态，未通过不放行进入需求阶段。
+ 1. **注册预检**：`register_env_asset` 申请资源时调用 `cmdb-cli.py register`，先查 CMDB 数据库，命中「已占用」即判定冲突；
+ 2. **自动裁决**：`空闲` → 直接占用并登记；可替换资源（如端口）→ 自动改资源标识重新申请；
+ 3. **人工升阶**：独占资源（大模型容器 / GPU / Docker 运行时）冲突 → 自动升阶 `change_audit` 留痕（冲突描述/占用方/申请方/决策），由用户决策「等待释放 / 抢占（须授权）/ 换资源」；
+ 4. **更新清单**：占用 / 释放 / 仲裁结果一律回写到 CMDB 数据库，状态与占用项目保持最新；
+ 5. **启动门禁**：`check_ready` 校验项目所需资源全部登记且无「冲突」状态，未通过不放行进入需求阶段。
+
+### 10.5 CMDB 工具使用示例
+
+#### 1. 初始化 CMDB 数据库
+
+```bash
+# 初始化 CMDB 数据库
+python tools/cmdb/cmdb-cli.py init
+```
+
+#### 2. 注册主机
+
+```bash
+# 注册开发服务器
+python tools/cmdb/cmdb-cli.py register --host dev-server-01 --type port --identifier 8000 --project backend-api --name "Backend API Server"
+```
+
+#### 3. 注册资源
+
+```bash
+# 注册端口
+python tools/cmdb/cmdb-cli.py register --host dev-server-01 --type port --identifier 3000 --project frontend-app --name "Frontend Dev Server"
+
+# 注册容器
+python tools/cmdb/cmdb-cli.py register --host dev-server-01 --type container --identifier mysql-01 --project backend-api --name "MySQL Database"
+
+# 注册大模型
+python tools/cmdb/cmdb-cli.py register --host dev-server-01 --type model --identifier llama3-8b --project ai-team --name "Llama3 8B Model"
+
+# 注册 GPU
+python tools/cmdb/cmdb-cli.py register --host dev-server-01 --type gpu --identifier gpu-01 --project ai-team --name "NVIDIA A100"
+```
+
+#### 4. 查询资源
+
+```bash
+# 查询所有资源
+python tools/cmdb/cmdb-cli.py query
+
+# 查询特定主机的资源
+python tools/cmdb/cmdb-cli.py query --host dev-server-01
+
+# 查询特定项目的资源
+python tools/cmdb/cmdb-cli.py query --project backend-api
+
+# 查询特定类型的资源
+python tools/cmdb/cmdb-cli.py query --type port
+
+# 查询特定状态的资源
+python tools/cmdb/cmdb-cli.py query --status occupied
+```
+
+#### 5. 列出所有主机
+
+```bash
+python tools/cmdb/cmdb-cli.py list-hosts
+```
+
+#### 6. 导出资源为 CSV
+
+```bash
+# 导出到文件
+python tools/cmdb/cmdb-cli.py export --project backend-api --output backend-api-resources.csv
+
+# 导出到 stdout
+python tools/cmdb/cmdb-cli.py export --project backend-api --output -
+```
+
+#### 7. 释放资源
+
+```bash
+# 按资源 ID 释放
+python tools/cmdb/cmdb-cli.py release --resource-id 1 --project backend-api
+
+# 按类型和标识释放
+python tools/cmdb/cmdb-cli.py release --type port --identifier 8000 --project backend-api
+```
+
+### 10.6 CMDB 与 CSV 清单的关系
+
+- **CMDB 数据库**（`cmdb.db`）：实时存储，支持快速查询、冲突检测、审计日志
+- **CSV 导出**（`cmdb_export.csv`）：按需导出，供团队共享、文档记录
+- **同步机制**：`cmdb-cli.py export` 定期导出 CSV，手动更新 `25_环境资源清单.csv`（可选，用于文档归档）
+- **审计日志**（`cmdb_audit.log`）：记录所有操作，支持事后追溯
 
 ### 10.3 本地小工具/脚本的运行目标环境
 

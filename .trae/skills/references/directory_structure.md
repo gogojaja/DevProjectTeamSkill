@@ -4,6 +4,20 @@
 
 ```
 项目根文件夹/
+├── tools/                          工具目录（配套技能库的打包/部署/固化脚本 + CMDB 工具）
+│   ├── cmdb/                      CMDB 轻量级资源管理工具
+│   │   ├── cmdb-cli.py           CLI 工具（注册/查询/释放/冲突检测）
+│   │   ├── cmdb.db               SQLite 数据库（本地运行时，不提交到 Git）
+│   │   ├── cmdb_export.csv       资源导出 CSV（按需导出，供团队共享）
+│   │   ├── cmdb_audit.log        审计日志（操作留痕）
+│   │   └── README.md             CMDB 使用说明
+│   ├── package_skills.sh          打包全部 8 角色包到 dist/
+│   ├── package_skills.sh --role role-testing  打包单个角色包
+│   ├── deploy_skills.sh --roles role-a,role-b  部署到目标目录
+│   ├── solidify.sh "<说明>"      固化到目标目录并提交 Git
+│   ├── solidify.py               Python 固化脚本（版本一致性校验）
+│   ├── excel_to_csv.py           迁移存量 xlsx→csv
+│   └── check_version_consistency.py  版本一致性校验
 ├── 台账/                          主台账目录（role-governance 路由壳 → 6 子域读写，24 个 NN_ 前缀 CSV）
 │   ├── 00_阶段配置.csv            阶段/活动裁剪配置（阶段、保留或裁剪、裁剪理由、责任方）
 │   ├── 01_启动组.csv              项目立项、相关方、项目目标、沟通记录
