@@ -53,7 +53,7 @@
 
 - 所有跨技能引用使用相对路径 `../references/`，禁止裸 `references/` 路径；
 - 本文件作为版本管理规范的唯一事实来源，各技能仅保留简短的引用声明；
-- 多项目隔离方案引用：`references/multi_project_isolation.md`（Git/运行时/数据库/Docker 四层隔离）。
+- 多项目隔离方案引用：`references/multi_project_isolation.md`（Git/运行时/数据库/Docker 四层隔离 + 第 5 层全局环境资产注册与冲突仲裁，`台账/25_环境资源清单.csv`）。
 
 ### 2.2 文档页脚
 

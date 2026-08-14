@@ -28,10 +28,10 @@
 9. 各包辅助能力统一指向 `shared/`（源码单源），打包产物内嵌副本；
 10. **GitHub 访问异常**：`github.com:443` 不可达时，加载 `references/github_access.md`（候选 IP 池 / 连通性验证 / push 带凭据）；
 11. **嵌套能力（v21.4.0）**：编排器内嵌 `team-orchestration`（并行编排）与 `multi-perspective-validation`（多视角验证），模型档位 S0~S3 + 免费体系（对齐 `references/model_selection.md` §4）；
-12. **多项目隔离**：多项目并行开发时，参考 `references/multi_project_isolation.md`（Git/运行时/数据库/Docker 四层隔离架构）。
+12. **多项目隔离**：多项目并行开发时，参考 `references/multi_project_isolation.md`（Git/运行时/数据库/Docker 四层隔离架构 + **第 5 层全局环境资产注册与冲突仲裁**：`register_env_asset` 登记 `台账/25_环境资源清单.csv`，独占资源（大模型容器/GPU/Docker 单一运行时/端口）先注册先得，冲突升阶 `change_audit` 留痕；本地工具/脚本运行目标缺省为本地轻量模型档，见 `references/model_selection.md` §7.1）。
 
 ---
 
-**文档版本**：v21.5.1
-**最后更新**：2026-08-13（authoring.md 新增 §3 临时文件与产出物目录强制规则，同步 api_contracts §8）
+**文档版本**：v21.5.2
+**最后更新**：2026-08-14（多项目隔离第 5 层：全局环境资产注册与冲突仲裁 + register_env_asset + 25_环境资源清单 + model_selection §7.1）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

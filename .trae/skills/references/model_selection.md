@@ -156,9 +156,18 @@ graph TD
 | `Nemotron 3.5 Lightning` | S1/S2 | 免费(云端) | 国内稳定（硅基流动等免费池） | 通用 / 低延迟 | NVIDIA Nemotron 3.5 Lightning 免费档 |
 
 > 本地 Ollama 模型默认 `OLLAMA_MAX_LOADED_MODELS=1`：同一时间仅一个模型驻留显存/内存，换模型自动卸载前一个。嵌入模型 `mxbai-embed-large`（669MB，本地）专用于检索/RAG，不计入生成路由池。
+
+### 7.1 本地工具/脚本运行目标环境（缺省规则）
+
+> 适用：仓库内开发的本地小工具与脚本依赖大模型执行时，确定其**运行目标环境**。
+
+1. **缺省 = 本地轻量模型档**：工具/脚本运行目标优先本地 Ollama S0/S1 免费档（`qwen3:4b` / `qwen2.5:7b` / `qwen2.5-coder:7b`），本地离线、免费、无网络依赖；
+2. **单驻留约束**：一台机器同一时间仅一个生成模型驻留（`OLLAMA_MAX_LOADED_MODELS=1`），多工具并发经排队队列串行推理；
+3. **云端强模型（例外）**：工具确需 S2/S3 复杂分析/长上下文时，须在 `20_环境配置.csv` 登记模型引用别名，并经 `select_model` 决策留痕，禁止工具代码内硬编码云端密钥；
+4. **运行目标登记**：工具计划书/README 须标注运行目标环境（本地模型名或云端别名），与 `25_环境资源清单.csv` 大模型登记一致（见 `multi_project_isolation.md` §10.3）。
 > 免费云模型为候选池（国内可稳定访问，多经硅基流动/OpenRouter 等聚合平台免费档）；接入 opencode 前须经 `select_model` + 用户确认 provider 可达性，并补 `references/api_contracts.md` 与 provider 配置、同步台账 `21_模型选型.csv`。
 > 免费云模型为候选池（均为国内可稳定访问），按需经 `select_model` + 用户确认接入 opencode 对应 provider；接入后须补 `references/api_contracts.md` 与 provider 配置并同步台账 `21_模型选型.csv`。
 
 ---
 
-**文档版本**：v21.3.7　**最后更新**：2026-08-12（§7 模型清单扩充云端免费候选：新增 DeepSeek V4 Flash / Hy3 / Laguna S 2.1 / Ling-3.0-tiny / MiMo V2.5 / Nemotron 3 Ultra / Nemotron 3.5 Lightning 免费档，与既有本地免费 + GLM-4.7-Flash 共同构成免费模型池）
+**文档版本**：v21.3.8　**最后更新**：2026-08-14（§7.1 新增本地工具/脚本运行目标环境缺省规则：本地轻量模型档 + 单驻留约束 + 运行目标登记）

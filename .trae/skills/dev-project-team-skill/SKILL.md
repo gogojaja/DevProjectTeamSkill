@@ -12,9 +12,10 @@ description: "软件研发多角色编排器：按阶段渐进加载角色包（
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.5.0
-- **版本发布日期**：2026-08-13
+- **技能版本**：v21.5.1
+- **版本发布日期**：2026-08-14
 - **版本变更记录**：
+  - v21.5.1：多项目隔离第 5 层（2026-08-14）——`references/multi_project_isolation.md` 新增第 5 层「全局环境资产注册与冲突仲裁」：25_环境资源清单.csv 统一注册（端口/容器/数据库/大模型独占资源先注册先得，冲突升阶 change_audit 留痕）；role-project-init 新增 register_env_asset 环节；model_selection §7.1 本地工具/脚本运行目标缺省本地轻量档；台账 20→25。
   - v21.5.0：新增多项目环境隔离最佳实践（2026-08-13）——新增 `references/multi_project_isolation.md`，提供 Git/运行时/数据库/Docker 四层隔离架构；更新 `role-development` 引用隔离方案；更新 `SKILL_INDEX.md` 添加隔离参考。
   - v21.4.0：嵌套能力模型体系适配（2026-08-10）——内嵌 `skills/team-orchestration`（并行编排）与 `skills/multi-perspective-validation`（多视角验证）模型路由由 Opus/Sonnet/Haiku 改为 S0~S3 四档 + 免费体系（对齐 `../references/model_selection.md` §4），弱推理模型（免费/低价档）可正常运行 S0/S1 任务，S2/S3 高危任务仍要求强模型。
   - v21.3.4：模型路由增网关策略（2026-08-09）——`references/model_selection.md` §4.5 增网关路由策略（auto/weighted/fallback + auto 分档），衔接档位决策与本地网关，仅约定策略与配置列，不携带网关业务代码；配置列（routing_strategy/model_pool/fallback_chain/cost_per_token）入 `20_环境配置.csv`。
@@ -119,10 +120,11 @@ description: "软件研发多角色编排器：按阶段渐进加载角色包（
 | 接口契约 | `../references/api_contracts.md` | action 接口清单 |
 | 目录规范 | `../references/directory_structure.md` | 台账/资产目录定义 |
 | 环境标准 | `../references/environment_standard.md` | dev/test/prod 环境配置抽取与检查 |
-| 模型选型 | `../references/model_selection.md` | 阶段开始大模型分级选型 + 任务路由决策（§4）+ 网关策略（§4.5） |
+| 模型选型 | `../references/model_selection.md` | 阶段开始大模型分级选型 + 任务路由决策（§4）+ 网关策略（§4.5）+ 本地工具运行目标 §7.1 |
+| 多项目隔离 | `../references/multi_project_isolation.md` | 四层隔离 + 第 5 层全局环境资产注册与冲突仲裁（25_环境资源清单） |
 | 铁律卡 | `../references/iron_rules.md` | 压缩后重读/新会话锚点（授权/备份/留痕） |
 
 ---
 
-**文档版本**：v21.5.0　**最后更新**：2026-08-13（嵌套能力模型体系适配：team-orchestration / multi-perspective-validation 改 S0~S3 + 免费档）
+**文档版本**：v21.5.1　**最后更新**：2026-08-14（多项目隔离第 5 层：全局环境资产注册与冲突仲裁）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

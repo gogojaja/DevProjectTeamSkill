@@ -548,8 +548,11 @@ DevProjectTeamSkill（总控）
 | `register_stakeholder` | 干系人登记册（角色/权力-利益/沟通需求） | 章程确认后 |
 | `define_scope_prelim` | 范围初定义（边界/排除项/假设/制约） | 干系人确认后 |
 | `init_tailor` | 阶段/活动裁剪决策（依据项目特点裁剪生命周期阶段与活动） | 范围初定后 |
-| `assess_feasibility` | 五维可行性评估 | 裁剪确认后 |
-| `check_ready` | 启动就绪检查（Go/No-Go/暂缓） | 可行性通过后 |
+| `register_env_asset` | 环境资产注册与冲突预检（25_环境资源清单.csv，先注册先得 + 冲突升阶 change_audit 留痕） | 裁剪确认后 |
+| `assess_feasibility` | 五维可行性评估 | register_env_asset 后 |
+| `check_ready` | 启动就绪检查（Go/No-Go/暂缓，含「资源无未裁决冲突」门禁） | 可行性通过后 |
 | `init_baseline` | 调用 role-governance `create_baseline` 初始化台账 | 就绪=Go 后 |
 
 **与 role-requirements-analysis 边界**：本包输出范围初定义与项目上下文（第 0 阶段）；需求收集与 SRS 编写由 role-requirements-analysis 承接（需求阶段）。
+
+**多项目共享环境（第 5 层）**：环境资产注册与冲突仲裁规则详见 `multi_project_isolation.md` §10；台账 `25_环境资源清单.csv` 为跨项目共享登记表。
