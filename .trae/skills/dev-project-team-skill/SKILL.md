@@ -12,9 +12,10 @@ description: "软件研发多角色编排器：按阶段渐进加载角色包（
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.5.3
+- **技能版本**：v21.5.4
 - **版本发布日期**：2026-08-14
 - **版本变更记录**：
+  - v21.5.4：环境信息脱敏铁律（2026-08-14）——`references/iron_rules.md` 新增 §3.1（本机/环境信息提交公共仓库前必须脱敏：IP 完全脱敏默认、保留主机名须授权）；同步 `shared/references/iron_rules.md`、`AGENTS.md` 核心规则第 8 条、`SKILL_INDEX.md`。
   - v21.5.3：集成 CMDB CLI 到 register_env_asset 环节（2026-08-14）——`role-project-init` 更新 `register_env_asset` 环节，使用 CMDB CLI 工具注册资源到 CMDB 数据库（`tools/cmdb/cmdb-cli.py`），补充 CMDB CLI 调用示例；更新 `role-project-init/SKILL.md` 版本至 v21.0.2。
   - v21.5.2：CMDB 轻量级资源管理工具（2026-08-14）——新增 `tools/cmdb/cmdb-cli.py`（注册/查询/释放/冲突检测；SQLite 数据库；审计日志；CSV 导出）；更新 `references/multi_project_isolation.md` 第 10 节补充 CMDB 使用示例；更新 `directory_structure.md` 添加 tools/cmdb/ 目录；更新 `SKILL_INDEX.md` 添加 CMDB 工具条目。
   - v21.5.1：多项目隔离第 5 层（2026-08-14）——`references/multi_project_isolation.md` 新增第 5 层「全局环境资产注册与冲突仲裁」：25_环境资源清单.csv 统一注册（端口/容器/数据库/大模型独占资源先注册先得，冲突升阶 change_audit 留痕）；role-project-init 新增 register_env_asset 环节；model_selection §7.1 本地工具/脚本运行目标缺省本地轻量档；台账 20→25。
@@ -128,5 +129,5 @@ description: "软件研发多角色编排器：按阶段渐进加载角色包（
 
 ---
 
-**文档版本**：v21.5.3　**最后更新**：2026-08-14（集成 CMDB CLI 到 register_env_asset 环节）
+**文档版本**：v21.5.4　**最后更新**：2026-08-14（新增环境信息脱敏铁律 §3.1）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

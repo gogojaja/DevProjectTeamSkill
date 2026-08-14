@@ -22,7 +22,7 @@
 3. **敏捷迭代**：`init_tailor` 额外产出 18_迭代配置.csv（容量/技术债/DoR/DoD/发布点），迭代循环 + 发布级强门禁（`release_gate`），新增 `iterate_backlog`/`iteration_review` action；
 4. **技能维护**：新建/修改 SKILL.md 走 role-governance 的 `skill-authoring` 路由（`../shared/authoring.md` 五步流程，非执行项目业务）；产物目录强制对准该文件 §3（最终产出物落 `.trae/skills/<包名>/`，打包/临时物归 `dist/`、`backup/tmp_migrations/`、`_pkg_tmp/`）;
 5. **增强能力（v21.3.0）**：每阶段开始 `select_model`（21_模型选型）；阶段末 `retrospect_harvest`（22_阶段复盘 + 23_复用资产）；环境准备 `record_env_config`（20_环境配置）；标准见 `references/model_selection.md` 与 `references/environment_standard.md`；
-6. **铁律锚点**：压缩/新会话后重读 `references/iron_rules.md`，每轮回显锚点 `授权→备份→留痕`；
+6. **铁律锚点**：压缩/新会话后重读 `references/iron_rules.md`，每轮回显锚点 `授权→备份→留痕`；§3.1 环境信息脱敏铁律（IP 完全脱敏默认、保留主机名须授权）提交公共仓库前强制；
 7. **授权登记/时效**：系统/外部文件授权经 `register_auth` 登记 `14_授权登记.csv`（含有效期），每阶段末检查并提醒续期/撤销；
 8. 单角色任务直接加载对应包；多角色/全生命周期由编排器调度；
 9. 各包辅助能力统一指向 `shared/`（源码单源），打包产物内嵌副本；
@@ -34,6 +34,6 @@
 
 ---
 
-**文档版本**：v21.5.3
-**最后更新**：2026-08-14（多项目隔离第 5 层 + CMDB 工具 v1.0.0）
+**文档版本**：v21.5.4
+**最后更新**：2026-08-14（新增 §3.1 环境信息脱敏铁律）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
