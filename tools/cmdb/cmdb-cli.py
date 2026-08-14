@@ -337,7 +337,7 @@ def main():
     # register
     register_parser = subparsers.add_parser("register", help="注册资源")
     register_parser.add_argument("--host", required=True, help="主机名")
-    register_parser.add_argument("--type", required=True, choices=["port", "container", "model", "gpu", "database", "domain"], help="资源类型")
+    register_parser.add_argument("--type", required=True, choices=["port", "container", "model", "gpu", "database", "domain", "software"], help="资源类型")
     register_parser.add_argument("--identifier", required=True, help="资源标识（端口号/容器名/模型名）")
     register_parser.add_argument("--name", help="资源名称（可选）")
     register_parser.add_argument("--project", required=True, help="占用项目")
