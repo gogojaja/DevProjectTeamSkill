@@ -4,14 +4,31 @@ set -u
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
+DRY_RUN=0
+CHECK_ONLY=0
+REMOTE_URL=""
+
+clean_transport_env() {
+  for name in HTTP_PROXY HTTPS_PROXY ALL_PROXY http_proxy https_proxy all_proxy GIT_SSH_COMMAND GIT_SSH_VARIANT GIT_PROXY_COMMAND; do
+    unset "$name" 2>/dev/null || true
+  done
+  export http_proxy=""
+  export https_proxy=""
+  export all_proxy=""
+  export HTTP_PROXY=""
+  export HTTPS_PROXY=""
+  export ALL_PROXY=""
+  export GIT_SSH_COMMAND=""
+  export GIT_SSH_VARIANT=""
+  export GIT_PROXY_COMMAND=""
+  export GIT_TERMINAL_PROMPT=0
+  export GIT_ASKPASS=echo
+}
+
 cd "$REPO_ROOT" || {
   echo "ERROR: failed to enter repository root: $REPO_ROOT" >&2
   exit 2
 }
-
-DRY_RUN=0
-CHECK_ONLY=0
-REMOTE_URL=""
 
 usage() {
   cat <<'EOF'
@@ -73,20 +90,12 @@ run_cmd() {
 }
 
 unset_proxy_vars() {
-  for name in HTTP_PROXY HTTPS_PROXY ALL_PROXY http_proxy https_proxy all_proxy; do
-    unset "$name" 2>/dev/null || true
-  done
-  export http_proxy=""
-  export https_proxy=""
-  export all_proxy=""
-  export HTTP_PROXY=""
-  export HTTPS_PROXY=""
-  export ALL_PROXY=""
+  clean_transport_env
 }
 
 require_git_repo() {
-  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    echo "ERROR: This script must be run from a Git repository or from a path that resolves to one." >&2
+  if ! git -C "$REPO_ROOT" rev-parse --show-toplevel >/dev/null 2>&1; then
+    echo "ERROR: The resolved repository root is not a valid Git worktree: $REPO_ROOT" >&2
     exit 2
   fi
 }
@@ -148,6 +157,7 @@ convert_to_ssh443_remote() {
 }
 
 main() {
+  unset_proxy_vars
   require_git_repo
 
   print_step "Resetting proxy variables and Git transport state"
@@ -155,7 +165,10 @@ main() {
   run_cmd git config --global --unset-all http.proxy 2>/dev/null || true
   run_cmd git config --global --unset-all https.proxy 2>/dev/null || true
   run_cmd git config --global --unset-all all.proxy 2>/dev/null || true
-  env | grep -Ei 'http|https|proxy|socks|all_proxy' | sort || true
+  run_cmd git config --global --unset-all core.sshCommand 2>/dev/null || true
+  run_cmd git config --local --unset-all core.sshCommand 2>/dev/null || true
+  echo "Environment after cleanup:"
+  env | grep -Ei 'http|https|proxy|socks|all_proxy|GIT_' | sort || true
 
   print_step "Checking GitHub reachability"
   if probe_known_ips >/dev/null 2>&1; then
@@ -200,7 +213,7 @@ main() {
   print_step "Testing remote read access"
   local ssh_cmd="ssh -T -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=${TMPDIR:-/tmp}/gh_known_hosts_$$ -o ConnectTimeout=10 -p 443"
   if [[ "$DRY_RUN" -eq 0 ]]; then
-    GIT_SSH_COMMAND="$ssh_cmd" git ls-remote origin HEAD
+    env -u GIT_SSH_COMMAND -u GIT_SSH_VARIANT -u GIT_PROXY_COMMAND GIT_SSH_COMMAND="$ssh_cmd" git ls-remote origin HEAD
     if [[ $? -ne 0 ]]; then
       echo "ERROR: GitHub remote still not reachable from this environment." >&2
       echo "Try switching to a different outbound network path or VPN before retrying." >&2
@@ -208,11 +221,11 @@ main() {
     fi
 
     print_step "Attempting a real push"
-    GIT_SSH_COMMAND="$ssh_cmd" git push origin HEAD
+    env -u GIT_SSH_COMMAND -u GIT_SSH_VARIANT -u GIT_PROXY_COMMAND GIT_SSH_COMMAND="$ssh_cmd" git push origin HEAD
     exit $?
   else
-    echo "[DRY-RUN] GIT_SSH_COMMAND='$ssh_cmd' git ls-remote origin HEAD"
-    echo "[DRY-RUN] GIT_SSH_COMMAND='$ssh_cmd' git push origin HEAD"
+    echo "[DRY-RUN] env -u GIT_SSH_COMMAND -u GIT_SSH_VARIANT -u GIT_PROXY_COMMAND GIT_SSH_COMMAND='$ssh_cmd' git ls-remote origin HEAD"
+    echo "[DRY-RUN] env -u GIT_SSH_COMMAND -u GIT_SSH_VARIANT -u GIT_PROXY_COMMAND GIT_SSH_COMMAND='$ssh_cmd' git push origin HEAD"
   fi
 }
 
