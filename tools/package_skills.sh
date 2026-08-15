@@ -45,6 +45,7 @@ ALL_ROLES=(
   role-testing
   role-deployment
   role-governance
+  role-program-mgmt
 )
 
 # 待处理角色

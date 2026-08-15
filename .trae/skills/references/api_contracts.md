@@ -8,6 +8,7 @@
 
 ```
 DevProjectTeamSkill（总控）
+├── role-program-mgmt          ← 跨项目协同层：项目群/项目集（定义/收益/依赖/IMS 进度/标准一致/Program Board 评审/收尾）
 ├── role-project-init          ← 第 0 阶段：项目启动（章程/干系人/范围初定/基线）
 ├── role-governance             ← 所有角色共享：路由分发至 6 子域（评审/门禁/审计/台账/归档/交接）
 │   ├── governance              ← 治理：基线/固化/归档/交接
@@ -79,6 +80,13 @@ DevProjectTeamSkill（总控）
 | `declare_access_boundary` | role-project-init | 访问边界声明（26_访问边界.csv，本项目可读写/删除范围=本项目目录） | 项目启动（declare_access_boundary 环节） |
 | `define_org_structure` | role-project-init | 组织架构与责任分配（27_组织架构.csv：团队构成 + RACI 矩阵 + 决策权限 + 汇报关系，A 唯一、C/I 区分） | 项目启动（define_org_structure 环节） |
 | `define_issue_escalation` | role-project-init | 问题解决与升级机制（12_风险问题台账.csv 升级字段：P1~P4 分级 + 四级升级阶梯 L1~L4 + 响应时限 + 单一 Owner） | 项目启动（define_issue_escalation 环节） |
+| `define_program` | role-program-mgmt | 项目群定义（28_项目群注册.csv：业务论证/章程/路线图/治理四角色 Sponsor-Program Board-Program Manager-PMO/tranche 划分） | 项目群协同（define_program 环节） |
+| `manage_benefits` | role-program-mgmt | 收益管理（28_项目群注册.csv 收益档案区：owner/metric/基线/目标/兑现时间线 + 追踪） | 项目群协同（manage_benefits 环节） |
+| `map_dependencies` | role-program-mgmt | 跨项目依赖矩阵（29_项目依赖矩阵.csv：FS/SS/FF/SF + 相互交付物 + 共享资源 + 传导分析） | 项目群协同（map_dependencies 环节） |
+| `align_schedule` | role-program-mgmt | IMS 三层集成主进度（30_项目群主进度.csv：滚动式规划/关键路径/SAFe PI Planning 可选 + 周/月节奏） | 项目群协同（align_schedule 环节） |
+| `standardize_execution` | role-program-mgmt | 统一执行标准与度量口径（CPI/SPI/缺陷密度/里程碑准点率/变更计费率/资源负载 + 报告 cadence） | 项目群协同（standardize_execution 环节） |
+| `review_program` | role-program-mgmt | Program Board tranche 边界决策（继续/转向/终止 + 三层门禁叠加：时间对齐/依赖无冲突/标准一致） | 项目群协同（review_program 环节） |
+| `close_program` | role-program-mgmt | 项目群收尾（收益确认/移交/资源释放/复盘归档） | 项目群协同（close_program 环节） |
 
 ### 1.1 governance（项目治理子域）
 
@@ -87,7 +95,7 @@ DevProjectTeamSkill（总控）
 
 | action | 用途 | 典型调用时机 |
 |--------|------|-------------|
-| `create_baseline` | 创建全套台账 CSV 与项目基准（27 个 NN_ 前缀 CSV，含 12_风险问题台账升级字段/25_环境资源清单/26_访问边界/27_组织架构） | 项目初始化 |
+| `create_baseline` | 创建全套台账 CSV 与项目基准（30 个 NN_ 前缀 CSV，含 12_风险问题台账升级字段/25_环境资源清单/26_访问边界/27_组织架构/28_项目群注册/29_项目依赖矩阵/30_项目群主进度） | 项目初始化 |
 | `stage_close` | 阶段固化基线（备份+版本+产出物清单） | 评审通过、门禁放行 |
 | `release_gate` | 发布级门禁（自动化质量阈值：测试通过率≥95%/关键路径全绿/SAST 无高危） | 敏捷 发布点=Y |
 | `iteration_review` | 迭代末轻量评审 + 回顾记录（02_迭代回顾.csv） | 每迭代末 |

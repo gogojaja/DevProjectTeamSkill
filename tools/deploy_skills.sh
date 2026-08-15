@@ -69,6 +69,7 @@ ALL_ROLES=(
   role-testing
   role-deployment
   role-governance
+  role-program-mgmt
 )
 
 if [[ ${#ROLES[@]} -eq 0 ]]; then

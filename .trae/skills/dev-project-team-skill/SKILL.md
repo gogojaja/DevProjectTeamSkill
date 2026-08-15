@@ -12,9 +12,10 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.5.9
+- **技能版本**：v21.6.0
 - **版本发布日期**：2026-08-16
 - **版本变更记录**：
+  - v21.6.0：新增项目群/项目集协同层（2026-08-16）——新增第 9 角色包 `role-program-mgmt`（定义/收益/依赖/IMS 进度/标准一致/评审/收尾），治理三层模型，Program Board 在 tranche 边界决策；新台账 28/29/30；标准见 `references/program_management.md`。
   - v21.5.9：项目启动治理完善（2026-08-16）——`role-project-init` 新增 `define_org_structure`（组织架构 + RACI 矩阵，`27_组织架构.csv`）与 `define_issue_escalation`（问题解决与升级机制：P1~P4 分级 + 四级升级阶梯 L1~L4 + 响应时限 + 单一 Owner，`12_风险问题台账.csv` 升级字段）；`create_charter` 补成功标准/PM 任命职权/签字批准（对齐 PMBOK 章程六要素）；`check_ready` 新增「组织架构已明确」「问题升级机制已确立」两条硬门禁；role-governance 风险详情补问题升级子流程；台账 26→27；`role-project-init` 版本 v21.1.0→v21.2.0。
   - v21.5.7：多角色并行优先级仲裁规则（2026-08-15）——`skills/team-orchestration` 新增 `domain/priority-arbitration.md`（方案冲突按 P0~P6 裁决：需求基线/总控→安全→架构→测试→开发→部署→文档；一票否决制 + 领域速查表 + 仲裁留痕），`team-orchestration/SKILL.md` 新增 §6 冲突仲裁规则并升级 v1.1.0；对齐 multi-perspective-validation 聚合裁决机制。
   - v21.5.6：技能维护模式闭环执行能力升级（2026-08-15）——`shared/authoring.md` 强制要求所有维护产出的技能具备 `闭环执行系统` 标题与标准模板，包含任务入口、状态机、验收门禁、失败恢复、交接审计；同步更新 `SKILL_INDEX.md` 与 `role-governance/SKILL.md`，将“闭环执行能力”提升为维护模式硬门禁。
@@ -75,6 +76,7 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 | **敏捷迭代** | 「用敏捷/迭代/快速上线」 | 1~2 周迭代循环（需求→开发→测试），迭代轻量评审 + 发布级强门禁；启动 `init_tailor` 产出 `18_迭代配置.csv`（容量/技术债/DoR/DoD/发布点） |
 | **角色组合加载** | 单角色「启用需求分析师」/多角色「需求分析师+测试工程师」/双角色业务人员「需求+测试」 | 按用户指令加载对应角色包数量与组合：单角色=仅 1 包；多角色=加载多包；双角色裁剪=业务人员预设组合（需求+测试），台账按使用/简化/不使用裁剪 |
 | **技能维护** | 「手工编写/修改 SKILL.md」「skill-authoring」 | 维护技能库本身，非执行项目业务；按 role-governance 的 `skill-authoring`（`../shared/authoring.md`）六步流程（定义→建模→编写→校验→验证→打包发布），且所有维护产出必须具备 `闭环执行系统` 章节与终审门禁（任务入口/状态机/验收门禁/失败恢复/交接审计） |
+| **项目群协同** | 「项目群/项目集/多项目协同/PMO 决策层」 | 多项目协同层：`role-program-mgmt` 承载（对齐 PMI SPM 5th/MSP/IMS/EVM），7 环节定义/收益/依赖/IMS 进度/标准一致/Program Board 评审/收尾；治理三层模型，Program Board 在 tranche 边界决策（继续/转向/终止）；与项目级 check_ready/stage_review 叠加双层门禁，不替代单项目治理 |
 
 ---
 
@@ -89,6 +91,7 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 | 5 | role-testing | 测试 | 测试策略/计划/用例/执行/缺陷/总结 | role-testing/ |
 | 6 | role-deployment | 投产 | 投产策略/计划/Go-Live/发布/回滚/交接 | role-deployment/ |
 | 7 | role-governance | 总控保障 | 台账/评审/门禁/基线固化/变更/归档/交接 | role-governance/ |
+| 8 | role-program-mgmt | 项目群/项目集 | 项目群/项目集/多项目协同/PMO/依赖/里程碑对齐/收益/IMS | role-program-mgmt/ |
 
 - **元技能自省**：`shared/evolution.md`（SkillEvolutionSkill）按需触发，执行完毕即卸载；
 - **角色隔离**：各角色任务必须在对应角色包内完成，禁止跨角色执行；§2 公共底座对全角色强制生效；
@@ -187,5 +190,5 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 
 ---
 
-**文档版本**：v21.5.9　**最后更新**：2026-08-16（项目启动治理完善：组织架构/RACI + 问题升级机制）
+**文档版本**：v21.6.0　**最后更新**：2026-08-16（新增项目群/项目集协同层：role-program-mgmt 第 9 角色包）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

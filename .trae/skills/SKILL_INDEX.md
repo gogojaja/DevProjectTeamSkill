@@ -16,6 +16,7 @@
 | 5 | role-testing | 测试 | 测试策略 / 测试计划 / 用例设计 / 测试执行 / 缺陷管理 / 测试总结 | role-testing/ |
 | 6 | role-deployment | 投产 | 投产策略 / 投产计划 / Go-Live / 发布执行 / 回滚 / 运维交接 | role-deployment/ |
 | 7 | role-governance | 总控保障 | 台账读写 / 阶段评审 / 门禁 / 基线固化 / 变更审计 / 归档 / 交接 | role-governance/ |
+| 8 | role-program-mgmt | 项目群/项目集 | 项目群 / 项目集 / 多项目协同 / PMO / 依赖 / 里程碑对齐 / 收益 / IMS | role-program-mgmt/ |
 
 ## 使用规则
 
@@ -39,8 +40,10 @@
 
 14. **启动治理（v21.5.9）**：启动阶段须完成组织架构与责任分配（`define_org_structure`，`27_组织架构.csv` RACI 矩阵）与问题解决与升级机制（`define_issue_escalation`，`12_风险问题台账.csv` 升级字段 P1~P4 分级 + 四级升级阶梯 + 单一 Owner）；`check_ready` 硬门禁（未明确不得 Go），详见 `role-project-init/SKILL.md`。
 
+15. **项目群协同（v21.6.0）**：多项目协同层由 `role-program-mgmt` 承载（对齐 PMI SPM 5th/MSP/IMS/EVM），7 环节 `define_program`/`manage_benefits`/`map_dependencies`/`align_schedule`/`standardize_execution`/`review_program`/`close_program`；治理三层模型（项目治理<项目群治理<组合治理），Program Board 在 tranche 边界决策（继续/转向/终止），Program Manager 管理不决策、PMO 提供机制不决策；新台账 28_项目群注册/29_项目依赖矩阵/30_项目群主进度；与项目级 check_ready/stage_review 叠加为双层门禁，不替代单项目治理，详见 `role-program-mgmt/SKILL.md` 与 `references/program_management.md`。
+
 ---
 
-**文档版本**：v21.5.9
-**最后更新**：2026-08-16（项目启动治理完善：define_org_structure 组织架构/RACI + define_issue_escalation 问题升级机制）
+**文档版本**：v21.6.0
+**最后更新**：2026-08-16（新增项目群/项目集协同层 role-program-mgmt：7 环节 + 3 台账 + 治理三层模型 + Program Board tranche 决策）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

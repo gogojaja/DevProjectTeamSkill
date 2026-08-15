@@ -11,7 +11,8 @@ else:
 DEFAULT_TARGETS = [os.path.join(ROOT, t) for t in
                    ('.github/skills', '.claude/skills', '.agents/skills')] + [GLOBAL_SKILLS]
 ALL_ROLES = ['dev-project-team-skill','role-project-init','role-requirements-analysis',
-             'role-architecture','role-development','role-testing','role-deployment','role-governance']
+             'role-architecture','role-development','role-testing','role-deployment','role-governance',
+             'role-program-mgmt']
 
 def parse_args(argv):
     targets = []

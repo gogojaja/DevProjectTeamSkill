@@ -14,7 +14,8 @@ sys.stdout.reconfigure(encoding='utf-8')
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKILLS_DIR = os.environ.get('SKILLS_DIR', os.path.join(ROOT, '.trae', 'skills'))
 ALL_ROLES = ['dev-project-team-skill','role-project-init','role-requirements-analysis',
-             'role-architecture','role-development','role-testing','role-deployment','role-governance']
+             'role-architecture','role-development','role-testing','role-deployment','role-governance',
+             'role-program-mgmt']
 
 VRE = re.compile(r'技能版本\*\*[：:]\s*(v[0-9]+\.[0-9]+\.[0-9]+)')       # 元数据行
 FRE = re.compile(r'\*\*文档版本\*\*[：:]\s*(v[0-9]+\.[0-9]+\.[0-9]+)')   # 页脚
