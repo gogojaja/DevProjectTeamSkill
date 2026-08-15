@@ -77,8 +77,26 @@ def snapshot(ver):
     print(f'   ✓ 快照已生成 → {snap}')
 
 if __name__ == '__main__':
-    note = sys.argv[1] if len(sys.argv) > 1 else ''
+    # simple arg parsing: optional note, plus --dry-run / --json
+    note = ''
+    dry_run = False
+    as_json = False
+    args = sys.argv[1:]
+    i = 0
+    while i < len(args):
+        a = args[i]
+        if a == '--dry-run':
+            dry_run = True; i += 1
+        elif a == '--json':
+            as_json = True; i += 1
+        else:
+            # first non-flag is note
+            if not note:
+                note = a
+            i += 1
+
     stamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    info = {'action': 'solidify', 'stamp': stamp, 'note': note, 'dry_run': dry_run}
     print('==============================================')
     print(' 育权台断点固化 (solidify v21, Python port)')
     print('==============================================')
@@ -93,20 +111,37 @@ if __name__ == '__main__':
         print('❌ 版本一致性校验未通过，中止固化。请先统一各包元数据/页脚版本。')
         sys.exit(1)
     print('[2/5] 刷新交接文档断点区')
-    refresh_handoff(stamp, note)
+    if not dry_run:
+        refresh_handoff(stamp, note)
+    else:
+        print('   (dry-run) refresh_handoff skipped')
     print('[3/5] 快照')
     m = re.search(r'技能版本\*\*[：:]\s*(v[0-9]+\.[0-9]+\.[0-9]+)',
                   open(os.path.join(SKILLS_DIR, 'dev-project-team-skill', 'SKILL.md'), encoding='utf-8').read())
     v = m.group(1) if m else 'v21.0.0'
-    snapshot(v)
+    if not dry_run:
+        snapshot(v)
+    else:
+        print(f'   (dry-run) snapshot {v} skipped')
     print('[4/5] 打包 dist')
-    if run_package() != 0:
-        print('   ✗ package_skills.py 失败'); sys.exit(1)
-    print('   ✓ package_skills.py 完成')
+    if not dry_run:
+        if run_package() != 0:
+            print('   ✗ package_skills.py 失败'); sys.exit(1)
+        print('   ✓ package_skills.py 完成')
+    else:
+        print('   (dry-run) package_skills.py skipped')
     print('[5/5] 部署四目录')
-    if run_deploy() != 0:
-        print('   ✗ deploy_skills.py 失败'); sys.exit(1)
-    print('   ✓ deploy_skills.py 完成')
+    if not dry_run:
+        if run_deploy() != 0:
+            print('   ✗ deploy_skills.py 失败'); sys.exit(1)
+        print('   ✓ deploy_skills.py 完成')
+    else:
+        print('   (dry-run) deploy_skills.py skipped')
+
     print('==============================================')
     print(' 固化完成。请执行: git add -A && git commit -m "<说明>"')
     print('==============================================')
+    info['status'] = 'completed' if not dry_run else 'dry-run'
+    if as_json:
+        import json
+        print(json.dumps(info, ensure_ascii=False))

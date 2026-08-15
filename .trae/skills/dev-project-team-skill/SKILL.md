@@ -12,9 +12,10 @@ description: "软件研发多角色编排器：按阶段渐进加载角色包（
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.5.5
-- **版本发布日期**：2026-08-14
+- **技能版本**：v21.5.6
+- **版本发布日期**：2026-08-15
 - **版本变更记录**：
+  - v21.5.6：技能维护模式闭环执行能力升级（2026-08-15）——`shared/authoring.md` 强制要求所有维护产出的技能具备 `闭环执行系统` 标题与标准模板，包含任务入口、状态机、验收门禁、失败恢复、交接审计；同步更新 `SKILL_INDEX.md` 与 `role-governance/SKILL.md`，将“闭环执行能力”提升为维护模式硬门禁。
   - v21.5.5：敏感信息分级处理矩阵（2026-08-14）——`references/iron_rules.md` §3 统一为 A/B/C 三级（A 禁止入库：密钥凭据 Token；B 脱敏入库：主机名/IP/用户名/路径；C 正常入库）；原 §3.1 脱敏细则并入 B 级；同步 `shared/references/iron_rules.md`、`AGENTS.md` 第 8 条、`SKILL_INDEX.md`。
   - v21.5.4：环境信息脱敏铁律（2026-08-14）——`references/iron_rules.md` 新增 §3.1（本机/环境信息提交公共仓库前必须脱敏：IP 完全脱敏默认、保留主机名须授权）；同步 `shared/references/iron_rules.md`、`AGENTS.md` 核心规则第 8 条、`SKILL_INDEX.md`。
   - v21.5.3：集成 CMDB CLI 到 register_env_asset 环节（2026-08-14）——`role-project-init` 更新 `register_env_asset` 环节，使用 CMDB CLI 工具注册资源到 CMDB 数据库（`tools/cmdb/cmdb-cli.py`），补充 CMDB CLI 调用示例；更新 `role-project-init/SKILL.md` 版本至 v21.0.2。
@@ -71,7 +72,7 @@ description: "软件研发多角色编排器：按阶段渐进加载角色包（
 | 阶段裁剪 | 项目仅需部分阶段（如只有需求+测试） | 启动阶段 `init_tailor` 产出阶段/活动裁剪配置（00_阶段配置.csv），仅加载保留阶段角色包 |
 | **敏捷迭代** | 「用敏捷/迭代/快速上线」 | 1~2 周迭代循环（需求→开发→测试），迭代轻量评审 + 发布级强门禁；启动 `init_tailor` 产出 `18_迭代配置.csv`（容量/技术债/DoR/DoD/发布点） |
 | **角色组合加载** | 单角色「启用需求分析师」/多角色「需求分析师+测试工程师」/双角色业务人员「需求+测试」 | 按用户指令加载对应角色包数量与组合：单角色=仅 1 包；多角色=加载多包；双角色裁剪=业务人员预设组合（需求+测试），台账按使用/简化/不使用裁剪 |
-| **技能维护** | 「手工编写/修改 SKILL.md」「skill-authoring」 | 维护技能库本身，非执行项目业务；按 role-governance 的 `skill-authoring`（`../shared/authoring.md`）五步流程（定义→编写→校验→验证→打包发布） |
+| **技能维护** | 「手工编写/修改 SKILL.md」「skill-authoring」 | 维护技能库本身，非执行项目业务；按 role-governance 的 `skill-authoring`（`../shared/authoring.md`）六步流程（定义→建模→编写→校验→验证→打包发布），且所有维护产出必须具备 `闭环执行系统` 章节与终审门禁（任务入口/状态机/验收门禁/失败恢复/交接审计） |
 
 ---
 
@@ -130,5 +131,5 @@ description: "软件研发多角色编排器：按阶段渐进加载角色包（
 
 ---
 
-**文档版本**：v21.5.5　**最后更新**：2026-08-14（敏感信息分级处理矩阵 A/B/C）
+**文档版本**：v21.5.6　**最后更新**：2026-08-15（技能维护闭环执行能力升级）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

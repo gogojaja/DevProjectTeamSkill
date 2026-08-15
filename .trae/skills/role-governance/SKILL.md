@@ -9,8 +9,8 @@ description: "总控保障角色包：台账与基线初始化、五维评审与
 
 ## 1. 元数据
 
-- **技能版本**：v21.3.2　**发布日期**：2026-08-07
-- **变更记录**：v21.3.2 新增 register_auth 授权登记 + 阶段末授权时效检查（14_授权登记/13 留痕入 git）；v21.3.0 新增 record_env_config/retrospect_harvest/select_model 三 action（环境配置抽取/阶段复盘收割/模型选型）；v21.2.1 新增发布级门禁（release_gate 自动化质量阈值）+ 迭代评审/回顾（iteration_review），门禁分级/防绕过见 `../shared/governance.md`；v21.0.0 由 project-monitor-skill + 6 子技能 + project-governance-skill 重组为角色包；SkillEvolution/SkillAuthoring 迁至 `shared/`
+- **技能版本**：v21.3.3　**发布日期**：2026-08-15
+- **变更记录**：v21.3.3 补充技能维护闭环执行能力门禁（2026-08-15）——维护产出的每个技能必须具备 `闭环执行系统` 标题与标准模板，包含任务入口、状态机、验收门禁、失败恢复、交接审计，不得仅停留在描述型流程；v21.3.2 新增 register_auth 授权登记 + 阶段末授权时效检查（14_授权登记/13 留痕入 git）；v21.3.0 新增 record_env_config/retrospect_harvest/select_model 三 action（环境配置抽取/阶段复盘收割/模型选型）；v21.2.1 新增发布级门禁（release_gate 自动化质量阈值）+ 迭代评审/回顾（iteration_review），门禁分级/防绕过见 `../shared/governance.md`；v21.0.0 由 project-monitor-skill + 6 子技能 + project-governance-skill 重组为角色包；SkillEvolution/SkillAuthoring 迁至 `shared/`
 - **参考标准**：PMBOK（十大过程组/领域管控）· ISO 31000 风险
 
 ## 2. 触发规则
@@ -38,11 +38,11 @@ description: "总控保障角色包：台账与基线初始化、五维评审与
 | 授权登记/时效 | register_auth / 授权检查 | `../shared/governance.md`（14_授权登记 + 13 留痕 + 阶段末时效检查） |
 | 交接归档 | handover_export | `domain/governance.md`（交接文档优先） |
 | 技能自省 | evolve_start / ctx_health_check | `../dev-project-team-skill/skills/self-improve/SKILL.md`（PDCA/哈希链/健康监控） |
-| 技能维护 | skill-authoring | `../shared/authoring.md` |
+| 技能维护 | skill-authoring | `../shared/authoring.md`（强制闭环执行系统门禁） |
 
 ## 4. 铁律
 
-评审/变更/门禁/固化/归档禁止其他角色包自主处理，一律经本包；高危文件操作先 `security_audit`；审计链非删除；固化后交接文档断点区必须反映磁盘最新状态（solidify.sh）；跨模型交接优先读 `交接文档.md`。
+评审/变更/门禁/固化/归档禁止其他角色包自主处理，一律经本包；高危文件操作先 `security_audit`；审计链非删除；固化后交接文档断点区必须反映磁盘最新状态（solidify.sh）；跨模型交接优先读 `交接文档.md`；**维护产出的技能必须具备 `闭环执行系统` 标题与终审门禁，不得以纯描述型流程发版。**
 
 ## 5. 输出规范与边界
 
@@ -52,5 +52,5 @@ description: "总控保障角色包：台账与基线初始化、五维评审与
 
 ---
 
-**文档版本**：v21.3.2　**最后更新**：2026-08-07（register_auth 授权登记 + 阶段末时效检查）
+**文档版本**：v21.3.3　**最后更新**：2026-08-15（技能维护闭环执行能力门禁）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

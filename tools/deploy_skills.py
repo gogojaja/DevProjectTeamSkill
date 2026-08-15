@@ -16,6 +16,8 @@ ALL_ROLES = ['dev-project-team-skill','role-project-init','role-requirements-ana
 def parse_args(argv):
     targets = []
     roles = []
+    dry_run = False
+    as_json = False
     i = 0
     while i < len(argv):
         a = argv[i]
@@ -23,12 +25,16 @@ def parse_args(argv):
             targets.append(argv[i+1]); i += 2
         elif a == '--roles':
             roles += [x for x in argv[i+1].split(',') if x]; i += 2
+        elif a == '--dry-run':
+            dry_run = True; i += 1
+        elif a == '--json':
+            as_json = True; i += 1
         elif a in ('-h', '--help'):
-            print('用法: package_skills.py [--target <dir>]... [--roles <role,role,...>]')
+            print('用法: package_skills.py [--target <dir>]... [--roles <role,role,...>] [--dry-run] [--json]')
             sys.exit(0)
         else:
             print(f'未知参数: {a}'); sys.exit(1)
-    return targets or DEFAULT_TARGETS, roles or ALL_ROLES
+    return (targets or DEFAULT_TARGETS), (roles or ALL_ROLES), dry_run, as_json
 
 def check_names(roles):
     fail = 0
@@ -79,11 +85,29 @@ def deploy_target(target, roles):
         sys.exit(1)
 
 if __name__ == '__main__':
-    targets, roles = parse_args(sys.argv[1:])
-    print('技能库部署 (v21, Python port, --roles 按需部署)')
-    print(f'源库: {SKILLS_DIR}')
-    print(f'待部署角色包: {",".join(roles)}')
-    check_names(roles)
-    for t in targets:
-        deploy_target(t, roles)
-    print('全部完成。注入型工具请只放入本次任务所需角色包。')
+    targets, roles, dry_run, as_json = parse_args(sys.argv[1:])
+    info = {
+        'action': 'deploy_skills',
+        'source': SKILLS_DIR,
+        'targets': targets,
+        'roles': roles,
+        'dry_run': dry_run
+    }
+    if not dry_run:
+        print('技能库部署 (v21, Python port, --roles 按需部署)')
+        print(f'源库: {SKILLS_DIR}')
+        print(f'待部署角色包: {",".join(roles)}')
+        check_names(roles)
+        for t in targets:
+            deploy_target(t, roles)
+        print('全部完成。注入型工具请只放入本次任务所需角色包。')
+        info['status'] = 'completed'
+    else:
+        # dry-run: do not perform file system changes, only report
+        info['status'] = 'dry-run'
+        info['message'] = f'Would deploy {len(roles)} roles to {len(targets)} targets.'
+        print(info['message'])
+
+    if as_json:
+        import json
+        print(json.dumps(info, ensure_ascii=False))
