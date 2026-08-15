@@ -23,6 +23,14 @@ def run_version_check():
     print('   ✓ 版本一致性校验执行完毕' if r.returncode == 0 else '   ✗ 版本一致性校验失败')
     return r.returncode
 
+
+def run_closure_check():
+    """硬门禁：闭环执行系统校验，失败中止固化。"""
+    r = _run_script('check_skill_closure.py')
+    print('   ✓ 闭环执行门禁执行完毕' if r.returncode == 0 else '   ✗ 闭环执行门禁失败')
+    return r.returncode
+
+
 def run_deploy():
     return _run_script('deploy_skills.py').returncode
 
@@ -109,6 +117,10 @@ if __name__ == '__main__':
     print('[1a/5] 版本一致性校验（硬门禁）')
     if run_version_check() != 0:
         print('❌ 版本一致性校验未通过，中止固化。请先统一各包元数据/页脚版本。')
+        sys.exit(1)
+    print('[1b/5] 闭环执行门禁校验（硬门禁）')
+    if run_closure_check() != 0:
+        print('❌ 闭环执行门禁未通过，中止固化。请先补齐“闭环执行系统”章节与关键门禁项。')
         sys.exit(1)
     print('[2/5] 刷新交接文档断点区')
     if not dry_run:
