@@ -21,7 +21,8 @@
 2. **阶段裁剪**：项目启动阶段依据项目特点裁剪阶段/活动（`init_tailor`，产出 00_阶段配置.csv），编排器仅加载保留阶段角色包；第 0 阶段与总控保障强制保留；
 3. **敏捷迭代**：`init_tailor` 额外产出 18_迭代配置.csv（容量/技术债/DoR/DoD/发布点），迭代循环 + 发布级强门禁（`release_gate`），新增 `iterate_backlog`/`iteration_review` action；
 4. **技能维护**：新建/修改 SKILL.md 走 role-governance 的 `skill-authoring` 路由（`../shared/authoring.md` 六步流程，非执行项目业务）；产物目录强制对准该文件 §3（最终产出物落 `.trae/skills/<包名>/`，打包/临时物归 `dist/`、`backup/tmp_migrations/`、`_pkg_tmp/`）；
-   - **硬门禁**：维护产出的每个技能必须具备 `闭环执行系统` 标题与模板，包含任务入口、执行状态、验收门禁、失败处理、产出与交接、审计记录，且必须通过 `tools/check_skill_closure.py` 与 `tools/check_version_consistency.py`；不得仅停留在描述型流程；
+   - **硬门禁**：维护产出的每个技能必须具备 `闭环执行系统` 标题与模板，包含任务入口、执行状态、验收门禁、失败处理、产出与交接、审计记录，且必须通过 `tools/check_skill_closure.py`、`tools/check_skill_release_gate.py` 与 `tools/check_version_consistency.py`；不得仅停留在描述型流程；
+   - **维护 SOP**：详细执行流程与统一模板见 `../shared/skill_maintenance_sop.md`；
 5. **增强能力（v21.3.0）**：每阶段开始 `select_model`（21_模型选型）；阶段末 `retrospect_harvest`（22_阶段复盘 + 23_复用资产）；环境准备 `record_env_config`（20_环境配置）；标准见 `references/model_selection.md` 与 `references/environment_standard.md`；
 6. **铁律锚点**：压缩/新会话后重读 `references/iron_rules.md`，每轮回显锚点 `授权→备份→留痕`；§3 敏感信息分级处理（A 禁止入库/B 脱敏入库/C 正常入库），B 级脱敏提交前强制；
 7. **授权登记/时效**：系统/外部文件授权经 `register_auth` 登记 `14_授权登记.csv`（含有效期），每阶段末检查并提醒续期/撤销；

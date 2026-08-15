@@ -118,6 +118,8 @@
 4. 通过 `tools/check_skill_closure.py` 与 `tools/check_skill_release_gate.py`；
 5. 仅在全部通过后，才允许执行 `package_skills.sh`、`deploy_skills.sh` 或 `solidify.sh`。
 
+> 详细执行流程和统一标准，见 `../shared/skill_maintenance_sop.md`。
+
 ## 6. 临时文件与产出物目录（强制）
 
 - **最终产出物**：新写/修改的 SKILL.md、`domain/*.md`、`*__resources/` 一律落盘在 `.trae/skills/<包名>/` 源码（唯一事实来源）；打包产物由 `tools/package_skills.sh` 输出至项目根 `dist/`（`dist/<包名>_v<版本>.zip`），禁止手工复制 shared/references 进角色包；
