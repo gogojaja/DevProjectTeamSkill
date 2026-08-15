@@ -36,7 +36,8 @@ description: "Project initiation skill covering startup foundations: charter & b
 | `define_scope_prelim` | 范围初定义 | register_stakeholder |
 | `init_tailor` | 阶段/活动裁剪决策 | define_scope_prelim |
 | `register_env_asset` | 环境资产注册与冲突预检（25_环境资源清单.csv） | init_tailor |
-| `assess_feasibility` | 五维可行性评估 | register_env_asset |
+| `declare_access_boundary` | 访问边界声明（26_访问边界.csv，本项目可读写/删除范围=本项目目录） | register_env_asset |
+| `assess_feasibility` | 五维可行性评估 | declare_access_boundary |
 | `check_ready` | 就绪检查（Go 判定） | assess_feasibility |
 | `init_baseline` | create_baseline 初始化台账 | check_ready=Go |
 
@@ -44,7 +45,7 @@ description: "Project initiation skill covering startup foundations: charter & b
 
 ## 3. 项目启动流程
 
-流程主线：`init_kickoff → create_charter → register_stakeholder → define_scope_prelim → init_tailor → register_env_asset → assess_feasibility → check_ready → (Go) → init_baseline → 需求阶段入场`；No-Go/暂缓 → 阻塞清单 + 建议行动，停止。
+流程主线：`init_kickoff → create_charter → register_stakeholder → define_scope_prelim → init_tailor → register_env_asset → declare_access_boundary → assess_feasibility → check_ready → (Go) → init_baseline → 需求阶段入场`；No-Go/暂缓 → 阻塞清单 + 建议行动，停止。
 
 - **门禁**：每环节产出经用户确认后进入下一环节；
 - **刹车**：章程确认连续 2 次未通过 → 停止并推送人工决策；
@@ -127,6 +128,17 @@ python tools/cmdb/cmdb-cli.py release --type port --identifier 8000 --project ba
 
 > 单项目独立开发机（无共享冲突风险）可跳过本环节，按需登记即可。
 
+### 环节 6.5：访问边界声明（declare_access_boundary，强制必做）
+
+处理：声明**本项目文件系统访问边界**——本项目可读写/删除范围 = **本项目所在目录（含子目录）**，写入 `台账/26_访问边界.csv`（边界类型/路径范围/读写/删除/授权要求/有效期/状态）：
+
+- **默认边界**：可读写/删除仅限本项目目录；项目外（其他项目目录、系统文件、仓库外路径）一律禁止未经授权的读写/删除；
+- **跨项目访问**：需要访问本项目目录之外的其他项目目录/文件时，一律经 `register_auth`（总控，`台账/14_授权登记.csv`）授权，**未填有效期默认仅本次对话有效**，会话结束自动失效；跨会话须用户显式指定到期时间并留痕；
+- **安全对齐**：系统文件/项目外文件操作铁律见 `../../references/iron_rules.md` §1（授权+备份+留痕三条件齐备，经 `security_audit` 前置审计）；
+- **未声明不放行**：访问边界未声明或存在未决授权，不得进入后续可行性评估与就绪检查。
+
+输出：《访问边界声明》（写入 `台账/26_访问边界.csv`，字段：边界类型/路径范围/读写/删除/授权要求/有效期/状态）。
+
 ### 环节 7：可行性评估（assess_feasibility）
 五维矩阵，任一项"不可行"则 No-Go：
 
@@ -141,11 +153,11 @@ python tools/cmdb/cmdb-cli.py release --type port --identifier 8000 --project ba
 输出：《可行性评估报告》（五维结论 + Go/No-Go 建议）。
 
 ### 环节 8：启动就绪检查（check_ready）
-处理：Gate 清单——章程确认 / 干系人登记（含权力-利益分析）/ 范围初定义 / 裁剪配置确认 / **环境资产已注册且无未裁决冲突（`25_环境资源清单.csv`）** / 可行性通过 / 预算里程碑明确 / 需求入场条件识别。判定 **Go**（全过）/ **No-Go**（任一不满足且无法调整）/ **暂缓**（条件暂缺，补足重查）；No-Go/暂缓输出阻塞清单与建议行动。
+处理：Gate 清单——章程确认 / 干系人登记（含权力-利益分析）/ 范围初定义 / 裁剪配置确认 / **环境资产已注册且无未裁决冲突（`25_环境资源清单.csv`）** / **访问边界已声明（`26_访问边界.csv`，可读写/删除范围=本项目目录）** / 可行性通过 / 预算里程碑明确 / 需求入场条件识别。判定 **Go**（全过）/ **No-Go**（任一不满足且无法调整）/ **暂缓**（条件暂缺，补足重查）；No-Go/暂缓输出阻塞清单与建议行动。
 输出：《启动就绪检查单》（Go/No-Go/暂缓 + 阻塞清单）。
 
 ### 环节 9：基线初始化（init_baseline）
-处理：调用 ProjectMonitorSkill `create_baseline` 创建全套台账（20+ 个 CSV，含「00_阶段配置」「18_迭代配置」「19_迭代回顾」）；启动产物写入对应 CSV（「01_启动组」编号/目标/相关方/沟通、「02_范围基准」范围/边界/禁止项、「03_进度基准」初步里程碑、「04_成本基准」预算/阈值、「00_阶段配置」阶段/活动裁剪清单、「18_迭代配置」敏捷迭代配置、「12_风险问题台账」初始风险登记册、「25_环境资源清单」已登记资源快照）；依据裁剪配置确定后续保留阶段，固化后输出《项目启动完成报告》，移交首个保留阶段入场。
+处理：调用 ProjectMonitorSkill `create_baseline` 创建全套台账（26 个 CSV，含「00_阶段配置」「18_迭代配置」「19_迭代回顾」「25_环境资源清单」「26_访问边界」）；启动产物写入对应 CSV（「01_启动组」编号/目标/相关方/沟通、「02_范围基准」范围/边界/禁止项、「03_进度基准」初步里程碑、「04_成本基准」预算/阈值、「00_阶段配置」阶段/活动裁剪清单、「18_迭代配置」敏捷迭代配置、「12_风险问题台账」初始风险登记册、「25_环境资源清单」已登记资源快照、「26_访问边界」访问边界声明）；依据裁剪配置确定后续保留阶段，固化后输出《项目启动完成报告》，移交首个保留阶段入场。
 输出：`台账/`（20+ 个 CSV，已初始化）+《项目启动完成报告》。
 
 ---
@@ -170,7 +182,8 @@ python tools/cmdb/cmdb-cli.py release --type port --identifier 8000 --project ba
 2. **章程铁律**：章程未经干系人确认，禁止固化范围初定义；
 3. **决策铁律**：No-Go/暂缓必须停止推进并输出阻塞清单，不得强行开工；
 4. **边界铁律**：不做需求细化、架构设计、写代码——范围初定义不等于需求规格说明书；
-5. **权限铁律**：范围/基线变更经 ProjectMonitorSkill 审计。
+5. **权限铁律**：范围/基线变更经 ProjectMonitorSkill 审计；
+6. **目录边界铁律**：本项目可读写/删除范围=本项目目录（`26_访问边界.csv`）；本项目目录之外（其他项目目录/系统文件）一律经 `register_auth` 授权，未填有效期默认仅本次对话有效，未授权禁止读写/删除（详见 `../../references/iron_rules.md` §1）。
 
 **禁用**：需求收集与规格编写（由 RequirementsAnalysisSkill 执行）；架构/开发/测试/部署等后续阶段；跳过就绪检查直接固化基线。
 
@@ -182,5 +195,5 @@ python tools/cmdb/cmdb-cli.py release --type port --identifier 8000 --project ba
 
 ---
 
-**文档版本**：v21.2.3（register_env_asset 集成 CMDB CLI 工具，2026-08-14）
+**文档版本**：v21.1.0（declare_access_boundary 访问边界声明 + 目录边界铁律，2026-08-15）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

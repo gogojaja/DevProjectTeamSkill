@@ -1,6 +1,6 @@
 ---
 name: "role-deployment"
-description: "投产发布角色包：部署策略与风险分析、发布计划、准备与演练、分阶段发布执行与监控、回滚、Go-Live 评审与运维交接。触发词：投产策略、发布计划、发布准备、部署执行、发布监控、回滚、Go-Live、运维交接。Load when the user analyzes deployment strategy, writes the release plan, prepares/executes a release, rolls back, or hands over operations."
+description: "用户提到投产策略、发布计划、发布准备、部署执行、发布监控、回滚、Go-Live、运维交接时加载本投产发布角色包：负责部署策略与风险分析、发布计划、准备与演练、分阶段发布执行与监控、回滚、Go-Live 评审与运维交接，输出投产方案、部署清单、执行记录与回滚预案。用户说投产/发布/部署/回滚/运维时加载。"
 ---
 
 # role-deployment 投产发布角色包

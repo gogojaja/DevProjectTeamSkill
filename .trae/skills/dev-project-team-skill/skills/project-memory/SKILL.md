@@ -1,6 +1,6 @@
 ---
 name: "project-memory"
-description: "持久化記憶層：跨會話/跨模型的項目級長期記憶，支援決策記錄、架構約束、知識圖譜、上下文恢復，內建 Notepad/ProjectMemory/向量檢索。觸發詞：項目記憶、持久化記憶、長期記憶、決策記錄、知識圖譜、上下文恢復。Load when user needs cross-session project memory, decision logs, or context restoration."
+description: "用户提到项目记忆、持久化记忆、长期记忆、决策记录、知识图谱、上下文恢复时加载本持久化记忆层技能：跨会话/跨模型的项目级长期记忆，支持决策记录、架构约束、知识图谱、上下文恢复，内置 Notepad/ProjectMemory/向量检索引擎，保证跨会话上下文连贯。用户说记忆/决策记录/上下文恢复时加载。"
 ---
 
 # Project Memory 持久化記憶層

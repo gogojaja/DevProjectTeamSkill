@@ -3,6 +3,8 @@
 > 技能库根只读入口：**工具/编排器据此选择角色包**，每包一行。
 > 子技能明细由各角色包根 SKILL.md 路由表承载，本索引不重复。
 > 规范详见 `references/token_standard.md` §1。
+> **弱模型适配**：能力弱模型下技能识别与执行规范见 `references/weak_model_compatibility.md`（description 单语言/触发词前置）。
+> **目录访问边界**：本项目可读写/删除范围=本项目目录（`台账/26_访问边界.csv`），本项目目录外访问须经 `register_auth` 授权（默认仅本次对话），见 `references/iron_rules.md` §1a。
 
 | # | 角色包 | 域 | 触发词 | 加载路径 |
 |---|--------|-----|--------|----------|
@@ -37,6 +39,6 @@
 
 ---
 
-**文档版本**：v21.5.6
-**最后更新**：2026-08-15（新增多角色并行优先级仲裁：team-orchestration/domain/priority-arbitration.md）
+**文档版本**：v21.5.7
+**最后更新**：2026-08-15（目录访问边界铁律 26_访问边界.csv + description 弱模型适配单语言化）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

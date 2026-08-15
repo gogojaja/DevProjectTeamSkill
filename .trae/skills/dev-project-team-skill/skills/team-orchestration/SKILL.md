@@ -1,6 +1,6 @@
 ---
 name: "team-orchestration"
-description: "并行编排层：基于团队流水线的多角色并行执行，支持 team/ultrawork/ralph 三种模式，自动拆解任务依赖图并调度 Worker 并行。触发词：并行编排、团队流水线、多角色并行、team、ultrawork、ralph。Load when user requests parallel multi-role execution or team pipeline."
+description: "用户提到并行编排、团队流水线、多角色并行、team、ultrawork、ralph时加载本并行编排层技能：基于团队流水线多角色并行执行，支持 team/ultrawork/ralph 三种模式，自动拆解任务依赖图并调度 Worker 并行，方案冲突按优先级仲裁规则裁决。用户说并行编排/团队流水线时加载。"
 ---
 
 # Team Orchestration 并行编排层

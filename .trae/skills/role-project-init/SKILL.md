@@ -1,6 +1,6 @@
 ---
 name: "role-project-init"
-description: "项目启动角色包：立项、项目章程、干系人登记、范围初定、可行性检查、启动就绪、台账基线初始化。触发词：启动项目、立项、项目章程、干系人、范围初定、可行性、启动就绪、初始化基线。Load when the user starts a new project, creates the charter, registers stakeholders, checks feasibility/readiness, or initializes the project baseline."
+description: "用户启动项目、立项、写项目章程、登记干系人、范围初定、可行性检查、启动就绪、初始化基线时加载本项目启动角色包：负责立项登记、项目章程、干系人登记（权力-利益矩阵）、范围初定义、阶段裁剪、环境与访问边界声明、五维可行性评估、启动就绪检查与台账基线初始化，对齐 PMBOK 启动过程组。用户说启动项目/初始化时加载。"
 ---
 
 # role-project-init 项目启动角色包
@@ -9,8 +9,8 @@ description: "项目启动角色包：立项、项目章程、干系人登记、
 
 ## 1. 元数据
 
-- **技能版本**：v21.0.2　**发布日期**：2026-08-14
-- **变更记录**：v21.0.2 集成 CMDB CLI 工具到 register_env_asset 环节；v21.0.1 新增环境资产注册（register_env_asset）路由与 25_环境资源清单；v21.0.0 由 project-init-skill 重组为角色包（标准 SKILL.md + domain/）
+- **技能版本**：v21.1.0　**发布日期**：2026-08-15
+- **变更记录**：v21.1.0 新增访问边界声明（declare_access_boundary，26_访问边界.csv）+ 目录边界铁律；v21.0.2 集成 CMDB CLI 工具到 register_env_asset 环节；v21.0.1 新增环境资产注册（register_env_asset）路由与 25_环境资源清单；v21.0.0 由 project-init-skill 重组为角色包（标准 SKILL.md + domain/）
 - **参考标准**：PMBOK 启动过程组（initiating process group）
 
 ## 2. 触发规则
@@ -26,11 +26,13 @@ description: "项目启动角色包：立项、项目章程、干系人登记、
 | 干系人 | register_stakeholder | `domain/project-init.md` |
 | 范围初定 | 范围初步定义 | `domain/project-init.md` |
 | 裁剪 | init_tailor + 环境资产注册 | `domain/project-init.md` |
+| 访问边界 | declare_access_boundary | `domain/project-init.md` |
 | 可行性 | 可行性检查 | `domain/project-init.md` |
 | 启动就绪 | check_ready | `domain/project-init.md` |
 | 基线初始化 | create_baseline（经总控） | `../shared/governance.md` |
 
 > 多项目共享同一服务器时，`init_tailor` 后须执行 `register_env_asset` 资源注册与冲突预检（`台账/25_环境资源清单.csv`，详见 `../references/multi_project_isolation.md` §10），`check_ready` 含「资源无未裁决冲突」门禁。
+> **访问边界铁律**：启动阶段必须执行 `declare_access_boundary` 声明本项目可读写/删除范围=本项目所在目录（`台账/26_访问边界.csv`），未声明禁止进入 `check_ready`；本项目目录之外的任何访问（其他项目目录/系统文件）一律经 `register_auth` 授权（未填有效期默认仅本次对话有效），铁律详见 `../references/iron_rules.md` §1。
 
 ## 4. 输出规范与边界
 
@@ -93,5 +95,5 @@ description: "项目启动角色包：立项、项目章程、干系人登记、
 
 ---
 
-**文档版本**：v21.0.2　**最后更新**：2026-08-14
+**文档版本**：v21.1.0　**最后更新**：2026-08-15
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

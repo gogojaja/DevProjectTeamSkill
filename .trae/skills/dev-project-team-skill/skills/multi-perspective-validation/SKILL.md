@@ -1,6 +1,6 @@
 ---
 name: "multi-perspective-validation"
-description: "多視角驗證技能：對代碼/架構/文檔/配置進行多角色並行驗證，支援 Architect/CodeReviewer/SecurityReviewer/TestEngineer/PerformanceEngineer 五視角並行，輸出統一驗證報告與簽署。觸發詞：多視角驗證、代碼審查、架構評審、安全審查、質量門禁。Load when user requests multi-perspective code/architecture review or quality gate."
+description: "用户提到多视角验证、代码审查、架构评审、安全审查、质量门禁时加载本多视角验证技能：对代码/架构/文档/配置进行多角色并行验证，支持 Architect/CodeReviewer/SecurityReviewer/TestEngineer/PerformanceEngineer 五视角并行，输出统一验证报告与签署。用户说多视角验证/审查/门禁时加载。"
 ---
 
 # Multi-Perspective Validation 多視角驗證

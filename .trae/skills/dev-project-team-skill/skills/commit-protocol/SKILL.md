@@ -1,6 +1,6 @@
 ---
 name: "commit-protocol"
-description: "提交協議技能：基於 Git trailers 的決策上下文保存、規範化提交訊息、簽署協議、分支/PR 命名、發布提交規範、自動化提交訊息生成。觸發詞：提交協議、Git trailers、commit message、conventional commits、簽署協議、分支命名、發布提交。Load when user needs standardized commit practices, git trailers, or automated commit messages."
+description: "用户提到提交协议、Git trailers、commit message、conventional commits、签署协议、分支命名、发布提交时加载本提交协议技能：基于 Git trailers 保存决策上下文、规范化提交信息、签署协议、分支/PR 命名、发布提交规范、自动化生成提交信息。用户说提交信息/提交规范时加载。"
 ---
 
 # Commit Protocol 提交協議技能

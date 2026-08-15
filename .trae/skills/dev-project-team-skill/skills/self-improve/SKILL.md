@@ -1,6 +1,6 @@
 ---
 name: "self-improve"
-description: "自我改进循环技能：对技能库/流程/工具/标准进行持续诊断与迭代改进，支援自省诊断（PDCA/哈希链/上下文健康）、偏差侦测、根因分析、改进提案、实验评估、版本化发布。触发词：自我改进、技能迭代、流程优化、改进提案、经验总结、闭环复盘、自省、诊断。Load when user requests self-improvement loops, skill iteration, self-diagnosis, or process optimization."
+description: "用户提到自我改进、技能迭代、流程优化、改进提案、经验总结、闭环复盘、自省、诊断时加载本自我改进循环技能：对技能库/流程/工具/标准持续诊断与迭代改进，支持自省诊断（PDCA/哈希链/上下文健康）、偏差侦测、根因分析、改进提案、实验评估与版本化发布，形成持续改进闭环。用户说自我改进/复盘/优化时加载。"
 ---
 
 # Self-Improve 自我改進循環

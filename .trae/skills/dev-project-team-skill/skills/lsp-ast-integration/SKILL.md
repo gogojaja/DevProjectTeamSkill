@@ -1,6 +1,6 @@
 ---
 name: "lsp-ast-integration"
-description: "LSP/AST 集成技能：語言服務器協議與抽象語法樹深度集成，支援代碼智能導航、重構、查詢、分析、生成，內建 LSP 客戶端、AST 解析器、查詢引擎、重構引擎。觸發詞：LSP、AST、代碼導航、代碼重構、代碼查詢、符號解析、引用查找、重命名、代碼生成。Load when user needs code intelligence, navigation, refactoring, or AST-based analysis."
+description: "用户提到 LSP、AST、代码导航、代码重构、代码查询、符号解析、引用查找、重命名、代码生成时加载本 LSP/AST 集成技能：语言服务器协议与抽象语法树深度集成，支持代码智能导航、重构、查询、分析、生成，内置 LSP 客户端、AST 解析器、查询引擎与重构引擎，输出符号与引用定位。用户说代码智能/导航/重构时加载。"
 ---
 
 # LSP/AST Integration LSP/AST 集成技能

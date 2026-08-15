@@ -74,8 +74,9 @@ DevProjectTeamSkill（总控）
 | `record_env_config` | §1.1 governance | 环境配置抽取到 20_环境配置.csv | 开发/测试/部署环境准备 |
 | `retrospect_harvest` | §1.1 governance | 阶段末复盘收割（22_阶段复盘.csv + 23_复用资产.csv） | 每阶段末 |
 | `select_model` | §1.1 governance | 阶段开始模型选型（21_模型选型.csv） | 每阶段开始 |
-| `register_auth` | §1.1 governance | 授权登记（14_授权登记.csv + 13 留痕）+ 阶段末时效检查提醒 | 系统/外部文件授权、每阶段末 |
+| `register_auth` | §1.1 governance | 授权登记（14_授权登记.csv + 13 留痕）+ 阶段末时效检查提醒；**未填有效期默认仅本次对话有效**，跨会话须显式指定到期时间 | 系统/项目外文件授权、其他项目目录访问、每阶段末 |
 | `register_env_asset` | tools/cmdb/ | 注册资源到 CMDB 数据库（端口/容器/大模型/GPU/数据库/域名），冲突检测与仲裁 | 项目启动（register_env_asset 环节） |
+| `declare_access_boundary` | role-project-init | 访问边界声明（26_访问边界.csv，本项目可读写/删除范围=本项目目录） | 项目启动（declare_access_boundary 环节） |
 
 ### 1.1 governance（项目治理子域）
 
@@ -84,7 +85,7 @@ DevProjectTeamSkill（总控）
 
 | action | 用途 | 典型调用时机 |
 |--------|------|-------------|
-| `create_baseline` | 创建全套台账 CSV 与项目基准（24 个 NN_ 前缀 CSV） | 项目初始化 |
+| `create_baseline` | 创建全套台账 CSV 与项目基准（26 个 NN_ 前缀 CSV，含 25_环境资源清单/26_访问边界） | 项目初始化 |
 | `stage_close` | 阶段固化基线（备份+版本+产出物清单） | 评审通过、门禁放行 |
 | `release_gate` | 发布级门禁（自动化质量阈值：测试通过率≥95%/关键路径全绿/SAST 无高危） | 敏捷 发布点=Y |
 | `iteration_review` | 迭代末轻量评审 + 回顾记录（02_迭代回顾.csv） | 每迭代末 |
@@ -552,7 +553,8 @@ DevProjectTeamSkill（总控）
 | `define_scope_prelim` | 范围初定义（边界/排除项/假设/制约） | 干系人确认后 |
 | `init_tailor` | 阶段/活动裁剪决策（依据项目特点裁剪生命周期阶段与活动） | 范围初定后 |
 | `register_env_asset` | 环境资产注册与冲突预检（25_环境资源清单.csv，先注册先得 + 冲突升阶 change_audit 留痕） | 裁剪确认后 |
-| `assess_feasibility` | 五维可行性评估 | register_env_asset 后 |
+| `declare_access_boundary` | 访问边界声明（26_访问边界.csv，本项目可读写/删除范围=本项目目录） | 环境资产注册后 |
+| `assess_feasibility` | 五维可行性评估 | 访问边界声明后 |
 | `check_ready` | 启动就绪检查（Go/No-Go/暂缓，含「资源无未裁决冲突」门禁） | 可行性通过后 |
 | `init_baseline` | 调用 role-governance `create_baseline` 初始化台账 | 就绪=Go 后 |
 

@@ -1,6 +1,6 @@
 ---
 name: "role-requirements-analysis"
-description: "需求分析角色包：需求收集、七维度分析、IEEE 830 SRS 编写、需求评审、变更影响分析与双向追溯。触发词：收集需求、分析需求、编写 SRS、需求规格、需求评审、需求变更、需求追溯、需求基线。Load when the user asks to gather, analyze, specify (SRS), review, change, or trace requirements."
+description: "用户提到收集需求、分析需求、编写SRS、需求规格、需求评审、需求变更、需求追溯、需求基线时加载本需求分析角色包：负责需求收集、七维度分析、IEEE 830 SRS 编写、需求评审、变更影响分析与双向追溯，输出 SRS、需求收集清单、需求冲突记录、变更评估表与追溯矩阵。用户说需求/规格/SRS时加载。"
 ---
 
 # role-requirements-analysis 需求分析角色包

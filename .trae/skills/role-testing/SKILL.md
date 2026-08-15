@@ -1,6 +1,6 @@
 ---
 name: "role-testing"
-description: "测试管理角色包：可测性分析与风险测试策略、测试计划、用例设计（等价类/边界/决策表/状态迁移）、环境数据准备、执行与缺陷管理、总结与门禁退出。触发词：测试策略、测试计划、用例设计、测试环境、测试数据、执行测试、缺陷、测试总结。Load when the user plans test strategy, writes the test plan, designs cases, prepares env/data, executes tests, or writes the summary."
+description: "用户提到测试策略、测试计划、用例设计、测试环境、测试数据、执行测试、缺陷、测试总结时加载本测试管理角色包：负责可测性分析与风险测试策略、测试计划、用例设计（等价类/边界/决策表/状态迁移）、环境数据准备、执行与缺陷管理、总结与门禁退出，输出测试追溯矩阵、缺陷清单与门禁结论。用户说测试相关请求时加载。"
 ---
 
 # role-testing 测试管理角色包

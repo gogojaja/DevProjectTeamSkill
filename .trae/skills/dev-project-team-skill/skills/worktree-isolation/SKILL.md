@@ -1,6 +1,6 @@
 ---
 name: "worktree-isolation"
-description: "Worktree 隔離層：基於 git worktree 的並行開發環境管理，支援 issue/PR/feature 多任務隔離，內建會話註冊表、tmux 整合、專案別名、GitHub/Jira 提供商。觸發詞：worktree 隔離、並行開發環境、多任務隔離、git worktree、PSM、Teleport。Load when user needs isolated parallel development environments for issues, PRs, or features."
+description: "用户提到 worktree 隔离、并行开发环境、多任务隔离、git worktree、PSM、Teleport时加载本 worktree 隔离层技能：基于 git worktree 的并行开发环境管理，支持 issue/PR/feature 多任务隔离，内置会话注册表、tmux 整合、项目别名、GitHub/Jira 提供商。用户说 worktree/并行环境隔离时加载。"
 ---
 
 # Worktree Isolation 工作樹隔離層

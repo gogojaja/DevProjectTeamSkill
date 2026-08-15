@@ -1,6 +1,6 @@
 ---
 name: "dev-project-team-skill"
-description: "软件研发多角色编排器：按阶段渐进加载角色包（启动/需求/架构/开发/测试/投产/总控），跨模型/跨会话切换、全生命周期管控、台账评审门禁与基线固化。触发词：全生命周期、启用某角色、切换角色、多角色联合、项目管控、阶段评审、基线固化、交接文档。Load when the user starts a software project lifecycle, enables sw roles, or requests stage review/baseline/handover."
+description: "用户启用全生命周期、启用某角色、切换角色、多角色联合、项目管控、阶段评审、基线固化、交接文档时加载本软件研发多角色编排器：按阶段渐进加载角色包（启动/需求/架构/开发/测试/投产/总控），支持跨模型/跨会话切换、全生命周期管控、台账评审门禁、基线固化与优先级仲裁。用户说启动生命周期/启用角色时加载。"
 ---
 
 # DevProjectTeamSkill 软件研发多角色编排器
@@ -12,9 +12,10 @@ description: "软件研发多角色编排器：按阶段渐进加载角色包（
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.5.7
+- **技能版本**：v21.5.8
 - **版本发布日期**：2026-08-15
 - **版本变更记录**：
+  - v21.5.8：目录访问边界铁律 + description 弱模型适配（2026-08-15）——项目启动新增 `declare_access_boundary`（`26_访问边界.csv`，本项目可读写/删除范围=本项目目录）；`register_auth` 未填有效期默认仅本次对话有效，跨会话须显式指定到期；铁律卡新增 §1a 目录访问边界；全部 SKILL.md description 单语言化+触发词前置（`weak_model_compatibility.md` + `token_standard.md` §2.1 + `tools/check_skill_descriptions.py`）。
   - v21.5.7：多角色并行优先级仲裁规则（2026-08-15）——`skills/team-orchestration` 新增 `domain/priority-arbitration.md`（方案冲突按 P0~P6 裁决：需求基线/总控→安全→架构→测试→开发→部署→文档；一票否决制 + 领域速查表 + 仲裁留痕），`team-orchestration/SKILL.md` 新增 §6 冲突仲裁规则并升级 v1.1.0；对齐 multi-perspective-validation 聚合裁决机制。
   - v21.5.6：技能维护模式闭环执行能力升级（2026-08-15）——`shared/authoring.md` 强制要求所有维护产出的技能具备 `闭环执行系统` 标题与标准模板，包含任务入口、状态机、验收门禁、失败恢复、交接审计；同步更新 `SKILL_INDEX.md` 与 `role-governance/SKILL.md`，将“闭环执行能力”提升为维护模式硬门禁。
   - v21.5.5：敏感信息分级处理矩阵（2026-08-14）——`references/iron_rules.md` §3 统一为 A/B/C 三级（A 禁止入库：密钥凭据 Token；B 脱敏入库：主机名/IP/用户名/路径；C 正常入库）；原 §3.1 脱敏细则并入 B 级；同步 `shared/references/iron_rules.md`、`AGENTS.md` 第 8 条、`SKILL_INDEX.md`。
@@ -128,7 +129,8 @@ description: "软件研发多角色编排器：按阶段渐进加载角色包（
 | 环境标准 | `../references/environment_standard.md` | dev/test/prod 环境配置抽取与检查 |
 | 模型选型 | `../references/model_selection.md` | 阶段开始大模型分级选型 + 任务路由决策（§4）+ 网关策略（§4.5）+ 本地工具运行目标 §7.1 |
 | 多项目隔离 | `../references/multi_project_isolation.md` | 四层隔离 + 第 5 层全局环境资产注册与冲突仲裁（25_环境资源清单） |
-| 铁律卡 | `../references/iron_rules.md` | 压缩后重读/新会话锚点（授权/备份/留痕） |
+| 弱模型适配 | `../references/weak_model_compatibility.md` | 能力弱模型下技能识别/执行优化（description 单语言/触发词前置/头部 5 行第一步） |
+| 铁律卡 | `../references/iron_rules.md` | 压缩后重读/新会话锚点（授权/备份/留痕 + §1a 目录访问边界） |
 
 ---
 
@@ -185,5 +187,5 @@ description: "软件研发多角色编排器：按阶段渐进加载角色包（
 
 ---
 
-**文档版本**：v21.5.7　**最后更新**：2026-08-15（多角色并行优先级仲裁规则）
+**文档版本**：v21.5.8　**最后更新**：2026-08-15（目录访问边界铁律 + description 弱模型适配）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

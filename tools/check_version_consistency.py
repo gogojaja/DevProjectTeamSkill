@@ -89,11 +89,13 @@ def main():
         else:
             print(f'  ✓ {r:<40} 闭环执行门禁通过')
 
-        # 轻量契约校验：检查 SKILL.md 前 400 字是否包含任务契约要点
-        head = content[:400]
+        # 轻量契约校验：检查 SKILL.md 正文（跳过 frontmatter）前 1200 字是否包含任务契约要点
+        # （正文前部为元数据+变更记录，触发规则/任务入口区通常在 400~900 字处）
+        body = content.split('---', 2)[2] if content.startswith('---') else content
+        head = body[:1200]
         required_keys = ['目标', '触发', '不适用', '输入', '输出', '回退', '失败']
         if not any(k in head for k in required_keys):
-            print(f'  ✗ {r:<40} 任务契约要点缺失（前400字未包含目标/触发/输入/输出/回退等关键词）')
+            print(f'  ✗ {r:<40} 任务契约要点缺失（正文前1200字未包含目标/触发/输入/输出/回退等关键词）')
             hard += 1
     uniq = sorted(set(v for v in versions.values() if v))
     if len(uniq) > 1:
