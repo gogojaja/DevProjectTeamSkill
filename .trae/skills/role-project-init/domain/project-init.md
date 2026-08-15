@@ -10,7 +10,7 @@ description: "Project initiation skill covering startup foundations: charter & b
 ## 1. 基础元数据
 
 - **技能唯一标识**：ProjectInitSkill
-- **技能版本**：v21.2.1
+- **技能版本**：v21.2.0
 - **定位**：项目启动前置哨兵（Front-Gate），是六阶段全生命周期的「第 0 阶段」，对齐 PMBOK 启动过程组。
 - **调用主体**：DevProjectTeamSkill（标准模式入口）/ 用户直接指令
 - **依赖工具**：ProjectMonitorSkill（`create_baseline` 台账初始化、`change_audit` 变更审计）
@@ -24,7 +24,7 @@ description: "Project initiation skill covering startup foundations: charter & b
 
 ## 2. 统一入参标准
 
-统一入参：`action`（七指令之一）+ `content`（背景/章程/干系人/范围/可行性/就绪/基线信息）+ `stage`（当前环节）+ `user_confirm`（无/同意/拒绝/查错）。
+统一入参：`action`（九指令之一）+ `content`（背景/章程/干系人/组织/RACI/问题升级/范围/可行性/就绪/基线信息）+ `stage`（当前环节）+ `user_confirm`（无/同意/拒绝/查错）。
 
 #### action 指令清单
 
@@ -33,7 +33,9 @@ description: "Project initiation skill covering startup foundations: charter & b
 | `init_kickoff` | 启动登记 | 无 |
 | `create_charter` | 输出项目章程 | init_kickoff |
 | `register_stakeholder` | 干系人登记册 | create_charter |
-| `define_scope_prelim` | 范围初定义 | register_stakeholder |
+| `define_org_structure` | 组织架构与 RACI 矩阵（27_组织架构.csv） | register_stakeholder |
+| `define_issue_escalation` | 问题解决与升级机制（12_风险问题台账.csv 升级字段） | define_org_structure |
+| `define_scope_prelim` | 范围初定义 | define_issue_escalation |
 | `init_tailor` | 阶段/活动裁剪决策 | define_scope_prelim |
 | `register_env_asset` | 环境资产注册与冲突预检（25_环境资源清单.csv） | init_tailor |
 | `declare_access_boundary` | 访问边界声明（26_访问边界.csv，本项目可读写/删除范围=本项目目录） | register_env_asset |
@@ -45,7 +47,7 @@ description: "Project initiation skill covering startup foundations: charter & b
 
 ## 3. 项目启动流程
 
-流程主线：`init_kickoff → create_charter → register_stakeholder → define_scope_prelim → init_tailor → register_env_asset → declare_access_boundary → assess_feasibility → check_ready → (Go) → init_baseline → 需求阶段入场`；No-Go/暂缓 → 阻塞清单 + 建议行动，停止。
+流程主线：`init_kickoff → create_charter → register_stakeholder → define_org_structure → define_issue_escalation → define_scope_prelim → init_tailor → register_env_asset → declare_access_boundary → assess_feasibility → check_ready → (Go) → init_baseline → 需求阶段入场`；No-Go/暂缓 → 阻塞清单 + 建议行动，停止。
 
 - **门禁**：每环节产出经用户确认后进入下一环节；
 - **刹车**：章程确认连续 2 次未通过 → 停止并推送人工决策；
@@ -56,12 +58,20 @@ description: "Project initiation skill covering startup foundations: charter & b
 输出：项目登记记录（写入台账「01_启动组.csv」候选行）。
 
 ### 环节 2：项目章程（create_charter）
-处理：章程含立项授权、目标（业务+交付）、约束、预算上限、关键里程碑；须经干系人确认；目标不清晰时输出「章程缺陷清单」，不强行通过。
+处理：章程含**立项授权、目标（业务+交付，SMART）、成功标准、约束、预算上限、关键里程碑、项目经理任命与职权范围、签字批准**，对齐 PMBOK 章程六核心要素（目的/目标/成功标准、关键干系人与角色 RACI、PM 任命与职权、高层范围与交付物、预算时间、签字批准）；须经干系人确认；目标不清晰时输出「章程缺陷清单」，不强行通过。
 输出：《项目章程》（Markdown 或 CSV），经干系人确认。
 
 ### 环节 3：干系人登记（register_stakeholder）
 处理：登记册字段（角色/组织/影响/参与度/沟通需求/频率/联系方式）；**权力-利益矩阵**四象限（高权高利→重点管理、高权低利→使其满意、低权高利→保持知会、低权低利→监督）；识别项目经理/需求方/测试方；变更增量更新不重写整册。
 输出：《干系人登记册》（写入「01_启动组.csv」）。
+
+### 环节 3.5：组织架构与责任分配（define_org_structure）
+处理：基于干系人登记册，输出**项目组织架构**——团队构成、角色职责、汇报关系、决策权限，并形成 **RACI 矩阵**（每项任务/活动分配 **R 执行**、**唯一 A 责任人**、C 咨询、I 知会；每任务唯一 Accountable 使升级路径清晰，Consulted 与 Informed 严格区分，禁止无 A、多 A 或全员 C）；责任划分覆盖后续保留阶段的治理活动（评审/门禁/变更/风险处置），与 `define_issue_escalation` 衔接。
+输出：《组织架构与 RACI 矩阵》（写入「27_组织架构.csv」：团队/角色/职责/汇报关系/决策权限/任务/RACI），经干系人确认，变更增量更新不重写整表。
+
+### 环节 3.6：问题解决与升级机制（define_issue_escalation）
+处理：建立**问题升级阶梯**——问题分级 P1~P4（P1 阻断/重大、P2 高/关键、P3 中、P4 低/一般）+ **四级升级路径**（L1 项目团队识别并尝试解决 → L2 项目经理分析决策 → L3 指导委员会/项目委员会 → L4 高层/Sponsor 战略干预）+ 各级**响应时限** + **单一 Owner 原则**（每问题唯一负责人，升级路径清晰）；与 multi-perspective-validation 的 P0~P6 仲裁、`change_audit` 变更审计衔接，问题升级不经审批链外绕过；分级与升级规则写入「12_风险问题台账.csv」升级字段，风险+问题统一视图。
+输出：《问题升级矩阵》（写入「12_风险问题台账.csv」扩展字段：问题级别 P1~P4 / 升级路径 / 响应时限 / Owner / 状态），经干系人确认。
 
 ### 环节 4：范围初定义（define_scope_prelim）
 处理：输出交付边界（做什么）、排除项（不做什么）、假设与制约；范围为「初步」，细则由需求阶段细化；变更走 ProjectMonitorSkill `change_audit`。
@@ -153,11 +163,11 @@ python tools/cmdb/cmdb-cli.py release --type port --identifier 8000 --project ba
 输出：《可行性评估报告》（五维结论 + Go/No-Go 建议）。
 
 ### 环节 8：启动就绪检查（check_ready）
-处理：Gate 清单——章程确认 / 干系人登记（含权力-利益分析）/ 范围初定义 / 裁剪配置确认 / **环境资产已注册且无未裁决冲突（`25_环境资源清单.csv`）** / **访问边界已声明（`26_访问边界.csv`，可读写/删除范围=本项目目录）** / 可行性通过 / 预算里程碑明确 / 需求入场条件识别。判定 **Go**（全过）/ **No-Go**（任一不满足且无法调整）/ **暂缓**（条件暂缺，补足重查）；No-Go/暂缓输出阻塞清单与建议行动。
+处理：Gate 清单——章程确认 / 干系人登记（含权力-利益分析）/ **组织架构已明确（`27_组织架构.csv`，团队构成 + RACI 矩阵）** / **问题升级机制已确立（`12_风险问题台账.csv` 升级字段，P1~P4 分级 + 升级路径 + 响应时限 + Owner）** / 范围初定义 / 裁剪配置确认 / **环境资产已注册且无未裁决冲突（`25_环境资源清单.csv`）** / **访问边界已声明（`26_访问边界.csv`，可读写/删除范围=本项目目录）** / 可行性通过 / 预算里程碑明确 / 需求入场条件识别。判定 **Go**（全过）/ **No-Go**（任一不满足且无法调整）/ **暂缓**（条件暂缺，补足重查）；No-Go/暂缓输出阻塞清单与建议行动。
 输出：《启动就绪检查单》（Go/No-Go/暂缓 + 阻塞清单）。
 
 ### 环节 9：基线初始化（init_baseline）
-处理：调用 ProjectMonitorSkill `create_baseline` 创建全套台账（26 个 CSV，含「00_阶段配置」「18_迭代配置」「19_迭代回顾」「25_环境资源清单」「26_访问边界」）；启动产物写入对应 CSV（「01_启动组」编号/目标/相关方/沟通、「02_范围基准」范围/边界/禁止项、「03_进度基准」初步里程碑、「04_成本基准」预算/阈值、「00_阶段配置」阶段/活动裁剪清单、「18_迭代配置」敏捷迭代配置、「12_风险问题台账」初始风险登记册、「25_环境资源清单」已登记资源快照、「26_访问边界」访问边界声明）；依据裁剪配置确定后续保留阶段，固化后输出《项目启动完成报告》，移交首个保留阶段入场。
+处理：调用 ProjectMonitorSkill `create_baseline` 创建全套台账（27 个 CSV，含「00_阶段配置」「18_迭代配置」「19_迭代回顾」「25_环境资源清单」「26_访问边界」「27_组织架构」）；启动产物写入对应 CSV（「01_启动组」编号/目标/相关方/沟通、「02_范围基准」范围/边界/禁止项、「03_进度基准」初步里程碑、「04_成本基准」预算/阈值、「00_阶段配置」阶段/活动裁剪清单、「18_迭代配置」敏捷迭代配置、「12_风险问题台账」初始风险登记册 + 问题升级机制（P1~P4 分级/升级路径/响应时限/Owner）、「25_环境资源清单」已登记资源快照、「26_访问边界」访问边界声明、「27_组织架构」团队构成 + RACI 矩阵 + 决策权限）；依据裁剪配置确定后续保留阶段，固化后输出《项目启动完成报告》，移交首个保留阶段入场。
 输出：`台账/`（20+ 个 CSV，已初始化）+《项目启动完成报告》。
 
 ---
@@ -183,7 +193,8 @@ python tools/cmdb/cmdb-cli.py release --type port --identifier 8000 --project ba
 3. **决策铁律**：No-Go/暂缓必须停止推进并输出阻塞清单，不得强行开工；
 4. **边界铁律**：不做需求细化、架构设计、写代码——范围初定义不等于需求规格说明书；
 5. **权限铁律**：范围/基线变更经 ProjectMonitorSkill 审计；
-6. **目录边界铁律**：本项目可读写/删除范围=本项目目录（`26_访问边界.csv`）；本项目目录之外（其他项目目录/系统文件）一律经 `register_auth` 授权，未填有效期默认仅本次对话有效，未授权禁止读写/删除（详见 `../../references/iron_rules.md` §1）。
+6. **目录边界铁律**：本项目可读写/删除范围=本项目目录（`26_访问边界.csv`）；本项目目录之外（其他项目目录/系统文件）一律经 `register_auth` 授权，未填有效期默认仅本次对话有效，未授权禁止读写/删除（详见 `../../references/iron_rules.md` §1）；
+7. **治理铁律**：组织架构（RACI）与问题升级机制未明确（`27_组织架构.csv` / `12_风险问题台账.csv` 升级字段），禁止进入范围初定与就绪检查。
 
 **禁用**：需求收集与规格编写（由 RequirementsAnalysisSkill 执行）；架构/开发/测试/部署等后续阶段；跳过就绪检查直接固化基线。
 
@@ -195,5 +206,5 @@ python tools/cmdb/cmdb-cli.py release --type port --identifier 8000 --project ba
 
 ---
 
-**文档版本**：v21.1.0（declare_access_boundary 访问边界声明 + 目录边界铁律，2026-08-15）
+**文档版本**：v21.2.0（新增 define_org_structure 组织架构/RACI + define_issue_escalation 问题升级机制 + 章程补成功标准/PM 任命职权/签字批准，2026-08-16）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

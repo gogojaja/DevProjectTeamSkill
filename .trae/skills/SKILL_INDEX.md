@@ -9,7 +9,7 @@
 | # | 角色包 | 域 | 触发词 | 加载路径 |
 |---|--------|-----|--------|----------|
 | 0 | dev-project-team-skill | 编排器 | 全生命周期 / 角色组合加载 / 切换角色 / 技能维护 | dev-project-team-skill/ |
-| 1 | role-project-init | 项目启动 | 启动项目 / 立项 / 章程 / 干系人 / 基线初始化 | role-project-init/ |
+| 1 | role-project-init | 项目启动 | 启动项目 / 立项 / 章程 / 干系人 / 组织架构 / RACI / 问题升级 / 基线初始化 | role-project-init/ |
 | 2 | role-requirements-analysis | 需求 | 收集需求 / 分析需求 / 编写 SRS / 需求变更 / 需求追溯 | role-requirements-analysis/ |
 | 3 | role-architecture | 架构 | 架构策略 / 架构设计 / 数据安全 / ADR / 架构评审 | role-architecture/ |
 | 4 | role-development | 开发 | 开发策略 / 编码 / 代码走查 / 单元测试 / 联调 / 质量收口 | role-development/ |
@@ -37,8 +37,10 @@
 
 13. **CMDB 工具**：多项目共享服务器资源管理工具，参考 `tools/cmdb/README.md`（注册/查询/释放/冲突检测；SQLite 数据库；审计日志；CSV 导出）。
 
+14. **启动治理（v21.5.9）**：启动阶段须完成组织架构与责任分配（`define_org_structure`，`27_组织架构.csv` RACI 矩阵）与问题解决与升级机制（`define_issue_escalation`，`12_风险问题台账.csv` 升级字段 P1~P4 分级 + 四级升级阶梯 + 单一 Owner）；`check_ready` 硬门禁（未明确不得 Go），详见 `role-project-init/SKILL.md`。
+
 ---
 
-**文档版本**：v21.5.7
-**最后更新**：2026-08-15（目录访问边界铁律 26_访问边界.csv + description 弱模型适配单语言化）
+**文档版本**：v21.5.9
+**最后更新**：2026-08-16（项目启动治理完善：define_org_structure 组织架构/RACI + define_issue_escalation 问题升级机制）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

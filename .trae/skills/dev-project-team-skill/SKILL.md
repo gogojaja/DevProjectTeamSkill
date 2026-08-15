@@ -12,10 +12,10 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.5.8
-- **版本发布日期**：2026-08-15
+- **技能版本**：v21.5.9
+- **版本发布日期**：2026-08-16
 - **版本变更记录**：
-  - v21.5.8：目录访问边界铁律 + description 弱模型适配（2026-08-15）——项目启动新增 `declare_access_boundary`（`26_访问边界.csv`，本项目可读写/删除范围=本项目目录）；`register_auth` 未填有效期默认仅本次对话有效，跨会话须显式指定到期；铁律卡新增 §1a 目录访问边界；全部 SKILL.md description 单语言化+触发词前置（`weak_model_compatibility.md` + `token_standard.md` §2.1 + `tools/check_skill_descriptions.py`）。
+  - v21.5.9：项目启动治理完善（2026-08-16）——`role-project-init` 新增 `define_org_structure`（组织架构 + RACI 矩阵，`27_组织架构.csv`）与 `define_issue_escalation`（问题解决与升级机制：P1~P4 分级 + 四级升级阶梯 L1~L4 + 响应时限 + 单一 Owner，`12_风险问题台账.csv` 升级字段）；`create_charter` 补成功标准/PM 任命职权/签字批准（对齐 PMBOK 章程六要素）；`check_ready` 新增「组织架构已明确」「问题升级机制已确立」两条硬门禁；role-governance 风险详情补问题升级子流程；台账 26→27；`role-project-init` 版本 v21.1.0→v21.2.0。
   - v21.5.7：多角色并行优先级仲裁规则（2026-08-15）——`skills/team-orchestration` 新增 `domain/priority-arbitration.md`（方案冲突按 P0~P6 裁决：需求基线/总控→安全→架构→测试→开发→部署→文档；一票否决制 + 领域速查表 + 仲裁留痕），`team-orchestration/SKILL.md` 新增 §6 冲突仲裁规则并升级 v1.1.0；对齐 multi-perspective-validation 聚合裁决机制。
   - v21.5.6：技能维护模式闭环执行能力升级（2026-08-15）——`shared/authoring.md` 强制要求所有维护产出的技能具备 `闭环执行系统` 标题与标准模板，包含任务入口、状态机、验收门禁、失败恢复、交接审计；同步更新 `SKILL_INDEX.md` 与 `role-governance/SKILL.md`，将“闭环执行能力”提升为维护模式硬门禁。
   - v21.5.5：敏感信息分级处理矩阵（2026-08-14）——`references/iron_rules.md` §3 统一为 A/B/C 三级（A 禁止入库：密钥凭据 Token；B 脱敏入库：主机名/IP/用户名/路径；C 正常入库）；原 §3.1 脱敏细则并入 B 级；同步 `shared/references/iron_rules.md`、`AGENTS.md` 第 8 条、`SKILL_INDEX.md`。
@@ -187,5 +187,5 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 
 ---
 
-**文档版本**：v21.5.8　**最后更新**：2026-08-15（目录访问边界铁律 + description 弱模型适配）
+**文档版本**：v21.5.9　**最后更新**：2026-08-16（项目启动治理完善：组织架构/RACI + 问题升级机制）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

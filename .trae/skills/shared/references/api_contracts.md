@@ -44,6 +44,8 @@ DevProjectTeamSkill（总控）
 │   ├── planning                ← 投产方案：12 章编写/变更分类审批
 │   ├── release                 ← 投产执行：准备预演/执行监控/回滚
 │   └── handover                ← 评审总结交接：Go-Live/总结/交接/阶段评审
+├── tools/
+│   └── cmdb/                   ← CMDB 轻量级资源管理工具（注册/查询/释放/冲突检测；SQLite 数据库；审计日志；CSV 导出）
 └── shared/
     ├── evolution.md            ← 桥接页（已并入 self-improve/self-diagnosis.md）
     └── authoring.md            ← 元技能，Skill 创建/修改，简化模式路由
@@ -73,6 +75,10 @@ DevProjectTeamSkill（总控）
 | `retrospect_harvest` | §1.1 governance | 阶段末复盘收割（22_阶段复盘.csv + 23_复用资产.csv） | 每阶段末 |
 | `select_model` | §1.1 governance | 阶段开始模型选型（21_模型选型.csv） | 每阶段开始 |
 | `register_auth` | §1.1 governance | 授权登记（14_授权登记.csv + 13 留痕）+ 阶段末时效检查提醒；**未填有效期默认仅本次对话有效**，跨会话须显式指定到期时间 | 系统/项目外文件授权、其他项目目录访问、每阶段末 |
+| `register_env_asset` | tools/cmdb/ | 注册资源到 CMDB 数据库（端口/容器/大模型/GPU/数据库/域名），冲突检测与仲裁 | 项目启动（register_env_asset 环节） |
+| `declare_access_boundary` | role-project-init | 访问边界声明（26_访问边界.csv，本项目可读写/删除范围=本项目目录） | 项目启动（declare_access_boundary 环节） |
+| `define_org_structure` | role-project-init | 组织架构与责任分配（27_组织架构.csv：团队构成 + RACI 矩阵 + 决策权限 + 汇报关系，A 唯一、C/I 区分） | 项目启动（define_org_structure 环节） |
+| `define_issue_escalation` | role-project-init | 问题解决与升级机制（12_风险问题台账.csv 升级字段：P1~P4 分级 + 四级升级阶梯 L1~L4 + 响应时限 + 单一 Owner） | 项目启动（define_issue_escalation 环节） |
 
 ### 1.1 governance（项目治理子域）
 
@@ -81,7 +87,7 @@ DevProjectTeamSkill（总控）
 
 | action | 用途 | 典型调用时机 |
 |--------|------|-------------|
-| `create_baseline` | 创建全套台账 CSV 与项目基准（26 个 NN_ 前缀 CSV，含 25_环境资源清单/26_访问边界） | 项目初始化 |
+| `create_baseline` | 创建全套台账 CSV 与项目基准（27 个 NN_ 前缀 CSV，含 12_风险问题台账升级字段/25_环境资源清单/26_访问边界/27_组织架构） | 项目初始化 |
 | `stage_close` | 阶段固化基线（备份+版本+产出物清单） | 评审通过、门禁放行 |
 | `release_gate` | 发布级门禁（自动化质量阈值：测试通过率≥95%/关键路径全绿/SAST 无高危） | 敏捷 发布点=Y |
 | `iteration_review` | 迭代末轻量评审 + 回顾记录（02_迭代回顾.csv） | 每迭代末 |
@@ -544,14 +550,18 @@ DevProjectTeamSkill（总控）
 | action | 用途 | 典型调用时机 |
 |--------|------|-------------|
 | `init_kickoff` | 启动登记（项目编号/目标/背景） | 新项目立项 |
-| `create_charter` | 输出项目章程（授权/目标/约束/预算） | 立项登记后 |
+| `create_charter` | 输出项目章程（授权/目标/SMART 成功标准/约束/预算/里程碑/PM 任命职权/签字批准） | 立项登记后 |
 | `register_stakeholder` | 干系人登记册（角色/权力-利益/沟通需求） | 章程确认后 |
-| `define_scope_prelim` | 范围初定义（边界/排除项/假设/制约） | 干系人确认后 |
+| `define_org_structure` | 组织架构与责任分配（团队构成 + RACI 矩阵 + 决策权限 + 汇报关系，27_组织架构.csv） | 干系人登记后 |
+| `define_issue_escalation` | 问题解决与升级机制（P1~P4 分级 + 四级升级阶梯 L1~L4 + 响应时限 + 单一 Owner，12_风险问题台账.csv 升级字段） | 组织架构后 |
+| `define_scope_prelim` | 范围初定义（边界/排除项/假设/制约） | 问题机制后 |
 | `init_tailor` | 阶段/活动裁剪决策（依据项目特点裁剪生命周期阶段与活动） | 范围初定后 |
-| `register_env_asset` | 环境资产注册与冲突预检（25_环境资源清单.csv，经 CMDB CLI） | 裁剪确认后 |
+| `register_env_asset` | 环境资产注册与冲突预检（25_环境资源清单.csv，先注册先得 + 冲突升阶 change_audit 留痕） | 裁剪确认后 |
 | `declare_access_boundary` | 访问边界声明（26_访问边界.csv，本项目可读写/删除范围=本项目目录） | 环境资产注册后 |
 | `assess_feasibility` | 五维可行性评估 | 访问边界声明后 |
-| `check_ready` | 启动就绪检查（Go/No-Go/暂缓） | 可行性通过后 |
+| `check_ready` | 启动就绪检查（Go/No-Go/暂缓，含「组织架构已明确」「问题升级机制已确立」「资源无未裁决冲突」门禁） | 可行性通过后 |
 | `init_baseline` | 调用 role-governance `create_baseline` 初始化台账 | 就绪=Go 后 |
 
 **与 role-requirements-analysis 边界**：本包输出范围初定义与项目上下文（第 0 阶段）；需求收集与 SRS 编写由 role-requirements-analysis 承接（需求阶段）。
+
+**多项目共享环境（第 5 层）**：环境资产注册与冲突仲裁规则详见 `multi_project_isolation.md` §10；台账 `25_环境资源清单.csv` 为跨项目共享登记表。

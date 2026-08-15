@@ -36,7 +36,7 @@ description: "Project governance skill covering baseline initialization (17-shee
 
 | action | 作用 | 触发场景 | 前置条件 |
 |--------|------|----------|----------|
-| `create_baseline` | 创建全套台账 CSV 与项目基准（20 个 NN_ 前缀 CSV） | 项目初始化 | 启动就绪=Go |
+| `create_baseline` | 创建全套台账 CSV 与项目基准（27 个 NN_ 前缀 CSV） | 项目初始化 | 启动就绪=Go |
 | `stage_close` | 阶段固化基线（备份+更新版本+产出物清单） | 评审通过、门禁放行 | 评审/门禁通过 |
 | `project_archive` | 全项目归档（台账+交付物+审计日志） | 所有阶段完工 | 全部阶段固化 |
 | `handover_export` | 跨会话交接打包（话术+台账快照+交接文档） | 周期复盘、新建对话 | 台账可读 |
@@ -63,9 +63,9 @@ description: "Project governance skill covering baseline initialization (17-shee
 
 **DoR**：项目启动就绪=Go ✅ · 启动产物已具备（章程/干系人/范围初定/可行性）✅
 
-**执行内容**：创建 `台账/`（20 个 NN_ 前缀 CSV：00_阶段配置.csv … 02_迭代回顾.csv 等全量初始化）、录入项目基准（目标/边界/干系人/质量验收标准/初始风险）、基线版本 v0.1，详见 `.//project_governance_details.md` §1。
+**执行内容**：创建 `台账/`（27 个 NN_ 前缀 CSV：00_阶段配置.csv … 02_迭代回顾.csv 等全量初始化）、录入项目基准（目标/边界/干系人/质量验收标准/初始风险 + 问题升级机制 + 组织架构 RACI）、基线版本 v0.1，详见 `.//project_governance_details.md` §1。
 
-**DoD**：台账 20 个 CSV 全部创建 ✅ · 项目基准写入「范围基准」CSV ✅ · 初始风险写入「风险&问题台账」CSV ✅ · 基线 v0.1 记录 ✅
+**DoD**：台账 27 个 CSV 全部创建 ✅ · 项目基准写入「范围基准」CSV ✅ · 初始风险写入「风险&问题台账」CSV ✅ · 问题升级机制写入「风险&问题台账」升级字段 ✅ · 组织架构/RACI 写入「组织架构」CSV ✅ · 基线 v0.1 记录 ✅
 
 **规则**：台账存放于 `.trae/` 目录；未初始化禁止进入需求阶段。
 
@@ -103,7 +103,7 @@ description: "Project governance skill covering baseline initialization (17-shee
 
 ## 5. 标准化输出结构
 
-1. **基线类**：`台账/`（20 个 NN_ 前缀 CSV）、基线版本号、产出物基准清单；
+1. **基线类**：`台账/`（27 个 NN_ 前缀 CSV，含 12_风险问题台账升级字段 / 27_组织架构）、基线版本号、产出物基准清单；
 2. **固化类**：备份文件、`台账/` 备份 CSV、验收结论；
 3. **归档类**：归档文档包、归档清单；
 4. **交接类**：交接话术、台账快照、跨会话交接文档；
