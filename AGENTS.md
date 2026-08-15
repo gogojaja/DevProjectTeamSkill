@@ -40,13 +40,13 @@ python tools/excel_to_csv.py            # 迁移存量 xlsx→csv
 git commit                              # 每原子改动一次提交
 ```
 
-## GitHub 访问异常处理规则（win32，PowerShell 环境）
+## GitHub 访问异常处理规则（win32 / macOS / PowerShell / zsh 环境）
 
-本机访问 `github.com:443` 偶发 DNS 解析到坏 IP 或全部候选 IP 不可达。故障现象：`Failed to connect` / `Could not connect` / `Recv failure: Connection was reset`。
+本机访问 `github.com:443` 偶发 DNS 解析到坏 IP 或全部候选 IP 不可达，最常见根因是 DNS 实效，导致远端环境无法访问。故障现象：`Failed to connect` / `Could not connect` / `Recv failure: Connection was reset` / `nc: connection failed, SOCKS error 2`。
 
 ### 1. 候选 IP 池（按优先级排序）
 
-完整 DNS 资源记录见 `docs/github_ip_records.csv`（含 api/ssh/gist/raw/pages/Fastly CDN 等子域）。
+优先保留真实 IP 记录；若 DNS 失效，直接用候选 IP 做临时解析回退。完整 DNS 资源记录见 `docs/github_ip_records.csv`（含 api/ssh/gist/raw/pages/Fastly CDN 等子域）。
 
 **github.com 主站（当前解析）：**
 ```
@@ -91,8 +91,13 @@ git commit                              # 每原子改动一次提交
 ### 2. 连通性验证流程
 
 ```powershell
+# 先解除代理，避免 SOCKS/HTTP 代理造成误判
+Remove-Item Env:HTTP_PROXY -ErrorAction SilentlyContinue
+Remove-Item Env:HTTPS_PROXY -ErrorAction SilentlyContinue
+Remove-Item Env:ALL_PROXY -ErrorAction SilentlyContinue
+
 # 逐个测试候选 IP（超时 8 秒）
-$ips = @("20.205.243.166","140.82.112.4","140.82.113.4","140.82.114.4","140.82.121.4","185.199.108.153")
+$ips = @("20.205.243.166","140.82.112.4","140.82.113.4","140.82.114.4","140.82.121.4","185.199.108.153","162.125.34.133")
 foreach ($ip in $ips) {
   $r = curl.exe -s -o NUL -w "%{http_code}" --connect-timeout 8 --resolve github.com:443:$ip https://github.com
   Write-Output "$ip -> $r"
@@ -107,6 +112,7 @@ ipconfig /flushdns
 ```powershell
 # 如全部不可达，用 --resolve 强制绑定可达 IP 执行 git 操作
 curl.exe -s --resolve github.com:443:140.82.112.4 https://github.com
+curl.exe -s --resolve github.com:443:20.205.243.166 https://github.com
 ```
 
 ### 3. push 需带凭据 token（fine-grained PAT，Contents read/write；token 由用户提供，勿硬编码入库）
