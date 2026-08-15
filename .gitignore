@@ -48,3 +48,7 @@ secrets-example/
 *credential*
 *credentials*.json
 service-account*.json
+
+# Python 编译缓存
+__pycache__/
+*.pyc
