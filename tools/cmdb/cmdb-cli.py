@@ -113,7 +113,7 @@ def cmd_register(args):
 
         # 检查资源是否已存在
         cursor = conn.execute(
-            "SELECT id, occupied_by, status FROM resources WHERE host_id = ? AND resource_type = ? AND resource_identifier = ?",
+            "SELECT id, occupied_by, status, resource_name FROM resources WHERE host_id = ? AND resource_type = ? AND resource_identifier = ?",
             (host_id, args.type, args.identifier)
         )
         existing = cursor.fetchone()
@@ -126,8 +126,21 @@ def cmd_register(args):
             if not args.force:
                 print(f"   使用 --force 强制覆盖")
                 return 1
+            # --force：更新已有记录，不新建（避免残留旧记录）
+            conn.execute(
+                """UPDATE resources
+                   SET resource_name = ?, occupied_by = ?, status = 'occupied', priority = ?, notes = ?,
+                       released_at = NULL
+                   WHERE id = ?""",
+                (args.name or existing["resource_name"] or "", args.project, args.priority or "medium", args.notes or "", existing["id"])
+            )
+            resource_id = existing["id"]
+            log_audit("register(force)", resource_id, args.operator, f"project={args.project}, priority={args.priority}")
+            conn.commit()
+            print(f"✅ 资源覆盖成功: {args.type}={args.identifier} (host={args.host}, project={args.project}, id={resource_id})")
+            return 0
 
-        # 插入资源记录
+        # 资源不存在：插入新记录
         conn.execute(
             """INSERT INTO resources (host_id, resource_type, resource_identifier, resource_name, occupied_by, status, priority, notes)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
