@@ -106,7 +106,17 @@
 - 必须包含失败恢复；
 - 必须包含产出物和交接说明；
 - 必须能证明该技能可被执行、验证、恢复与交接；
+- 必须通过 `tools/check_skill_closure.py` 与 `tools/check_skill_release_gate.py` 的发布级门禁；
 - 若只有流程建议、角色职责或经验总结，则判定为不合格维护产出。
+
+## 8. 发布级门禁（强制）
+
+每个维护产出的 SKILL.md 在进入打包/部署前，必须满足以下条件：
+1. frontmatter 包含 `name` 与合法 `description`（包含 `Load when` 触发声明）；
+2. 正文包含 `技能版本` 和 `**文档版本**` 以及 `**最后更新**`；
+3. 正文包含 `闭环执行系统` 章节及其六大核心部分；
+4. 通过 `tools/check_skill_closure.py` 与 `tools/check_skill_release_gate.py`；
+5. 仅在全部通过后，才允许执行 `package_skills.sh`、`deploy_skills.sh` 或 `solidify.sh`。
 
 ## 6. 临时文件与产出物目录（强制）
 

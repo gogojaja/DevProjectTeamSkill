@@ -31,6 +31,13 @@ def run_closure_check():
     return r.returncode
 
 
+def run_release_gate():
+    """发布级门禁：检查 frontmatter/metadata/闭环结构，失败中止固化与发布。"""
+    r = _run_script('check_skill_release_gate.py')
+    print('   ✓ 发布级门禁执行完毕' if r.returncode == 0 else '   ✗ 发布级门禁失败')
+    return r.returncode
+
+
 def run_deploy():
     return _run_script('deploy_skills.py').returncode
 
@@ -121,6 +128,10 @@ if __name__ == '__main__':
     print('[1b/5] 闭环执行门禁校验（硬门禁）')
     if run_closure_check() != 0:
         print('❌ 闭环执行门禁未通过，中止固化。请先补齐“闭环执行系统”章节与关键门禁项。')
+        sys.exit(1)
+    print('[1c/5] 发布级门禁校验（硬门禁）')
+    if run_release_gate() != 0:
+        print('❌ 发布级门禁未通过，中止固化。请先补齐 frontmatter、metadata 与闭环执行结构。')
         sys.exit(1)
     print('[2/5] 刷新交接文档断点区')
     if not dry_run:
