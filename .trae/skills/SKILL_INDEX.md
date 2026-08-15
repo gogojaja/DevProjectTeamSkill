@@ -30,13 +30,13 @@
 8. 单角色任务直接加载对应包；多角色/全生命周期由编排器调度；
 9. 各包辅助能力统一指向 `shared/`（源码单源），打包产物内嵌副本；
 10. **GitHub 访问异常**：`github.com:443` 不可达时，加载 `references/github_access.md`（候选 IP 池 / 连通性验证 / push 带凭据）；
-11. **嵌套能力（v21.4.0）**：编排器内嵌 `team-orchestration`（并行编排）与 `multi-perspective-validation`（多视角验证），模型档位 S0~S3 + 免费体系（对齐 `references/model_selection.md` §4）；
+11. **嵌套能力（v21.4.0）**：编排器内嵌 `team-orchestration`（并行编排）与 `multi-perspective-validation`（多视角验证），模型档位 S0~S3 + 免费体系（对齐 `references/model_selection.md` §4）；**多角色并行方案冲突按 `team-orchestration/domain/priority-arbitration.md` 仲裁**（P0~P6 优先级：需求基线/总控→安全→架构→测试→开发→部署→文档，一票否决制，仲裁留痕，见 team-orchestration v1.1.0）；
 12. **多项目隔离**：多项目并行开发时，参考 `references/multi_project_isolation.md`（Git/运行时/数据库/Docker 四层隔离架构 + **第 5 层全局环境资产注册与冲突仲裁**：`register_env_asset` 通过 `tools/cmdb/cmdb-cli.py` 登记 CMDB 数据库，独占资源（大模型容器/GPU/Docker 单一运行时/端口）先注册先得，冲突升阶 `change_audit` 留痕；本地工具/脚本运行目标缺省为本地轻量模型档，见 `references/model_selection.md` §7.1）。
 
 13. **CMDB 工具**：多项目共享服务器资源管理工具，参考 `tools/cmdb/README.md`（注册/查询/释放/冲突检测；SQLite 数据库；审计日志；CSV 导出）。
 
 ---
 
-**文档版本**：v21.5.5
-**最后更新**：2026-08-14（§3 统一为敏感信息分级处理矩阵 A/B/C 三级）
+**文档版本**：v21.5.6
+**最后更新**：2026-08-15（新增多角色并行优先级仲裁：team-orchestration/domain/priority-arbitration.md）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

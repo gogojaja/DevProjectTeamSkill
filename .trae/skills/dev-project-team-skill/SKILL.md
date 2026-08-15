@@ -12,9 +12,10 @@ description: "软件研发多角色编排器：按阶段渐进加载角色包（
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.5.6
+- **技能版本**：v21.5.7
 - **版本发布日期**：2026-08-15
 - **版本变更记录**：
+  - v21.5.7：多角色并行优先级仲裁规则（2026-08-15）——`skills/team-orchestration` 新增 `domain/priority-arbitration.md`（方案冲突按 P0~P6 裁决：需求基线/总控→安全→架构→测试→开发→部署→文档；一票否决制 + 领域速查表 + 仲裁留痕），`team-orchestration/SKILL.md` 新增 §6 冲突仲裁规则并升级 v1.1.0；对齐 multi-perspective-validation 聚合裁决机制。
   - v21.5.6：技能维护模式闭环执行能力升级（2026-08-15）——`shared/authoring.md` 强制要求所有维护产出的技能具备 `闭环执行系统` 标题与标准模板，包含任务入口、状态机、验收门禁、失败恢复、交接审计；同步更新 `SKILL_INDEX.md` 与 `role-governance/SKILL.md`，将“闭环执行能力”提升为维护模式硬门禁。
   - v21.5.5：敏感信息分级处理矩阵（2026-08-14）——`references/iron_rules.md` §3 统一为 A/B/C 三级（A 禁止入库：密钥凭据 Token；B 脱敏入库：主机名/IP/用户名/路径；C 正常入库）；原 §3.1 脱敏细则并入 B 级；同步 `shared/references/iron_rules.md`、`AGENTS.md` 第 8 条、`SKILL_INDEX.md`。
   - v21.5.4：环境信息脱敏铁律（2026-08-14）——`references/iron_rules.md` 新增 §3.1（本机/环境信息提交公共仓库前必须脱敏：IP 完全脱敏默认、保留主机名须授权）；同步 `shared/references/iron_rules.md`、`AGENTS.md` 核心规则第 8 条、`SKILL_INDEX.md`。
@@ -184,5 +185,5 @@ description: "软件研发多角色编排器：按阶段渐进加载角色包（
 
 ---
 
-**文档版本**：v21.5.6　**最后更新**：2026-08-15（技能维护闭环执行能力升级）
+**文档版本**：v21.5.7　**最后更新**：2026-08-15（多角色并行优先级仲裁规则）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
