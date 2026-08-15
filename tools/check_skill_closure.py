@@ -30,6 +30,9 @@ def check_closure(content):
     for key in REQUIRED_KEYS:
         if key not in content:
             return False, f'缺少关键章节: {key}'
+    if '统一引用 `../shared/closure_execution_template.md`' not in content and 'closure_execution_template.md' not in content:
+        # 允许模板引用缺失时保留最小门禁，但在维护模式中建议强制引用模板
+        pass
     return True, 'ok'
 
 
