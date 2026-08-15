@@ -39,13 +39,14 @@ def validate_scope(scope: str, explicit_dev_root: bool = False) -> tuple[bool, s
         return False, "maintenance_scope is required. Use --scope current_project or a specific role package."
 
     normalized = scope.strip().lower()
+    if normalized == "dev-project-team-skill" and not explicit_dev_root:
+        return False, "Maintaining DevProjectTeamSkill itself requires explicit user authorization; use --allow-dev-project-team-skill or --scope current_project."
+
     roles = discover_role_names()
     if normalized in roles:
         return True, f"scope={normalized} is allowed for this workspace"
 
     if normalized in ALLOWED_SCOPE_PREFIXES:
-        if normalized == "dev-project-team-skill" and not explicit_dev_root:
-            return False, "Maintaining DevProjectTeamSkill itself requires explicit user authorization; use --allow-dev-project-team-skill or --scope current_project."
         return True, f"scope={normalized} is allowed for this workspace"
 
     return False, (
