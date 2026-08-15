@@ -118,7 +118,7 @@
 4. 通过 `tools/check_skill_closure.py` 与 `tools/check_skill_release_gate.py`；
 5. 仅在全部通过后，才允许执行 `package_skills.sh`、`deploy_skills.sh` 或 `solidify.sh`。
 
-> 详细执行流程和统一标准，见 `../shared/skill_maintenance_sop.md`。
+> 详细执行流程和统一标准，见 `../shared/skill_maintenance_sop.md` 与 `../shared/skill_maintenance_charter.md`。
 
 ## 6. 临时文件与产出物目录（强制）
 
