@@ -62,6 +62,8 @@ def detect_failure_mode(log_text: str) -> str:
         "recv failure",
         "connection reset by peer",
         "connection closed by unknown port",
+        "connection closed by",
+        "connection closed by 20.205.243.166 port 443",
     )):
         return "proxy_or_network_block"
 
@@ -127,7 +129,11 @@ def get_remediation_steps(mode: str) -> list[str]:
             "git config --global --unset-all https.proxy || true",
             "git config --global --unset-all all.proxy || true",
             "curl -I --connect-timeout 8 https://github.com",
+            "curl -I --connect-timeout 8 --resolve github.com:443:20.205.243.166 https://github.com",
+            "ssh -T -o StrictHostKeyChecking=no -p 443 git@ssh.github.com",
+            "git remote set-url origin ssh://git@ssh.github.com:443/<user>/<repo>.git",
             "python3 tools/check_github_connectivity.py --list-ips",
+            "git ls-remote origin HEAD",
             "git push origin HEAD",
         ]
 

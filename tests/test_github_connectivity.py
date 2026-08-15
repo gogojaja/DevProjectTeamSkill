@@ -32,6 +32,13 @@ fatal: unable to access 'https://github.com/...': The requested URL returned err
         self.assertTrue(any("unset HTTP_PROXY" in step or "unset https_proxy" in step for step in steps))
         self.assertTrue(any("git remote -v" in step for step in steps))
 
+    def test_detect_failure_mode_with_ssh_443_close(self):
+        output = """git push
+Connection closed by 20.205.243.166 port 443
+fatal: Could not read from remote repository.
+"""
+        self.assertEqual(detect_failure_mode(output), "proxy_or_network_block")
+
     def test_maintenance_scope_rejects_dev_project_root_without_explicit_authorization(self):
         ok, message = validate_scope("dev-project-team-skill", explicit_dev_root=False)
         self.assertFalse(ok)
