@@ -41,6 +41,7 @@ description: "Requirements lifecycle management sub-skill covering requirement r
 
 - 评审：第 2 轮整改仍存严重/主要缺陷 → 停止自动修复，人工介入；门禁未达标 → 禁止评审通过，转整改
 - 变更：同一需求连续 3 次无审批变更 → 冻结基准预警；未审批先实施 → 暂停，补审批
+- **需求基线权威**：需求基线是设计与开发的唯一权威基准；设计/开发阶段评审发现已实现功能 ≠ 需求基线 → 一律以需求基线为准，偏差即缺陷、返工实现；**禁止以已实现内容逆向修正需求基线**；需求基线调整仅允许经合法 `change_analysis`+`change_audit` 审批触发（来源限范围调整/接口变化/合规新规/新诉求/缺陷澄清，来源为「已实现内容」驳回）
 - 追溯：断链率超过 20% → 暂停流转，要求补全追溯关系
 
 ---
@@ -48,4 +49,4 @@ description: "Requirements lifecycle management sub-skill covering requirement r
 > 目录规范详见 `../../shared/references/directory_structure.md`
 > 协作接口详见 `../../shared/references/api_contracts.md`
 
-**文档版本**：v21.0.0 | **最后更新**：2026-08-02 | **知识产权所有**：段波（duanbo.douglas@163.com）
+**文档版本**：v21.0.1 | **最后更新**：2026-08-15（需求基线权威铁律） | **知识产权所有**：段波（duanbo.douglas@163.com）

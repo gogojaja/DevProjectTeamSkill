@@ -26,6 +26,7 @@ description: "Code review skill covering code walkthrough (Fagan Inspection) and
 | 问题分级 | 阻断/严重/主要/次要分级管理 |
 | 客观记录 | 走查会议只记录问题，不讨论方案 |
 | 及时关闭 | 阻断级问题必须修复后才能合并 |
+| **需求基线权威** | 实现与需求基线不符 → 以需求基线为准，记为缺陷返工实现；**禁止以已实现内容修正需求基线** |
 
 ## 2. 统一入参标准
 
