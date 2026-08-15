@@ -24,7 +24,27 @@
 - 输出目标；
 - 关键依赖；
 - 本地工具/脚本；
-- 交接对象。
+- 交接对象；
+- `maintenance_scope`（维护范围）：默认仅当前工作目录/当前项目中的技能，除非用户明确要求维护 `DevProjectTeamSkill` 本体。
+
+### 2.1 维护范围默认值
+- 默认：`current_project`，或按当前工作目录检测到的本地技能目录；
+- 禁止默认扩大到：`DevProjectTeamSkill`、全库根目录、其他项目；
+- 仅当用户明确说“维护 DevProjectTeamSkill”或“维护整套技能库”时，才允许设置更大范围；
+- 若未声明 scope，维护动作必须中止并要求用户确认范围。
+
+### 2.2 自动范围校验
+在维护行为启动前，必须执行：
+
+```bash
+python3 tools/check_maintenance_scope.py --scope current_project
+```
+
+若用户确认维护本体，则：
+
+```bash
+python3 tools/check_maintenance_scope.py --scope dev-project-team-skill --allow-dev-project-team-skill
+```
 
 ## 3. 强制模板
 
@@ -47,7 +67,8 @@
 - 明确触发词与场景；
 - 明确输入与输出；
 - 明确不适用场景；
-- 明确前置条件与角色状态。
+- 明确前置条件与角色状态；
+- 必须先声明 `maintenance_scope`。默认仅维护当前工作目录/当前项目中的技能，不维护 `DevProjectTeamSkill` 本体；只有在用户明确要求时才扩展到 `dev-project-team-skill`。
 
 ### Step 2：能力建模
 - 建立状态机；

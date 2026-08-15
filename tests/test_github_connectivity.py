@@ -5,6 +5,7 @@ from tools.check_github_connectivity import (
     get_remediation_steps,
     normalize_proxy_setting,
 )
+from tools.check_maintenance_scope import validate_scope
 
 
 class GitHubConnectivityTests(unittest.TestCase):
@@ -30,6 +31,16 @@ fatal: unable to access 'https://github.com/...': The requested URL returned err
         steps = get_remediation_steps("proxy_or_network_block")
         self.assertTrue(any("unset HTTP_PROXY" in step or "unset https_proxy" in step for step in steps))
         self.assertTrue(any("git remote -v" in step for step in steps))
+
+    def test_maintenance_scope_rejects_dev_project_root_without_explicit_authorization(self):
+        ok, message = validate_scope("dev-project-team-skill", explicit_dev_root=False)
+        self.assertFalse(ok)
+        self.assertIn("explicit", message.lower())
+
+    def test_maintenance_scope_allows_dev_project_root_with_explicit_authorization(self):
+        ok, message = validate_scope("dev-project-team-skill", explicit_dev_root=True)
+        self.assertTrue(ok)
+        self.assertIn("allowed", message.lower())
 
 
 if __name__ == "__main__":

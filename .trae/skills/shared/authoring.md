@@ -20,11 +20,45 @@
 
 > 若技能仅有流程描述、最佳实践、角色职责说明而无闭环执行系统，则不视为合格产出。维护产出必须通过 `tools/check_skill_closure.py` 与 `tools/check_version_consistency.py` 的硬门禁后才允许打包、部署和固化。
 
-## 2. 轻量六步流程（~60 分钟）
+## 2. 维护范围硬门禁（默认仅维护当前工作目录/当前项目）
+
+维护模式启动时，必须先声明 `maintenance_scope`。默认行为为：仅维护当前工作目录或当前项目中的技能，不维护 `DevProjectTeamSkill` 本体；只有在用户明确要求时，才允许维护 `DevProjectTeamSkill` 自身。
+
+### 2.1 自动检查
+在维护开始前，必须执行：
+
+```bash
+python3 tools/check_maintenance_scope.py --scope current_project
+```
+
+如果用户明确要求维护本体，则使用：
+
+```bash
+python3 tools/check_maintenance_scope.py --scope dev-project-team-skill --allow-dev-project-team-skill
+```
+
+### 2.2 默认规则
+- 默认 `maintenance_scope`：`current_project` 或 `current_directory`；
+- 默认禁止范围：`DevProjectTeamSkill`、全库根目录、其他无关项目；
+- 允许扩展范围：仅在用户明确要求“维护 DevProjectTeamSkill”或“维护整套技能库”时才可扩大范围；
+- 若未声明 `maintenance_scope`，视为“只维护当前工作目录/当前项目”，并触发人工确认。
+
+### 2.2 维护范围判定模板
+```text
+maintenance_scope = current_project
+# or: current_directory
+# or: dev-project-team-skill
+# or: role-project-init
+# or: role-development
+```
+
+> 若范围命中 `dev-project-team-skill`，必须要求用户显式确认；默认不得直接维护本体技能库。
+
+## 3. 轻量六步流程（~60 分钟）
 
 | Step | 名称 | 要点 |
 |------|------|------|
-| 1 | 需求定义 | 明确触发场景、触发词、前置条件、输出目标 |
+| 1 | 需求定义 | 明确触发场景、触发词、前置条件、输出目标，并先确认 `maintenance_scope` |
 | 2 | 能力建模 | 确定任务入口、状态机、动作层、验收门禁 |
 | 3 | SKILL.md 编写 | 结构化正文：触发规则 + 流程 + 输出规范 + 边界 + 闭环执行系统 |
 | 4 | 结构校验 | 校验 frontmatter / description / 目录一致 / 闭环执行系统完整性 |

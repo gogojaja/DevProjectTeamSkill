@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^/opt/homebrew/bin/python3\\.12 tools/check_maintenance_scope\\.py --scope current_project && echo '---' && /opt/homebrew/bin/python3\\.12 tools/check_maintenance_scope\\.py --scope dev-project-team-skill$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}
