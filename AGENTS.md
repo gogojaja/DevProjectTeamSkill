@@ -165,6 +165,32 @@ git remote set-url origin "https://github.com/gogojaja/DevProjectTeamSkill.git" 
 - 权威站点核验：`sites.ipaddress.com/{github.com,fastly.net,assets-cdn.github.com}`（Cloudflare 挑战保护，人工读取 DNS Resource Records）
 - 社区记录：`docs/github_ip_records.csv`（含历史 IP、各子域、Fastly CDN 节点）
 
+## 国内镜像同步（地缘风险对冲）
+
+GitHub 为境外服务器，**网络访问不稳定 + 存在地缘政治风险**。为避免单点失联导致源码/台账无法推送或丢失，采用**国内代码托管镜像**对冲：以 Gitee（码云）为主镜像（最像 GitHub、免费导入+同步、HTTPS/SSH 稳），备选 GitCode / 阿里云效 Codeup / 腾讯工蜂 / 华为云 CodeHub / AtomGit。
+
+### 1. 同步策略（双推为主，定时校验为辅）
+- **主策略：每次提交双推** `origin`(GitHub) + `mirror`(Gitee)。用 `tools/mirror_push.py` 逐目标推送，**单目标失败不阻断另一个**，并写 `台账/32_镜像同步记录.csv` 留痕。
+- **辅策略：Gitee 侧「仓库同步」** 周期性从 GitHub 拉取兜底（即使本机某次双推遗漏，也能补回）；也可在 Gitee 创建仓库时「从 GitHub 导入」。
+- 不要依赖「本机定时从 GitHub 拉取再推国内」作为唯一手段——本机访问 GitHub 本身会 flapping，反而单点失败。
+
+### 2. 凭据（铁律 #3 A 级，禁止入库）
+- 国内 token（fine-grained PAT，Contents read/write）**只经环境变量或 `.secrets/` 提供**，脚本从 `GITEE_TOKEN` / `GITEE_USER` 读取并以 `url.<auth>@.insteadOf` 注入，**绝不写入仓库或硬编码**。
+- 推送命令示例（不落地 token）：
+  ```powershell
+  $env:GITEE_TOKEN="<从凭据管理器读取>"; $env:GITEE_USER="gogojaja"
+  py -3.11 tools/mirror_push.py          # 双推 origin + mirror
+  ```
+
+### 3. 初始化步骤（搭框架后由用户补全）
+1. 在 Gitee 建仓库 `DevProjectTeamSkill`（建议「从 GitHub 导入」或空仓）；
+2. 添加 remote：`git remote add mirror https://gitee.com/<user>/DevProjectTeamSkill.git`；
+3. 配置凭据：把 `GITEE_TOKEN` 放入系统凭据管理器 / `.secrets/gitee_token`（仓库已 gitignore `.secrets/`）；
+4. 此后统一用 `py -3.11 tools/mirror_push.py` 替代裸 `git push`（脚本会自动跳过未配置的 remote，框架阶段不报错阻断）。
+
+### 4. 同步台账
+- `台账/32_镜像同步记录.csv`（UTF-8 BOM）：同步编号 / 同步时间 / 源commit / 目标remote / 远程URL(脱敏) / 状态 / 耗时秒 / 说明。每次双推追加，便于审计与故障回溯。
+
 ## 效率约定
 
 - 先读根 `SKILL.md` 路由表 → 命中后只读目标文件，**禁止**一次性 Read 全部文件。
