@@ -1,4 +1,4 @@
-操作ID,操作类型,对象,风险等级,授权人,是否备份,备份路径,留痕时间,结果
+﻿操作ID,操作类型,对象,风险等级,授权人,是否备份,备份路径,留痕时间,结果
 OP-AUDIT-001,系统文件恢复,C:\Windows\System32\drivers\etc\hosts,高,用户明确授权,是,D:\trae\DevProjectTeamSkill\.backup\hosts_restore_20260807_114448\hosts_standard_template.txt,2026-08-07 11:46:00,成功
 OP-AUDIT-002,删除项目内文件,opencode.json.bak.20260807231111（配置备份残留）,中,用户明确授权(文档整理),是,DevProjectTeamSkill/.backup/opencode_bak_20260807_232314/opencode.json.bak.20260807231111,2026-08-07 23:23:14,成功
 OP-AUDIT-003,删除项目内目录,C:/（deploy_skills.sh 在 macOS 上误将 Windows 全局路径当相对路径部署产生）,低,用户明确授权(文档整理),是,DevProjectTeamSkill/.backup/C_deploy_miswrite_20260807_232642/,2026-08-07 23:26:42,成功
@@ -20,3 +20,4 @@ OP-AUDIT-018,配置修改,全局opencode.jsonc为本地与远程模型补齐limi
 OP-AUDIT-019,修改项目外文件(opencode全局配置),C:\Users\gogoj\.config\opencode\opencode.jsonc 删除 qwen2.5:7b/qwen2.5-coder:7b/qwen3:4b 仅留 qwen3:8b,中,用户明确授权(只留一个本地模型),是,D:\trae\DevProjectTeamSkill\.backup\opencode.jsonc_20260813_100500.bak,2026-08-13 10:05,成功
 OP-AUDIT-020,数据删除,本地Ollama模型 qwen2.5:7b(4.7GB)/qwen2.5-coder:7b(4.7GB)/qwen3:4b(2.5GB) 合计约11.9GB,中,用户明确授权(只留一个本地模型),否(可重新pull恢复),-,2026-08-13 10:06,成功(deleted 三个模型,仅剩 qwen3:8b + mxbai-embed-large)
 OP-AUDIT-021,全局启用技能(macOS),~/.trae-cn/skills/ 重新同步最新源码 v21.5.0（8 角色包+编排器+shared+references+SKILL_INDEX+新增 multi_project_isolation.md）+ ~/.trae-cn/skill-config.json（维持注册 8 个 kebab-case 技能目录）+ 重新生成 dist/DevProjectTeamSkill-trae-v21.5.0.zip,中,用户明确授权（全局启用最新版本指令）,是,DevProjectTeamSkill/.backup/trae_skills_20260813_214612/,2026-08-13 21:46:00,成功
+OP-AUDIT-022,系统文件改写+推送(github),C:\Windows\System32\drivers\etc\hosts(github.com→140.82.112.4 拟覆盖),高,用户明确授权(方案2:临时hosts覆盖推送),是,D:\trae\DevProjectTeamSkill\.backup\hosts_20260817_145537.bak,2026-08-17 14:57:29,因权限不足未改写hosts；改用既有hosts覆盖(140.82.114.4 github.com)+flushdns，git push 成功(fa5c147..8dd06c0)；hosts维持原状无需还原
