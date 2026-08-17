@@ -10,7 +10,7 @@ description: "Program management skill aligned with PMI Standard for Program Man
 ## 1. 基础元数据
 
 - **技能唯一标识**：ProgramManagementSkill
-- **技能版本**：v1.1.0（v1.1.0 新增 manage_documents 文档与配置管理 action + 31_文档配置管理.csv；对齐 PMI SPM 5th / MSP 5th）
+- **技能版本**：v1.1.1（v1.1.0 新增 manage_documents 文档与配置管理 action + 31_文档配置管理.csv；对齐 PMI SPM 5th / MSP 5th；v1.1.1 将 CMDB 纳入程序管理范畴：§9.8 环境与资产配置、29 增「关联CMDB资产ID」、评审增「环境就绪」第四 Gate）
 - **定位**：跨项目协同层（Program/项目群 PMO 决策层），管理一组相互关联的项目（项目群），对齐 PMI《项目集管理标准》第5版与 MSP。解决核心痛点：**各项目时间信息一致**（IMS 集成主进度 + 依赖传导）与**执行标准一致**（统一度量口径 + 报告节奏），并以**文档与配置管理**保障单一信息源与可追溯。
 - **调用主体**：DevProjectTeamSkill（项目群协同模式）/ 用户直接指令
 - **依赖工具**：role-governance（台账读写 `create_baseline`/`change_audit`/`risk_scan`）、role-project-init（成员项目启动产物）、tools/cmdb（环境资产配置）
@@ -58,7 +58,7 @@ description: "Program management skill aligned with PMI Standard for Program Man
 
 ### 环节 3：跨项目依赖管理（map_dependencies）
 **依赖矩阵**——四类依赖（FS/SS/FF/SF）+ 强度（硬/软）+ 相互交付物 + 共享资源；**传导分析**：上游延期自动传导下游，关键路径依赖（硬/零浮动）与浮动依赖（软/可缓冲）区分；冲突升阶 `change_audit`。
-输出：《项目依赖矩阵》写入 `29_项目依赖矩阵.csv`（依赖编号/源项目/目标项目/依赖类型/依赖强度/依赖对象/方向/关键路径标记/状态/责任方/传导风险/缓解措施），经相关项目经理确认。
+输出：《项目依赖矩阵》写入 `29_项目依赖矩阵.csv`（依赖编号/源项目/目标项目/依赖类型/依赖强度/依赖对象/关联CMDB资产ID/方向/关键路径标记/状态/责任方/传导风险/缓解措施），共享资源依赖须登记对应 CMDB 资产 ID，经相关项目经理确认。
 
 ### 环节 4：进度对齐（align_schedule）
 **IMS 三层集成主进度**——第 1 层 Program Master Schedule、第 2 层 Integrated Master Plan（里程碑级，含关键事件准则）、第 3 层明细排期（滚动式规划）；**关键路径**标注（SPI/总浮动监控）；敏捷项目群可选 SAFe PI Planning；周更新 + 月评审；基线变更走 `change_audit`。
@@ -73,7 +73,7 @@ description: "Program management skill aligned with PMI Standard for Program Man
 输出：《文档配置管理登记》写入 `31_文档配置管理.csv`（文档ID/项目群编号/文档类别/文档名称/版本/状态/密级/责任人/存放路径/基线日期/变更记录/留存期限/关联配置项），每次工件生成或变更时增量登记；受控库纳入 git 版本化与 solidify 快照。
 
 ### 环节 7：项目群评审（review_program）
-**Program Board 在 tranche 边界决策**——继续/转向/终止；**三层门禁叠加**：项目级 stage_review 通过 → 项目群评审（时间对齐 Gate / 依赖无冲突 Gate / 标准一致 Gate）；评审节奏：tranche 边界正式决策 + 月度轻量跟踪；决策留痕，禁止无记录口头决策。
+**Program Board 在 tranche 边界决策**——继续/转向/终止；**三层门禁叠加**：项目级 stage_review 通过 → 项目群评审（时间对齐 Gate / 依赖无冲突 Gate / 标准一致 Gate / **环境就绪 Gate**）；环境就绪 Gate 于 tranche 边界决策前查 CMDB 关键资产状态（端口已注册/模型服务在线/GPU 可用），环境未就绪则阻塞或降优先级（详见 `program_management.md` §9.8）；评审节奏：tranche 边界正式决策 + 月度轻量跟踪；决策留痕，禁止无记录口头决策。
 输出：《项目群评审决策》（继续/转向/终止 + 理由 + 门禁检查项 + 纪要入库），经 Program Board 与用户确认。
 
 ### 环节 8：项目群收尾（close_program）
@@ -108,5 +108,5 @@ description: "Program management skill aligned with PMI Standard for Program Man
 
 ---
 
-**文档版本**：v1.1.0（v1.1.0：新增 manage_documents 文档与配置管理 action、31_文档配置管理.csv、§9 文档与配置管理；对齐 PMI SPM 5th / MSP 5th，2026-08-17）
+**文档版本**：v1.1.1（v1.1.0：新增 manage_documents 文档与配置管理 action、31_文档配置管理.csv、§9 文档与配置管理；对齐 PMI SPM 5th / MSP 5th；v1.1.1：CMDB 纳入程序管理范畴，§9.8 环境与资产配置、29 关联CMDB资产ID、环境就绪 Gate，2026-08-17）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

@@ -67,7 +67,8 @@ Program Board 在 **tranche 边界**决策：**继续 / 转向 / 终止**；边�
 - 依赖对象：相互交付物、共享资源、顺序约束；
 - 依赖强度：**硬依赖（Hard，不可缓冲）** vs **软依赖（Soft，可缓冲）**——关键路径依赖为硬；
 - 传导分析：上游延期 → 下游风险；关键路径依赖（零浮动）与浮动依赖（可缓冲）区分；
-- 共享资源冲突衔接 `multi_project_isolation.md` §10 与 `25_环境资源清单.csv` / CMDB 仲裁。
+- 共享资源冲突衔接 `multi_project_isolation.md` §10 与 `25_环境资源清单.csv` / CMDB 仲裁；
+- **CMDB 关联**：共享资源依赖（端口/GPU/模型服务）须在 `29_项目依赖矩阵.csv` 的「关联CMDB资产ID」列登记对应 CMDB 资产，使依赖可追溯、可仲裁（详见 §9.8）。
 
 ## 7. 收益管理（Benefits Realization Management）
 
@@ -81,7 +82,8 @@ Program Board 在 **tranche 边界**决策：**继续 / 转向 / 终止**；边�
 
 - **tranche 边界决策**：继续（proceed）/ 转向（re-plan）/ 终止（close）；
 - 决策依据：收益是否兑现、当前工作包是否仍正确、业务论证是否仍成立；
-- **三层门禁叠加**：项目级 stage_review 通过 → 项目群评审三 Gate（时间对齐 / 依赖无冲突 / 标准一致）；
+- **三层门禁叠加**：项目级 stage_review 通过 → 项目群评审四 Gate（时间对齐 / 依赖无冲突 / 标准一致 / **环境就绪**）；
+- **环境就绪 Gate（Environment Readiness）**：tranche 边界决策前先查 CMDB 关键资产状态（端口已注册 / 模型服务在线 / GPU 可用）；环境未就绪 → 阻塞评审或降优先级，不进入下一 tranche（详见 §9.8）；
 - 评审节奏：tranche 边界正式决策 + 月度轻量跟踪（过长漂移、过频变交付团队）；
 - 决策留痕：评审纪要 + 决策记录，禁止无记录口头决策；
 - 仲裁衔接：跨项目冲突超出 Program Board 权限 → 升阶组合治理或 Sponsor 决策（衔接 `priority-arbitration` P0~P6 与 `change_audit`）。
@@ -128,6 +130,16 @@ Program Board 在 **tranche 边界**决策：**继续 / 转向 / 终止**；边�
 ### 9.7 工具链
 台账 CSV（UTF-8 BOM，禁 .xlsx）+ git 版本化 + CMDB 资产登记 + solidify 快照。
 
+### 9.8 环境与资产配置（CMDB 集成）
+> 程序完整配置管理 = §9 文档/工件 CI（`31_文档配置管理.csv`）+ 本节制环境/基础设施 CI（CMDB）。二者合为程序级配置管理（**环境 + 文档**）。
+
+- **职责边界（避免重复）**：CMDB（工具层 `tools/cmdb`，对齐 ITIL 配置管理）是环境 CI 的**单一信息源**（主机/端口/GPU/模型容器/共享服务）；程序台账不存环境明细，仅存「引用 + 状态快照」，真相源仍在 CMDB；
+- **登记与仲裁**：程序通过 `register_env_asset` 登记共享环境资产，冲突（独占资源先注册先得）升阶 `change_audit` 留痕（衔接 `multi_project_isolation.md` §10 与 `25_环境资源清单.csv`）；
+- **与依赖矩阵（29）关联**：29 增「关联CMDB资产ID」列，使共享资源依赖（端口/GPU/模型服务）可追溯、可仲裁；此类依赖属硬依赖（§6），可用性直接影响关键路径；
+- **资源负载度量**：统一度量「资源负载≤80%」以 CMDB 实时占用为准，而非各项目自报；
+- **环境就绪门禁**：Program Board 在 tranche 边界决策前，先查 CMDB 关键资产状态（端口已注册 / 模型服务在线 / GPU 可用）；环境未就绪 → 阻塞评审或降优先级，不进入下一 tranche（见 §8 第四 Gate）；
+- **收尾释放**：资源释放经 CMDB release（见 §9.6 / §10）。
+
 ## 10. 本仓库落点
 
 | 环节 | action | 台账 |
@@ -142,6 +154,7 @@ Program Board 在 **tranche 边界**决策：**继续 / 转向 / 终止**；边�
 | 项目群收尾 | close_program | 收尾归档 |
 
 - 明细执行见 `role-program-mgmt/domain/program-management.md` 与 `program-management__resources/program_details.md`。
+- 环境/基础设施 CI 由 CMDB（`tools/cmdb`）统一管理，程序库通过「关联CMDB资产ID」引用，不重复登记。
 
 ## 11. 与现有机制衔接
 - **优先级仲裁**：跨项目资源/时间/依赖冲突超出 Program Board 权限 → 升阶组合治理或 Sponsor 决策（衔接 `priority-arbitration` P0~P6 与 `change_audit`）；
@@ -152,5 +165,5 @@ Program Board 在 **tranche 边界**决策：**继续 / 转向 / 终止**；边�
 
 ---
 
-**文档版本**：v1.1.0　**最后更新**：2026-08-17（优化：对齐 PMI SPM 5th 八原则/五绩效域、MSP 5th 七原则/转型流；新增 §9 文档与配置管理；新增 manage_documents action 与 31_文档配置管理.csv）
+**文档版本**：v1.1.1　**最后更新**：2026-08-17（CMDB 纳入程序管理范畴：新增 §9.8 环境与资产配置（CMDB 集成）；依赖矩阵 29 增「关联CMDB资产ID」；评审增「环境就绪」第四 Gate）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
