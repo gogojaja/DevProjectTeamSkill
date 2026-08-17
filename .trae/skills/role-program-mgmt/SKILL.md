@@ -1,6 +1,6 @@
 ---
 name: "role-program-mgmt"
-description: "用户提到项目群、项目集、多项目协同、PMO 决策层、跨项目依赖、里程碑对齐、统一执行标准、文档与配置管理时加载本项目群管理角色包：负责项目群定义（业务论证/章程/路线图/治理四角色/tranche 划分）、收益管理（收益档案与维持）、跨项目依赖矩阵、IMS 三层集成主进度（滚动式规划/关键路径/SAFe PI Planning）、统一执行标准与度量口径（CPI/SPI/里程碑准点率）、文档与配置管理（单一信息源/版本/基线/CI/留存）、Program Board tranche 边界决策与收尾。用户说项目群/多项目协同/PMO/文档配置管理时加载。Load when the user manages a program/portfolio, multi-project coordination, PMO decisions, cross-project dependencies, milestone alignment, or document/configuration management."
+description: "用户提到项目群、项目集、多项目协同、PMO 决策层、跨项目依赖、里程碑对齐、统一执行标准、文档与配置管理时加载本项目群管理角色包：负责项目群定义（业务论证/章程/路线图/治理四角色/tranche 划分）与收益管理（收益档案与维持）、跨项目依赖矩阵、IMS 三层集成主进度（滚动式规划/关键路径）、统一执行标准与度量口径（CPI/SPI/里程碑准点率）、文档与配置管理（单一信息源/基线）、Program Board tranche 边界决策与收尾。用户说项目群/多项目协同/PMO 时加载。"
 ---
 
 # role-program-mgmt 项目群管理角色包

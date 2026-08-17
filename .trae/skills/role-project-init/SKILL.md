@@ -1,6 +1,6 @@
 ---
 name: "role-project-init"
-description: "用户启动项目、立项、写章程、登记干系人、定组织架构与 RACI、建问题升级机制、范围初定、可行性检查、启动就绪、初始化基线时加载本项目启动角色包：负责立项登记、项目章程（成功标准/PM 任命职权/签字批准）、干系人登记（权力-利益矩阵）、组织架构与 RACI 矩阵、问题升级机制（P1~P4 分级/四级升级阶梯/Owner）、范围初定义、阶段裁剪、环境与访问边界声明、五维可行性评估、就绪检查与台账基线初始化，对齐 PMBOK 启动过程组。用户说启动项目/初始化/定 RACI/问题升级时加载。Load when the user starts a new project, creates the charter, registers stakeholders, or initializes project baseline."
+description: "用户启动项目、立项、写章程、登记干系人、定组织架构与 RACI、建问题升级机制、范围初定、可行性检查、启动就绪、初始化基线时加载本项目启动角色包：负责立项登记、项目章程（成功标准/PM 任命职权/签字批准）、干系人登记（权力-利益矩阵）、组织架构与 RACI 矩阵、问题升级机制（P1~P4 分级/四级升级阶梯/Owner）、范围初定义、阶段裁剪、环境与访问边界声明、五维可行性评估、就绪检查与台账基线初始化，对齐 PMBOK 启动过程组。用户说启动项目/初始化/定 RACI/问题升级时加载。"
 ---
 
 # role-project-init 项目启动角色包

@@ -1,6 +1,6 @@
 ---
 name: "role-architecture"
-description: "用户提到架构策略、架构设计、4+1视图、C4模型、数据架构、安全架构、ADR、架构评审、ATAM时加载本架构设计角色包：负责架构策略分析、4+1 视图与 C4 逻辑设计、数据与安全架构设计、ADR 决策、ATAM 评审及基线固化，输出架构设计说明书、ADR 与评审报告。用户说架构策略/设计/评审时加载。Load when the user requests architecture strategy, 4+1/C4 design, data/security architecture, ADR, or ATAM review."
+description: "用户提到架构策略、架构设计、4+1视图、C4模型、数据架构、安全架构、ADR、架构评审、ATAM时加载本架构设计角色包：负责架构策略分析、4+1 视图与 C4 逻辑设计、数据与安全架构设计、ADR 决策、ATAM 评审及基线固化，输出架构设计说明书、ADR 与评审报告。用户说架构策略/设计/评审时加载。"
 ---
 
 # role-architecture 架构设计角色包
