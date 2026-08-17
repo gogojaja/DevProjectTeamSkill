@@ -72,7 +72,7 @@ DevProjectTeamSkill（总控）
 | `iteration_review` | §1.1 governance | 迭代末轻量评审 + 回顾记录 CSV | 每迭代末 |
 | `project_archive` | §1.1 governance | 全项目归档 | 所有阶段完工 |
 | `handover_export` | §1.1 governance | 跨会话交接打包 | 周期复盘、新建对话 |
-| `record_env_config` | §1.1 governance | 环境配置抽取到 20_环境配置.csv | 开发/测试/部署环境准备 |
+| `record_env_config` | §1.1 governance | 环境配置抽取到 20_环境配置.csv（双套拓扑：环境组 nonprod/prod + 隔离方式 + 端口区间 + 共用边界 + 权限角色，见 environment_topology.md） | 开发/测试/部署环境准备 |
 | `retrospect_harvest` | §1.1 governance | 阶段末复盘收割（22_阶段复盘.csv + 23_复用资产.csv） | 每阶段末 |
 | `select_model` | §1.1 governance | 阶段开始模型选型（21_模型选型.csv） | 每阶段开始 |
 | `register_auth` | §1.1 governance | 授权登记（14_授权登记.csv + 13 留痕）+ 阶段末时效检查提醒；**未填有效期默认仅本次对话有效**，跨会话须显式指定到期时间 | 系统/项目外文件授权、其他项目目录访问、每阶段末 |
@@ -101,7 +101,7 @@ DevProjectTeamSkill（总控）
 | `iteration_review` | 迭代末轻量评审 + 回顾记录（02_迭代回顾.csv） | 每迭代末 |
 | `project_archive` | 全项目归档（台账+交付物+审计日志） | 所有阶段完工 |
 | `handover_export` | 跨会话交接打包（话术+台账快照+交接文档） | 周期复盘、新建对话 |
-| `record_env_config` | 环境配置抽取到 `台账/20_环境配置.csv`（dev/test/prod 三列，密钥别名引用） | 环境准备 |
+| `record_env_config` | 环境配置抽取到 `台账/20_环境配置.csv`（双套拓扑：环境组 nonprod/prod + 隔离方式 + 端口区间 + 共用边界 + 权限角色，dev/test/prod 配置并列，密钥别名引用） | 环境准备 |
 | `retrospect_harvest` | 阶段末复盘收割：输出 `22_阶段复盘.csv`（可固化流程/复用工具/降Token）与 `23_复用资产.csv` | 每阶段末 |
 | `select_model` | 阶段开始模型选型：输出 `21_模型选型.csv`（四级规则：免费→低价→国内稳定→排除不可访问） | 每阶段开始 |
 

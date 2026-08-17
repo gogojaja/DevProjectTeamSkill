@@ -12,11 +12,12 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.6.0
-- **版本发布日期**：2026-08-16
+- **技能版本**：v21.7.0
+- **版本发布日期**：2026-08-17
 - **版本变更记录**：
-  - v21.6.0：新增项目群/项目集协同层（2026-08-16）——新增第 9 角色包 `role-program-mgmt`（定义/收益/依赖/IMS 进度/标准一致/评审/收尾），治理三层模型，Program Board 在 tranche 边界决策；新台账 28/29/30；标准见 `references/program_management.md`。
-  - v21.5.9：项目启动治理完善（2026-08-16）——`role-project-init` 新增 `define_org_structure`（组织架构 + RACI 矩阵，`27_组织架构.csv`）与 `define_issue_escalation`（问题解决与升级机制：P1~P4 分级 + 四级升级阶梯 L1~L4 + 响应时限 + 单一 Owner，`12_风险问题台账.csv` 升级字段）；`create_charter` 补成功标准/PM 任命职权/签字批准（对齐 PMBOK 章程六要素）；`check_ready` 新增「组织架构已明确」「问题升级机制已确立」两条硬门禁；role-governance 风险详情补问题升级子流程；台账 26→27；`role-project-init` 版本 v21.1.0→v21.2.0。
+  - v21.7.0：双套环境拓扑（2026-08-17）——新增 `environment_topology.md` 标准；`environment_standard.md` v21.3.1 衔接；`20_环境配置.csv` 扩展列。
+  - v21.6.0：新增项目群/项目集协同层（2026-08-16）——新增第 9 角色包 `role-program-mgmt`（定义/收益/依赖/IMS 进度/标准一致/评审/收尾，Program Board Tranche 边界决策）；新台账 28/29/30。
+  - v21.5.9：项目启动治理完善（2026-08-16）——`role-project-init` 新增 `define_org_structure`（组织架构 + RACI，`27_组织架构.csv`）与 `define_issue_escalation`（问题升级：P1~P4 + 四级升级阶梯 + 单一 Owner）；`create_charter` 补成功标准/PM 任命职权/签字批准；`check_ready` 新增治理硬门禁；台账 26→27；`role-project-init` v21.2.0。
   - v21.5.7：多角色并行优先级仲裁规则（2026-08-15）——`skills/team-orchestration` 新增 `domain/priority-arbitration.md`（方案冲突按 P0~P6 裁决：需求基线/总控→安全→架构→测试→开发→部署→文档；一票否决制 + 领域速查表 + 仲裁留痕），`team-orchestration/SKILL.md` 新增 §6 冲突仲裁规则并升级 v1.1.0；对齐 multi-perspective-validation 聚合裁决机制。
   - v21.5.6：技能维护模式闭环执行能力升级（2026-08-15）——`shared/authoring.md` 强制要求所有维护产出的技能具备 `闭环执行系统` 标题与标准模板，包含任务入口、状态机、验收门禁、失败恢复、交接审计；同步更新 `SKILL_INDEX.md` 与 `role-governance/SKILL.md`，将“闭环执行能力”提升为维护模式硬门禁。
   - v21.5.5：敏感信息分级处理矩阵（2026-08-14）——`references/iron_rules.md` §3 统一为 A/B/C 三级（A 禁止入库：密钥凭据 Token；B 脱敏入库：主机名/IP/用户名/路径；C 正常入库）；原 §3.1 脱敏细则并入 B 级；同步 `shared/references/iron_rules.md`、`AGENTS.md` 第 8 条、`SKILL_INDEX.md`。
@@ -190,5 +191,5 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 
 ---
 
-**文档版本**：v21.6.0　**最后更新**：2026-08-16（新增项目群/项目集协同层：role-program-mgmt 第 9 角色包）
+**文档版本**：v21.7.0　**最后更新**：2026-08-17（双套环境拓扑标准：非生产组 dev+test / 生产组隔离 + 文件端口隔离 + 共用边界 + RBAC）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

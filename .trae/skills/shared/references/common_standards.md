@@ -52,7 +52,9 @@
 ### 2.1 引用规范
 
 - 所有跨技能引用使用相对路径 `../references/`，禁止裸 `references/` 路径；
-- 本文件作为版本管理规范的唯一事实来源，各技能仅保留简短的引用声明。
+- 本文件作为版本管理规范的唯一事实来源，各技能仅保留简短的引用声明；
+- 多项目隔离方案引用：`references/multi_project_isolation.md`（Git/运行时/数据库/Docker 四层隔离 + 第 5 层全局环境资产注册与冲突仲裁，`台账/25_环境资源清单.csv`）；
+- 双套环境拓扑引用：`references/environment_topology.md`（非生产组 dev+test 共享软硬件 + 生产组独立隔离，文件/端口隔离 + 共用边界 + RBAC；配置列见 `references/environment_standard.md`，台账 `20_环境配置.csv`）。
 
 ### 2.2 文档页脚
 

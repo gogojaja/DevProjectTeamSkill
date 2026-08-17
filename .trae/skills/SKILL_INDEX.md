@@ -28,6 +28,7 @@
    - **维护 SOP**：详细执行流程与统一模板见 `../shared/skill_maintenance_sop.md`；
    - **维护章程**：最终规则/门禁/交接要求见 `../shared/skill_maintenance_charter.md`；
 5. **增强能力（v21.3.0）**：每阶段开始 `select_model`（21_模型选型）；阶段末 `retrospect_harvest`（22_阶段复盘 + 23_复用资产）；环境准备 `record_env_config`（20_环境配置）；标准见 `references/model_selection.md` 与 `references/environment_standard.md`；
+5a. **双套环境拓扑（v21.7.0）**：每项目环境管理采用「非生产组 dev+test 共享基础软硬件 + 生产组独立隔离」双套拓扑，文件/端口隔离、基础软硬件共用边界与 RBAC 见 `references/environment_topology.md`（20_环境配置.csv 含环境组/端口区间/共用边界/权限角色列，衔接 multi_project_isolation CMDB）；
 6. **铁律锚点**：压缩/新会话后重读 `references/iron_rules.md`，每轮回显锚点 `授权→备份→留痕`；§3 敏感信息分级处理（A 禁止入库/B 脱敏入库/C 正常入库），B 级脱敏提交前强制；
 7. **授权登记/时效**：系统/外部文件授权经 `register_auth` 登记 `14_授权登记.csv`（含有效期），每阶段末检查并提醒续期/撤销；
 8. 单角色任务直接加载对应包；多角色/全生命周期由编排器调度；
@@ -44,6 +45,6 @@
 
 ---
 
-**文档版本**：v21.6.2
-**最后更新**：2026-08-17（role-program-mgmt 优化至 v1.1.1：将 CMDB 纳入程序管理范畴——§9.8 环境与资产配置、29 关联CMDB资产ID、评审增环境就绪 Gate；文档/配置管理（31）与环境 CMDB 合为程序完整配置管理）
+**文档版本**：v21.7.0
+**最后更新**：2026-08-17（新增双套环境拓扑标准 environment_topology.md：每项目「非生产组 dev+test 共享基础软硬件 + 生产组独立隔离」，文件/端口隔离 + 基础软硬件共用边界 + RBAC，20_环境配置.csv 扩展列；SKILL_INDEX 第 5a 条）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
