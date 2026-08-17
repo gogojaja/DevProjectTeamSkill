@@ -41,6 +41,7 @@ for f in $files; do
   case "$f" in
     *.png|*.jpg|*.jpeg|*.gif|*.ico|*.pdf|*.zip|*.lock|*.jar|*.war) continue ;;
     .githooks/*|scripts/*) continue ;;  # 钩子/脚本自身含路径示例，跳过 B 级（仍受 A 级扫描）
+    AGENTS.md|docs/github_ip_records.csv) continue ;;  # GitHub 候选 IP 为公开基础设施 IP（既有文档），豁免 B 级
   esac
   content=$(git show :"$f" 2>/dev/null) || continue
   # 过滤脱敏示例行（xxx.xxx.xxx.xxx 已合规）与 CMDB 登记类已知脱敏文件

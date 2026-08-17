@@ -38,8 +38,11 @@ bash tools/package_skills.sh --role role-testing
 bash tools/deploy_skills.sh --roles role-a,role-b
 bash tools/solidify.sh "说明"
 python tools/excel_to_csv.py            # 迁移存量 xlsx→csv
-git commit                              # 每原子改动一次提交
+bash scripts/install-hooks.sh           # 新 clone 后一键安装 pre-commit 环境门禁钩子（core.hooksPath .githooks，git 钩子不随 clone 分发，必须执行一次）
+git commit                              # 每原子改动一次提交（钩子未安装时先跑 install-hooks.sh）
 ```
+
+> **环境门禁钩子**：`.githooks/pre-commit` 提交前自动检查 A 级密钥/B 级脱敏/.env 与 .secrets 禁提交/大文件 >4K。失败阻断提交（`git commit --no-verify` 仅应急，不推荐）。
 
 ## GitHub 访问异常处理规则（win32 / macOS / PowerShell / zsh 环境）
 
