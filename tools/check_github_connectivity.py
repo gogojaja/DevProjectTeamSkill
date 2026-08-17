@@ -108,6 +108,7 @@ def get_remediation_steps(mode: str) -> list[str]:
     if mode == "dns_invalid":
         return [
             "git remote -v",
+            "python3 tools/github_ip_refresh.py  # 动态补充 DNS Resource Records(系统解析器/DoH/ipaddress.com)",
             "nslookup github.com 8.8.8.8 || getent hosts github.com || ping -c 1 github.com",
             "cat docs/github_ip_records.csv | head -n 20",
             "curl -I --connect-timeout 8 https://github.com",

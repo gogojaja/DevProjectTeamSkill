@@ -51,3 +51,4 @@ github.githubassets.com,A,185.199.110.154,fliu2476/gh-hosts,2021-12-03,资源CDN
 githubstatus.com,A,185.199.108.153,fliu2476/gh-hosts,2021-12-03,状态页
 assets-cdn.github.com,A,151.101.100.133,社区记录,2022-11-27,旧Fastly CDN IP
 central.github.com,A,140.82.112.21,fliu2476/gh-hosts,2021-12-03,Central服务
+codeload.github.com,A,20.205.243.165,system-resolver,2026-08-17,动态补充(ipaddress.com/DoH/系统解析)

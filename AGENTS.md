@@ -45,6 +45,29 @@ git commit                              # 每原子改动一次提交
 
 本机访问 `github.com:443` 偶发 DNS 解析到坏 IP 或全部候选 IP 不可达，最常见根因是 DNS 实效，导致远端环境无法访问。故障现象：`Failed to connect` / `Could not connect` / `Recv failure: Connection was reset` / `nc: connection failed, SOCKS error 2`。
 
+### 0. 动态补充 DNS Resource Records（ipaddress.com）
+
+`docs/github_ip_records.csv` 的候选 IP（§1）是**静态快照，可能过期**。出现「全部候选 IP 不可达 / DNS 实效」时，**先动态刷新最新 A 记录，再决定恢复路径**：
+
+1. **一键动态刷新**（首选；只要本机 DNS 正常即可解析，即使 `github.com:443` 被墙也能解析）：
+   ```powershell
+   py -3.11 tools/github_ip_refresh.py            # 系统解析器(nslookup) 动态补充
+   py -3.11 tools/github_ip_refresh.py --doh      # 追加 DNS-over-HTTPS(1.1.1.1/dns.google)
+   ```
+   工具经系统解析器 / DoH 动态解析 `github.com / api.github.com / gist.github.com / codeload.github.com / raw.githubusercontent.com / github.global.ssl.fastly.net / assets-cdn.github.com / fastly.net / github.io` 的当前 A 记录，去重追加进 `docs/github_ip_records.csv`，并对 `github.com` 候选 IP 做可达性探测（`curl --resolve`），打印 hosts 覆盖块与 `restore_github_push.sh` 恢复命令。
+2. **权威站点人工核验**（页面受 Cloudflare 挑战保护，无法自动抓取，可人工抄录后登记）：
+   - https://sites.ipaddress.com/github.com/
+   - https://sites.ipaddress.com/fastly.net/
+   - https://sites.ipaddress.com/assets-cdn.github.com/
+   
+   在页面「DNS Resource Records」区读取最新 A 记录，用以下命令登记（避免手改 CSV）：
+   ```powershell
+   py -3.11 tools/github_ip_refresh.py --manual github.com=20.205.243.166,140.82.112.4 assets-cdn.github.com=185.199.108.153 fastly.net=151.101.0.0
+   ```
+3. **刷新后仍不可达**：走 §3 token 推送或 §4 VPN/代理；必要时按铁律 #7 临时 hosts 覆盖 `github.com <可达IP>`（先备份、留痕 `13_安全审计台账.csv`）。
+
+> 设计原则：**DNS 解析与 TCP/443 可达性解耦**——`nslookup` 能解析说明 DNS 正常、问题在路由；动态刷新保证候选池始终是最新「DNS Resource Records」，而非依赖过期快照。
+
 ### 1. 候选 IP 池（按优先级排序）
 
 优先保留真实 IP 记录；若 DNS 失效，直接用候选 IP 做临时解析回退。完整 DNS 资源记录见 `docs/github_ip_records.csv`（含 api/ssh/gist/raw/pages/Fastly CDN 等子域）。
@@ -136,8 +159,10 @@ git remote set-url origin "https://github.com/gogojaja/DevProjectTeamSkill.git" 
 ### 5. 数据来源
 
 - DNS 解析：`nslookup -type=A github.com 8.8.8.8` / `1.1.1.1` / `208.67.222.222`
+- **动态刷新工具**：`tools/github_ip_refresh.py`（系统解析器 / DoH 动态补充 `docs/github_ip_records.csv`；`--manual` 登记 ipaddress.com 人工抄录）
 - GitHub Meta API：`https://api.github.com/meta`（返回完整服务 IP 段）
 - Fastly 公网 IP：`https://api.fastly.com/public-ip-list`
+- 权威站点核验：`sites.ipaddress.com/{github.com,fastly.net,assets-cdn.github.com}`（Cloudflare 挑战保护，人工读取 DNS Resource Records）
 - 社区记录：`docs/github_ip_records.csv`（含历史 IP、各子域、Fastly CDN 节点）
 
 ## 效率约定
