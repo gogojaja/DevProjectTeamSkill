@@ -1,6 +1,6 @@
 ---
 name: "role-governance"
-description: "用户提到台账、阶段评审、门禁、变更审计、EVM、进度、风险、安全审计、基线固化、归档、交接文档时加载本总控保障角色包：负责台账与基线初始化、五维评审与门禁、变更审计、进度成本(EVM)、风险扫描、安全审计、基线固化/归档/交接，输出评审报告、门禁记录、审计台账与基线。用户说管控/评审/门禁/审计时加载。"
+description: "用户提到台账、阶段评审、门禁、变更审计、EVM、进度、风险、安全审计、基线固化、归档、交接文档时加载本总控保障角色包：负责台账与基线初始化、五维评审与门禁、变更审计、进度成本(EVM)、风险扫描、安全审计、基线固化/归档/交接，输出评审报告、门禁记录、审计台账与基线。用户说管控/评审/门禁/审计时加载。Load when the user manages the ledger, runs reviews/gates, audits changes, updates progress, scans risks, or solidifies/archives/hands over."
 ---
 
 # role-governance 总控保障角色包（文档管理员）

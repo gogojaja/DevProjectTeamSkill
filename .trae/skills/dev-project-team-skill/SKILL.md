@@ -1,6 +1,6 @@
 ---
 name: "dev-project-team-skill"
-description: "用户启用全生命周期、启用某角色、切换角色、多角色联合、项目管控、阶段评审、基线固化、交接文档时加载本软件研发多角色编排器：按阶段渐进加载角色包（启动/需求/架构/开发/测试/投产/总控），支持跨模型/跨会话切换、全生命周期管控、台账评审门禁、基线固化与优先级仲裁。用户说启动生命周期/启用角色时加载。"
+description: "用户启用全生命周期、启用某角色、切换角色、多角色联合、项目管控、阶段评审、基线固化、交接文档时加载本软件研发多角色编排器：按阶段渐进加载角色包（启动/需求/架构/开发/测试/投产/总控），支持跨模型/跨会话切换、全生命周期管控、台账评审门禁、基线固化与优先级仲裁。用户说启动生命周期/启用角色时加载。Load when the user starts a software project lifecycle, enables sw roles, or requests stage review/baseline/handover."
 ---
 
 # DevProjectTeamSkill 软件研发多角色编排器

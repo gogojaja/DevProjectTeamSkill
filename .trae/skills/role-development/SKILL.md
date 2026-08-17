@@ -1,6 +1,6 @@
 ---
 name: "role-development"
-description: "用户提到开发策略、技术栈、分支规范、编码、代码走查、PR评审、单元测试、联调、质量检查时加载本开发管理角色包：负责开发策略与技术栈选型、分支编码规范、模块编码与安全编码、代码走查与 PR 评审、单元测试、联调与质量收口及基线固化，输出开发总结报告、技术债务登记与质量报告。用户说开发/编码/代码评审时加载。"
+description: "用户提到开发策略、技术栈、分支规范、编码、代码走查、PR评审、单元测试、联调、质量检查时加载本开发管理角色包：负责开发策略与技术栈选型、分支编码规范、模块编码与安全编码、代码走查与 PR 评审、单元测试、联调与质量收口及基线固化，输出开发总结报告、技术债务登记与质量报告。用户说开发/编码/代码评审时加载。Load when the user starts development strategy, codes modules, reviews code (PR), runs unit tests, integrates, or closes quality baseline."
 ---
 
 # role-development 开发管理角色包
