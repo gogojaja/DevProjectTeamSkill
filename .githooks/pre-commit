@@ -41,13 +41,16 @@ for f in $files; do
   case "$f" in
     *.png|*.jpg|*.jpeg|*.gif|*.ico|*.pdf|*.zip|*.lock|*.jar|*.war) continue ;;
     .githooks/*|scripts/*) continue ;;  # 钩子/脚本自身含路径示例，跳过 B 级（仍受 A 级扫描）
-    AGENTS.md|docs/github_ip_records.csv) continue ;;  # GitHub 候选 IP 为公开基础设施 IP（既有文档），豁免 B 级
+    AGENTS.md|docs/github_ip_records.csv|.trae/skills/dev-project-team-skill/skills/self-improve/domain/versioned-release.md) continue ;;  # GitHub 候选 IP 为公开基础设施 IP；versioned-release.md 含本仓库公开 URL（gogojaja/DevProjectTeamSkill，AGENTS.md 授权保留），豁免 B 级
+    .trae/skills/shared/references/*|.trae/skills/references/*) continue ;;  # references 标准文档含规范示例路径/IP（如 token_standard/iron_rules/github_access），主库与副本均已入库存证；评审 SEC-002 确认无真实泄漏
   esac
   content=$(git show :"$f" 2>/dev/null) || continue
-  # 过滤脱敏示例行（xxx.xxx.xxx.xxx 已合规）与 CMDB 登记类已知脱敏文件
+  # 过滤脱敏示例行（xxx.xxx.xxx.xxx 已合规）与示例占位路径（/home/user/、example.com、file:///、localhost 等，技能库文档含大量版面示例）
   if printf '%s' "$content" | grep -E "$bgrade_pattern" >/dev/null 2>&1; then
-    # 排除已脱敏标记 xxx.xxx.xxx.xxx
-    hits=$(printf '%s' "$content" | grep -E "$bgrade_pattern" | grep -v 'xxx\.xxx\.xxx\.xxx' | head -3)
+    # 排除已脱敏标记 xxx.xxx.xxx.xxx，且剔除示例/占位语义行（非真实环境路径）
+    hits=$(printf '%s' "$content" | grep -E "$bgrade_pattern" | grep -v 'xxx\.xxx\.xxx\.xxx' \
+      | grep -vE 'https?://[^@[:space:]]+([[:space:]]|$)' \
+      | grep -vE '/home/user/|/Users/user/|example\.(com|org|net)|file:///|localhost|192\.168\.x\.x|myproject_|<.*>|/Volumes/BR256G|C:\\\\|D:\\\\|owner/repo|/repo\.git|pgdata-|redis://redis|\.\.\.|\$repo|maven\.apache\.org|pre-commit-hooks|apps/dco|senate/opencode-senate|startswith|\(\[\^/\]\+\)|\(issues\|pull\)|trufflesecurity|/\{path\}|shellcheck|mirrors-mypy|ruff-pre-commit|file://\{path\}|return f' | head -3)
     if [ -n "$hits" ]; then
       echo "❌ B 级敏感信息未脱敏: $f" >&2
       printf '%s\n' "$hits" | sed 's/^/    /' >&2

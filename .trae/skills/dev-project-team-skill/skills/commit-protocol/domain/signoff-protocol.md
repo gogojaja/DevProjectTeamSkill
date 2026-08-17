@@ -1,13 +1,13 @@
-# 簽署協議：Signed-off-by / Co-authored-by / 審查簽署
+# 签署协议：Signed-off-by / Co-authored-by / 审查签署
 
-> 編排器：`../SKILL.md`
+> 编排器：`../SKILL.md`
 
 ---
 
-## 1. Signed-off-by (DCO 簽署)
+## 1. Signed-off-by (DCO 签署)
 
-### 1.1 定義
-`Signed-off-by` 是開發者對提交內容的法律聲明，遵循 **Developer Certificate of Origin (DCO) v1.1**：
+### 1.1 定义
+`Signed-off-by` 是开发者对提交内容的法律声明，遵循 **Developer Certificate of Origin (DCO) v1.1**：
 
 ```
 Developer Certificate of Origin
@@ -51,49 +51,49 @@ By making a contribution to this project, I certify that:
 ```
 Signed-off-by: Full Name <email@example.com>
 ```
-- **姓名**：法定全名或慣用名
-- **郵箱**：有效聯繫郵箱（建議使用項目認可的郵箱）
-- **生成**：`git commit -s` 自動添加（需配置 `user.name`/`user.email`）
+- **姓名**：法定全名或惯用名
+- **邮箱**：有效联系邮箱（建议使用项目认可的邮箱）
+- **生成**：`git commit -s` 自动添加（需配置 `user.name`/`user.email`）
 
-### 1.3 強制要求
-| 場景 | 強制 |
+### 1.3 强制要求
+| 场景 | 强制 |
 |------|------|
 | 所有正式提交 | ✅ 是 |
-| PR/MR 合併提交 | ✅ 是 |
-| 發布提交 | ✅ 是 |
+| PR/MR 合并提交 | ✅ 是 |
+| 发布提交 | ✅ 是 |
 | Revert 提交 | ✅ 是 |
-| 僅格式化/重排 (style) | 建議 |
-| 僅文檔/註釋 (docs) | 建議 |
+| 仅格式化/重排 (style) | 建议 |
+| 仅文档/注释 (docs) | 建议 |
 
 ---
 
-## 2. Co-authored-by (協作作者)
+## 2. Co-authored-by (协作作者)
 
-### 2.1 定義
-標記對提交有實質貢獻但非主要作者的協作者，GitHub/GitLab 會在提交頁面顯示其頭像。
+### 2.1 定义
+标记对提交有实质贡献但非主要作者的协作者，GitHub/GitLab 会在提交页面显示其头像。
 
 ### 2.2 格式
 ```
 Co-authored-by: Full Name <email@example.com>
 ```
-- 可多行，每行一位協作者
-- 郵箱需與 GitHub/GitLab 賬號關聯才能正確顯示頭像
+- 可多行，每行一位协作者
+- 邮箱需与 GitHub/GitLab 账号关联才能正确显示头像
 
-### 2.3 適用場景
-| 場景 | 是否添加 |
+### 2.3 适用场景
+| 场景 | 是否添加 |
 |------|----------|
-| 兩人以上共同編程 | ✅ 是 |
-| 代碼審查者提出關鍵修改並由作者提交 | ✅ 是 |
-| 設計/架構師提供核心方案 | ✅ 是 |
-| 僅提出建議/意見 | ❌ 否 |
-| 僅測試/驗證 | 視貢獻程度 |
+| 两人以上共同编程 | ✅ 是 |
+| 代码审查者提出关键修改并由作者提交 | ✅ 是 |
+| 设计/架构师提供核心方案 | ✅ 是 |
+| 仅提出建议/意见 | ❌ 否 |
+| 仅测试/验证 | 视贡献程度 |
 
 ---
 
-## 3. 審查簽署
+## 3. 审查签署
 
-### 3.1 代碼審查簽署
-在 PR/MR 審查通過時，審查者在評論中簽署：
+### 3.1 代码审查签署
+在 PR/MR 审查通过时，审查者在评论中签署：
 
 ```markdown
 ## Review Sign-off
@@ -107,7 +107,7 @@ Co-authored-by: Full Name <email@example.com>
 **Signed-off-by**: Reviewer Name <reviewer@example.com>
 ```
 
-### 3.2 架構審查簽署
+### 3.2 架构审查签署
 ```markdown
 ## Architecture Review Sign-off
 
@@ -120,7 +120,7 @@ Co-authored-by: Full Name <email@example.com>
 **Signed-off-by**: Architect Name <architect@example.com>
 ```
 
-### 3.3 安全審查簽署
+### 3.3 安全审查签署
 ```markdown
 ## Security Review Sign-off
 
@@ -136,13 +136,13 @@ Co-authored-by: Full Name <email@example.com>
 
 ---
 
-## 4. 簽署驗證自動化
+## 4. 签署验证自动化
 
-### 4.1 Git Hook 驗證
+### 4.1 Git Hook 验证
 ```bash
 #!/bin/bash
 # .git/hooks/commit-msg
-# 驗證 Signed-off-by 存在
+# 验证 Signed-off-by 存在
 
 MSG_FILE=$1
 if ! grep -q "^Signed-off-by:" "$1"; then
@@ -153,7 +153,7 @@ fi
 exit 0
 ```
 
-### 4.2 CI 驗證
+### 4.2 CI 验证
 ```yaml
 # .github/workflows/dco-check.yml
 name: DCO Check
@@ -179,8 +179,8 @@ jobs:
 
 ### 4.3 GitHub DCO App
 ```yaml
-# 使用 GitHub DCO App 自動檢查
-# 安裝: https://github.com/apps/dco
+# 使用 GitHub DCO App 自动检查
+# 安装: https://github.com/apps/dco
 # 配置: .github/dco.yml
 repos:
   - your-org/your-repo
@@ -190,22 +190,22 @@ allow_rebase: false
 
 ---
 
-## 5. 簽署最佳實踐
+## 5. 签署最佳实践
 
-### 5.1 配置全局簽署
+### 5.1 配置全局签署
 ```bash
-# 設置用戶信息
+# 设置用户信息
 git config --global user.name "Your Full Name"
 git config --global user.email "your.email@example.com"
 
-# 啟用自動簽署
-git config --global commit.gpgsign true  # 可選：GPG 簽名
-git config --global commit.signoff true  # 自動添加 Signed-off-by
+# 启用自动签署
+git config --global commit.gpgsign true  # 可选：GPG 签名
+git config --global commit.signoff true  # 自动添加 Signed-off-by
 ```
 
-### 5.2 GPG 簽名 (可選增強)
+### 5.2 GPG 签名 (可选增强)
 ```bash
-# 生成 GPG 密鑰
+# 生成 GPG 密钥
 gpg --full-generate-key
 
 # 配置 Git 使用 GPG
@@ -213,32 +213,32 @@ git config --global user.signingkey <KEY_ID>
 git config --global commit.gpgsign true
 git config --global tag.gpgsign true
 
-# 導出公鑰到 GitHub/GitLab
+# 导出公钥到 GitHub/GitLab
 gpg --armor --export <KEY_ID>
 ```
 
-### 5.3 團隊簽署規範
-| 角色 | 簽署要求 |
+### 5.3 团队签署规范
+| 角色 | 签署要求 |
 |------|----------|
-| 開發者 | 每次提交 `Signed-off-by` |
-| 審查者 | PR 批准時 `Co-authored-by` 或審查簽署 |
-| 架構師 | 架構決策提交 `Signed-off-by` + ADR 引用 |
-| 安全工程師 | 安全修復提交 `Signed-off-by` + 威脅模型引用 |
-| 發布工程師 | 發布提交 `Signed-off-by` + 版本/變更日誌 |
-| 專案負責人 | 關鍵發布/風險接受 `Signed-off-by` |
+| 开发者 | 每次提交 `Signed-off-by` |
+| 审查者 | PR 批准时 `Co-authored-by` 或审查签署 |
+| 架构师 | 架构决策提交 `Signed-off-by` + ADR 引用 |
+| 安全工程师 | 安全修复提交 `Signed-off-by` + 威胁模型引用 |
+| 发布工程师 | 发布提交 `Signed-off-by` + 版本/变更日志 |
+| 专案负责人 | 关键发布/风险接受 `Signed-off-by` |
 
 ---
 
-## 6. 簽署異常處理
+## 6. 签署异常处理
 
-| 異常 | 處理 |
+| 异常 | 处理 |
 |------|------|
-| 缺少 Signed-off-by | CI 阻斷，要求補充 `git commit --amend -s` |
-| 郵箱不匹配 GitHub | 提示更新 `user.email` 或在 GitHub 添加郵箱 |
-| 多人共用一提交 | 主作者 `Signed-off-by`，協作者 `Co-authored-by` |
-| 批量提交缺少簽署 | `git rebase -i` 逐個 `amend -s` 或腳本批量添加 |
-| GPG 密鑰過期 | 更新密鑰或暫時關閉 `commit.gpgsign` |
+| 缺少 Signed-off-by | CI 阻断，要求补充 `git commit --amend -s` |
+| 邮箱不匹配 GitHub | 提示更新 `user.email` 或在 GitHub 添加邮箱 |
+| 多人共用一提交 | 主作者 `Signed-off-by`，协作者 `Co-authored-by` |
+| 批量提交缺少签署 | `git rebase -i` 逐个 `amend -s` 或脚本批量添加 |
+| GPG 密钥过期 | 更新密钥或暂时关闭 `commit.gpgsign` |
 
 ---
 
-**文檔版本**: v1.0.0  **最後更新**: 2026-08-08
+**文档版本**: v1.0.0  **最后更新**: 2026-08-08

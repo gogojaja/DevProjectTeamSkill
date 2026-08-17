@@ -1,12 +1,12 @@
-# LSP 客戶端：啟動/能力/請求/響應/診斷/工作區
+# LSP 客户端：启动/能力/请求/响应/诊断/工作区
 
-> 編排器：`../SKILL.md`
+> 编排器：`../SKILL.md`
 
 ---
 
-## 1. LSP 服務器管理
+## 1. LSP 服务器管理
 
-### 1.1 服務器啟動策略
+### 1.1 服务器启动策略
 ```python
 class LSPServerManager:
     def __init__(self):
@@ -39,7 +39,7 @@ class LSPServerManager:
         return self.servers[key]
 ```
 
-### 1.2 服務器進程管理
+### 1.2 服务器进程管理
 ```python
 class LSPServer:
     def __init__(self, config: dict, project_root: str):
@@ -60,9 +60,9 @@ class LSPServer:
             cwd=self.project_root,
             bufsize=0
         )
-        # 啟動輸出讀取線程
+        # 启动输出读取线程
         self._start_read_loop()
-        # 發送 initialize 請求
+        # 发送 initialize 请求
         self.initialize()
     
     def initialize(self):
@@ -81,13 +81,13 @@ class LSPServer:
         result = future.result(timeout=30)
         self.capabilities = result.get('capabilities', {})
         self.initialized = True
-        # 發送 initialized 通知
+        # 发送 initialized 通知
         self._send_notification("initialized", {})
 ```
 
 ---
 
-## 2. LSP 協議實現
+## 2. LSP 协议实现
 
 ### 2.1 消息格式
 ```json
@@ -128,7 +128,7 @@ class LSPServer:
 }
 ```
 
-### 2.2 核心請求方法
+### 2.2 核心请求方法
 ```python
 class LSPClient:
     def __init__(self, server: LSPServer):
@@ -141,7 +141,7 @@ class LSPClient:
         self.server._send(msg)
         return asyncio.wait_for(future, timeout=timeout)
     
-    # 核心導航
+    # 核心导航
     def goto_definition(self, uri: str, line: int, char: int) -> List[Location]:
         return self._request("textDocument/definition", {
             "textDocument": {"uri": uri},
@@ -220,9 +220,9 @@ class LSPClient:
 
 ---
 
-## 3. 診斷與文檔同步
+## 3. 诊断与文档同步
 
-### 3.1 文檔同步
+### 3.1 文档同步
 ```python
 class DocumentSyncManager:
     def __init__(self, client: LSPClient):
@@ -262,7 +262,7 @@ class DocumentSyncManager:
         self.client._send_notification("textDocument/didSave", params)
 ```
 
-### 3.2 診斷處理
+### 3.2 诊断处理
 ```python
 class DiagnosticsManager:
     def __init__(self, client: LSPClient):
@@ -272,7 +272,7 @@ class DiagnosticsManager:
     
     def _on_diagnostics(self, params: PublishDiagnosticsParams):
         self.diagnostics[params.uri] = params.diagnostics
-        # 觸發回調/事件
+        # 触发回调/事件
         self._emit("diagnostics_changed", params.uri, params.diagnostics)
     
     def get_diagnostics(self, uri: str = None) -> Dict[str, List[Diagnostic]]:
@@ -294,9 +294,9 @@ class DiagnosticsManager:
 
 ---
 
-## 4. 工作區管理
+## 4. 工作区管理
 
-### 4.1 工作區文件夾
+### 4.1 工作区文件夹
 ```python
 class WorkspaceManager:
     def __init__(self, client: LSPClient):
@@ -319,7 +319,7 @@ class WorkspaceManager:
             })
 ```
 
-### 4.2 配置變更
+### 4.2 配置变更
 ```python
 class ConfigurationManager:
     def __init__(self, client: LSPClient):
@@ -337,9 +337,9 @@ class ConfigurationManager:
 
 ---
 
-## 5. 代碼動作與重構支持
+## 5. 代码动作与重构支持
 
-### 5.1 代碼動作
+### 5.1 代码动作
 ```python
 class CodeActionProvider:
     def __init__(self, client: LSPClient):
@@ -371,7 +371,7 @@ class CodeActionProvider:
 
 ---
 
-## 5. 工具函數
+## 5. 工具函数
 
 ```python
 def file_to_uri(path: str) -> str:
@@ -398,4 +398,4 @@ def range_to_lsp(start_line, start_char, end_line, end_char) -> Range:
 
 ---
 
-**文檔版本**: v1.0.0  **最後更新**: 2026-08-08
+**文档版本**: v1.0.0  **最后更新**: 2026-08-08

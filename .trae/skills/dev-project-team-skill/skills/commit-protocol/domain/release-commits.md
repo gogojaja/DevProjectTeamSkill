@@ -1,37 +1,37 @@
-# 發布提交：版本號/變更日誌/標籤/回滾
+# 发布提交：版本号/变更日志/标签/回滚
 
-> 編排器：`../SKILL.md`
+> 编排器：`../SKILL.md`
 
 ---
 
-## 1. 發布提交流程
+## 1. 发布提交流程
 
-### 1.1 版本號規範 (SemVer)
+### 1.1 版本号规范 (SemVer)
 ```
 MAJOR.MINOR.PATCH[-PRERELEASE][+BUILD]
 
 示例:
   1.0.0           # 正式版
-  2.1.0           # Minor 發布
-  2.1.1           # Patch 修復
+  2.1.0           # Minor 发布
+  2.1.1           # Patch 修复
   3.0.0-rc.1      # Release Candidate
   2.0.0-beta.3    # Beta
-  1.0.0+build.123 # Build 元數據
+  1.0.0+build.123 # Build 元数据
 ```
 
-### 1.2 版本升級規則
-| 變更類型 | 版本升級 | 示例 |
+### 1.2 版本升级规则
+| 变更类型 | 版本升级 | 示例 |
 |----------|----------|------|
-| 破壞性 API 變更 | MAJOR +1 | 1.2.3 → 2.0.0 |
-| 新功能 (向後兼容) | MINOR +1 | 1.2.3 → 1.3.0 |
-| Bug 修復 | PATCH +1 | 1.2.3 → 1.2.4 |
-| 預發布 | 追加標識 | 1.2.3 → 1.3.0-rc.1 |
+| 破坏性 API 变更 | MAJOR +1 | 1.2.3 → 2.0.0 |
+| 新功能 (向后兼容) | MINOR +1 | 1.2.3 → 1.3.0 |
+| Bug 修复 | PATCH +1 | 1.2.3 → 1.2.4 |
+| 预发布 | 追加标识 | 1.2.3 → 1.3.0-rc.1 |
 
 ---
 
-## 2. 發布提交格式
+## 2. 发布提交格式
 
-### 2.1 標準發布提交
+### 2.1 标准发布提交
 ```bash
 release: v2.1.0
 
@@ -66,7 +66,7 @@ Contributors: 8
 Signed-off-by: Release Engineer <release@example.com>
 ```
 
-### 2.2 預發布提交
+### 2.2 预发布提交
 ```bash
 release: v2.2.0-rc.1
 
@@ -89,9 +89,9 @@ Signed-off-by: Release Engineer <release@example.com>
 
 ---
 
-## 3. 變更日誌生成
+## 3. 变更日志生成
 
-### 3.1 自動生成腳本
+### 3.1 自动生成脚本
 ```python
 #!/usr/bin/env python3
 # generate-changelog.py
@@ -145,29 +145,29 @@ if __name__ == '__main__':
 
 ---
 
-## 3. 發布自動化流程
+## 3. 发布自动化流程
 
-### 2.1 發布腳本
+### 2.1 发布脚本
 ```bash
 #!/bin/bash
-# release.sh - 自動化發布流程
+# release.sh - 自动化发布流程
 set -e
 
 VERSION_TYPE=${1:-patch}  # major | minor | patch | prerelease
 DRY_RUN=${2:-false}
 
-# 1. 檢查工作目錄乾淨
+# 1. 检查工作目录干净
 if [[ -n $(git status --porcelain) ]]; then
     echo "❌ Working directory not clean"
     exit 1
 fi
 
-# 2. 獲取當前版本
+# 2. 获取当前版本
 CURRENT=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
 CURRENT=${CURRENT#v}
 IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
 
-# 3. 計算新版本
+# 3. 计算新版本
 case $1 in
     major) NEW_VERSION="$((MAJOR+1)).0.0" ;;
     minor) NEW_VERSION="$MAJOR.$((MINOR+1)).0" ;;
@@ -188,12 +188,12 @@ if [[ "$DRY_RUN" == "true" ]]; then
     exit 0
 fi
 
-# 3. 生成變更日誌
+# 3. 生成变更日志
 CHANGELOG=$(python3 tools/generate-changelog.py "$PREV_TAG")
 echo "$CHANGELOG" > CHANGELOG.md
 
 # 3. 更新版本文件
-# 根據項目類型更新: package.json / pyproject.toml / Cargo.toml / go.mod / pom.xml 等
+# 根据项目类型更新: package.json / pyproject.toml / Cargo.toml / go.mod / pom.xml 等
 update_version_files "$NEW_VERSION"
 
 # 3. 提交版本更新
@@ -210,7 +210,7 @@ Date: $(date -u +%Y-%m-%d)
 
 Signed-off-by: $(git config user.name) <$(git config user.email)>"
 
-# 4. 創建標籤
+# 4. 创建标签
 git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION
 
 $(cat CHANGELOG.md | head -50)"
@@ -224,14 +224,14 @@ echo "✅ Released $NEW_TAG"
 
 ---
 
-## 3. 回滾流程
+## 3. 回滚流程
 
-### 3.1 版本回滾
+### 3.1 版本回滚
 ```bash
 #!/bin/bash
-# rollback.sh - 版本回滾
+# rollback.sh - 版本回滚
 
-TARGET_VERSION=${1:-}  # 目標版本，如 v2.0.1
+TARGET_VERSION=${1:-}  # 目标版本，如 v2.0.1
 
 if [[ -z $TARGET_VERSION ]]; then
     echo "Usage: $0 <target-version>"
@@ -239,17 +239,17 @@ if [[ -z $TARGET_VERSION ]]; then
     exit 1
 fi
 
-# 1. 檢查目標標籤存在
+# 1. 检查目标标签存在
 if ! git rev-parse "refs/tags/$TARGET_VERSION" >/dev/null 2>&1; then
     echo "❌ Tag $TARGET_VERSION not found"
     exit 1
 fi
 
-# 2. 創建回滾分支
+# 2. 创建回滚分支
 ROLLBACK_BRANCH="rollback/$(date +%Y%m%d-%H%M%S)-to-$TARGET_VERSION"
 git checkout -b "$ROLLBACK_BRANCH" "$TARGET_VERSION"
 
-# 3. 更新版本號 (添加 .rollback 後綴)
+# 3. 更新版本号 (添加 .rollback 后缀)
 CURRENT=$(git describe --tags --abbrev=0)
 NEW_VERSION="${TARGET_VERSION#v}.1-rollback"
 update_version_files "$NEW_VERSION"
@@ -262,12 +262,12 @@ Rollback to $TARGET_VERSION due to critical issue in current release.
 Rollback-Metadata:
   From: $(git describe --tags --abbrev=0)
   To: $TARGET_VERSION
-  Reason: <填寫回滾原因>
+  Reason: <填写回滚原因>
   Initiated-by: $(git config user.name)
 
 Signed-off-by: $(git config user.name) <$(git config user.email)>"
 
-# 4. 推送回滾分支
+# 4. 推送回滚分支
 git push origin "$ROLLBACK_BRANCH"
 echo "✅ Rollback branch created: $ROLLBACK_BRANCH"
 echo "Create PR from $ROLLBACK_BRANCH to main for deployment"
@@ -275,20 +275,20 @@ echo "Create PR from $ROLLBACK_BRANCH to main for deployment"
 
 ---
 
-## 3. 標籤管理
+## 3. 标签管理
 
-### 3.1 標籤命名
-| 類型 | 格式 | 示例 |
+### 3.1 标签命名
+| 类型 | 格式 | 示例 |
 |------|------|------|
-| 正式發布 | `v<MAJOR>.<MINOR>.<PATCH>` | `v2.1.0` |
+| 正式发布 | `v<MAJOR>.<MINOR>.<PATCH>` | `v2.1.0` |
 | RC | `v<MAJOR>.<MINOR>.<PATCH>-rc.<N>` | `v2.1.0-rc.1` |
 | Beta | `v<MAJOR>.<MINOR>.<PATCH>-beta.<N>` | `v2.0.0-beta.3` |
 | Alpha | `v<MAJOR>.<MINOR>.<PATCH>-alpha.<N>` | `v1.0.0-alpha.1` |
-| 熱修復 | `v<MAJOR>.<MINOR>.<PATCH+1>` | `v2.0.1` |
+| 热修复 | `v<MAJOR>.<MINOR>.<PATCH+1>` | `v2.0.1` |
 
-### 3.2 標籤操作
+### 3.2 标签操作
 ```bash
-# 創建帶註釋標籤
+# 创建带注释标签
 git tag -a v2.1.0 -m "Release v2.1.0
 
 ## Changelog
@@ -297,14 +297,14 @@ git tag -a v2.1.0 -m "Release v2.1.0
 
 Signed-off-by: Release Engineer"
 
-# 推送標籤
+# 推送标签
 git push origin v2.1.0
 
-# 刪除本地/遠端標籤
+# 删除本地/远端标签
 git tag -d v2.1.0
 git push origin :refs/tags/v2.1.0
 
-# 列出標籤
+# 列出标签
 git tag -l "v2.*" --sort=-v:refname
 ```
 
@@ -312,7 +312,7 @@ git tag -l "v2.*" --sort=-v:refname
 
 ## 4. CI/CD 集成
 
-### 4.1 GitHub Actions 發布
+### 4.1 GitHub Actions 发布
 ```yaml
 # .github/workflows/release.yml
 name: Release
@@ -351,7 +351,7 @@ jobs:
       - name: Deploy
         if: github.ref_type == 'tag' && !contains(github.ref_name, '-rc') && !contains(github.ref_name, '-beta')
         run: |
-          # 部署腳本
+          # 部署脚本
           ./deploy.sh ${{ github.ref_name }}
 ```
 
@@ -359,7 +359,7 @@ jobs:
 
 ## 5. 版本文件同步
 
-### 5.1 多語言版本文件更新
+### 5.1 多语言版本文件更新
 ```python
 # update_version_files.py
 import sys, json, toml, xml.etree.ElementTree as ET, re, yaml
@@ -376,14 +376,14 @@ def update_version(version: str):
     # Cargo.toml
     update_toml('Cargo.toml', {'package': {'version': v}})
     
-    # go.mod (手動或 go mod edit)
-    # go.mod 通常不直接編輯版本
+    # go.mod (手动或 go mod edit)
+    # go.mod 通常不直接编辑版本
     
     # pom.xml
     update_xml('pom.xml', './/version', v)
     
     # setup.py / setup.cfg
-    # 通常從 pyproject.toml 讀取
+    # 通常从 pyproject.toml 读取
     
     # Dockerfile
     update_dockerfile('Dockerfile', v)
@@ -433,4 +433,4 @@ if __name__ == '__main__':
 
 ---
 
-**文檔版本**: v1.0.0  **最後更新**: 2026-08-08
+**文档版本**: v1.0.0  **最后更新**: 2026-08-08

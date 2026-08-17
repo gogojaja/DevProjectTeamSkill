@@ -11,7 +11,10 @@ sys.stdout.reconfigure(encoding='utf-8')
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKILLS_DIR = os.environ.get('SKILLS_DIR', os.path.join(ROOT, '.trae', 'skills'))
 ALL_ROLES = ['dev-project-team-skill','role-project-init','role-requirements-analysis',
-             'role-architecture','role-development','role-testing','role-deployment','role-governance']
+             'role-architecture','role-development','role-testing','role-deployment','role-governance',
+             'role-program-mgmt']
+SUB_SKILLS = ['commit-protocol','lsp-ast-integration','multi-perspective-validation',
+              'project-memory','self-improve','team-orchestration','worktree-isolation']
 
 
 def read_text(path):
@@ -24,7 +27,9 @@ def check_frontmatter_and_metadata(text, role):
     if not re.search(r'^---\s*\nname:\s*"[^"]+"\s*\n', text, re.M):
         errors.append('缺少 frontmatter name')
     if not re.search(r'description:\s*".*Load when.*"', text, re.S):
-        errors.append('缺少 description 中的 Load when 触发声明')
+        # 单语言原则（token_standard §2.1）：判废英文 Load when，改验中文触发词「用户说/触发词时加载」
+        if not re.search(r'description:\s*".*(用户说|当用户|用户提到|触发词).*(时加载|加载本)', text, re.S):
+            errors.append('缺少 description 中的中文触发声明（用户说…时加载，token_standard §2.1）')
     if '技能版本' not in text:
         errors.append('缺少 技能版本 元数据')
     if '**文档版本**' not in text:
@@ -78,6 +83,26 @@ def main():
             print(f'  ✗ {role:<40} 发布级门禁失败')
             for err in errors:
                 print(f'      - {err}')
+            failed += 1
+
+    # 子技能（内嵌于编排器）纳入发布级门禁
+    for sub in SUB_SKILLS:
+        p = os.path.join(SKILLS_DIR, 'dev-project-team-skill', 'skills', sub, 'SKILL.md')
+        if not os.path.isfile(p):
+            continue
+        text = read_text(p)
+        errs = []
+        errs.extend(check_frontmatter_and_metadata(text, sub))
+        ok, missing = check_closure(text)
+        if not ok:
+            errs.append(f'闭环执行缺失：{missing}')
+        label = f'{sub} (sub)'
+        if not errs:
+            print(f'  ✓ {label:<36} 发布级门禁通过')
+        else:
+            print(f'  ✗ {label:<36} 发布级门禁失败')
+            for e in errs:
+                print(f'      - {e}')
             failed += 1
     print('=' * 50)
     if failed:

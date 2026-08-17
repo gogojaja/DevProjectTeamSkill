@@ -68,7 +68,7 @@ maintenance_scope = current_project
 ## 3. 统一结构规范
 
 - frontmatter `name` 与目录名一致；
-- description 结构 `<做什么>。<触发词，前置>。Load when <user says>.`（150~250 字符）；
+- description 结构 `<做什么>。<触发词，前置>。用户说…时加载。`（150~250 字符）；
 - 表格按 `../shared/references/token_standard.md` §3（CSV/Markdown 阈值）；
 - 明细外置 `domain/*.md` 与 `shared/`，禁止正文堆砌；
 - 每个技能正文必须包含 `闭环执行系统` 强制章节。
@@ -146,7 +146,7 @@ maintenance_scope = current_project
 ## 8. 发布级门禁（强制）
 
 每个维护产出的 SKILL.md 在进入打包/部署前，必须满足以下条件：
-1. frontmatter 包含 `name` 与合法 `description`（包含 `Load when` 触发声明）；
+1. frontmatter 包含 `name` 与合法 `description`（包含中文触发声明「用户说…时加载」，单语言原则，禁英文 Load when 尾巴）；
 2. 正文包含 `技能版本` 和 `**文档版本**` 以及 `**最后更新**`；
 3. 正文包含 `闭环执行系统` 章节及其六大核心部分；
 4. 通过 `tools/check_skill_closure.py` 与 `tools/check_skill_release_gate.py`；
@@ -167,5 +167,5 @@ maintenance_scope = current_project
 
 ---
 
-**文档版本**：v21.5.6　**最后更新**：2026-08-15（技能维护模式强制闭环执行能力）
+**文档版本**：v21.5.7　**最后更新**：2026-08-18（description 模板统一中文触发声明并对齐 release_gate 触发检查）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

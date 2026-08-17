@@ -1,55 +1,55 @@
-# 上下文快照：捕獲/恢復/歸檔/版本管理
+# 上下文快照：捕获/恢复/归档/版本管理
 
-> 編排器：`../SKILL.md`　上位：編排器 §5 調度規則
+> 编排器：`../SKILL.md`　上位：编排器 §5 调度规则
 
 ---
 
-## 1. 快照定義
+## 1. 快照定义
 
-### 1.1 觸發時機
-| 觸發器 | 說明 | 優先級 |
+### 1.1 触发时机
+| 触发器 | 说明 | 优先级 |
 |--------|------|--------|
-| 會話結束 | 用戶退出 / 會話超時 | 高 |
-| 階段切換 | 編排器階段轉換 (plan→prd→exec...) | 高 |
-| 手動觸發 | 用戶執行 `/snapshot` | 中 |
-| 關鍵決策後 | 記錄 ADR/關鍵約束後 | 中 |
-| 錯誤/異常 | 捕獲錯誤上下文用於事後分析 | 低 |
+| 会话结束 | 用户退出 / 会话超时 | 高 |
+| 阶段切换 | 编排器阶段转换 (plan→prd→exec...) | 高 |
+| 手动触发 | 用户执行 `/snapshot` | 中 |
+| 关键决策后 | 记录 ADR/关键约束后 | 中 |
+| 错误/异常 | 捕获错误上下文用于事后分析 | 低 |
 
-### 1.2 快照內容
+### 1.2 快照内容
 ```python
 @dataclass
 class ContextSnapshot:
     id: str                         # snap-{timestamp}-{seq}
-    session_id: str                 # 歸屬會話
+    session_id: str                 # 归属会话
     trigger: str                    # manual | phase_change | session_end | decision | error
     timestamp: str                  # ISO 8601
     
-    # 任務上下文
-    current_task: Optional[str]     # 當前任務描述
+    # 任务上下文
+    current_task: Optional[str]     # 当前任务描述
     task_progress: Dict             # {task_id: status}
-    active_files: List[str]         # 當前打開/編輯的文件
-    cursor_positions: Dict[str, int] # 文件光標位置
+    active_files: List[str]         # 当前打开/编辑的文件
+    cursor_positions: Dict[str, int] # 文件光标位置
     
-    # 決策/記憶上下文
-    recent_decisions: List[str]     # 近期決策 ID
-    active_constraints: List[str]   # 生效約束 ID
-    working_hypothesis: str         # 當前工作假設/調試方向
+    # 决策/记忆上下文
+    recent_decisions: List[str]     # 近期决策 ID
+    active_constraints: List[str]   # 生效约束 ID
+    working_hypothesis: str         # 当前工作假设/调试方向
     
-    # 環境狀態
+    # 环境状态
     git_status: Dict                # {branch, commit, dirty_files}
-    env_vars: Dict[str, str]        # 關鍵環境變量
-    running_services: List[str]     # 本地運行的服務
+    env_vars: Dict[str, str]        # 关键环境变量
+    running_services: List[str]     # 本地运行的服务
     
-    # 元數據
+    # 元数据
     tags: List[str]                 # checkpoint | milestone | debugging | handoff
-    metadata: Dict                  # 擴展字段
+    metadata: Dict                  # 扩展字段
 ```
 
 ---
 
-## 2. 捕獲流程
+## 2. 捕获流程
 
-### 2.1 自動捕獲 (會話結束/階段切換)
+### 2.1 自动捕获 (会话结束/阶段切换)
 ```python
 def capture_snapshot(trigger: str, session_id: str, extra: Dict = None) -> ContextSnapshot:
     snap = ContextSnapshot(
@@ -78,26 +78,26 @@ def capture_snapshot(trigger: str, session_id: str, extra: Dict = None) -> Conte
     # 2. 更新索引
     update_snapshot_index(snap)
     
-    # 3. 關聯決策/約束
+    # 3. 关联决策/约束
     for dec_id in snap.recent_decisions:
         link_snapshot_decision(snap.id, dec_id)
     
     return snap
 ```
 
-### 2.2 手動快照
+### 2.2 手动快照
 ```bash
-# 用戶命令
-/snapshot "完成 API 設計，準備進入實現階段"
+# 用户命令
+/snapshot "完成 API 设计，准备进入实现阶段"
 # 或
 /snapshot --tag milestone "Phase 1 完成"
 ```
 
 ---
 
-## 3. 恢復流程
+## 3. 恢复流程
 
-### 3.1 會話啟動自動恢復
+### 3.1 会话启动自动恢复
 ```python
 def restore_on_session_start(session_id: str) -> RestoreReport:
     # 1. 找到最近的有效快照
@@ -107,19 +107,19 @@ def restore_on_session_start(session_id: str) -> RestoreReport:
     
     latest = snapshots[0]
     
-    # 2. 恢復環境
+    # 2. 恢复环境
     restore_git_status(latest.git_status)
     restore_env_vars(latest.env_vars)
     start_services(latest.running_services)
     
-    # 3. 恢復編輯器狀態 (需編輯器協作)
+    # 3. 恢复编辑器状态 (需编辑器协作)
     restore_editor_state(latest.active_files, latest.cursor_positions)
     
-    # 4. 注入決策/約束上下文
+    # 4. 注入决策/约束上下文
     inject_decisions(latest.recent_decisions)
     inject_constraints(latest.active_constraints)
     
-    # 5. 設置工作假設
+    # 5. 设置工作假设
     set_working_hypothesis(latest.working_hypothesis)
     
     return RestoreReport(
@@ -129,21 +129,21 @@ def restore_on_session_start(session_id: str) -> RestoreReport:
     )
 ```
 
-### 3.2 手動恢復 (切換快照)
+### 3.2 手动恢复 (切换快照)
 ```bash
 # 列出可用快照
 snapshot list --session current
 
-# 恢復指定快照
+# 恢复指定快照
 snapshot restore snap-20260808-003
 
-# 查看快照差異
+# 查看快照差异
 snapshot diff snap-20260808-001 snap-20260808-003
 ```
 
 ---
 
-## 4. 版本管理與歸檔
+## 4. 版本管理与归档
 
 ### 4.1 快照索引
 ```json
@@ -158,16 +158,16 @@ snapshot diff snap-20260808-001 snap-20260808-003
 }
 ```
 
-### 4.2 歸檔策略
-| 策略 | 觸發 | 動作 |
+### 4.2 归档策略
+| 策略 | 触发 | 动作 |
 |------|------|------|
-| 會話級保留 | 會話活躍 | 保留所有 |
-| 最近 N 個 | 會話結束 | 保留最近 10 個 |
-| 標簽保留 | 標簽 milestone/decision | 永久保留 |
-| 時間歸檔 | > 30 天 | 移至 `.senate/memory/snapshots/archive/YYYY-MM/` |
-| 壓縮 | 歸檔時 | gzip + 移除大字段 (cursor_positions 等) |
+| 会话级保留 | 会话活跃 | 保留所有 |
+| 最近 N 个 | 会话结束 | 保留最近 10 个 |
+| 标签保留 | 标签 milestone/decision | 永久保留 |
+| 时间归档 | > 30 天 | 移至 `.senate/memory/snapshots/archive/YYYY-MM/` |
+| 压缩 | 归档时 | gzip + 移除大字段 (cursor_positions 等) |
 
-### 4.3 版本對比
+### 4.3 版本对比
 ```python
 def diff_snapshots(snap1: ContextSnapshot, snap2: ContextSnapshot) -> DiffReport:
     return DiffReport(
@@ -182,36 +182,36 @@ def diff_snapshots(snap1: ContextSnapshot, snap2: ContextSnapshot) -> DiffReport
 
 ---
 
-## 5. 交接/協作場景
+## 5. 交接/协作场景
 
-### 5.1 會話交接
+### 5.1 会话交接
 ```bash
 # 生成交接包
 snapshot handoff --output handoff-20260808.json
 
 # 包含:
 # - 最新快照
-# - 關鍵決策/約束摘要
-# - 待辦事項
-# - 環境啟動腳本
+# - 关键决策/约束摘要
+# - 待办事项
+# - 环境启动脚本
 ```
 
-### 5.2 團隊協作
+### 5.2 团队协作
 ```bash
-# 導出共享快照 (去除敏感信息)
+# 导出共享快照 (去除敏感信息)
 snapshot export --sanitize --output team-checkpoint.json
 
-# 團隊成員導入
+# 团队成员导入
 snapshot import team-checkpoint.json --merge
 ```
 
 ---
 
-## 5. 存儲結構
+## 5. 存储结构
 
 ```
 .senate/memory/snapshots/
-├── index.json                    # 總索引
+├── index.json                    # 总索引
 ├── snap-20260808-001.json        # 快照文件
 ├── snap-20260808-002.json
 └── archive/
@@ -224,4 +224,4 @@ snapshot import team-checkpoint.json --merge
 
 ---
 
-**文檔版本**: v1.0.0  **最後更新**: 2026-08-08
+**文档版本**: v1.0.0  **最后更新**: 2026-08-08

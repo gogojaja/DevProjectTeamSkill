@@ -1,26 +1,26 @@
-# 提交自動化：Git hooks / CI 集成 / 訊息生成 / 校驗
+# 提交自动化：Git hooks / CI 集成 / 讯息生成 / 校验
 
-> 編排器：`../SKILL.md`
+> 编排器：`../SKILL.md`
 
 ---
 
-## 1. Git Hooks 自動化
+## 1. Git Hooks 自动化
 
-### 1.1 Hook 類型與用途
-| Hook | 觸發時機 | 用途 |
+### 1.1 Hook 类型与用途
+| Hook | 触发时机 | 用途 |
 |------|----------|------|
-| `pre-commit` | `git commit` 前 | 代碼格式化、靜態檢查、測試、敏感信息掃描 |
-| `prepare-commit-msg` | 生成提交訊息前 | 自動填充模板、提取 Ticket ID |
-| `commit-msg` | 提交訊息生成後 | 校驗格式、Trailers 完整性、DCO |
-| `post-commit` | 提交完成後 | 通知、記錄、觸發 CI |
-| `pre-push` | `git push` 前 | 運行測試、檢查分支名、阻止推送到保護分支 |
-| `pre-rebase` | `git rebase` 前 | 防止重寫已推送歷史 |
+| `pre-commit` | `git commit` 前 | 代码格式化、静态检查、测试、敏感信息扫描 |
+| `prepare-commit-msg` | 生成提交讯息前 | 自动填充模板、提取 Ticket ID |
+| `commit-msg` | 提交讯息生成后 | 校验格式、Trailers 完整性、DCO |
+| `post-commit` | 提交完成后 | 通知、记录、触发 CI |
+| `pre-push` | `git push` 前 | 运行测试、检查分支名、阻止推送到保护分支 |
+| `pre-rebase` | `git rebase` 前 | 防止重写已推送历史 |
 
 ---
 
 ## 2. Pre-commit Hook 配置
 
-### 2.1 pre-commit 框架 (推薦)
+### 2.1 pre-commit 框架 (推荐)
 ```yaml
 # .pre-commit-config.yaml
 repos:
@@ -38,7 +38,7 @@ repos:
       - id: detect-aws-credentials
       - id: forbid-new-submodules
 
-  # Python: ruff (格式化+靜態檢查)
+  # Python: ruff (格式化+静态检查)
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.5.0
     hooks:
@@ -46,14 +46,14 @@ repos:
         args: [--fix, --exit-non-zero-on-fix]
       - id: ruff-format
 
-  # Python: mypy 類型檢查
+  # Python: mypy 类型检查
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.11.0
     hooks:
       - id: mypy
         additional_dependencies: [types-requests, types-pyyaml]
 
-  # 通用: 秘鑰掃描
+  # 通用: 秘钥扫描
   - repo: https://github.com/trufflesecurity/trufflehog
     rev: v3.75.0
     hooks:
@@ -72,7 +72,7 @@ repos:
     hooks:
       - id: golangci-lint
 
-  # 通用: 正則檢查 (如禁止 console.log)
+  # 通用: 正则检查 (如禁止 console.log)
   - repo: local
     hooks:
       - id: no-console-log
@@ -83,15 +83,15 @@ repos:
         exclude: test|spec
 ```
 
-### 2.2 安裝與運行
+### 2.2 安装与运行
 ```bash
-# 安裝
+# 安装
 pip install pre-commit
 pre-commit install
 pre-commit install --hook-type commit-msg
 pre-commit install --hook-type pre-push
 
-# 手動運行
+# 手动运行
 pre-commit run --all-files
 
 # 更新 hooks
@@ -100,20 +100,20 @@ pre-commit autoupdate
 
 ---
 
-## 3. Commit-msg Hook 自動化
+## 3. Commit-msg Hook 自动化
 
-### 3.1 自動填充模板
+### 3.1 自动填充模板
 ```bash
 #!/bin/bash
 # .git/hooks/prepare-commit-msg
-# 自動填充提交訊息模板
+# 自动填充提交讯息模板
 
 MSG_FILE=$1
 SOURCE=$2  # message | template | merge | squash | commit
 
-# 僅在非 merge/squash 且無現有訊息時填充
+# 仅在非 merge/squash 且无现有讯息时填充
 if [[ "$SOURCE" != "message" && "$SOURCE" != "merge" && "$SOURCE" != "squash" ]]; then
-    # 嘗試從分支名提取 Ticket ID
+    # 尝试从分支名提取 Ticket ID
     BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null || echo "")
     TICKET=""
     if [[ $BRANCH =~ ^(feat|fix|hotfix|refactor|perf|docs|test|chore)/([A-Z]+-[0-9]+) ]]; then
@@ -156,7 +156,7 @@ fi
 ### 3.2 提取 Ticket ID
 ```bash
 #!/bin/bash
-# 從分支名/提交訊息提取 Ticket ID
+# 从分支名/提交讯息提取 Ticket ID
 # 格式: type/TICKET-ID-description 或 type/TICKET-ID
 
 extract_ticket() {
@@ -171,18 +171,18 @@ extract_ticket() {
 
 ---
 
-## 4. Commit-msg 校驗
+## 4. Commit-msg 校验
 
-### 4.1 完整校驗腳本
+### 4.1 完整校验脚本
 ```bash
 #!/bin/bash
 # .git/hooks/commit-msg
-# 完整提交訊息校驗
+# 完整提交讯息校验
 
 MSG_FILE=$1
 ERRORS=()
 
-# 1. 讀取訊息
+# 1. 读取讯息
 MSG=$(cat "$MSG_FILE")
 
 # 2. 解析 Header
@@ -206,7 +206,7 @@ while IFS= read -r line; do
     fi
 done <<< "$MSG"
 
-# 4. 強制 Signed-off-by
+# 4. 强制 Signed-off-by
 if [[ -z "${TRAILERS[Signed-off-by]}" ]]; then
     ERRORS+=("Missing required trailer: Signed-off-by")
 fi
@@ -239,7 +239,7 @@ if [[ -n "${TRAILERS[ADR]}" ]]; then
     done
 fi
 
-# 輸出錯誤
+# 输出错误
 if [[ ${#ERRORS[@]} -gt 0 ]]; then
     echo "❌ Commit message validation failed:" >&2
     for err in "${ERRORS[@]}"; do
@@ -255,23 +255,23 @@ exit 0
 
 ## 5. Pre-push Hook
 
-### 5.1 分支保護與測試
+### 5.1 分支保护与测试
 ```bash
 #!/bin/bash
 # .git/hooks/pre-push
-# 推送前檢查
+# 推送前检查
 
 REMOTE=$1
 URL=$2
 
 while read LOCAL_REF LOCAL_SHA REMOTE_REF REMOTE_SHA; do
-    # 1. 防止強推到保護分支
+    # 1. 防止强推到保护分支
     if [[ $REMOTE_REF == "refs/heads/main" || $REMOTE_REF == "refs/heads/develop" ]]; then
         if [[ $LOCAL_SHA == "0000000000000000000000000000000000000000" ]]; then
             echo "❌ Deleting protected branch not allowed"
             exit 1
         fi
-        # 檢查是否強推 (非 fast-forward)
+        # 检查是否强推 (非 fast-forward)
         if git merge-base --is-ancestor $REMOTE_SHA $LOCAL_SHA 2>/dev/null; then
             : # fast-forward, OK
         else
@@ -281,7 +281,7 @@ while read LOCAL_REF LOCAL_SHA REMOTE_REF REMOTE_SHA; do
         fi
     fi
     
-    # 2. 分支名校驗
+    # 2. 分支名校验
     BRANCH=$(echo $LOCAL_REF | sed 's|refs/heads/||')
     if ! [[ $BRANCH =~ ^(feat|fix|hotfix|refactor|perf|docs|test|chore|release|exp)/[A-Z]+-[0-9]+-[a-z0-9-]+$|^release/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
         echo "❌ Invalid branch name: $BRANCH"
@@ -289,7 +289,7 @@ while read LOCAL_REF LOCAL_SHA REMOTE_REF REMOTE_SHA; do
         exit 1
     fi
     
-    # 3. 運行測試 (僅推送到 main/develop 時)
+    # 3. 运行测试 (仅推送到 main/develop 时)
     if [[ $REMOTE_REF == "refs/heads/main" || $REMOTE_REF == "refs/heads/develop" ]]; then
         echo "🧪 Running pre-push tests..."
         if ! ./run-tests.sh; then
@@ -323,11 +323,11 @@ jobs:
           fetch-depth: 0
       - name: Lint commit messages
         run: |
-          # 檢查 PR 中所有提交
+          # 检查 PR 中所有提交
           commits=$(git log --format="%H" ${{ github.event.pull_request.base.sha }}..HEAD)
           for sha in $commits; do
             msg=$(git log -1 --format="%B" $sha)
-            # 這裡調用 commit-msg 校驗邏輯
+            # 这里调用 commit-msg 校验逻辑
             python3 tools/lint-commit.py "$msg" || exit 1
           done
 
@@ -367,9 +367,9 @@ jobs:
 
 ---
 
-## 7. 自動化提交訊息生成
+## 7. 自动化提交讯息生成
 
-### 7.1 智能生成腳本
+### 7.1 智能生成脚本
 ```python
 #!/usr/bin/env python3
 # generate-commit-msg.py
@@ -377,7 +377,7 @@ import subprocess, sys, re, json
 from pathlib import Path
 
 def get_staged_changes():
-    """獲取暫存區變更摘要"""
+    """获取暂存区变更摘要"""
     result = subprocess.run(
         ["git", "diff", "--cached", "--stat"],
         capture_output=True, text=True
@@ -385,7 +385,7 @@ def get_staged_changes():
     return result.stdout.strip()
 
 def get_diff_summary():
-    """獲取詳細 diff"""
+    """获取详细 diff"""
     result = subprocess.run(
         ["git", "diff", "--cached"],
         capture_output=True, text=True
@@ -393,11 +393,11 @@ def get_diff_summary():
     return result.stdout
 
 def infer_type_summary(diff: str) -> tuple:
-    """從 diff 推斷類型和範圍"""
-    # 統計文件類型
+    """从 diff 推断类型和范围"""
+    # 统计文件类型
     files = re.findall(r'^\+\+\+\s+b/(.+)$', diff, re.MULTILINE)
     
-    # 關鍵詞匹配
+    # 关键词匹配
     keywords = {
         'feat': ['add', 'implement', 'create', 'new', 'introduce'],
         'fix': ['fix', 'resolve', 'correct', 'handle', 'patch'],
@@ -414,7 +414,7 @@ def infer_type_summary(diff: str) -> tuple:
     scores = {k: sum(1 for kw in v if kw in diff_lower) for k, v in keywords.items()}
     best_type = max(scores, key=scores.get) if max(scores.values()) > 0 else 'chore'
     
-    # 推斷 scope
+    # 推断 scope
     scopes = set()
     for f in files:
         parts = f.split('/')
@@ -427,12 +427,12 @@ def infer_type_summary(diff: str) -> tuple:
     return best_type, scope
 
 def generate_subject(diff: str, max_len: int = 72) -> str:
-    """生成主題行"""
-    # 提取關鍵動作
+    """生成主题行"""
+    # 提取关键动作
     added = re.findall(r'^\+.*', diff, re.MULTILINE)
     removed = re.findall(r'^\-.*', diff, re.MULTILINE)
     
-    # 簡化生成
+    # 简化生成
     actions = []
     for line in added[:3]:
         line = line[1:].strip()
@@ -451,14 +451,14 @@ def main():
     commit_type, scope = infer_type_summary(diff)
     subject = generate_subject(diff)
     
-    # 從分支名獲取 Ticket
+    # 从分支名获取 Ticket
     branch = subprocess.run(["git", "symbolic-ref", "--short", "HEAD"], 
                            capture_output=True, text=True).stdout.strip()
     ticket = ""
     if re.match(r'(feat|fix|hotfix|refactor|perf|docs|test|chore)/([A-Z]+-\d+)', branch):
         ticket = re.match(r'[^/]+/([A-Z]+-\d+)', branch).group(1)
     
-    # 生成完整提交訊息
+    # 生成完整提交讯息
     template = f"""{commit_type}({scope}): {subject}
 
 ## Motivation
@@ -495,44 +495,44 @@ if __name__ == '__main__':
 
 ### 7.2 使用方式
 ```bash
-# 1. 暫存變更
+# 1. 暂存变更
 git add .
 
-# 2. 生成提交訊息
+# 2. 生成提交讯息
 python3 tools/generate-commit-msg.py > .git/COMMIT_MSG
 
-# 3. 編輯/確認後提交
+# 3. 编辑/确认后提交
 git commit -F .git/COMMIT_MSG
 
-# 或一鍵生成並編輯
-git commit -v  # 使用編輯器，模板自動填充
+# 或一键生成并编辑
+git commit -v  # 使用编辑器，模板自动填充
 ```
 
 ---
 
-## 8. 完整自動化流程圖
+## 8. 完整自动化流程图
 
 ```mermaid
 graph TD
-    A[開發者修改代碼] --> B[git add .]
+    A[开发者修改代码] --> B[git add .]
     B --> C{pre-commit hooks}
-    C -->|格式化/檢查/測試| D[通過?]
-    D -->|否| E[修復問題] --> B
-    D -->|是| F[生成提交訊息模板]
-    F --> G[編輯/確認訊息]
-    G --> H{commit-msg 校驗}
-    H -->|失敗| I[修正訊息] --> G
-    H -->|通過| J[提交成功]
+    C -->|格式化/检查/测试| D[通过?]
+    D -->|否| E[修复问题] --> B
+    D -->|是| F[生成提交讯息模板]
+    F --> G[编辑/确认讯息]
+    G --> H{commit-msg 校验}
+    H -->|失败| I[修正讯息] --> G
+    H -->|通过| J[提交成功]
     J --> K[git push]
     K --> L{pre-push hooks}
-    L -->|測試/分支名| M[通過?]
-    M -->|否| N[修復] --> K
+    L -->|测试/分支名| M[通过?]
+    M -->|否| N[修复] --> K
     M -->|是| O[推送成功]
     O --> P[CI/CD Pipeline]
-    P --> Q[提交訊息/分支名/預提交]
-    Q --> R[全部通過] --> S[合併/部署]
+    P --> Q[提交讯息/分支名/预提交]
+    Q --> R[全部通过] --> S[合并/部署]
 ```
 
 ---
 
-**文檔版本**: v1.0.0  **最後更新**: 2026-08-08
+**文档版本**: v1.0.0  **最后更新**: 2026-08-08

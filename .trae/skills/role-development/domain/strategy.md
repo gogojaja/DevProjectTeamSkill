@@ -60,7 +60,7 @@ description: "Development strategy and environment skill covering technical stac
 
 - **DoR**：开发策略已确认 ✅ 编码规范已定稿 ✅ 技术栈版本已确认 ✅
 - **执行内容**：环境搭建（本地/容器/远程）、依赖管理、工具链配置、CI/CD 流水线、数据库/中间件本地实例、安全工具配置，详见 `.//development_strategy_details.md` §2。
-- **环境配置抽取**：dev 环境配置项统一写入 `台账/20_环境配置.csv`（`../shared/references/environment_standard.md`），密钥只存别名不存明文；供测试/部署引用与检查。
+- **环境配置抽取**：dev 环境配置项统一写入 `台账/20_环境配置.csv`（`../../shared/references/environment_standard.md`），密钥只存别名不存明文；供测试/部署引用与检查。
 - **DoD**：环境搭建完成 ✅ 依赖版本锁定文件生成 ✅ 工具链（Linter/Formatter/Git Hooks）完成 ✅ CI/CD 流水线完成 ✅ 数据库/中间件本地实例就绪 ✅ 安全工具配置完成 ✅ 环境配置已写入 `20_环境配置.csv` ✅
 - **规则**：开发环境与生产环境结构一致（配置外部化）；依赖版本锁定禁止 floating；CI/CD 在代码开发前配置完成；Git Hooks 配提交前检查；安全工具在首次提交前配置完成。
 

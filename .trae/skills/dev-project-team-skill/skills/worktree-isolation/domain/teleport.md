@@ -1,47 +1,47 @@
-# Teleport 輕量 worktree 命令
+# Teleport 轻量 worktree 命令
 
-> 編排器：`../SKILL.md`　上位：PSM 協議簡化版
+> 编排器：`../SKILL.md`　上位：PSM 协议简化版
 
 ---
 
-## 1. 設計目標
+## 1. 设计目标
 
 | 特性 | PSM | Teleport |
 |------|-----|----------|
 | Git worktree | ✅ | ✅ |
-| Tmux 會話 | ✅ | ❌ |
-| Claude Code 啟動 | ✅ | ❌ |
-| 會話註冊表 | ✅ | ❌ |
-| 專案別名 | ✅ | ❌ (使用當前 repo) |
-| 自動清理 | ✅ | ❌ |
-| 適用場景 | 完整受控會話 | 快速隔離開發 |
+| Tmux 会话 | ✅ | ❌ |
+| Claude Code 启动 | ✅ | ❌ |
+| 会话注册表 | ✅ | ❌ |
+| 专案别名 | ✅ | ❌ (使用当前 repo) |
+| 自动清理 | ✅ | ❌ |
+| 适用场景 | 完整受控会话 | 快速隔离开发 |
 
 ---
 
-## 2. 命令規格
+## 2. 命令规格
 
-### 2.1 `teleport <ref>` — 創建 worktree
+### 2.1 `teleport <ref>` — 创建 worktree
 
 ```bash
 # 支援格式
-teleport #123                    # 當前 repo 的 issue/PR
+teleport #123                    # 当前 repo 的 issue/PR
 teleport owner/repo#123          # 指定 repo
 teleport https://github.com/owner/repo/issues/42
 teleport my-feature              # 功能分支
 
-# 選項
---worktree      # 創建 worktree (默認 true)
---path <path>   # 自定義 worktree 根目錄 (默認 ~/Workspace/omc-worktrees/)
---base <branch> # 基礎分支 (默認 main)
---json          # JSON 輸出
+# 选项
+--worktree      # 创建 worktree (默认 true)
+--path <path>   # 自定义 worktree 根目录 (默认 ~/Workspace/omc-worktrees/)
+--base <branch> # 基础分支 (默认 main)
+--json          # JSON 输出
 ```
 
-### 2.2 實現流程
+### 2.2 实现流程
 
 ```bash
 # 1. 解析引用
 if [[ "$1" =~ ^#([0-9]+)$ ]]; then
-  # #123 → 當前 repo
+  # #123 → 当前 repo
   repo=$(git remote get-url origin | sed 's/.*github.com[:/]\(.*\)\.git/\1/')
   ref_type="issue"
   ref_num="${BASH_REMATCH[1]}"
@@ -61,7 +61,7 @@ else
   ref_type="feature"
 fi
 
-# 2. 確定 worktree 路徑
+# 2. 确定 worktree 路径
 worktree_root="${WORKTREE_ROOT:-$HOME/Workspace/omc-worktrees}"
 case "$ref_type" in
   issue)  worktree_path="$worktree_root/issue/$repo-$ref_num" ;;
@@ -69,12 +69,12 @@ case "$ref_type" in
   feature) worktree_path="$worktree_root/feat/$repo-$feature_name" ;;
 esac
 
-# 3. 確保本地 repo 存在
+# 3. 确保本地 repo 存在
 if [[ ! -d "$local_repo_path" ]]; then
   git clone "https://github.com/$repo.git" "$local_repo_path"
 fi
 
-# 4. 創建 worktree
+# 4. 创建 worktree
 cd "$local_repo_path"
 case "$ref_type" in
   issue)
@@ -96,7 +96,7 @@ esac
 
 git worktree add "$worktree_path" "$branch_name"
 
-# 5. 輸出結果
+# 5. 输出结果
 if [[ "$JSON_OUTPUT" == "true" ]]; then
   jq -n --arg id "$repo-$ref_type-$ref_num" --arg path "$worktree_path" --arg branch "$branch_name" \
     '{id: $id, path: $path, branch: $branch, type: $ref_type}'
@@ -149,7 +149,7 @@ git worktree remove "$worktree_path" --force
 echo "Removed: $1"
 ```
 
-### 2.5 佈局結構
+### 2.5 布局结构
 
 ```
 ~/Workspace/omc-worktrees/
@@ -163,15 +163,15 @@ echo "Removed: $1"
 
 ---
 
-## 3. PSM vs Teleport 選擇指南
+## 3. PSM vs Teleport 选择指南
 
-| 需求 | 推薦 |
+| 需求 | 推荐 |
 |------|------|
-| 完整受控會話、tmux、自動清理、專案別名 | PSM |
-| 快速創建隔離環境、手動管理、無 tmux 依賴 | Teleport |
-| CI/CD 集成、腳本化批量創建 | Teleport |
-| 團隊協作、會話共享、狀態持久化 | PSM |
+| 完整受控会话、tmux、自动清理、专案别名 | PSM |
+| 快速创建隔离环境、手动管理、无 tmux 依赖 | Teleport |
+| CI/CD 集成、脚本化批量创建 | Teleport |
+| 团队协作、会话共享、状态持久化 | PSM |
 
 ---
 
-**文檔版本**: v1.0.0  **最後更新**: 2026-08-08
+**文档版本**: v1.0.0  **最后更新**: 2026-08-08

@@ -8,6 +8,7 @@
 
 ```
 DevProjectTeamSkill（总控）
+├── role-program-mgmt          ← 跨项目协同层：项目群/项目集（定义/收益/依赖/IMS 进度/标准一致/Program Board 评审/收尾）
 ├── role-project-init          ← 第 0 阶段：项目启动（章程/干系人/范围初定/基线）
 ├── role-governance             ← 所有角色共享：路由分发至 6 子域（评审/门禁/审计/台账/归档/交接）
 │   ├── governance              ← 治理：基线/固化/归档/交接
@@ -71,7 +72,7 @@ DevProjectTeamSkill（总控）
 | `iteration_review` | §1.1 governance | 迭代末轻量评审 + 回顾记录 CSV | 每迭代末 |
 | `project_archive` | §1.1 governance | 全项目归档 | 所有阶段完工 |
 | `handover_export` | §1.1 governance | 跨会话交接打包 | 周期复盘、新建对话 |
-| `record_env_config` | §1.1 governance | 环境配置抽取到 20_环境配置.csv | 开发/测试/部署环境准备 |
+| `record_env_config` | §1.1 governance | 环境配置抽取到 20_环境配置.csv（双套拓扑：环境组 nonprod/prod + 隔离方式 + 端口区间 + 共用边界 + 权限角色，见 environment_topology.md） | 开发/测试/部署环境准备 |
 | `retrospect_harvest` | §1.1 governance | 阶段末复盘收割（22_阶段复盘.csv + 23_复用资产.csv） | 每阶段末 |
 | `select_model` | §1.1 governance | 阶段开始模型选型（21_模型选型.csv） | 每阶段开始 |
 | `register_auth` | §1.1 governance | 授权登记（14_授权登记.csv + 13 留痕）+ 阶段末时效检查提醒；**未填有效期默认仅本次对话有效**，跨会话须显式指定到期时间 | 系统/项目外文件授权、其他项目目录访问、每阶段末 |
@@ -79,6 +80,13 @@ DevProjectTeamSkill（总控）
 | `declare_access_boundary` | role-project-init | 访问边界声明（26_访问边界.csv，本项目可读写/删除范围=本项目目录） | 项目启动（declare_access_boundary 环节） |
 | `define_org_structure` | role-project-init | 组织架构与责任分配（27_组织架构.csv：团队构成 + RACI 矩阵 + 决策权限 + 汇报关系，A 唯一、C/I 区分） | 项目启动（define_org_structure 环节） |
 | `define_issue_escalation` | role-project-init | 问题解决与升级机制（12_风险问题台账.csv 升级字段：P1~P4 分级 + 四级升级阶梯 L1~L4 + 响应时限 + 单一 Owner） | 项目启动（define_issue_escalation 环节） |
+| `define_program` | role-program-mgmt | 项目群定义（28_项目群注册.csv：业务论证/章程/路线图/治理四角色 Sponsor-Program Board-Program Manager-PMO/tranche 划分） | 项目群协同（define_program 环节） |
+| `manage_benefits` | role-program-mgmt | 收益管理（28_项目群注册.csv 收益档案区：owner/metric/基线/目标/兑现时间线 + 追踪） | 项目群协同（manage_benefits 环节） |
+| `map_dependencies` | role-program-mgmt | 跨项目依赖矩阵（29_项目依赖矩阵.csv：FS/SS/FF/SF + 相互交付物 + 共享资源 + 传导分析） | 项目群协同（map_dependencies 环节） |
+| `align_schedule` | role-program-mgmt | IMS 三层集成主进度（30_项目群主进度.csv：滚动式规划/关键路径/SAFe PI Planning 可选 + 周/月节奏） | 项目群协同（align_schedule 环节） |
+| `standardize_execution` | role-program-mgmt | 统一执行标准与度量口径（CPI/SPI/缺陷密度/里程碑准点率/变更计费率/资源负载 + 报告 cadence） | 项目群协同（standardize_execution 环节） |
+| `review_program` | role-program-mgmt | Program Board tranche 边界决策（继续/转向/终止 + 三层门禁叠加：时间对齐/依赖无冲突/标准一致） | 项目群协同（review_program 环节） |
+| `close_program` | role-program-mgmt | 项目群收尾（收益确认/移交/资源释放/复盘归档） | 项目群协同（close_program 环节） |
 
 ### 1.1 governance（项目治理子域）
 
@@ -87,13 +95,13 @@ DevProjectTeamSkill（总控）
 
 | action | 用途 | 典型调用时机 |
 |--------|------|-------------|
-| `create_baseline` | 创建全套台账 CSV 与项目基准（27 个 NN_ 前缀 CSV，含 12_风险问题台账升级字段/25_环境资源清单/26_访问边界/27_组织架构） | 项目初始化 |
+| `create_baseline` | 创建全套台账 CSV 与项目基准（30 个 NN_ 前缀 CSV，含 12_风险问题台账升级字段/25_环境资源清单/26_访问边界/27_组织架构/28_项目群注册/29_项目依赖矩阵/30_项目群主进度） | 项目初始化 |
 | `stage_close` | 阶段固化基线（备份+版本+产出物清单） | 评审通过、门禁放行 |
 | `release_gate` | 发布级门禁（自动化质量阈值：测试通过率≥95%/关键路径全绿/SAST 无高危） | 敏捷 发布点=Y |
 | `iteration_review` | 迭代末轻量评审 + 回顾记录（02_迭代回顾.csv） | 每迭代末 |
 | `project_archive` | 全项目归档（台账+交付物+审计日志） | 所有阶段完工 |
 | `handover_export` | 跨会话交接打包（话术+台账快照+交接文档） | 周期复盘、新建对话 |
-| `record_env_config` | 环境配置抽取到 `台账/20_环境配置.csv`（dev/test/prod 三列，密钥别名引用） | 环境准备 |
+| `record_env_config` | 环境配置抽取到 `台账/20_环境配置.csv`（双套拓扑：环境组 nonprod/prod + 隔离方式 + 端口区间 + 共用边界 + 权限角色，dev/test/prod 配置并列，密钥别名引用） | 环境准备 |
 | `retrospect_harvest` | 阶段末复盘收割：输出 `22_阶段复盘.csv`（可固化流程/复用工具/降Token）与 `23_复用资产.csv` | 每阶段末 |
 | `select_model` | 阶段开始模型选型：输出 `21_模型选型.csv`（四级规则：免费→低价→国内稳定→排除不可访问） | 每阶段开始 |
 
@@ -565,3 +573,10 @@ DevProjectTeamSkill（总控）
 **与 role-requirements-analysis 边界**：本包输出范围初定义与项目上下文（第 0 阶段）；需求收集与 SRS 编写由 role-requirements-analysis 承接（需求阶段）。
 
 **多项目共享环境（第 5 层）**：环境资产注册与冲突仲裁规则详见 `multi_project_isolation.md` §10；台账 `25_环境资源清单.csv` 为跨项目共享登记表。
+
+
+---
+
+**文档版本**：v21.1.0
+**最后更新**：2026-08-18（技能库本体评审补版本页脚）
+**知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

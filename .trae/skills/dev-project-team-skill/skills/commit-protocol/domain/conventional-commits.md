@@ -1,6 +1,6 @@
-# Conventional Commits 完整規範
+# Conventional Commits 完整规范
 
-> 編排器：`../SKILL.md`
+> 编排器：`../SKILL.md`
 
 ---
 
@@ -20,93 +20,93 @@ Signed-off-by: <name> <email>
 
 ---
 
-## 2. Type 類型完整定義
+## 2. Type 类型完整定义
 
-| Type | 語義 | 觸發場景 | 版本影響 |
+| Type | 语义 | 触发场景 | 版本影响 |
 |------|------|----------|----------|
-| `feat` | 新功能 | 用戶可見的新能力 | Minor |
-| `fix` | Bug 修復 | 修復不正確行為 | Patch |
-| `refactor` | 重構 | 代碼結構優化，行為不變 | 無 |
-| `perf` | 性能優化 | 提升速度/資源效率 | Patch |
-| `docs` | 文檔 | README/註釋/架構文檔 | 無 |
-| `style` | 風格 | 格式/縮進/引號/空格 | 無 |
-| `test` | 測試 | 新增/修改測試 | 無 |
-| `chore` | 雜項 | 依賴/構建/配置/腳本 | 無/Patch |
-| `revert` | 回滾 | 撤銷前次提交 | 視情況 |
-| `security` | 安全 | 漏洞修復/加固 | Patch |
-| `ci` | CI/CD | 流水線/腳本/環境 | 無 |
-| `build` | 構建 | 包管理/編譯/打包 | Patch |
-| `config` | 配置 | 環境/參數/特性開關 | 無/Patch |
+| `feat` | 新功能 | 用户可见的新能力 | Minor |
+| `fix` | Bug 修复 | 修复不正确行为 | Patch |
+| `refactor` | 重构 | 代码结构优化，行为不变 | 无 |
+| `perf` | 性能优化 | 提升速度/资源效率 | Patch |
+| `docs` | 文档 | README/注释/架构文档 | 无 |
+| `style` | 风格 | 格式/缩进/引号/空格 | 无 |
+| `test` | 测试 | 新增/修改测试 | 无 |
+| `chore` | 杂项 | 依赖/构建/配置/脚本 | 无/Patch |
+| `revert` | 回滚 | 撤销前次提交 | 视情况 |
+| `security` | 安全 | 漏洞修复/加固 | Patch |
+| `ci` | CI/CD | 流水线/脚本/环境 | 无 |
+| `build` | 构建 | 包管理/编译/打包 | Patch |
+| `config` | 配置 | 环境/参数/特性开关 | 无/Patch |
 
-### 2.1 Type 選擇決策樹
+### 2.1 Type 选择决策树
 ```
-是否修復 Bug? → 是 → fix
-否 → 是否新增用戶可見功能? → 是 → feat
+是否修复 Bug? → 是 → fix
+否 → 是否新增用户可见功能? → 是 → feat
 否 → 是否改善性能? → 是 → perf
-否 → 是否僅文檔? → 是 → docs
-否 → 是否僅格式/風格? → 是 → style
-否 → 是否僅測試? → 是 → test
-否 → 是否重構(行為不變)? → 是 → refactor
-否 → 是否安全相關? → 是 → security
-否 → 是否 CI/CD/構建/配置? → 是 → ci/build/config
-否 → 是否依賴更新/雜項? → 是 → chore
-否 → 是否回滾? → 是 → revert
+否 → 是否仅文档? → 是 → docs
+否 → 是否仅格式/风格? → 是 → style
+否 → 是否仅测试? → 是 → test
+否 → 是否重构(行为不变)? → 是 → refactor
+否 → 是否安全相关? → 是 → security
+否 → 是否 CI/CD/构建/配置? → 是 → ci/build/config
+否 → 是否依赖更新/杂项? → 是 → chore
+否 → 是否回滚? → 是 → revert
 ```
 
 ---
 
-## 3. Scope 範圍規範
+## 3. Scope 范围规范
 
-### 3.1 標準 Scope 列表
-| Scope | 含義 | 示例 |
+### 3.1 标准 Scope 列表
+| Scope | 含义 | 示例 |
 |-------|------|------|
-| `auth` | 認證授權 | `feat(auth): add SSO` |
+| `auth` | 认证授权 | `feat(auth): add SSO` |
 | `api` | API 接口 | `fix(api): handle 429` |
-| `db` | 數據庫 | `perf(db): add index` |
-| `ui` | 用戶界面 | `style(ui): fix alignment` |
-| `core` | 核心業務邏輯 | `refactor(core): simplify` |
-| `cache` | 緩存 | `perf(cache): add Redis` |
-| `queue` | 消息隊列 | `feat(queue): add dead-letter` |
-| `storage` | 存儲/文件 | `fix(storage): handle large files` |
+| `db` | 数据库 | `perf(db): add index` |
+| `ui` | 用户界面 | `style(ui): fix alignment` |
+| `core` | 核心业务逻辑 | `refactor(core): simplify` |
+| `cache` | 缓存 | `perf(cache): add Redis` |
+| `queue` | 消息队列 | `feat(queue): add dead-letter` |
+| `storage` | 存储/文件 | `fix(storage): handle large files` |
 | `config` | 配置管理 | `config: add feature flags` |
-| `deps` | 依賴管理 | `chore(deps): upgrade lodash` |
-| `build` | 構建系統 | `build: add Docker multi-stage` |
+| `deps` | 依赖管理 | `chore(deps): upgrade lodash` |
+| `build` | 构建系统 | `build: add Docker multi-stage` |
 | `ci` | CI/CD | `ci: add security scan` |
-| `release` | 發布流程 | `release: v2.1.0` |
+| `release` | 发布流程 | `release: v2.1.0` |
 | `security` | 安全加固 | `security: rotate keys` |
-| `test` | 測試基礎設施 | `test: add contract tests` |
-| `docs` | 文檔 | `docs: update API guide` |
-| `infra` | 基礎設施 | `infra: add k8s manifests` |
+| `test` | 测试基础设施 | `test: add contract tests` |
+| `docs` | 文档 | `docs: update API guide` |
+| `infra` | 基础设施 | `infra: add k8s manifests` |
 
-### 3.2 Scope 選擇原則
-- **單一職責**：一個提交只影響一個主要 scope
-- **粒度適中**：不宜過細（如 `auth-login`）或過粗（如 `backend`）
-- **團隊約定**：項目啟動時定義 scope 白名單，CI 校驗
+### 3.2 Scope 选择原则
+- **单一职责**：一个提交只影响一个主要 scope
+- **粒度适中**：不宜过细（如 `auth-login`）或过粗（如 `backend`）
+- **团队约定**：项目启动时定义 scope 白名单，CI 校验
 
 ---
 
-## 4. Subject 主題行規範
+## 4. Subject 主题行规范
 
 ### 4.1 格式要求
-- **長度**：≤ 72 字符（含 `type(scope): `）
-- **大小寫**：動詞小寫開頭
-- **語氣**：祈使語氣
-- **標點**：不以句號結尾
-- **語言**：項目統一語言（中文/英文）
+- **长度**：≤ 72 字符（含 `type(scope): `）
+- **大小写**：动词小写开头
+- **语气**：祈使语气
+- **标点**：不以句号结尾
+- **语言**：项目统一语言（中文/英文）
 
-### 4.2 動詞規範
-| 操作 | 推薦動詞 | 反例 |
+### 4.2 动词规范
+| 操作 | 推荐动词 | 反例 |
 |------|----------|------|
 | 新增 | `add` `introduce` `implement` | `create` `make` `build` |
 | 移除 | `remove` `drop` `delete` | `del` `rm` |
-| 修改 | `update` `modify` `change` `adjust` | `fix` `modify` (用於 feat) |
-| 替換 | `replace` `migrate` `switch` | `change` `update` |
-| 優化 | `optimize` `improve` `speed up` | `perf` `enhance` |
-| 重構 | `refactor` `restructure` `simplify` | `cleanup` `reorganize` |
-| 修復 | `fix` `resolve` `correct` | `patch` `handle` |
-| 回滾 | `revert` `rollback` | `undo` |
-| 文檔 | `document` `add docs` `update docs` | `write` |
-| 測試 | `add test` `cover` `extend coverage` | `test` |
+| 修改 | `update` `modify` `change` `adjust` | `fix` `modify` (用于 feat) |
+| 替换 | `replace` `migrate` `switch` | `change` `update` |
+| 优化 | `optimize` `improve` `speed up` | `perf` `enhance` |
+| 重构 | `refactor` `restructure` `simplify` | `cleanup` `reorganize` |
+| 修复 | `fix` `resolve` `correct` | `patch` `handle` |
+| 回滚 | `revert` `rollback` | `undo` |
+| 文档 | `document` `add docs` `update docs` | `write` |
+| 测试 | `add test` `cover` `extend coverage` | `test` |
 
 ### 4.3 Subject 模板
 | Type | 模板 | 示例 |
@@ -121,33 +121,33 @@ Signed-off-by: <name> <email>
 
 ---
 
-## 5. Body 正文規範
+## 5. Body 正文规范
 
-### 5.1 結構
+### 5.1 结构
 ```
-動機/背景：為什麼做這個變更
-決策理由：為什麼選這個方案（拒絕了什麼替代方案）
-影響分析：影響範圍/風險/遷移需求
-測試證據：如何驗證
+动机/背景：为什么做这个变更
+决策理由：为什么选这个方案（拒绝了什么替代方案）
+影响分析：影响范围/风险/迁移需求
+测试证据：如何验证
 ```
 
-### 5.2 寫作模板
+### 5.2 写作模板
 ```
 ## Motivation
-<問題描述 / 業務需求 / 技術債>
+<问题描述 / 业务需求 / 技术债>
 
 ## Decision
-<選擇方案> 而非 <替代方案1/2>
+<选择方案> 而非 <替代方案1/2>
 理由：<核心理由>
 
 ## Impact
-影響範圍：<模塊/服務/用戶>
-風險：<高/中/低> - <具體風險>
-遷移：<無/需遷移腳本/需配置變更>
+影响范围：<模块/服务/用户>
+风险：<高/中/低> - <具体风险>
+迁移：<无/需迁移脚本/需配置变更>
 
 ## Testing
-- <測試類型>: <覆蓋範圍>
-- <關鍵測試場景>
+- <测试类型>: <覆盖范围>
+- <关键测试场景>
 ```
 
 ---
@@ -191,9 +191,9 @@ Co-authored-by: Bob Wang <bob@example.com>
 
 ---
 
-## 7. CI 校驗規則
+## 7. CI 校验规则
 
-### 7.1 Header 校驗
+### 7.1 Header 校验
 ```yaml
 # .github/lint-commit.yml
 header:
@@ -202,7 +202,7 @@ header:
   
 body:
   max_line_length: 72
-  required_sections: ["Motivation", "Decision", "Impact", "Testing"]  # feat/fix 強制
+  required_sections: ["Motivation", "Decision", "Impact", "Testing"]  # feat/fix 强制
   
 trailers:
   required: ["Signed-off-by"]
@@ -222,16 +222,16 @@ trailers:
 
 ---
 
-## 8. 常見錯誤與修正
+## 8. 常见错误与修正
 
-| 錯誤 | 修正 |
+| 错误 | 修正 |
 |------|------|
-| `feat: Add new feature` | `feat: add new feature` (動詞小寫) |
-| `fix(auth): Fixed bug.` | `fix(auth): fix null pointer when token expired` (祈使語氣、具體) |
-| `refactor: code cleanup` | `refactor(core): simplify order processing logic` (具體) |
-| `feat: add feature.` | `feat: add feature` (無句號) |
-| `type(scope): subject` 行超 72 字符 | 縮短 subject 或移除次要信息到 body |
+| `feat: Add new feature` | `feat: add new feature` (动词小写) |
+| `fix(auth): Fixed bug.` | `fix(auth): fix null pointer when token expired` (祈使语气、具体) |
+| `refactor: code cleanup` | `refactor(core): simplify order processing logic` (具体) |
+| `feat: add feature.` | `feat: add feature` (无句号) |
+| `type(scope): subject` 行超 72 字符 | 缩短 subject 或移除次要信息到 body |
 
 ---
 
-**文檔版本**: v1.0.0  **最後更新**: 2026-08-08
+**文档版本**: v1.0.0  **最后更新**: 2026-08-08

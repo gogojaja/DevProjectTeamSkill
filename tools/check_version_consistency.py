@@ -32,7 +32,7 @@ CLOSURE_REQUIRED = [
 
 def check_closure_section(content):
     """校验技能是否具备闭环执行系统的关键章节与门禁。"""
-    if re.search(r'(?m)^(#+\s*)?闭环执行系统\s*$', content) is None:
+    if re.search(r'(?m)^\s*#+\s*(?:\d+\.\s*)?闭环执行系统\s*$', content) is None:
         return False
     for key in CLOSURE_REQUIRED:
         if key not in content:

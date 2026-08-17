@@ -3,31 +3,33 @@ name: "worktree-isolation"
 description: "用户提到 worktree 隔离、并行开发环境、多任务隔离、git worktree、PSM、Teleport时加载本 worktree 隔离层技能：基于 git worktree 的并行开发环境管理，支持 issue/PR/feature 多任务隔离，内置会话注册表、tmux 整合、项目别名、GitHub/Jira 提供商。用户说 worktree/并行环境隔离时加载。"
 ---
 
-# Worktree Isolation 工作樹隔離層
+# Worktree Isolation 工作树隔离层
 
-> 版權聲明：`../../references/COPYRIGHT.md`　Token 標準：`../../references/token_standard.md`　編排器：`../SKILL.md`
+- **技能版本**：v1.1.0　**发布日期**：2026-08-18
+
+> 版权声明：`../../../references/COPYRIGHT.md`　Token 标准：`../../../references/token_standard.md`　编排器：`../../SKILL.md`
 
 ---
 
-## 1. 觸發規則
+## 1. 触发规则
 
-### 1.1 觸發場景
-- 用戶需要同時處理多個 issue/PR/feature，要求環境隔離互不干擾
-- 需要在同一倉庫中並行開發多個功能分支
-- PR 審查時需要乾淨的 checkout 環境
-- 熱修復與功能開發並行，需獨立 worktree
+### 1.1 触发场景
+- 用户需要同时处理多个 issue/PR/feature，要求环境隔离互不干扰
+- 需要在同一仓库中并行开发多个功能分支
+- PR 审查时需要干净的 checkout 环境
+- 热修复与功能开发并行，需独立 worktree
 
-### 1.2 觸發詞
-| 關鍵字 | 映射命令 | 說明 |
+### 1.2 触发词
+| 关键字 | 映射命令 | 说明 |
 |--------|----------|------|
-| `worktree` / `wt` | 通用入口 | 列出/創建/切換/清理 worktree |
-| `psm` / `project-session-manager` | 完整會話管理 | worktree + tmux + 註冊表 + 專案別名 |
-| `teleport` | 輕量 worktree | 僅創建 worktree，不建立 tmux 會話 |
-| `fix <ref>` | Issue 修復會話 | 基於 issue 創建隔離環境 |
-| `review <ref>` | PR 審查會話 | 基於 PR 創建隔離環境 |
-| `feature <name>` | 功能開發會話 | 創建功能分支 worktree |
+| `worktree` / `wt` | 通用入口 | 列出/创建/切换/清理 worktree |
+| `psm` / `project-session-manager` | 完整会话管理 | worktree + tmux + 注册表 + 专案别名 |
+| `teleport` | 轻量 worktree | 仅创建 worktree，不建立 tmux 会话 |
+| `fix <ref>` | Issue 修复会话 | 基于 issue 创建隔离环境 |
+| `review <ref>` | PR 审查会话 | 基于 PR 创建隔离环境 |
+| `feature <name>` | 功能开发会话 | 创建功能分支 worktree |
 
-### 1.3 觸發詞 → 行為映射
+### 1.3 触发词 → 行为映射
 ```yaml
 worktree:
   list: "wt list"
@@ -37,7 +39,7 @@ worktree:
   cleanup: "wt cleanup"
 
 psm:
-  fix: "psm fix <ref>"           # issue/PR/URL/別名
+  fix: "psm fix <ref>"           # issue/PR/URL/别名
   review: "psm review <ref>"
   feature: "psm feature <proj> <name>"
   list: "psm list [project]"
@@ -56,21 +58,21 @@ teleport:
 
 ## 2. 流程
 
-### 2.1 Worktree 生命週期
+### 2.1 Worktree 生命周期
 ```mermaid
 graph LR
-  A[解析引用] --> B[獲取遠端信息]
-  B --> C[確保本地倉庫存在]
-  C --> D[創建/獲取分支]
+  A[解析引用] --> B[获取远端信息]
+  B --> C[确保本地仓库存在]
+  C --> D[创建/获取分支]
   D --> E[git worktree add]
-  E --> F[寫入會話元數據]
-  F --> G[可選：創建 tmux 會話]
-  G --> H[可選：啟動編輯器/CLI]
-  H --> I[註冊到會話表]
-  I --> J[輸出連接信息]
+  E --> F[写入会话元数据]
+  F --> G[可选：创建 tmux 会话]
+  G --> H[可选：启动编辑器/CLI]
+  H --> I[注册到会话表]
+  I --> J[输出连接信息]
 ```
 
-### 2.2 會話註冊表
+### 2.2 会话注册表
 存放位置：`~/.psm/sessions.json`
 ```json
 {
@@ -95,7 +97,7 @@ graph LR
 }
 ```
 
-### 2.3 專案別名配置
+### 2.3 专案别名配置
 位置：`~/.psm/projects.json`
 ```json
 {
@@ -130,10 +132,10 @@ graph LR
 
 ---
 
-## 3. 輸出規範
+## 3. 输出规范
 
-### 3.1 會話元數據
-每個 worktree 根目錄包含 `.psm-session.json`：
+### 3.1 会话元数据
+每个 worktree 根目录包含 `.psm-session.json`：
 ```json
 {
   "id": "omc:pr-123",
@@ -151,7 +153,7 @@ graph LR
 }
 ```
 
-### 3.2 清理報告
+### 3.2 清理报告
 ```text
 Cleanup complete:
   Removed: omc:pr-123 (merged)
@@ -159,7 +161,7 @@ Cleanup complete:
   Kept: omc:feat-auth (active)
 ```
 
-### 3.3 狀態輸出
+### 3.3 状态输出
 ```text
 Current Session: omc:pr-123
 Type: review
@@ -172,37 +174,93 @@ Tmux: psm:omc:pr-123
 
 ---
 
-## 4. 邊界
+## 4. 边界
 
-### 4.1 適用邊界
-- ✅ 同倉庫多任務並行開發
-- ✅ PR 審查需要乾淨環境
-- ✅ 熱修復與功能開發並行
-- ✅ 多專案別名管理
+### 4.1 适用边界
+- ✅ 同仓库多任务并行开发
+- ✅ PR 审查需要干净环境
+- ✅ 热修复与功能开发并行
+- ✅ 多专案别名管理
 
-### 4.2 不適用邊界
-- ❌ 單任務開發（直接在主 worktree 工作即可）
-- ❌ 無 git 倉庫的項目
-- ❌ 不支援 tmux 的環境（可用 teleport 純 worktree 模式）
+### 4.2 不适用边界
+- ❌ 单任务开发（直接在主 worktree 工作即可）
+- ❌ 无 git 仓库的项目
+- ❌ 不支援 tmux 的环境（可用 teleport 纯 worktree 模式）
 
-### 4.3 資源限制
-- worktree 根目錄：`~/.psm/worktrees/`（可配置）
-- 自動清理：默認 14 天未活躍或 PR merged/issue closed
-- 最大並發會話：受限於磁盤空間與 tmux 會話數
+### 4.3 资源限制
+- worktree 根目录：`~/.psm/worktrees/`（可配置）
+- 自动清理：默认 14 天未活跃或 PR merged/issue closed
+- 最大并发会话：受限于磁盘空间与 tmux 会话数
 
 ---
 
-## 5. 明細外置
+## 5. 明细外置
 
-| 明細文件 | 說明 |
+| 明细文件 | 说明 |
 |----------|------|
-| `domain/psm-protocol.md` | PSM 完整協議：子命令解析、引用解析、會話創建/掛載/清理流程 |
-| `domain/teleport.md` | Teleport 輕量命令：worktree 創建/列表/移除、與 PSM 差異對比 |
-| `domain/providers.md` | GitHub/Jira 提供商實現：CLI 調用、引用解析、認證配置 |
-| `domain/session-registry.md` | 會話註冊表結構、CRUD、狀態機、併發安全 |
-| `domain/worktree-ops.md` | git worktree 底層操作：創建/切換/移除/遷移/清理、錯誤處理 |
+| `domain/psm-protocol.md` | PSM 完整协议：子命令解析、引用解析、会话创建/挂载/清理流程 |
+| `domain/teleport.md` | Teleport 轻量命令：worktree 创建/列表/移除、与 PSM 差异对比 |
+| `domain/providers.md` | GitHub/Jira 提供商实现：CLI 调用、引用解析、认证配置 |
+| `domain/session-registry.md` | 会话注册表结构、CRUD、状态机、并发安全 |
+| `domain/worktree-ops.md` | git worktree 底层操作：创建/切换/移除/迁移/清理、错误处理 |
 
 ---
 
-**文檔版本**: v1.0.0  **最後更新**: 2026-08-08
-**知識產權所有**: 段波（驗證郵箱: duanbo.douglas@163.com）
+---
+
+## 闭环执行系统
+
+### 1. 任务入口
+- 输入：用户要求 worktree 并行开发环境隔离/创建/清理、多任务隔离、会话注册（`worktree`/`并行环境隔离`/`PSM`/`Teleport`）；
+- 前置：已登记项目别名与 base 分支；明确任务/issue/PR 归属与并行边界；
+- 不适用：单仓库单任务开发、无需环境隔离的小改动、用户未要求多任务隔离时不强制创建。
+
+### 2. 执行状态
+| 状态 | 进入条件 | 退出条件 | 处理方式 |
+|------|---------|---------|---------|
+| 待启动 | 用户触发 worktree 操作 | 用户确认/系统启动 | 解析任务（issue/PR/feature）与目标别名 |
+| 执行中 | worktree 创建/切换中 | 环境就绪/失败 | 按 `domain/worktree-ops.md` 创建、注册会话元数据 |
+| 校验中 | 环境就绪 | 验证通过/失败 | 校验 worktree 与 session 注册一致性、tmux 附件 |
+| 阻塞 | 端口/分支/仓库冲突 | 冲突解决/人工介入 | 暂停并记录冲突原因 |
+| 完成 | 环境验证通过 | 进入开发/交接 | 更新 session 注册表与断点 |
+| 回退 | 创建失败/冲突 | 回到稳定环境 | 移除失败 worktree，保留审计 |
+
+### 3. 执行动作层
+- 执行步骤 1：登记任务 → 解析别名/base 分支（`domain/psm-protocol.md`）；
+- 执行步骤 2：`git worktree add` 创建隔离环境，写 `.psm-session.json`；
+- 执行步骤 3：可选 attach tmux 会话；任务完成/PR 合并后清理；
+- 所需工具/脚本：`domain/worktree-ops.md`、`domain/session-registry.md`、`domain/psm-protocol.md`、`domain/teleport.md`；
+- 输入输出约束：worktree 路径 `.psm/worktrees/<project>/<task>`；会话元数据 JSON 存 `.psm-session.json`；清除后必须从注册表移除。
+
+### 4. 验收门禁
+- 必须产出物：worktree 工作区 + 会话元数据（id/type/branch/base/github）+ 注册表条目；
+- 通过条件：worktree 干净创建 + 分支正确 + session 注册一致 + 无资源泄漏；
+- 失败条件：分支冲突、base 漂移、session 元数据缺失、worktree 残留、tmux 挂死；
+- 审核对象：项目负责人/工具维护者。
+
+### 5. 失败处理
+- 失败类型：分支已存在、端口被占、worktree 路径冲突、teleport 超时；
+- 恢复策略：改名/换路径/清理冲突 worktree（`domain/worktree-ops.md` 错误处理）；
+- 回滚方案：`worktree remove` 移除失败环境，恢复注册表；
+- 重试策略：解除冲突后重试，禁止强制覆盖在用 worktree；
+- 是否需要人工确认：删除他人 worktree、跨项目 create、生产分支操作需人工确认。
+
+### 6. 产出与交接
+- 产出物列表：隔离 worktree、会话元数据、清理报告、session 注册表更新；
+- 保存路径：`.psm/` 注册表、各 worktree `.psm-session.json`、交接断点；
+- 交接对象：任务开发角色、PR 评审者、工具维护者；
+- 下一步动作：环境就绪 → 开发；任务完成 → 提交+PR；合并 → 清理；
+- 归档条件：worktree 已清理、注册表一致、无孤儿会话。
+
+### 7. 审计记录
+- 执行时间：worktree 生命周期（创建→清理）；
+- 关键参数：session id、project、branch、worktree path（脱敏）、PR number；
+- 关键决策：别名解析、base 分支选择、冲突处理方式；
+- 结果证据：`.psm-session.json`、清理报告、注册表快照；
+- 失败原因：创建失败/冲突在台账或断点区留痕。
+
+---
+
+**文档版本**：v1.1.0　**最后更新**：2026-08-18（繁体转简体 + 新增闭环执行系统章节，技能库本体评审修复）
+
+**知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

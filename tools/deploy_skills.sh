@@ -21,7 +21,7 @@ SKILLS_DIR="${SKILLS_DIR:-$ROOT/.trae/skills}"
 # 全局 opencode 技能库：平台自适应（macOS/Linux -> ~/.config/opencode/skills；Windows -> %USERPROFILE%/.config/...）
 case "$(uname -s)" in
   MINGW*|MSYS*|CYGWIN*)
-    GLOBAL_SKILLS="${USERPROFILE:-C:/Users/gogoj}/.config/opencode/skills" ;;
+    GLOBAL_SKILLS="${USERPROFILE:-$HOME/.config}/.config/opencode/skills" ;;
   *)
     GLOBAL_SKILLS="${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills" ;;
 esac

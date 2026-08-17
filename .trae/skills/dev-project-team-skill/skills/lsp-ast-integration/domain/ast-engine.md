@@ -1,16 +1,16 @@
-# AST 引擎：解析器/查詢語言/模式匹配/符號表
+# AST 引擎：解析器/查询语言/模式匹配/符号表
 
-> 編排器：`../SKILL.md`
+> 编排器：`../SKILL.md`
 
 ---
 
-## 1. 解析器架構
+## 1. 解析器架构
 
-### 1.1 解析器選型
+### 1.1 解析器选型
 ```python
 class ParserRegistry:
     PARSERS = {
-        # tree-sitter (推薦：快、增量、多語言)
+        # tree-sitter (推荐：快、增量、多语言)
         'typescript': {'library': 'tree-sitter-typescript', 'grammar': 'typescript'},
         'tsx': {'library': 'tree-sitter-typescript', 'grammar': 'tsx'},
         'javascript': {'library': 'tree-sitter-javascript', 'grammar': 'javascript'},
@@ -51,22 +51,22 @@ class ParserRegistry:
 
 ---
 
-## 2. AST 數據結構
+## 2. AST 数据结构
 
-### 2.1 節點結構
+### 2.1 节点结构
 ```python
 @dataclass
 class ASTNode:
-    type: str                    # 節點類型: function_declaration, call_expression, ...
-    start_byte: int              # 字節偏移
-    end_byte: int                # 字節偏移
+    type: str                    # 节点类型: function_declaration, call_expression, ...
+    start_byte: int              # 字节偏移
+    end_byte: int                # 字节偏移
     start_point: Point           # (row, column) 0-based
     end_point: Point
-    children: List['ASTNode']    # 子節點
-    parent: Optional['ASTNode']  # 父節點
-    text: str                    # 節點文本 (可選，懶加載)
-    named: bool                  # 是否命名節點
-    field_name: str              # 在父節點中的字段名
+    children: List['ASTNode']    # 子节点
+    parent: Optional['ASTNode']  # 父节点
+    text: str                    # 节点文本 (可选，懒加载)
+    named: bool                  # 是否命名节点
+    field_name: str              # 在父节点中的字段名
     
     def text(self) -> str:
         if self._text is None:
@@ -94,14 +94,14 @@ class ASTNode:
 ```python
 @dataclass
 class Point:
-    row: int      # 0-based 行號
-    column: int   # 0-based 列號 (UTF-8 字符)
+    row: int      # 0-based 行号
+    column: int   # 0-based 列号 (UTF-8 字符)
     
     def to_lsp(self) -> Position:
         return {"line": self.row, "character": self.column}
     
     def to_utf16(self, source: str) -> int:
-        """轉換為 UTF-16 代碼單元 (LSP 使用)"""
+        """转换为 UTF-16 代码单元 (LSP 使用)"""
         lines = self.source.split('\n')
         line_text = lines[self.row]
         return len(line_text[:self.column].encode('utf-16-le')) // 2
@@ -109,9 +109,9 @@ class Point:
 
 ---
 
-## 3. 查詢語言
+## 3. 查询语言
 
-### 3.1 Tree-sitter Query 語法
+### 3.1 Tree-sitter Query 语法
 ```python
 class QueryEngine:
     def __init__(self, language: str):
@@ -119,7 +119,7 @@ class QueryEngine:
         self.queries: Dict[str, Query] = {}
     
     def query(self, ast: AST, pattern: str) -> List[QueryMatch]:
-        """執行 tree-sitter query"""
+        """执行 tree-sitter query"""
         query = self._get_or_compile(ast.language, pattern)
         cursor = query.exec(ast.root_node)
         matches = []
@@ -134,10 +134,10 @@ class QueryEngine:
         return matches[0] if matches else None
 ```
 
-### 3.2 常用查詢模式庫
+### 3.2 常用查询模式库
 ```python
 QUERY_LIBRARY = {
-    # 函數/方法
+    # 函数/方法
     "function": """
         (function_declaration name: (identifier) @name
             parameters: (formal_parameters) @params
@@ -160,7 +160,7 @@ QUERY_LIBRARY = {
             extends: (extends_clause)? @extends
             body: (interface_body) @body) @interface
     """,
-    # 調用
+    # 调用
     "call": """
         (call_expression function: (identifier) @callee
             arguments: (arguments) @args) @call
@@ -171,7 +171,7 @@ QUERY_LIBRARY = {
             property: (property_identifier) @method)
             arguments: (arguments) @args) @call
     """,
-    # 導入/導出
+    # 导入/导出
     "import": """
         (import_statement
             source: (string) @source
@@ -187,7 +187,7 @@ QUERY_LIBRARY = {
             (export_clause
                 (export_specifier name: (identifier) @name) @spec)?) @export
     """,
-    # 類型
+    # 类型
     "type_annotation": """
         (type_annotation type: (_) @type) @annotation
     """,
@@ -195,7 +195,7 @@ QUERY_LIBRARY = {
         (type_reference name: (type_identifier) @name
             type_arguments: (type_arguments)? @args) @ref
     """,
-    # 變量/常量
+    # 变量/常量
     "variable": """
         (variable_declaration
             (variable_declarator name: (identifier) @name
@@ -253,19 +253,19 @@ PY_QUERIES = {
 
 ---
 
-## 4. 符號表與語義分析
+## 4. 符号表与语义分析
 
-### 4.1 符號表構建
+### 4.1 符号表构建
 ```python
 @dataclass
 class Symbol:
     name: str
     kind: SymbolKind              # function, class, variable, constant, type, module, ...
     scope: Scope                  # 所在作用域
-    definition: ASTNode           # 定義節點
-    type: Optional[Type]          # 推導類型
+    definition: ASTNode           # 定义节点
+    type: Optional[Type]          # 推导类型
     references: List[Reference]   # 引用位置
-    documentation: str            # 文檔字符串
+    documentation: str            # 文档字符串
     deprecated: bool
     deprecated_message: str
 
@@ -275,7 +275,7 @@ class Scope:
     children: List['Scope']
     symbols: Dict[str, Symbol]
     scope_type: ScopeType         # global, module, class, function, block
-    ast_node: ASTNode             # 對應的 AST 節點
+    ast_node: ASTNode             # 对应的 AST 节点
 
 class SymbolTableBuilder:
     def __init__(self, language: str):
@@ -300,26 +300,26 @@ class SymbolTableBuilder:
         name_node = node.child_by_field("name")
         name = name_node.text if name_node else "<anonymous>"
         
-        # 創建函數符號
+        # 创建函数符号
         func_scope = Scope(scope, [], {}, ScopeType.FUNCTION, node)
         self.current_scope = func_scope
         
-        # 參數
+        # 参数
         params_node = node.child_by_field("parameters")
         if params_node:
             for param in params_node.children_of_type("formal_parameter"):
                 self._add_parameter(param, func_scope)
         
-        # 返回類型
+        # 返回类型
         return_type = node.child_by_field("return_type")
         
-        # 處理函數體
+        # 处理函数体
         body = node.child_by_field("body")
         if body:
             for child in body.children:
                 self._visit(child, func_scope)
         
-        # 註冊符號
+        # 注册符号
         symbol = Symbol(
             name=name,
             kind=SymbolKind.FUNCTION,
@@ -349,19 +349,19 @@ class SymbolTableBuilder:
                 scope.symbols[name] = symbol
     
     def _visit_call_expression(self, node: ASTNode, scope: Scope):
-        # 解析調用目標
+        # 解析调用目标
         func_node = node.child_by_field("function")
         if func_node:
             self._resolve_reference(func_node, scope)
         
-        # 參數
+        # 参数
         args_node = node.child_by_field("arguments")
         if args_node:
             for arg in args_node.children:
                 self._visit(arg, scope)
 ```
 
-### 4.2 類型推導
+### 4.2 类型推导
 ```python
 class TypeInference:
     def __init__(self, symbol_table: Scope):
@@ -376,7 +376,7 @@ class TypeInference:
             return self._infer_binary(node)
         elif node.type == "member_expression":
             return self._infer_member(node)
-        # ... 其他節點類型
+        # ... 其他节点类型
         return Type.UNKNOWN
     
     def _infer_identifier(self, node: ASTNode) -> Type:
@@ -407,7 +407,7 @@ class IncrementalParser:
     
     def parse(self, source: str, old_tree: Optional[Tree] = None) -> Tree:
         if old_tree and self.source:
-            # 計算編輯差異
+            # 计算编辑差异
             edits = self._compute_edits(self.source, source)
             if edits:
                 old_tree.edit(edits)
@@ -421,15 +421,15 @@ class IncrementalParser:
         return self.tree
     
     def _compute_edits(self, old: str, new: str) -> List[Edit]:
-        # 使用 difflib 或 Myers diff 算法計算最小編輯
+        # 使用 difflib 或 Myers diff 算法计算最小编辑
         pass
 ```
 
 ---
 
-## 6. 索引與緩存
+## 6. 索引与缓存
 
-### 6.1 符號索引
+### 6.1 符号索引
 ```python
 class SymbolIndex:
     def __init__(self, project_root: str):
@@ -461,9 +461,9 @@ class SymbolIndex:
 
 ---
 
-## 7. 性能優化
+## 7. 性能优化
 
-### 7.1 並行解析
+### 7.1 并行解析
 ```python
 class ParallelParser:
     def __init__(self, max_workers: int = None):
@@ -489,4 +489,4 @@ class ParallelParser:
 
 ---
 
-**文檔版本**: v1.0.0  **最後更新**: 2026-08-08
+**文档版本**: v1.0.0  **最后更新**: 2026-08-08

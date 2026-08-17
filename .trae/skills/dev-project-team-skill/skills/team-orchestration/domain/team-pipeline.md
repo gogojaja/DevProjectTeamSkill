@@ -49,7 +49,7 @@ transition:
 | verify | Architect + SecRev + CodeRev | S2/S3 | - | 3 |
 | fix | Executor(按根因) | S0~S2 | - | ≤2 |
 
-**模型路由规则**（档位见 `../../references/model_selection.md` §3-4）：
+**模型路由规则**（档位见 `../../../../references/model_selection.md` §3-4）：
 - 简单/模板化任务 → S0（免费/低价，快、省）
 - 标准实现/调试 → S1（低价/平衡）
 - 架构/安全/深度审查 → S2/S3（强模型，S3 高危禁止降档）

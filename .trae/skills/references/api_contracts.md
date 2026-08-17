@@ -573,3 +573,10 @@ DevProjectTeamSkill（总控）
 **与 role-requirements-analysis 边界**：本包输出范围初定义与项目上下文（第 0 阶段）；需求收集与 SRS 编写由 role-requirements-analysis 承接（需求阶段）。
 
 **多项目共享环境（第 5 层）**：环境资产注册与冲突仲裁规则详见 `multi_project_isolation.md` §10；台账 `25_环境资源清单.csv` 为跨项目共享登记表。
+
+
+---
+
+**文档版本**：v21.1.0
+**最后更新**：2026-08-18（技能库本体评审补版本页脚）
+**知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

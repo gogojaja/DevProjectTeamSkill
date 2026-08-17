@@ -91,7 +91,7 @@ def scheduler_loop(worker_id, local_deque, global_ready):
 
 ## 4. 模型路由表
 
-> 档位定义见 `../../references/model_selection.md` §3-4：S0 简单 / S1 常规 / S2 复杂 / S3 高危；成本档：免费 / 低价 / 平衡 / 强模型。
+> 档位定义见 `../../../../references/model_selection.md` §3-4：S0 简单 / S1 常规 / S2 复杂 / S3 高危；成本档：免费 / 低价 / 平衡 / 强模型。
 
 | 任务特征 | 档位 | 成本档 | 理由 |
 |----------|------|--------|------|

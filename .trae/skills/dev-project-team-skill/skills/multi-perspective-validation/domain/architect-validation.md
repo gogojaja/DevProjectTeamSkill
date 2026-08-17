@@ -1,28 +1,28 @@
-# 架構驗證：契約/模型/邊界/決策追溯/ADR 一致性
+# 架构验证：契约/模型/边界/决策追溯/ADR 一致性
 
-> 編排器：`../SKILL.md`
+> 编排器：`../SKILL.md`
 
 ---
 
-## 1. 驗證範疇
+## 1. 验证范畴
 
-| 領域 | 檢查點 | 嚴重性 | 自動化 |
+| 领域 | 检查点 | 严重性 | 自动化 |
 |------|--------|--------|--------|
-| 接口契約 | OpenAPI/Protobuf 與實現一致 | 高 | ✅ |
-| 數據模型 | 實體/關係/約束完整 | 高 | ✅ |
-| 服務邊界 | 領域劃分/職責單一/低耦合 | 中 | 半自動 |
-| 依賴方向 | 無循環/分層正確/無反向依賴 | 高 | ✅ |
-| ADR 一致性 | 實現符合架構決策記錄 | 高 | 半自動 |
-| 非功能需求 | 可擴展/可觀測/可部署/安全 | 中 | 人工 |
+| 接口契约 | OpenAPI/Protobuf 与实现一致 | 高 | ✅ |
+| 数据模型 | 实体/关系/约束完整 | 高 | ✅ |
+| 服务边界 | 领域划分/职责单一/低耦合 | 中 | 半自动 |
+| 依赖方向 | 无循环/分层正确/无反向依赖 | 高 | ✅ |
+| ADR 一致性 | 实现符合架构决策记录 | 高 | 半自动 |
+| 非功能需求 | 可扩展/可观测/可部署/安全 | 中 | 人工 |
 
 ---
 
-## 2. 核心檢查清單
+## 2. 核心检查清单
 
-### 2.1 接口契約一致性 (ARCH-001)
+### 2.1 接口契约一致性 (ARCH-001)
 ```python
 def verify_contract_consistency(spec_path: str, impl_path: str) -> CheckResult:
-    """OpenAPI/Protobuf 與實現一致性"""
+    """OpenAPI/Protobuf 与实现一致性"""
     spec = parse_spec(spec_path)
     impl = extract_routes(impl_path)
     
@@ -31,7 +31,7 @@ def verify_contract_consistency(spec_path: str, impl_path: str) -> CheckResult:
         if endpoint not in impl:
             mismatches.append(f"Missing: {endpoint.method} {endpoint.path}")
         else:
-            # 檢查參數/響應/狀態碼
+            # 检查参数/响应/状态码
             diff = diff_schema(endpoint.schema, impl[endpoint].schema)
             if diff:
                 mismatches.append(f"Schema diff {endpoint}: {diff}")
@@ -43,10 +43,10 @@ def verify_contract_consistency(spec_path: str, impl_path: str) -> CheckResult:
     )
 ```
 
-### 2.2 數據模型完整性 (ARCH-002)
+### 2.2 数据模型完整性 (ARCH-002)
 ```python
 def verify_data_model(models_path: str) -> CheckResult:
-    """實體/關係/約束/索引完整性"""
+    """实体/关系/约束/索引完整性"""
     issues = []
     for model in parse_models(models_path):
         # 必填字段
@@ -54,7 +54,7 @@ def verify_data_model(models_path: str) -> CheckResult:
         if not model.has_field("created_at"): issues.append(f"{model.name}: missing created_at")
         if not model.has_field("updated_at"): issues.append(f"{model.name}: missing updated_at")
         
-        # 關係完整性
+        # 关系完整性
         for rel in model.relationships:
             if not target_exists(rel.target): issues.append(f"Broken ref: {rel}")
         
@@ -64,24 +64,24 @@ def verify_data_model(models_path: str) -> CheckResult:
     return CheckResult(id="ARCH-002", status="PASS" if not issues else "FAIL", evidence=issues)
 ```
 
-### 2.3 服務邊界與依賴方向 (ARCH-003/004)
+### 2.3 服务边界与依赖方向 (ARCH-003/004)
 ```python
 def verify_service_boundaries(arch_config: str) -> CheckResult:
-    """領域劃分/職責單一/依賴方向/無循環"""
+    """领域划分/职责单一/依赖方向/无循环"""
     g = build_dependency_graph(arch_config)
     
     issues = []
-    # 循環依賴
+    # 循环依赖
     cycles = find_cycles(g)
     for cycle in cycles:
         issues.append(f"Cycle: {' -> '.join(cycle)}")
     
-    # 反向依賴 (presentation -> domain 等)
+    # 反向依赖 (presentation -> domain 等)
     for edge in g.edges:
         if violates_layering(edge):
             issues.append(f"Layer violation: {edge}")
     
-    # 職責過重
+    # 职责过重
     for node, out_deg in g.out_degree():
         if out_deg > 10:
             issues.append(f"God service: {node} ({out_deg} deps)")
@@ -92,12 +92,12 @@ def verify_service_boundaries(arch_config: str) -> CheckResult:
 ### 2.4 ADR 一致性 (ARCH-005)
 ```python
 def verify_adr_consistency(adr_dir: str, codebase: str) -> CheckResult:
-    """實現符合架構決策"""
+    """实现符合架构决策"""
     issues = []
     for adr in parse_adrs(adr_dir):
         if adr.status != "accepted": continue
         
-        # 提取決策規則
+        # 提取决策规则
         rules = extract_rules(adr.content)
         for rule in rules:
             violations = find_violations(rule, codebase)
@@ -109,31 +109,31 @@ def verify_adr_consistency(adr_dir: str, codebase: str) -> CheckResult:
 
 ---
 
-## 3. 自動化工具鏈
+## 3. 自动化工具链
 
 | 工具 | 用途 | 集成方式 |
 |------|------|----------|
-| `spectral` | OpenAPI 規範驗證 | CI pipeline |
-| `sqlfluff` / `prisma validate` | Schema 驗證 | pre-commit |
-| `madge` / `depcruise` | 依賴圖/循環檢測 | CI gate |
-| `archunit` (Java) / `import-linter` (Py) | 架構規則 | 測試套件 |
-| 自定義 ADR parser | 決策追溯 | 專用腳本 |
+| `spectral` | OpenAPI 规范验证 | CI pipeline |
+| `sqlfluff` / `prisma validate` | Schema 验证 | pre-commit |
+| `madge` / `depcruise` | 依赖图/循环检测 | CI gate |
+| `archunit` (Java) / `import-linter` (Py) | 架构规则 | 测试套件 |
+| 自定义 ADR parser | 决策追溯 | 专用脚本 |
 
 ---
 
-## 4. 證據與報告格式
+## 4. 证据与报告格式
 
 ```json
 {
   "perspective": "architect",
   "checks": [
-    {"id": "ARCH-001", "name": "接口契約一致性", "status": "PASS", "evidence": [], "severity": "high"},
-    {"id": "ARCH-002", "name": "數據模型完整性", "status": "FAIL", "evidence": ["User: missing updated_at"], "severity": "high"},
-    {"id": "ARCH-003", "name": "服務邊界", "status": "PASS", "evidence": [], "severity": "medium"},
-    {"id": "ARCH-004", "name": "依賴方向", "status": "FAIL", "evidence": ["Cycle: auth -> user -> billing -> auth"], "severity": "high"},
+    {"id": "ARCH-001", "name": "接口契约一致性", "status": "PASS", "evidence": [], "severity": "high"},
+    {"id": "ARCH-002", "name": "数据模型完整性", "status": "FAIL", "evidence": ["User: missing updated_at"], "severity": "high"},
+    {"id": "ARCH-003", "name": "服务边界", "status": "PASS", "evidence": [], "severity": "medium"},
+    {"id": "ARCH-004", "name": "依赖方向", "status": "FAIL", "evidence": ["Cycle: auth -> user -> billing -> auth"], "severity": "high"},
     {"id": "ARCH-005", "name": "ADR 一致性", "status": "PASS", "evidence": [], "severity": "high"}
   ],
-  "summary": "發現 2 項高嚴重性違規：依賴循環 + 缺少 updated_at",
+  "summary": "发现 2 项高严重性违规：依赖循环 + 缺少 updated_at",
   "confidence": "high",
   "tokens_used": 800
 }
@@ -141,16 +141,16 @@ def verify_adr_consistency(adr_dir: str, codebase: str) -> CheckResult:
 
 ---
 
-## 5. 門禁閾值
+## 5. 门禁阈值
 
-| 檢查項 | 門禁 | 可配置 |
+| 检查项 | 门禁 | 可配置 |
 |--------|------|--------|
-| 循環依賴 | 0 容忍 | 否 |
-| 契約不一致 | 0 容忍 | 否 |
+| 循环依赖 | 0 容忍 | 否 |
+| 契约不一致 | 0 容忍 | 否 |
 | 缺失必要字段 | 0 容忍 | 是 (legacy 例外) |
-| ADR 違規 | 0 容忍 | 是 (標記例外) |
+| ADR 违规 | 0 容忍 | 是 (标记例外) |
 | God service (>10 deps) | 警告 | 是 |
 
 ---
 
-**文檔版本**: v1.0.0  **最後更新**: 2026-08-08
+**文档版本**: v1.0.0  **最后更新**: 2026-08-08

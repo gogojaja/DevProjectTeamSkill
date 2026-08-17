@@ -5,74 +5,76 @@ description: "用户提到 LSP、AST、代码导航、代码重构、代码查�
 
 # LSP/AST Integration LSP/AST 集成技能
 
-> 版權聲明：`../../references/COPYRIGHT.md`　Token 標準：`../../references/token_standard.md`　編排器：`../SKILL.md`
+- **技能版本**：v1.1.0　**发布日期**：2026-08-18
+
+> 版权声明：`../../../references/COPYRIGHT.md`　Token 标准：`../../../references/token_standard.md`　编排器：`../../SKILL.md`
 
 ---
 
-## 1. 觸發規則
+## 1. 触发规则
 
-### 1.1 觸發場景
-- 需要代碼智能導航：跳轉定義、查找引用、查看文檔、類型提示
-- 需要代碼重構：重命名、提取方法/類、內聯、移動、簽名變更
-- 需要代碼查詢：模式匹配、依賴分析、影響分析、架構檢查
-- 需要代碼生成：樣板代碼、測試生成、遷移腳本、API 客戶端
-- 需要代碼分析：複雜度、重複、異味、依賴圖、調用鏈
+### 1.1 触发场景
+- 需要代码智能导航：跳转定义、查找引用、查看文档、类型提示
+- 需要代码重构：重命名、提取方法/类、内联、移动、签名变更
+- 需要代码查询：模式匹配、依赖分析、影响分析、架构检查
+- 需要代码生成：样板代码、测试生成、迁移脚本、API 客户端
+- 需要代码分析：复杂度、重复、异味、依赖图、调用链
 
-### 1.2 觸發詞
-| 關鍵字 | 映射操作 | 說明 |
+### 1.2 触发词
+| 关键字 | 映射操作 | 说明 |
 |--------|----------|------|
-| `goto` / `跳轉` / `定義` | LSP 導航 | 跳轉到定義/聲明/實現/類型定義 |
+| `goto` / `跳转` / `定义` | LSP 导航 | 跳转到定义/声明/实现/类型定义 |
 | `references` / `引用` / `查找引用` | LSP 引用 | 查找所有引用位置 |
-| `hover` / `懸停` / `文檔` | LSP 懸停 | 顯示類型/文檔/簽名信息 |
-| `rename` / `重命名` | LSP 重構 | 安全重命名符號 |
-| `refactor` / `重構` / `提取` | 重構引擎 | 提取方法/類/變量/內聯/移動 |
-| `ast` / `抽象語法樹` / `查詢` | AST 查詢 | 模式匹配/依賴分析/影響分析 |
-| `generate` / `生成` / `樣板` | 代碼生成 | 樣板/測試/遷移/API 客戶端 |
-| `diagnostics` / `診斷` / `錯誤` | LSP 診斷 | 實時錯誤/警告/提示 |
+| `hover` / `悬停` / `文档` | LSP 悬停 | 显示类型/文档/签名信息 |
+| `rename` / `重命名` | LSP 重构 | 安全重命名符号 |
+| `refactor` / `重构` / `提取` | 重构引擎 | 提取方法/类/变量/内联/移动 |
+| `ast` / `抽象语法树` / `查询` | AST 查询 | 模式匹配/依赖分析/影响分析 |
+| `generate` / `生成` / `样板` | 代码生成 | 样板/测试/迁移/API 客户端 |
+| `diagnostics` / `诊断` / `错误` | LSP 诊断 | 实时错误/警告/提示 |
 
-### 1.3 能力矩陣
-| 能力 | LSP | AST | 適用語言 |
+### 1.3 能力矩阵
+| 能力 | LSP | AST | 适用语言 |
 |------|-----|-----|----------|
-| 跳轉定義 | ✅ | ✅ | 所有 LSP 支持語言 |
-| 查找引用 | ✅ | ✅ | 所有 LSP 支持語言 |
-| 懸停/文檔 | ✅ | ❌ | 所有 LSP 支持語言 |
-| 重命名 | ✅ | ✅ | 所有 LSP 支持語言 |
-| 代碼補全 | ✅ | ❌ | 所有 LSP 支持語言 |
-| 模式匹配 | ❌ | ✅ | 所有可解析語言 |
-| 依賴分析 | ❌ | ✅ | 所有可解析語言 |
-| 影響分析 | ❌ | ✅ | 所有可解析語言 |
-| 代碼生成 | ❌ | ✅ | 所有可解析語言 |
-| 結構化編輯 | ❌ | ✅ | 所有可解析語言 |
+| 跳转定义 | ✅ | ✅ | 所有 LSP 支持语言 |
+| 查找引用 | ✅ | ✅ | 所有 LSP 支持语言 |
+| 悬停/文档 | ✅ | ❌ | 所有 LSP 支持语言 |
+| 重命名 | ✅ | ✅ | 所有 LSP 支持语言 |
+| 代码补全 | ✅ | ❌ | 所有 LSP 支持语言 |
+| 模式匹配 | ❌ | ✅ | 所有可解析语言 |
+| 依赖分析 | ❌ | ✅ | 所有可解析语言 |
+| 影响分析 | ❌ | ✅ | 所有可解析语言 |
+| 代码生成 | ❌ | ✅ | 所有可解析语言 |
+| 结构化编辑 | ❌ | ✅ | 所有可解析语言 |
 
 ---
 
 ## 2. 流程
 
-### 2.1 LSP 客戶端生命週期
+### 2.1 LSP 客户端生命周期
 ```mermaid
 graph LR
-  A[啟動 LSP 服務器] --> B[初始化]
-  B --> C[註冊能力]
-  C --> D[監聽文件變更]
-  D --> E[處理請求]
-  E --> F[返回響應]
+  A[启动 LSP 服务器] --> B[初始化]
+  B --> C[注册能力]
+  C --> D[监听文件变更]
+  D --> E[处理请求]
+  E --> F[返回响应]
   F --> D
 ```
 
 ### 2.2 AST 解析流程
 ```mermaid
 graph LR
-  A[源代碼] --> B[詞法分析]
-  B --> C[語法分析]
-  C --> D[AST 構建]
-  D --> E[語義分析]
-  E --> F[符號表構建]
-  F --> G[查詢/轉換/生成]
+  A[源代码] --> B[词法分析]
+  B --> C[语法分析]
+  C --> D[AST 构建]
+  D --> E[语义分析]
+  E --> F[符号表构建]
+  F --> G[查询/转换/生成]
 ```
 
 ### 2.3 核心操作
 
-#### 2.3.1 LSP 導航
+#### 2.3.1 LSP 导航
 ```python
 class LSPClient:
     def __init__(self, language: str, project_root: str):
@@ -80,7 +82,7 @@ class LSPClient:
         self.capabilities = self._initialize(project_root)
     
     def goto_definition(self, file: str, line: int, col: int) -> Location:
-        """跳轉到定義"""
+        """跳转到定义"""
         return self._request('textDocument/definition', {
             'textDocument': {'uri': file_to_uri(file)},
             'position': {'line': line, 'character': col}
@@ -95,7 +97,7 @@ class LSPClient:
         })
     
     def hover(self, file: str, line: int, col: int) -> HoverInfo:
-        """懸停信息：類型、文檔、簽名"""
+        """悬停信息：类型、文档、签名"""
         return self._request('textDocument/hover', {
             'textDocument': {'uri': file_to_uri(file)},
             'position': {'line': line, 'character': col}
@@ -110,43 +112,43 @@ class LSPClient:
         })
 ```
 
-#### 2.3.2 AST 查詢與重構
+#### 2.3.2 AST 查询与重构
 ```python
 class ASTEngine:
     def __init__(self, language: str):
-        self.parser = self._get_parser(language)  # tree-sitter / ANTLR / 內建
+        self.parser = self._get_parser(language)  # tree-sitter / ANTLR / 内建
     
     def parse(self, code: str, file_path: str = "") -> AST:
-        """解析代碼生成 AST"""
+        """解析代码生成 AST"""
         tree = self.parser.parse(bytes(code, 'utf-8'))
         return AST(tree, file_path)
     
     def query(self, ast: AST, pattern: str) -> List[Match]:
-        """模式匹配查詢"""
-        # 支援: tree-sitter query / XPath / CSS 選擇器 / 自定義 DSL
+        """模式匹配查询"""
+        # 支援: tree-sitter query / XPath / CSS 选择器 / 自定义 DSL
         return ast.query(pattern)
     
     def find_pattern(self, ast: AST, pattern: ASTPattern) -> List[Node]:
-        """結構化模式匹配"""
-        # 如: 函數調用、類定義、導入語句、特定模式
+        """结构化模式匹配"""
+        # 如: 函数调用、类定义、导入语句、特定模式
         pass
     
     def refactor(self, ast: AST, operation: RefactorOp) -> RefactorResult:
-        """重構操作"""
+        """重构操作"""
         # extract_method, extract_class, inline, move, rename, change_signature
         pass
     
     def generate(self, ast: AST, template: Template) -> str:
-        """代碼生成"""
-        # 基於模板和 AST 上下文生成代碼
+        """代码生成"""
+        # 基于模板和 AST 上下文生成代码
         pass
 ```
 
 ---
 
-## 3. 輸出規範
+## 3. 输出规范
 
-### 3.1 LSP 響應格式
+### 3.1 LSP 响应格式
 ```json
 {
   "id": 1,
@@ -162,7 +164,7 @@ class ASTEngine:
 }
 ```
 
-### 3.2 AST 查詢結果
+### 3.2 AST 查询结果
 ```json
 {
   "matches": [
@@ -181,7 +183,7 @@ class ASTEngine:
 }
 ```
 
-### 3.3 重構結果
+### 3.3 重构结果
 ```json
 {
   "operation": "extract_method",
@@ -205,39 +207,95 @@ class ASTEngine:
 
 ---
 
-## 4. 邊界
+## 4. 边界
 
-### 4.1 適用邊界
-- ✅ 所有支援 LSP 的語言 (TypeScript, Python, Go, Rust, Java, C#, ...)
-- ✅ 所有可解析語言的 AST 操作 (tree-sitter 支援 40+ 語言)
-- ✅ 大型代碼庫的增量解析與索引
-- ✅ CI/CD 集成的自動化分析/重構
+### 4.1 适用边界
+- ✅ 所有支援 LSP 的语言 (TypeScript, Python, Go, Rust, Java, C#, ...)
+- ✅ 所有可解析语言的 AST 操作 (tree-sitter 支援 40+ 语言)
+- ✅ 大型代码库的增量解析与索引
+- ✅ CI/CD 集成的自动化分析/重构
 
-### 4.2 不適用邊界
-- ❌ 無法解析的語言/DSL/配置文件
-- ❌ 極大文件 (>10MB) 的實時分析 (需分塊)
-- ❌ 高度動態/元編程語言的靜態分析 (需運行時輔助)
+### 4.2 不适用边界
+- ❌ 无法解析的语言/DSL/配置文件
+- ❌ 极大文件 (>10MB) 的实时分析 (需分块)
+- ❌ 高度动态/元编程语言的静态分析 (需运行时辅助)
 
-### 4.3 資源限制
-- LSP 服務器內存：建議 < 2GB
-- AST 索引內存：建議 < 1GB
-- 並發查詢：建議 ≤ 10
-- 索引構建時間：增量 < 1s，全量 < 60s
+### 4.3 资源限制
+- LSP 服务器内存：建议 < 2GB
+- AST 索引内存：建议 < 1GB
+- 并发查询：建议 ≤ 10
+- 索引构建时间：增量 < 1s，全量 < 60s
 
 ---
 
-## 5. 明細外置
+## 5. 明细外置
 
-| 明細文件 | 說明 |
+| 明细文件 | 说明 |
 |----------|------|
-| `domain/lsp-client.md` | LSP 客戶端：啟動/能力/請求/響應/診斷/工作區 |
-| `domain/ast-engine.md` | AST 引擎：解析器/查詢語言/模式匹配/符號表 |
-| `domain/refactoring-engine.md` | 重構引擎：提取/內聯/移動/重命名/簽名變更 |
-| `domain/code-generation.md` | 代碼生成：模板/上下文感知/類型感知/測試生成 |
-| `domain/dependency-analysis.md` | 依賴分析：導入圖/調用鏈/影響分析/循環檢測 |
-| `domain/lsp-ast-integration.md` | LSP+AST 聯合：混合導航/語義感知重構/類型感知生成 |
+| `domain/lsp-client.md` | LSP 客户端：启动/能力/请求/响应/诊断/工作区 |
+| `domain/ast-engine.md` | AST 引擎：解析器/查询语言/模式匹配/符号表 |
+| `domain/refactoring-engine.md` | 重构引擎：提取/内联/移动/重命名/签名变更 |
+| `domain/code-generation.md` | 代码生成：模板/上下文感知/类型感知/测试生成 |
+| `domain/dependency-analysis.md` | 依赖分析：导入图/调用链/影响分析/循环检测 |
+| `domain/lsp-ast-integration.md` | LSP+AST 联合：混合导航/语义感知重构/类型感知生成 |
 
 ---
 
-**文檔版本**: v1.0.0  **最後更新**: 2026-08-08
-**知識產權所有**: 段波（驗證郵箱: duanbo.douglas@163.com）
+---
+
+## 闭环执行系统
+
+### 1. 任务入口
+- 输入：用户要求代码智能导航/重构/查询/分析/生成（LSP/AST、符号解析、引用查找、定义跳转、重命名）；
+- 前置：已确认目标语言与项目内语言服务器可用；需查询/重构的符号/文件已知；
+- 不适用：无语言服务器支持的语言、无法解析的代码段、仅泛泛讨论代码架构概念时。
+
+### 2. 执行状态
+| 状态 | 进入条件 | 退出条件 | 处理方式 |
+|------|---------|---------|---------|
+| 待启动 | 用户触发代码智能请求 | 用户确认/系统启动 | 确认语言/文件/符号，初始化 LSP 客户端 |
+| 执行中 | 查询/导航/重构执行 | 结果产出/失败 | 按 `domain/lsp-client.md` 发请求，解析 AST |
+| 校验中 | 结果产出 | 校验通过/失败 | 校验符号定位准确、AST 查询命中、重构无损 |
+| 阻塞 | 语言服务器/索引缺失 | 引导安装/人工处理 | 暂停并记录缺失依赖 |
+| 完成 | 结果验证 | 进入交接 | 输出导航结果/重构差异/生成代码 |
+| 回退 | 重构破坏语义 | 回到原代码 | 撤销变更/恢复备份，保留审计 |
+
+### 3. 执行动作层
+- 执行步骤 1：初始化 LSP 客户端，`textDocument/definition|references|symbol` 请求；
+- 执行步骤 2：AST 解析与查询（`domain/ast-engine.md`），依赖分析（`domain/dependency-analysis.md`）；
+- 执行步骤 3：重构/生成（`domain/refactoring-engine.md`/`domain/code-generation.md`），校验语义等价；
+- 所需工具/脚本：`domain/lsp-client.md`、`domain/ast-engine.md`、`domain/dependency-analysis.md`、`domain/refactoring-engine.md`、`domain/code-generation.md`；
+- 输入输出约束：请求 JSON 遵 §3.1 LSP 格式；重构结果先 diff 后应用；生成代码须通过语义校验。
+
+### 4. 验收门禁
+- 必须产出物：定位/引用/查询结果 或 重构 diff 或 生成代码；
+- 通过条件：符号定位准确 + AST 命中无误 + 重构保持语义等价 + 依赖不破坏；
+- 失败条件：语言服务器错误、AST 解析失败、重构引入语法/引用错误、未走 diff 直接改文件；
+- 审核对象：代码评审者与质量门禁。
+
+### 5. 失败处理
+- 失败类型：LSP 初始化失败、索引过期、AST 解析失败、重构冲突；
+- 恢复策略：重启语言服务器/重建索引/回退改动后重试；
+- 回滚方案：用重构前 diff 恢复，保留审计；
+- 重试策略：依赖满足且索引刷新后重试；
+- 是否需要人工确认：跨文件/全局重命名、破坏性重构需人工确认。
+
+### 6. 产出与交接
+- 产出物列表：导航结果、引用清单、重构 diff、生成代码片段；
+- 保存路径：查询结果即时返回；重构 diff/生成代码经 `domain/*` 模板落盘待评审；
+- 交接对象：开发角色、代码评审者；
+- 下一步动作：导航/查询回填上下文，重构/生成进入评审与测试；
+- 归档条件：重构已合并、生成代码已验证。
+
+### 7. 审计记录
+- 执行时间：查询/重构执行时间；
+- 关键参数：language、符号、查询类型、重构范围（文件数/行数）；
+- 关键决策：重构策略选择、是否批量替换、语义等价判定；
+- 结果证据：LSP 响应、AST 查询输出、重构 diff；
+- 失败原因：解析失败/重构异常在台账或断点留痕。
+
+---
+
+**文档版本**：v1.1.0　**最后更新**：2026-08-18（繁体转简体 + 新增闭环执行系统章节，技能库本体评审修复）
+
+**知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

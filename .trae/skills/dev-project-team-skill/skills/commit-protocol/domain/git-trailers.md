@@ -1,66 +1,66 @@
-# Git Trailers 完整規範
+# Git Trailers 完整规范
 
-> 編排器：`../SKILL.md`
+> 编排器：`../SKILL.md`
 
 ---
 
-## 1. Trailer 格式規範
+## 1. Trailer 格式规范
 
-### 1.1 基本語法
+### 1.1 基本语法
 ```
 <Token>: <Value>
 ```
-- Token 首字母大寫，單詞連接用連字符：`Signed-off-by` `Risk-Accepted`
-- Value 不包含換行，長度建議 ≤ 100 字符
-- 多個 Trailer 逐行排列，順序不敏感但建議按重要性排序
+- Token 首字母大写，单词连接用连字符：`Signed-off-by` `Risk-Accepted`
+- Value 不包含换行，长度建议 ≤ 100 字符
+- 多个 Trailer 逐行排列，顺序不敏感但建议按重要性排序
 
-### 1.2 標準 Trailer 註冊表
-| Token | 必填 | 可重複 | 語義 | 解析器支持 |
+### 1.2 标准 Trailer 注册表
+| Token | 必填 | 可重复 | 语义 | 解析器支持 |
 |-------|------|--------|------|------------|
-| `Signed-off-by` | 是 | 是 | 開發者簽署 | Git 內建 |
-| `Co-authored-by` | 否 | 是 | 協作作者 | GitHub/GitLab |
-| `Constraint` | 否 | 是 | 活躍約束 | 自定義 |
-| `Rejected` | 否 | 是 | 被拒替代方案 | 自定義 |
-| `Directive` | 否 | 是 | 前瞻指令 | 自定義 |
-| `Confidence` | 否 | 否 | 決策信心度 | 自定義 |
-| `Scope-risk` | 否 | 否 | 風險範圍 | 自定義 |
-| `Not-tested` | 否 | 是 | 未測試項 | 自定義 |
-| `Risk-Accepted` | 否 | 是 | 風險接受單 ID | 自定義 |
-| `ADR` | 否 | 是 | 架構決策引用 | 自定義 |
-| `Fixes` | 否 | 是 | 修復 Issue | GitHub/GitLab |
-| `Related` | 否 | 是 | 關聯 PR/提交 | 自定義 |
-| `Breaking` | 否 | 是 | 破壞性變更標記 | 自定義 |
-| `Depends-on` | 否 | 是 | 依賴其他提交 | 自定義 |
+| `Signed-off-by` | 是 | 是 | 开发者签署 | Git 内建 |
+| `Co-authored-by` | 否 | 是 | 协作作者 | GitHub/GitLab |
+| `Constraint` | 否 | 是 | 活跃约束 | 自定义 |
+| `Rejected` | 否 | 是 | 被拒替代方案 | 自定义 |
+| `Directive` | 否 | 是 | 前瞻指令 | 自定义 |
+| `Confidence` | 否 | 否 | 决策信心度 | 自定义 |
+| `Scope-risk` | 否 | 否 | 风险范围 | 自定义 |
+| `Not-tested` | 否 | 是 | 未测试项 | 自定义 |
+| `Risk-Accepted` | 否 | 是 | 风险接受单 ID | 自定义 |
+| `ADR` | 否 | 是 | 架构决策引用 | 自定义 |
+| `Fixes` | 否 | 是 | 修复 Issue | GitHub/GitLab |
+| `Related` | 否 | 是 | 关联 PR/提交 | 自定义 |
+| `Breaking` | 否 | 是 | 破坏性变更标记 | 自定义 |
+| `Depends-on` | 否 | 是 | 依赖其他提交 | 自定义 |
 
 ---
 
-## 2. 標準 Trailer 詳細定義
+## 2. 标准 Trailer 详细定义
 
-### 2.1 Signed-off-by (強制)
+### 2.1 Signed-off-by (强制)
 ```
 Signed-off-by: Alice Chen <alice@example.com>
 ```
-- **語義**：開發者確認有權提交、遵守 DCO/許可證
-- **生成**：`git commit -s` 自動添加
-- **驗證**：CI 強制檢查存在
+- **语义**：开发者确认有权提交、遵守 DCO/许可证
+- **生成**：`git commit -s` 自动添加
+- **验证**：CI 强制检查存在
 
-### 2.2 Co-authored-by (協作)
+### 2.2 Co-authored-by (协作)
 ```
 Co-authored-by: Bob Wang <bob@example.com>
 Co-authored-by: Carol Lee <carol@example.com>
 ```
-- **語義**：標記協作貢獻者，顯示在 GitHub 提交頁
+- **语义**：标记协作贡献者，显示在 GitHub 提交页
 - **格式**：`Name <email>`
 
-### 2.3 Constraint (約束)
+### 2.3 Constraint (约束)
 ```
 Constraint: Single-table rows < 100M
 Constraint: API response P99 < 200ms
 Constraint: Must support PKCE for public clients
 ```
-- **語義**：塑造決策的硬性約束（技術/業務/合規）
-- **可重複**：是，每行一個約束
-- **解析**：CI 可提取用於架構驗證
+- **语义**：塑造决策的硬性约束（技术/业务/合规）
+- **可重复**：是，每行一个约束
+- **解析**：CI 可提取用于架构验证
 
 ### 2.4 Rejected (被拒替代方案)
 ```
@@ -69,8 +69,8 @@ Rejected: Custom JWT implementation | Maintenance burden
 Rejected: SAML integration | Complexity exceeds value
 ```
 - **格式**：`<alternative> | <reason>`
-- **語義**：記錄決策過程中被拒絕的方案及理由
-- **可重複**：是
+- **语义**：记录决策过程中被拒绝的方案及理由
+- **可重复**：是
 
 ### 2.5 Directive (前瞻指令)
 ```
@@ -78,8 +78,8 @@ Directive: Migrate to async IO in Q3
 Directive: Add OIDC discovery endpoint in v2.2
 Directive: Deprecate legacy API by 2026-Q4
 ```
-- **語義**：給未來開發者的指令/警告/計劃
-- **時效性**：建議包含時間範圍
+- **语义**：给未来开发者的指令/警告/计划
+- **时效性**：建议包含时间范围
 
 ### 2.6 Confidence (信心度)
 ```
@@ -88,41 +88,41 @@ Confidence: medium
 Confidence: low
 ```
 - **取值**：`high` `medium` `low`
-- **語義**：決策者對方案正確性的信心程度
+- **语义**：决策者对方案正确性的信心程度
 
-### 2.7 Scope-risk (風險範圍)
+### 2.7 Scope-risk (风险范围)
 ```
 Scope-risk: narrow
 Scope-risk: moderate
 Scope-risk: broad
 ```
-- **取值**：`narrow` (單模塊) `moderate` (少數服務) `broad` (跨系統)
-- **用途**：自動化風險評估、部署策略決策
+- **取值**：`narrow` (单模块) `moderate` (少数服务) `broad` (跨系统)
+- **用途**：自动化风险评估、部署策略决策
 
-### 2.8 Not-tested (未測試項)
+### 2.8 Not-tested (未测试项)
 ```
 Not-tested: E2E checkout flow with real payment gateway
 Not-tested: Multi-region failover scenario
 Not-tested: Load test > 10k concurrent users
 ```
-- **語義**：已知的驗證缺口，風險透明化
-- **可重複**：是
+- **语义**：已知的验证缺口，风险透明化
+- **可重复**：是
 
-### 2.9 Risk-Accepted (風險接受)
+### 2.9 Risk-Accepted (风险接受)
 ```
 Risk-Accepted: RA-20260808-001
 Risk-Accepted: RA-20260805-003
 ```
 - **格式**：`RA-YYYYMMDD-NNN`
-- **語義**：引用風險接受單，表明風險已審批接受
+- **语义**：引用风险接受单，表明风险已审批接受
 
-### 2.10 ADR (架構決策記錄)
+### 2.10 ADR (架构决策记录)
 ```
 ADR: ADR-003
 ADR: ADR-012
 ```
 - **格式**：`ADR-<NNN>`
-- **語義**：關聯架構決策記錄，便於追溯
+- **语义**：关联架构决策记录，便于追溯
 
 ### 2.11 Fixes / Related
 ```
@@ -130,21 +130,21 @@ Fixes: #1234
 Related: #5678
 Related: !456
 ```
-- **Fixes**：GitHub/GitLab 自動關閉 Issue
-- **Related**：關聯但不自動關閉
+- **Fixes**：GitHub/GitLab 自动关闭 Issue
+- **Related**：关联但不自动关闭
 
-### 2.12 Breaking (破壞性變更)
+### 2.12 Breaking (破坏性变更)
 ```
 Breaking: API v1 removed, migrate to v2
 Breaking: Database schema changed, migration required
 ```
-- **語義**：標記破壞性變更，觸發 Major 版本升級
+- **语义**：标记破坏性变更，触发 Major 版本升级
 
 ---
 
-## 3. Trailers 解析與驗證
+## 3. Trailers 解析与验证
 
-### 3.1 解析器實現
+### 3.1 解析器实现
 ```python
 import re
 
@@ -153,7 +153,7 @@ TRAILER_PATTERN = re.compile(
 )
 
 def parse_trailers(commit_msg: str) -> Dict[str, List[str]]:
-    """解析提交訊息中的 Trailers"""
+    """解析提交讯息中的 Trailers"""
     trailers = defaultdict(list)
     in_trailer_section = False
     
@@ -173,10 +173,10 @@ def parse_trailers(commit_msg: str) -> Dict[str, List[str]]:
     return dict(trailers)
 
 def validate_trailers(trailers: Dict[str, List[str]]) -> List[str]:
-    """驗證 Trailers 完整性"""
+    """验证 Trailers 完整性"""
     errors = []
     
-    # 強制簽署
+    # 强制签署
     if 'Signed-off-by' not in trailers:
         errors.append("Missing required trailer: Signed-off-by")
     
@@ -209,14 +209,14 @@ def validate_trailers(trailers: Dict[str, List[str]]) -> List[str]:
 
 ---
 
-## 4. 自動化生成與提取
+## 4. 自动化生成与提取
 
 ### 4.1 上下文感知生成
 ```python
 def generate_trailers_from_context(ctx: CommitContext) -> List[str]:
     trailers = []
     
-    # 約束
+    # 约束
     for c in ctx.constraints:
         trailers.append(f"Constraint: {c}")
     
@@ -228,17 +228,17 @@ def generate_trailers_from_context(ctx: CommitContext) -> List[str]:
     for d in ctx.directives:
         trailers.append(f"Directive: {d}")
     
-    # 信心度/風險
+    # 信心度/风险
     if ctx.confidence:
         trailers.append(f"Confidence: {ctx.confidence}")
     if ctx.scope_risk:
         trailers.append(f"Scope-risk: {ctx.scope_risk}")
     
-    # 未測試
+    # 未测试
     for nt in ctx.not_tested:
         trailers.append(f"Not-tested: {nt}")
     
-    # 風險接受
+    # 风险接受
     for ra in ctx.risk_acceptances:
         trailers.append(f"Risk-Accepted: {ra}")
     
@@ -246,33 +246,33 @@ def generate_trailers_from_context(ctx: CommitContext) -> List[str]:
     for adr in ctx.adrs:
         trailers.append(f"ADR: {adr}")
     
-    # Issue 關聯
+    # Issue 关联
     for issue in ctx.fixes:
         trailers.append(f"Fixes: #{issue}")
     for rel in ctx.related:
         trailers.append(f"Related: #{rel}")
     
-    # 破壞性變更
+    # 破坏性变更
     if ctx.breaking:
         trailers.append(f"Breaking: {ctx.breaking}")
     
     return trailers
 ```
 
-### 4.2 從代碼變更推斷
+### 4.2 从代码变更推断
 ```python
 def infer_trailers_from_changes(changes: List[Change]) -> List[str]:
     trailers = []
     
-    # 檢測破壞性變更
+    # 检测破坏性变更
     if any(is_breaking_change(c) for c in changes):
         trailers.append("Breaking: API/Schema changed, migration required")
     
-    # 檢測安全相關
+    # 检测安全相关
     if any(is_security_related(c) for c in changes):
         trailers.append("Directive: Review security implications")
     
-    # 檢測性能敏感
+    # 检测性能敏感
     if any(is_performance_sensitive(c) for c in changes):
         trailers.append("Directive: Benchmark before merge")
     
@@ -288,7 +288,7 @@ def infer_trailers_from_changes(changes: List[Change]) -> List[str]:
 # 全局模板
 git config commit.template ~/.gitmessage
 
-# ~/.gitmessage 內容
+# ~/.gitmessage 内容
 # <type>(<scope>): <subject>
 #
 # ## Motivation
@@ -314,11 +314,11 @@ git config commit.template ~/.gitmessage
 # Signed-off-by: 
 ```
 
-### 5.2 Git Hooks 驗證
+### 5.2 Git Hooks 验证
 ```bash
 #!/bin/bash
 # .git/hooks/commit-msg
-# 驗證 Trailers 完整性
+# 验证 Trailers 完整性
 
 COMMIT_MSG_FILE=$1
 ERRORS=$(python3 -c "
@@ -392,4 +392,4 @@ Co-authored-by: Bob Wang <bob@example.com>
 
 ---
 
-**文檔版本**: v1.0.0  **最後更新**: 2026-08-08
+**文档版本**: v1.0.0  **最后更新**: 2026-08-08

@@ -5,7 +5,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKILLS_DIR = os.environ.get('SKILLS_DIR', os.path.join(ROOT, '.trae', 'skills'))
 # 全局 opencode 技能库：平台自适应（Windows -> %USERPROFILE%/.config/...；macOS/Linux -> ~/.config/...）
 if sys.platform.startswith('win'):
-    GLOBAL_SKILLS = os.path.join(os.environ.get('USERPROFILE', 'C:/Users/gogoj'), '.config', 'opencode', 'skills')
+    GLOBAL_SKILLS = os.path.join(os.environ.get('USERPROFILE', os.path.expanduser('~')), '.config', 'opencode', 'skills')
 else:
     GLOBAL_SKILLS = os.path.join(os.environ.get('HOME', ''), '.config', 'opencode', 'skills')
 DEFAULT_TARGETS = [os.path.join(ROOT, t) for t in

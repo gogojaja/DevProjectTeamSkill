@@ -1,27 +1,27 @@
-# 根因分析：5-Why / 魚骨圖 / 優先級排序
+# 根因分析：5-Why / 鱼骨图 / 优先级排序
 
-> 編排器：`../SKILL.md`
+> 编排器：`../SKILL.md`
 
 ---
 
-## 1. 根因分析架構
+## 1. 根因分析架构
 
 ### 1.1 分析流程
 ```mermaid
 graph LR
-  A[偏差清單] --> B[5-Why 逐層問因]
-  B --> C[魚骨圖分類]
-  C --> D[根因確認]
-  D --> E[可改進點提取]
-  E --> F[優先級排序]
+  A[偏差清单] --> B[5-Why 逐层问因]
+  B --> C[鱼骨图分类]
+  C --> D[根因确认]
+  D --> E[可改进点提取]
+  E --> F[优先级排序]
 ```
 
-### 1.2 分析原則
-- **追根到底**：至少問 5 層「為什麼」，直到無可改進的系統性原因；
-- **分類審視**：按人/流程/工具/標準/環境五大類檢查，避免單一歸因；
-- **數據支撐**：每個「為什麼」都要有依據，禁止臆測；
-- **可改進性**：根因必須對應可改進點，否則繼續深挖；
-- **聚焦主因**：一個偏差通常有多因，找主因（80% 影響）優先。
+### 1.2 分析原则
+- **追根到底**：至少问 5 层「为什么」，直到无可改进的系统性原因；
+- **分类审视**：按人/流程/工具/标准/环境五大类检查，避免单一归因；
+- **数据支撑**：每个「为什么」都要有依据，禁止臆测；
+- **可改进性**：根因必须对应可改进点，否则继续深挖；
+- **聚焦主因**：一个偏差通常有多因，找主因（80% 影响）优先。
 
 ---
 
@@ -30,23 +30,23 @@ graph LR
 ### 2.1 方法
 ```python
 class FiveWhyAnalyzer:
-    """5-Why 逐層問因"""
+    """5-Why 逐层问因"""
     
     def __init__(self):
         self.depth_limit = 5
     
     def analyze(self, deviation: Deviation) -> RootCause:
-        """對偏差執行 5-Why"""
+        """对偏差执行 5-Why"""
         causes = []
         current = deviation.description
         depth = 0
         
         while depth < self.depth_limit:
-            question = f"為什麼：{current}？"
+            question = f"为什么：{current}？"
             answer = self._ask(question)
             
             if not answer or self._is_systemic_root(answer):
-                # 到達系統性根因
+                # 到达系统性根因
                 causes.append(Answer(level=depth, question=question, answer=answer, is_root=True))
                 break
             
@@ -62,60 +62,60 @@ class FiveWhyAnalyzer:
         )
     
     def _is_systemic_root(self, answer: str) -> bool:
-        """判斷是否為系統性根因"""
-        systemic_markers = ["標準缺失", "規範未定義", "流程未覆蓋", "無檢查點",
-                            "約束衝突", "資源不足", "沒有模板"]
+        """判断是否为系统性根因"""
+        systemic_markers = ["标准缺失", "规范未定义", "流程未覆盖", "无检查点",
+                            "约束冲突", "资源不足", "没有模板"]
         return any(m in answer for m in systemic_markers)
     
     def _check_improvable(self, root: str) -> bool:
-        """檢查根因是否可改進"""
-        improvable_markers = ["補", "加", "更新", "重寫", "優化", "新增", "調整"]
+        """检查根因是否可改进"""
+        improvable_markers = ["补", "加", "更新", "重写", "优化", "新增", "调整"]
         return any(m in root for m in improvable_markers)
 ```
 
-### 2.2 典型 5-Why 鏈
+### 2.2 典型 5-Why 链
 ```
-偏差：技能 A 觸發詞 X 下未加載
-├─ 為什麼①：description 沒有觸發詞 X
-│   └─ 為什麼②：編寫時按模板填但漏了
-│       └─ 為什麼③：結構校驗只查 description 有無，不查觸發詞覆蓋
-│           └─ 為什麼④：校驗清單沒有「觸發詞覆蓋」項
-│               └─ 為什麼⑤：skill-authoring 五步第 3 步校驗規則不完整  ← 系統根因
+偏差：技能 A 触发词 X 下未加载
+├─ 为什么①：description 没有触发词 X
+│   └─ 为什么②：编写时按模板填但漏了
+│       └─ 为什么③：结构校验只查 description 有无，不查触发词覆盖
+│           └─ 为什么④：校验清单没有「触发词覆盖」项
+│               └─ 为什么⑤：skill-authoring 五步第 3 步校验规则不完整  ← 系统根因
 ```
-→ 可改進點：authoring.md 結構校驗增加「觸發詞覆蓋率」檢查。
+→ 可改进点：authoring.md 结构校验增加「触发词覆盖率」检查。
 
 ---
 
-## 3. 魚骨圖分析
+## 3. 鱼骨图分析
 
-### 3.1 六大分類
-| 分類 | 檢查項 | 典型根因 |
+### 3.1 六大分类
+| 分类 | 检查项 | 典型根因 |
 |------|--------|----------|
-| 人 (People) | 操作者技能、經驗、疏忽 | 漏步驟、誤操作、模板漏填 |
-| 流程 (Process) | 步驟、檢查點、門禁 | 跳步、無校驗、繞過門禁 |
-| 工具 (Tools) | 腳本、腳本邏輯、兼容 | 腳本 bug、路徑硬編碼、版本不符 |
-| 標準 (Standards) | 規範、模板、約束 | 標準缺失、約束衝突、模板過期 |
-| 環境 (Environment) | 平台、網絡、依賴 | 平台差異、網絡不穩、依賴缺失 |
-| 數據 (Data) | 輸入、格式、內容 | 數據錯、格式不合規、內容過期 |
+| 人 (People) | 操作者技能、经验、疏忽 | 漏步骤、误操作、模板漏填 |
+| 流程 (Process) | 步骤、检查点、门禁 | 跳步、无校验、绕过门禁 |
+| 工具 (Tools) | 脚本、脚本逻辑、兼容 | 脚本 bug、路径硬编码、版本不符 |
+| 标准 (Standards) | 规范、模板、约束 | 标准缺失、约束冲突、模板过期 |
+| 环境 (Environment) | 平台、网络、依赖 | 平台差异、网络不稳、依赖缺失 |
+| 数据 (Data) | 输入、格式、内容 | 数据错、格式不合规、内容过期 |
 
-### 3.2 魚骨分類實現
+### 3.2 鱼骨分类实现
 ```python
 class FishboneAnalyzer:
-    """魚骨圖分類分析"""
+    """鱼骨图分类分析"""
     
-    CATEGORIES = ["人", "流程", "工具", "標準", "環境", "數據"]
+    CATEGORIES = ["人", "流程", "工具", "标准", "环境", "数据"]
     
     KEYWORD_MAP = {
-        "人": ["漏", "忘", "誤", "手動", "疏忽", "操作"],
-        "流程": ["跳", "繞", "缺步驟", "無檢查", "門禁", "審批"],
-        "工具": ["腳本", "路徑", "硬編碼", "兼容", "版本", "命令"],
-        "標準": ["規範", "模板", "約束", "標準", "政策", "規定"],
-        "環境": ["網絡", "平台", "依賴", "權限", "系統", "容器"],
-        "數據": ["格式", "內容", "CSV", "編碼", "欄位", "欄位值"],
+        "人": ["漏", "忘", "误", "手动", "疏忽", "操作"],
+        "流程": ["跳", "绕", "缺步骤", "无检查", "门禁", "审批"],
+        "工具": ["脚本", "路径", "硬编码", "兼容", "版本", "命令"],
+        "标准": ["规范", "模板", "约束", "标准", "政策", "规定"],
+        "环境": ["网络", "平台", "依赖", "权限", "系统", "容器"],
+        "数据": ["格式", "内容", "CSV", "编码", "栏位", "栏位值"],
     }
     
     def classify(self, cause_text: str) -> List[str]:
-        """將原因分類到魚骨類別"""
+        """将原因分类到鱼骨类别"""
         matched = []
         for category, keywords in self.KEYWORD_MAP.items():
             if any(k in cause_text for k in keywords):
@@ -123,7 +123,7 @@ class FishboneAnalyzer:
         return matched or ["其他"]
     
     def build_fishbone(self, causes: List[str]) -> FishboneDiagram:
-        """構建魚骨圖數據"""
+        """构建鱼骨图数据"""
         diagram = FishboneDiagram()
         for cause in causes:
             categories = self.classify(cause)
@@ -134,39 +134,39 @@ class FishboneAnalyzer:
 
 ---
 
-## 4. 根因確認
+## 4. 根因确认
 
-### 4.1 驗證規則
-| 規則 | 說明 |
+### 4.1 验证规则
+| 规则 | 说明 |
 |------|------|
-| 復現性 | 根因可復現偏差現象（驗證因果） |
-| 可控性 | 根因在技能庫/流程可控範圍內 |
-| 唯一性 | 排除掉不可能因素後留下的（歸謬法） |
-| 可改進 | 對根因的改進能消除偏差 |
+| 复现性 | 根因可复现偏差现象（验证因果） |
+| 可控性 | 根因在技能库/流程可控范围内 |
+| 唯一性 | 排除掉不可能因素后留下的（归谬法） |
+| 可改进 | 对根因的改进能消除偏差 |
 
-### 4.2 確認方法
+### 4.2 确认方法
 ```python
 class RootCauseValidator:
-    """根因驗證"""
+    """根因验证"""
     
     def validate(self, root_cause: RootCause) -> ValidationResult:
-        """驗證根因有效性"""
+        """验证根因有效性"""
         checks = []
         
-        # 1. 復現性驗證
+        # 1. 复现性验证
         if self._can_reproduce(root_cause):
-            checks.append(Check(name="復現性", passed=True, note="可復現"))
+            checks.append(Check(name="复现性", passed=True, note="可复现"))
         else:
-            checks.append(Check(name="復現性", passed=False, note="無法復現，需更多數據"))
+            checks.append(Check(name="复现性", passed=False, note="无法复现，需更多数据"))
         
-        # 2. 可控性驗證
-        controllable = any(m in root_cause.root for m in ["標準", "流程", "工具", "技能", "腳本", "模板"])
+        # 2. 可控性验证
+        controllable = any(m in root_cause.root for m in ["标准", "流程", "工具", "技能", "脚本", "模板"])
         checks.append(Check(name="可控性", passed=controllable, 
-                           note="可控" if controllable else "超出技能庫範圍"))
+                           note="可控" if controllable else "超出技能库范围"))
         
-        # 3. 可改進性
-        checks.append(Check(name="可改進性", passed=root_cause.improvable,
-                           note="可改進" if root_cause.improvable else "需重新分析"))
+        # 3. 可改进性
+        checks.append(Check(name="可改进性", passed=root_cause.improvable,
+                           note="可改进" if root_cause.improvable else "需重新分析"))
         
         return ValidationResult(
             valid=all(c.passed for c in checks),
@@ -176,39 +176,39 @@ class RootCauseValidator:
 
 ---
 
-## 5. 可改進點提取與優先級
+## 5. 可改进点提取与优先级
 
-### 5.1 可改進點模型
+### 5.1 可改进点模型
 ```python
 @dataclass
 class ImprovementPoint:
     id: str                  # IMP-001
-    root_cause: str          # 對應根因
-    target: str              # 改進目標（技能/流程/工具/標準）
-    proposal: str            # 改進方向
-    expected_benefit: str    # 預期收益
+    root_cause: str          # 对应根因
+    target: str              # 改进目标（技能/流程/工具/标准）
+    proposal: str            # 改进方向
+    expected_benefit: str    # 预期收益
     cost: str                # 成本（低/中/高）
-    risk: str                # 風險（低/中/高）
+    risk: str                # 风险（低/中/高）
     priority: str            # P0/P1/P2/P3
     
     def score(self) -> float:
-        """優先級得分：收益 / 成本"""
+        """优先级得分：收益 / 成本"""
         benefit_score = {"高": 3, "中": 2, "低": 1}.get(self.expected_benefit, 1)
         cost_score = {"低": 1, "中": 2, "高": 3}.get(self.cost, 2)
         return benefit_score / cost_score
 ```
 
-### 5.2 優先級矩陣
+### 5.2 优先级矩阵
 | 收益 \ 成本 | 低成本 | 中成本 | 高成本 |
 |------------|--------|--------|--------|
-| 高收益 | **P0 立即做** | P1 近期做 | P2 規劃做 |
-| 中收益 | P1 近期做 | P2 規劃做 | P3 緩議 |
-| 低收益 | P2 規劃做 | P3 緩議 | P3 不做 |
+| 高收益 | **P0 立即做** | P1 近期做 | P2 规划做 |
+| 中收益 | P1 近期做 | P2 规划做 | P3 缓议 |
+| 低收益 | P2 规划做 | P3 缓议 | P3 不做 |
 
-### 5.3 排序實現
+### 5.3 排序实现
 ```python
 def prioritize(points: List[ImprovementPoint]) -> List[ImprovementPoint]:
-    """按得分排序並賦優先級"""
+    """按得分排序并赋优先级"""
     for p in points:
         score = p.score()
         if score >= 2.0 and p.expected_benefit == "高":
@@ -226,40 +226,40 @@ def prioritize(points: List[ImprovementPoint]) -> List[ImprovementPoint]:
 
 ---
 
-## 6. 分析輸出
+## 6. 分析输出
 
-### 6.1 根因分析報告
+### 6.1 根因分析报告
 ```markdown
-## 根因分析報告
-- **偏差**：DEV-001 技能 A 觸發詞 X 下未加載
-- **5-Why 鏈**：
-  1. description 沒有觸發詞 X
-  2. 編寫時按模板填但漏了
-  3. 結構校驗只查 description 有無
-  4. 校驗清單沒有觸發詞覆蓋項
-  5. **authoring.md 第 3 步校驗規則不完整** ← 系統根因
-- **魚骨分類**：標準（校驗規則缺失）
-- **可改進點**：IMP-001 補 authoring.md 結構校驗觸發詞覆蓋率
-- **優先級**：P1（中收益低成本）
+## 根因分析报告
+- **偏差**：DEV-001 技能 A 触发词 X 下未加载
+- **5-Why 链**：
+  1. description 没有触发词 X
+  2. 编写时按模板填但漏了
+  3. 结构校验只查 description 有无
+  4. 校验清单没有触发词覆盖项
+  5. **authoring.md 第 3 步校验规则不完整** ← 系统根因
+- **鱼骨分类**：标准（校验规则缺失）
+- **可改进点**：IMP-001 补 authoring.md 结构校验触发词覆盖率
+- **优先级**：P1（中收益低成本）
 ```
 
-### 6.2 可改進點清單
+### 6.2 可改进点清单
 ```csv
 id,root_cause,target,proposal,expected_benefit,cost,risk,priority
-IMP-001,authoring.md校驗規則不完整,標準,結構校驗補觸發詞覆蓋率檢查,中,低,低,P1
-IMP-002,腳本路徑硬編碼,工具,deploy路徑改自定位,高,中,低,P0
+IMP-001,authoring.md校验规则不完整,标准,结构校验补触发词覆盖率检查,中,低,低,P1
+IMP-002,脚本路径硬编码,工具,deploy路径改自定位,高,中,低,P0
 ```
 
 ---
 
-## 7. 最佳實踐
+## 7. 最佳实践
 
-1. **5 層夠用**：多數根因 3~5 層可達系統級，勿無限深挖；
-2. **一次一因**：一次分析聚焦單一偏差，避免混雜多因；
-3. **先驗證再行動**：根因未驗證不進入提案階段；
-4. **可改進才提**：無法改進的根因（如外部限制）標註「接受」而非硬改；
-5. **沉澱模式**：常見偏差的根因模式沉澱到 `lesson-harvesting.md`，避免重複分析。
+1. **5 层够用**：多数根因 3~5 层可达系统级，勿无限深挖；
+2. **一次一因**：一次分析聚焦单一偏差，避免混杂多因；
+3. **先验证再行动**：根因未验证不进入提案阶段；
+4. **可改进才提**：无法改进的根因（如外部限制）标注「接受」而非硬改；
+5. **沉淀模式**：常见偏差的根因模式沉淀到 `lesson-harvesting.md`，避免重复分析。
 
 ---
 
-**文檔版本**: v1.0.0  **最後更新**: 2026-08-09
+**文档版本**: v1.0.0  **最后更新**: 2026-08-09

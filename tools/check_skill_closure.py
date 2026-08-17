@@ -12,7 +12,11 @@ sys.stdout.reconfigure(encoding='utf-8')
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKILLS_DIR = os.environ.get('SKILLS_DIR', os.path.join(ROOT, '.trae', 'skills'))
 ALL_ROLES = ['dev-project-team-skill','role-project-init','role-requirements-analysis',
-             'role-architecture','role-development','role-testing','role-deployment','role-governance']
+             'role-architecture','role-development','role-testing','role-deployment','role-governance',
+             'role-program-mgmt']
+SUB_SKILLS = ['commit-protocol','lsp-ast-integration','multi-perspective-validation',
+              'project-memory','self-improve','team-orchestration','worktree-isolation',
+              'customize-opencode']
 
 REQUIRED_KEYS = [
     '任务入口',
@@ -25,7 +29,7 @@ REQUIRED_KEYS = [
 
 
 def check_closure(content):
-    if re.search(r'(?m)^(#+\s*)?闭环执行系统\s*$', content) is None:
+    if re.search(r'(?m)^\s*#+\s*(?:\d+\.\s*)?闭环执行系统\s*$', content) is None:
         return False, '缺少 "闭环执行系统" 标题'
     for key in REQUIRED_KEYS:
         if key not in content:
@@ -53,6 +57,20 @@ def main():
             print(f'  ✓ {role:<40} 闭环执行门禁通过')
         else:
             print(f'  ✗ {role:<40} {reason}')
+            failed += 1
+    for sub in SUB_SKILLS:
+        path = os.path.join(SKILLS_DIR, 'dev-project-team-skill', 'skills', sub, 'SKILL.md')
+        label = f'{sub} (sub)'
+        if not os.path.isfile(path):
+            print(f'  ~ {label:<36} 未安装（跳过）')
+            continue
+        with open(path, encoding='utf-8') as fh:
+            content = fh.read()
+        ok, reason = check_closure(content)
+        if ok:
+            print(f'  ✓ {label:<36} 闭环执行门禁通过')
+        else:
+            print(f'  ✗ {label:<36} {reason}')
             failed += 1
 
     print('=' * 50)

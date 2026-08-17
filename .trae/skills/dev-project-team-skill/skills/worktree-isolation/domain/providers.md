@@ -1,6 +1,6 @@
-# 提供商抽象：GitHub / Jira 實現
+# 提供商抽象：GitHub / Jira 实现
 
-> 編排器：`../SKILL.md`　上位：PSM 協議 §2.4
+> 编排器：`../SKILL.md`　上位：PSM 协议 §2.4
 
 ---
 
@@ -13,7 +13,7 @@ from typing import Optional, List
 
 @dataclass
 class RefInfo:
-    """統一引用信息"""
+    """统一引用信息"""
     repo: str                 # owner/repo
     ref_type: str             # issue | pull | feature
     ref_id: str               # number or name
@@ -28,34 +28,34 @@ class RefInfo:
 class Provider(ABC):
     @abstractmethod
     def resolve_ref(self, ref: str) -> RefInfo:
-        """解析引用字符串為統一 RefInfo"""
+        """解析引用字符串为统一 RefInfo"""
         pass
     
     @abstractmethod
     def fetch_ref(self, ref_info: RefInfo) -> RefInfo:
-        """獲取完整引用信息（標題、描述、分支等）"""
+        """获取完整引用信息（标题、描述、分支等）"""
         pass
     
     @abstractmethod
     def check_state(self, ref_info: RefInfo) -> str:
-        """檢查狀態：open/closed/merged"""
+        """检查状态：open/closed/merged"""
         pass
     
     @abstractmethod
     def create_branch(self, ref_info: RefInfo, base: str) -> str:
-        """創建工作分支，返回分支名"""
+        """创建工作分支，返回分支名"""
         pass
 ```
 
 ---
 
-## 2. GitHub Provider 實現
+## 2. GitHub Provider 实现
 
-### 2.1 CLI 依賴
+### 2.1 CLI 依赖
 - `gh` (GitHub CLI) v2.0+
-- 認證：`gh auth login` 或 `GH_TOKEN` 環境變量
+- 认证：`gh auth login` 或 `GH_TOKEN` 环境变量
 
-### 2.2 實現細節
+### 2.2 实现细节
 
 ```python
 class GitHubProvider(Provider):
@@ -72,7 +72,7 @@ class GitHubProvider(Provider):
     
     def resolve_ref(self, ref: str) -> RefInfo:
         # 支援格式: #123, owner/repo#123, URL
-        # 返回基礎 RefInfo (repo, ref_type, ref_id)
+        # 返回基础 RefInfo (repo, ref_type, ref_id)
         pass
     
     def fetch_ref(self, ref_info: RefInfo) -> RefInfo:
@@ -116,18 +116,18 @@ class GitHubProvider(Provider):
         else:
             branch = f"feature/{ref_info.ref_id}"
         
-        # 獲取 base 分支
+        # 获取 base 分支
         subprocess.run(["git", "fetch", "origin", base], check=True)
         subprocess.run(["git", "checkout", "-b", branch, f"origin/{base}"], check=True)
         return branch
 ```
 
-### 2.3 PR 審查專用流程
+### 2.3 PR 审查专用流程
 
 ```python
 def prepare_pr_review(self, pr_number: int) -> tuple[str, str]:
-    """為 PR 審查準備 worktree，返回 (worktree_path, branch_name)"""
-    # 1. 獲取 PR 信息
+    """为 PR 审查准备 worktree，返回 (worktree_path, branch_name)"""
+    # 1. 获取 PR 信息
     data = self._run_gh(["pr", "view", str(pr_number),
         "--json", "number,title,headRefName,baseRefName,headRepository"])
     
@@ -137,10 +137,10 @@ def prepare_pr_review(self, pr_number: int) -> tuple[str, str]:
     # 2. fetch PR ref
     subprocess.run(["git", "fetch", "origin", f"pull/{pr_number}/head:pr-{pr_number}-review"], check=True)
     
-    # 3. worktree 路徑
+    # 3. worktree 路径
     worktree_path = f"$HOME/.psm/worktrees/{self.repo.replace('/', '_')}/pr-{pr_number}"
     
-    # 4. 創建 worktree
+    # 4. 创建 worktree
     subprocess.run(["git", "worktree", "add", worktree_path, f"pr-{pr_number}-review"], check=True)
     
     return worktree_path, f"pr-{pr_number}-review"
@@ -148,16 +148,16 @@ def prepare_pr_review(self, pr_number: int) -> tuple[str, str]:
 
 ---
 
-## 3. Jira Provider 實現
+## 3. Jira Provider 实现
 
-### 3.1 CLI 依賴
+### 3.1 CLI 依赖
 - `jira-cli` (ankitpokhrel/jira-cli)
-- 安裝：`brew install ankitpokhrel/jira-cli/jira-cli` (macOS)
-- 認證：`jira init` 交互式配置
+- 安装：`brew install ankitpokhrel/jira-cli/jira-cli` (macOS)
+- 认证：`jira init` 交互式配置
 
 ### 3.2 配置要求
 
-專案別名需顯式配置 `jira_project`：
+专案别名需显式配置 `jira_project`：
 ```json
 {
   "aliases": {
@@ -172,7 +172,7 @@ def prepare_pr_review(self, pr_number: int) -> tuple[str, str]:
 }
 ```
 
-### 3.3 實現細節
+### 3.3 实现细节
 
 ```python
 class JiraProvider(Provider):
@@ -227,15 +227,15 @@ class JiraProvider(Provider):
 
 ### 3.4 Jira 限制
 
-| 限制 | 說明 |
+| 限制 | 说明 |
 |------|------|
-| 無 PR 概念 | 不支援 `psm review`，僅支援 `fix`/`feature` |
-| 需顯式配置 | `jira_project` 必須在 aliases 中配置 |
-| CLI 獨立認證 | `jira init` 獨立於 gh 認證 |
+| 无 PR 概念 | 不支援 `psm review`，仅支援 `fix`/`feature` |
+| 需显式配置 | `jira_project` 必须在 aliases 中配置 |
+| CLI 独立认证 | `jira init` 独立于 gh 认证 |
 
 ---
 
-## 4. 提供商工廠
+## 4. 提供商工厂
 
 ```python
 def get_provider(config: dict) -> Provider:
@@ -259,9 +259,9 @@ def get_provider(config: dict) -> Provider:
 
 ```python
 def parse_ref(ref: str, default_project: str = None) -> tuple[Provider, RefInfo]:
-    """統一入口：解析引用字符串 → (Provider, RefInfo)"""
+    """统一入口：解析引用字符串 → (Provider, RefInfo)"""
     
-    # 1. 如果有別名配置
+    # 1. 如果有别名配置
     if "#" in ref and not ref.startswith("#"):
         alias, rest = ref.split("#", 1)
         project_config = load_project_config(alias)
@@ -270,7 +270,7 @@ def parse_ref(ref: str, default_project: str = None) -> tuple[Provider, RefInfo]
         ref_info.repo = project_config["repo"]
         return provider, ref_info
     
-    # 2. 當前 repo 推斷
+    # 2. 当前 repo 推断
     if ref.startswith("#"):
         repo = get_current_repo()
         provider = get_provider({"provider": "github", "repo": repo})
@@ -298,4 +298,4 @@ def parse_ref(ref: str, default_project: str = None) -> tuple[Provider, RefInfo]
 
 ---
 
-**文檔版本**: v1.0.0  **最後更新**: 2026-08-08
+**文档版本**: v1.0.0  **最后更新**: 2026-08-08

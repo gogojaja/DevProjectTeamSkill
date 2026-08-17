@@ -1,6 +1,6 @@
 # program_details — 项目群管理明细
 
-> 角色包明细资源，配合 `../domain/program-management.md` 使用。来源：PMI《项目集管理标准》第5版（SPM 5th, 2023）、MSP（Managing Successful Programmes 5th, 2020）、Integrated Master Schedule（IMS）、EVM 挣值管理（ANSI EIA-748）、SAFe、ISO 10007 配置管理 / ISO 15489 文档管理。
+> 角色包明细资源，配合 `../program-management.md` 使用。来源：PMI《项目集管理标准》第5版（SPM 5th, 2023）、MSP（Managing Successful Programmes 5th, 2020）、Integrated Master Schedule（IMS）、EVM 挣值管理（ANSI EIA-748）、SAFe、ISO 10007 配置管理 / ISO 15489 文档管理。
 
 ## 1. 治理模型（三层）
 

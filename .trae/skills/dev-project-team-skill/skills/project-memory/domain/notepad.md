@@ -1,53 +1,53 @@
-# Notepad 輕量工作記憶
+# Notepad 轻量工作记忆
 
-> 編排器：`../SKILL.md`　上位：編排器 §5 調度規則
+> 编排器：`../SKILL.md`　上位：编排器 §5 调度规则
 
 ---
 
-## 1. 設計目標
+## 1. 设计目标
 
 | 特性 | ProjectMemory | Notepad |
 |------|---------------|---------|
-| 持久化 | 永久 (JSONL + 向量) | 會話/短期 (內存 + 可選落盤) |
-| 向量化 | 是 (語義檢索) | 否 (關鍵詞/標籤) |
-| 結構 | 豐富 (類型/標籤/關聯/嵌入) | 極簡 (類型/內容/TTL) |
-| 讀寫延遲 | ~ms (含向量) | <1ms (純內存) |
-| 適用場景 | 決策/約束/長期知識 | 會話臨時筆記/觀察/待辦 |
+| 持久化 | 永久 (JSONL + 向量) | 会话/短期 (内存 + 可选落盘) |
+| 向量化 | 是 (语义检索) | 否 (关键词/标签) |
+| 结构 | 丰富 (类型/标签/关联/嵌入) | 极简 (类型/内容/TTL) |
+| 读写延迟 | ~ms (含向量) | <1ms (纯内存) |
+| 适用场景 | 决策/约束/长期知识 | 会话临时笔记/观察/待办 |
 
 ---
 
-## 1. 數據模型
+## 1. 数据模型
 
-### 1.1 筆記類型
+### 1.1 笔记类型
 ```python
 NOTE_TYPES = {
-    "working": {"ttl": "session", "desc": "正在進行的工作內容、代碼片段、調試信息"},
-    "observation": {"ttl": "7d", "desc": "運行時觀察、性能數據、異常現象"},
-    "todo": {"ttl": "30d", "desc": "待辦事項、後續跟進行動"},
-    "scratch": {"ttl": "1h", "desc": "極短期草稿、計算過程、臨時記錄"},
+    "working": {"ttl": "session", "desc": "正在进行的工作内容、代码片段、调试信息"},
+    "observation": {"ttl": "7d", "desc": "运行时观察、性能数据、异常现象"},
+    "todo": {"ttl": "30d", "desc": "待办事项、后续跟进行动"},
+    "scratch": {"ttl": "1h", "desc": "极短期草稿、计算过程、临时记录"},
 }
 ```
 
-### 1.2 筆記結構
+### 1.2 笔记结构
 ```python
 @dataclass
 class Note:
     id: str                     # note-{timestamp}-{seq}
     type: str                   # working | observation | todo | scratch
-    title: str                  # 可選，自動從內容首行生成
-    content: str                # 純文本/Markdown
-    tags: List[str]             # 可選標籤
-    session_id: str             # 歸屬會話
+    title: str                  # 可选，自动从内容首行生成
+    content: str                # 纯文本/Markdown
+    tags: List[str]             # 可选标签
+    session_id: str             # 归属会话
     created_at: str             # ISO 8601
-    expires_at: Optional[str]   # TTL 到期時間
-    metadata: Dict              # 任意擴展
+    expires_at: Optional[str]   # TTL 到期时间
+    metadata: Dict              # 任意扩展
 ```
 
 ---
 
-## 2. 存儲引擎
+## 2. 存储引擎
 
-### 2.1 內存優先 + 可選持久化
+### 2.1 内存优先 + 可选持久化
 ```python
 class Notepad:
     def __init__(self, session_id: str, persist_path: str = None):
@@ -61,11 +61,11 @@ class Notepad:
             with open(self.persist_path, "r") as f:
                 data = json.load(f)
                 self.notes = {k: Note(**v) for k, v in data.items()}
-                # 清理過期
+                # 清理过期
                 self._cleanup_expired()
     
     def _save(self):
-        # 原子寫入
+        # 原子写入
         data = {k: asdict(v) for k, v in self.notes.items()}
         atomic_write(self.persist_path, json.dumps(data, ensure_ascii=False, indent=2))
 ```
@@ -128,35 +128,35 @@ def cleanup_expired(self):
 
 ## 3. TTL 管理
 
-### 3.1 TTL 計算
+### 3.1 TTL 计算
 ```python
 def calculate_ttl(note_type: str, custom_ttl: str = None) -> Optional[str]:
     if custom_ttl:
         return parse_ttl(custom_ttl)
     
     defaults = {
-        "working": "session",     # 會話結束清理
+        "working": "session",     # 会话结束清理
         "observation": "7d",      # 7 天
         "todo": "30d",            # 30 天
-        "scratch": "1h",          # 1 小時
+        "scratch": "1h",          # 1 小时
     }
     ttl_str = defaults.get(note_type, "session")
     
     if ttl_str == "session":
-        return None  # 不設過期，會話結束由外部清理
+        return None  # 不设过期，会话结束由外部清理
     
     return (datetime.now() + parse_duration(ttl_str)).isoformat()
 ```
 
-### 3.2 自動清理
+### 3.2 自动清理
 ```python
-# 會話結束時調用
+# 会话结束时调用
 def on_session_end(session_id: str):
     path = f".senate/memory/notepad-{session_id}.json"
     if os.path.exists(path):
-        os.remove(path)  # working/scratch 直接刪除
+        os.remove(path)  # working/scratch 直接删除
 
-# 定時任務 (每小時)
+# 定时任务 (每小时)
 def periodic_cleanup():
     for path in glob(".senate/memory/notepad-*.json"):
         notepad = Notepad("", path)
@@ -167,20 +167,20 @@ def periodic_cleanup():
 
 ---
 
-## 4. 會話隔離
+## 4. 会话隔离
 
-### 4.1 會話級命名空間
+### 4.1 会话级命名空间
 ```
 .senate/memory/
-├── notepad-sess-abc123.json    # 會話 abc123 的筆記
-├── notepad-sess-def456.json    # 會話 def456 的筆記
-└── notepad-global.json         # 跨會話共享 (可選)
+├── notepad-sess-abc123.json    # 会话 abc123 的笔记
+├── notepad-sess-def456.json    # 会话 def456 的笔记
+└── notepad-global.json         # 跨会话共享 (可选)
 ```
 
-### 4.2 跨會話共享 (可選)
+### 4.2 跨会话共享 (可选)
 ```python
 def share_note(note_id: str, target_session: str = "global"):
-    """將筆記複製到另一會話或全局"""
+    """将笔记复制到另一会话或全局"""
     source = Notepad(current_session)
     note = source.read(note_id)
     if note:
@@ -194,29 +194,29 @@ def share_note(note_id: str, target_session: str = "global"):
 ## 4. CLI 介面
 
 ```bash
-# 寫入
-note "working" "正在修復 UserService N+1 查詢" --tags debug,performance
-note "observation" "API 響應 P99 從 200ms 降到 50ms" --tags api,optimization
-note "todo" "補全 ADR-012 選型文檔" --ttl 30d
+# 写入
+note "working" "正在修复 UserService N+1 查询" --tags debug,performance
+note "observation" "API 响应 P99 从 200ms 降到 50ms" --tags api,optimization
+note "todo" "补全 ADR-012 选型文档" --ttl 30d
 
-# 讀取/搜索
+# 读取/搜索
 note list --type working
 note search "N+1" --tags debug
 note read <note-id>
 
-# 刪除/清理
+# 删除/清理
 note delete <note-id>
 note cleanup --session current
 ```
 
 ---
 
-## 5. 與 ProjectMemory 協作
+## 5. 与 ProjectMemory 协作
 
-### 5.1 升級機制
+### 5.1 升级机制
 ```python
 def promote_to_memory(note_id: str, memory_type: str = "observation"):
-    """將成熟的筆記升級為長期記憶"""
+    """将成熟的笔记升级为长期记忆"""
     notepad = Notepad(current_session)
     note = notepad.read(note_id)
     if note:
@@ -227,16 +227,16 @@ def promote_to_memory(note_id: str, memory_type: str = "observation"):
             tags=note.tags + ["promoted-from-notepad"],
             source=f"notepad:{current_session}"
         )
-        # 標記已升級
+        # 标记已升级
         note.metadata["promoted_to"] = memory_id
         notepad._save()
         return memory_id
 ```
 
-### 5.2 降級/引用
+### 5.2 降级/引用
 ```python
 def reference_memory(memory_id: str) -> str:
-    """在 notepad 中引用長期記憶"""
+    """在 notepad 中引用长期记忆"""
     mem = read_memory(memory_id)
     if mem:
         return notepad.write("working", f"[Ref: {memory_id}] {mem.title}\n{mem.content}", tags=["ref"])
@@ -244,15 +244,15 @@ def reference_memory(memory_id: str) -> str:
 
 ---
 
-## 6. 性能指標
+## 6. 性能指标
 
-| 操作 | 耗時 | 說明 |
+| 操作 | 耗时 | 说明 |
 |------|------|------|
-| 寫入 | <0.5ms | 內存字典 + 異步落盤 |
-| 讀取 | <0.1ms | 字典查找 |
-| 搜索 | <1ms | 線性掃描 (通常 <100 條) |
-| TTL 清理 | <5ms | 批量刪除 |
+| 写入 | <0.5ms | 内存字典 + 异步落盘 |
+| 读取 | <0.1ms | 字典查找 |
+| 搜索 | <1ms | 线性扫描 (通常 <100 条) |
+| TTL 清理 | <5ms | 批量删除 |
 
 ---
 
-**文檔版本**: v1.0.0  **最後更新**: 2026-08-08
+**文档版本**: v1.0.0  **最后更新**: 2026-08-08

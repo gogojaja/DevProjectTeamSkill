@@ -1,20 +1,20 @@
-# 代碼生成：模板 / 上下文感知 / 類型感知 / 測試生成
+# 代码生成：模板 / 上下文感知 / 类型感知 / 测试生成
 
-> 編排器：`../SKILL.md`
+> 编排器：`../SKILL.md`
 
 ---
 
-## 1. 代碼生成架構
+## 1. 代码生成架构
 
-### 1.1 生成層次
-| 層次 | 能力 | 依賴 | 典型應用 |
+### 1.1 生成层次
+| 层次 | 能力 | 依赖 | 典型应用 |
 |------|------|------|----------|
-| 模板生成 | 填充模板 | 模板引擎 | 樣板代碼、項目骨架、CRUD |
-| 上下文感知 | 基於當前代碼 | AST 上下文 | 方法補全、類擴展、接口實現 |
-| 類型感知 | 基於類型系統 | 符號表 + LSP | API 客戶端、DTO 映射、ORM 模型 |
-| 語義感知 | 基於語義 | AST + 符號表 + LSP | 測試生成、遷移腳本、重構輔助 |
+| 模板生成 | 填充模板 | 模板引擎 | 样板代码、项目骨架、CRUD |
+| 上下文感知 | 基于当前代码 | AST 上下文 | 方法补全、类扩展、接口实现 |
+| 类型感知 | 基于类型系统 | 符号表 + LSP | API 客户端、DTO 映射、ORM 模型 |
+| 语义感知 | 基于语义 | AST + 符号表 + LSP | 测试生成、迁移脚本、重构辅助 |
 
-### 1.2 核心組件
+### 1.2 核心组件
 ```python
 class CodeGenerator:
     def __init__(self, ast_engine: ASTEngine, lsp_client: LSPClient = None):
@@ -25,24 +25,24 @@ class CodeGenerator:
         self._register_default_templates()
     
     def generate(self, request: GenerationRequest) -> GenerationResult:
-        # 1. 解析生成意圖
+        # 1. 解析生成意图
         intent = self._parse_intent(request)
         
         # 2. 收集上下文
         context = self._collect_context(intent)
         
-        # 3. 選擇生成器
+        # 3. 选择生成器
         generator = self.providers.get(intent.type)
         if not generator:
             return GenerationResult(success=False, errors=[f"Unknown generation type: {intent.type}"])
         
-        # 4. 生成代碼
+        # 4. 生成代码
         code = generator.generate(context)
         
         # 5. 格式化
         formatted = self._format(code, intent.language)
         
-        # 6. 校驗（可選 LSP 診斷）
+        # 6. 校验（可选 LSP 诊断）
         diagnostics = self._validate(formatted) if self.lsp else []
         
         return GenerationResult(
@@ -64,9 +64,9 @@ class Template:
     name: str
     language: str
     pattern: str                    # 生成模式
-    placeholders: List[str]         # 佔位符列表
-    conditionals: List[Conditional] # 條件邏輯
-    defaults: Dict[str, str]        # 默認值
+    placeholders: List[str]         # 占位符列表
+    conditionals: List[Conditional] # 条件逻辑
+    defaults: Dict[str, str]        # 默认值
     
     def render(self, context: Dict[str, Any]) -> str:
         """渲染模板"""
@@ -156,26 +156,26 @@ class ContextCollector:
         ast = self.ast_engine.parse_file(file)
         context = GenerationContext(file=file, ast=ast)
         
-        # 1. 當前作用域
+        # 1. 当前作用域
         if cursor:
             context.scope = self._find_enclosing_scope(ast, cursor)
         
-        # 2. 可見符號
+        # 2. 可见符号
         context.visible_symbols = self._collect_visible_symbols(ast, context.scope)
         
-        # 3. 導入語句
+        # 3. 导入语句
         context.imports = self._collect_imports(ast)
         
-        # 4. 命名衝突檢測
+        # 4. 命名冲突检测
         context.used_names = self._collect_used_names(ast)
         
-        # 5. 代碼風格
+        # 5. 代码风格
         context.style = self._detect_style(ast)
         
         return context
     
     def _find_enclosing_scope(self, ast, cursor) -> Scope:
-        """找到光標所在的最內層作用域"""
+        """找到光标所在的最内层作用域"""
         node = ast.root
         stack = []
         
@@ -189,13 +189,13 @@ class ContextCollector:
         return stack[-1] if stack else ast.root_scope
     
     def _collect_visible_symbols(self, ast, scope) -> List[Symbol]:
-        """收集作用域內可見符號"""
+        """收集作用域内可见符号"""
         symbols = []
         current = scope
         while current:
             symbols.extend(current.declarations)
             current = current.parent
-        # 加上全局 + 導入
+        # 加上全局 + 导入
         symbols.extend(ast.global_symbols)
         return symbols
 ```
@@ -204,7 +204,7 @@ class ContextCollector:
 ```python
 class ContextAwareGenerator:
     def generate(self, context: GenerationContext, intent: GenerationIntent) -> str:
-        """基於上下文生成"""
+        """基于上下文生成"""
         if intent.type == "implement_method":
             return self._generate_method(context, intent)
         elif intent.type == "implement_interface":
@@ -216,53 +216,53 @@ class ContextAwareGenerator:
         return ""
     
     def _generate_method(self, context, intent) -> str:
-        """生成方法實現"""
+        """生成方法实现"""
         signature = intent.signature
         return_type = signature.return_type
         
-        # 基於返回類型推導默認實現
+        # 基于返回类型推导默认实现
         default = self._default_for_type(return_type)
         
-        # 使用可用符號
+        # 使用可用符号
         available = [s for s in context.visible_symbols if self._is_usable(s, return_type)]
         
         return f"""def {signature.name}(self, {", ".join(signature.params)}):
-    # TODO: 實現 {signature.name}
+    # TODO: 实现 {signature.name}
     {self._suggest_impl(available, return_type)}
     return {default}"""
     
     def _suggest_impl(self, symbols, return_type) -> str:
-        """基於可見符號推導實現建議"""
+        """基于可见符号推导实现建议"""
         candidates = []
         for s in symbols:
             if s.type == return_type:
                 candidates.append(f"return {s.name}")
         if candidates:
             return candidates[0]
-        return f"# 提示: 可用的 {return_type} 符號: {', '.join(s.name for s in symbols[:5])}"
+        return f"# 提示: 可用的 {return_type} 符号: {', '.join(s.name for s in symbols[:5])}"
 ```
 
 ---
 
-## 4. 類型感知生成
+## 4. 类型感知生成
 
-### 4.1 類型推導
+### 4.1 类型推导
 ```python
 class TypeAwareGenerator:
     def __init__(self, lsp_client: LSPClient):
         self.lsp = lsp_client
     
     def infer_type(self, file: str, line: int, col: int) -> TypeInfo:
-        """推導變量/表達式類型"""
+        """推导变量/表达式类型"""
         hover = self.lsp.hover(file, line, col)
         if not hover:
             return TypeInfo(name="unknown", kind="any")
         
-        # 解析 hover 內容中的類型標記
+        # 解析 hover 内容中的类型标记
         return self._parse_type_from_hover(hover)
     
     def generate_api_client(self, spec: OpenAPISpec) -> str:
-        """基於 OpenAPI 生成 API 客戶端"""
+        """基于 OpenAPI 生成 API 客户端"""
         lines = ["class ApiClient:", "    def __init__(self, base_url):", "        self.base_url = base_url"]
         
         for path, methods in spec.paths.items():
@@ -277,7 +277,7 @@ class TypeAwareGenerator:
         return "\n".join(lines)
     
     def _generate_endpoint(self, method, path, detail, class_name) -> List[str]:
-        """生成端點方法"""
+        """生成端点方法"""
         params = []
         for p in detail.get("parameters", []):
             params.append(f"{p['name']}: {self._type_to_annotation(p['schema']['type'])}")
@@ -288,11 +288,11 @@ class TypeAwareGenerator:
             f"            url = f\"{self._path_with_query(path)}\"",
         ]
         
-        # 請求體
+        # 请求体
         if "requestBody" in detail:
             lines.append(f"            data = {self._body_serialize(detail['requestBody'])}")
         
-        # 發送請求
+        # 发送请求
         lines.extend([
             f"            response = self._client.request({method!r}, url, data=data)",
             "            response.raise_for_status()",
@@ -305,7 +305,7 @@ class TypeAwareGenerator:
 ```python
 class ModelGenerator:
     def generate_dto(self, schema: Dict) -> str:
-        """從 JSON Schema 生成 DTO"""
+        """从 JSON Schema 生成 DTO"""
         name = schema["title"]
         fields = []
         
@@ -343,9 +343,9 @@ class {name}:
 
 ---
 
-## 5. 測試生成
+## 5. 测试生成
 
-### 5.1 基於 AST 生成單元測試
+### 5.1 基于 AST 生成单元测试
 ```python
 class TestGenerator:
     def __init__(self, ast_engine: ASTEngine, framework: str = "pytest"):
@@ -353,21 +353,21 @@ class TestGenerator:
         self.framework = framework
     
     def generate_for_function(self, file: str, func_name: str) -> str:
-        """為函數生成單元測試"""
+        """为函数生成单元测试"""
         ast = self.ast_engine.parse_file(file)
         func = self._find_function(ast, func_name)
         
-        # 1. 分析函數簽名
+        # 1. 分析函数签名
         params = func.signature.params
         return_type = func.signature.return_type
         
-        # 2. 生成測試用例
+        # 2. 生成测试用例
         cases = []
         cases.extend(self._generate_normal_cases(func))
         cases.extend(self._generate_edge_cases(func))
         cases.extend(self._generate_error_cases(func))
         
-        # 3. 生成測試函數
+        # 3. 生成测试函数
         test_lines = [
             "import pytest",
             f"from {self._module_of(file)} import {func_name}",
@@ -384,8 +384,8 @@ class TestGenerator:
         return "\n".join(test_lines)
     
     def _generate_normal_cases(self, func) -> List[TestCase]:
-        """正常路徑測試"""
-        # 基於參數類型生成典型值
+        """正常路径测试"""
+        # 基于参数类型生成典型值
         cases = []
         params = func.signature.params
         for i in range(min(3, max(1, len(params)))):
@@ -399,7 +399,7 @@ class TestGenerator:
         return cases
     
     def _generate_edge_cases(self, func) -> List[TestCase]:
-        """邊界值測試"""
+        """边界值测试"""
         cases = []
         params = func.signature.params
         edge_values = {"int": ["0", "-1", "maxint"], "str": ["\"\"", "\" \"", "\"\\n\""], "list": ["[]"], "float": ["0.0", "-0.0", "inf"]}
@@ -415,7 +415,7 @@ class TestGenerator:
         return cases
     
     def _generate_error_cases(self, func) -> List[TestCase]:
-        """異常測試"""
+        """异常测试"""
         cases = []
         params = func.signature.params
         for p in params:
@@ -426,17 +426,17 @@ class TestGenerator:
         return cases
 ```
 
-### 5.2 測試覆蓋率分析
+### 5.2 测试覆盖率分析
 ```python
 class CoverageAnalyzer:
     def analyze(self, file: str, coverage_data: Dict) -> CoverageReport:
-        """分析測試覆蓋率並識別未覆蓋分支"""
+        """分析测试覆盖率并识别未覆盖分支"""
         ast = self.ast_engine.parse_file(file)
         
-        # 1. 找出所有條件節點
+        # 1. 找出所有条件节点
         conditionals = self._find_conditionals(ast)
         
-        # 2. 與覆蓋數據對比
+        # 2. 与覆盖数据对比
         uncovered = []
         for cond in conditionals:
             key = f"{cond.file}:{cond.line}"
@@ -447,7 +447,7 @@ class CoverageAnalyzer:
                 if data["branch_count"] != data["covered_count"]:
                     uncovered.append(cond)
         
-        # 3. 生成補充測試建議
+        # 3. 生成补充测试建议
         suggestions = [self._suggest_test(cond) for cond in uncovered]
         
         return CoverageReport(total=len(conditionals), uncovered=len(uncovered), suggestions=suggestions)
@@ -455,34 +455,34 @@ class CoverageAnalyzer:
 
 ---
 
-## 6. 生成質量保證
+## 6. 生成质量保证
 
-### 6.1 生成代碼校驗
+### 6.1 生成代码校验
 ```python
 class GenerationValidator:
     def __init__(self, lsp_client: LSPClient = None):
         self.lsp = lsp_client
     
     def validate(self, code: str, language: str, context: GenerationContext) -> ValidationResult:
-        """驗證生成代碼質量"""
+        """验证生成代码质量"""
         errors = []
         warnings = []
         
-        # 1. 語法校驗
+        # 1. 语法校验
         if not self._is_syntactically_valid(code, language):
             errors.append("Generated code has syntax errors")
         
-        # 2. 命名衝突
+        # 2. 命名冲突
         conflicts = self._check_name_conflicts(code, context.used_names)
         warnings.extend(conflicts)
         
-        # 3. 類型正確性
+        # 3. 类型正确性
         if self.lsp:
             diags = self.lsp.get_diagnostics_for_code(code, language)
             errors.extend([d for d in diags if d.severity == 1])
             warnings.extend([d for d in diags if d.severity == 2])
         
-        # 4. 安全檢查
+        # 4. 安全检查
         security = self._check_security(code, language)
         warnings.extend(security)
         
@@ -494,7 +494,7 @@ class GenerationValidator:
         )
     
     def _check_security(self, code, language) -> List[str]:
-        """安全檢查：SQL 注入、命令注入、路徑遍歷"""
+        """安全检查：SQL 注入、命令注入、路径遍历"""
         warnings = []
         
         if "eval(" in code or "exec(" in code:
@@ -511,4 +511,4 @@ class GenerationValidator:
 
 ---
 
-**文檔版本**: v1.0.0  **最後更新**: 2026-08-08
+**文档版本**: v1.0.0  **最后更新**: 2026-08-08

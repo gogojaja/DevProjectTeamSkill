@@ -1,46 +1,46 @@
-# 記憶檢索：混合檢索(向量+關鍵詞+圖)/重排序/上下文注入
+# 记忆检索：混合检索(向量+关键词+图)/重排序/上下文注入
 
-> 編排器：`../SKILL.md`　上位：編排器 §5 調度規則
+> 编排器：`../SKILL.md`　上位：编排器 §5 调度规则
 
 ---
 
-## 1. 檢索架構
+## 1. 检索架构
 
 ```
-用戶查詢
+用户查询
     │
-    ├─→ 意圖識別 (Intent Classifier)
-    │       ├─ fact: 事實查詢 → 向量 + 關鍵詞
-    │       ├─ decision: 決策查詢 → ProjectMemory + 標籤
-    │       ├─ impact: 影響分析 → KnowledgeGraph
-    │       ├─ context: 上下文恢復 → ContextSnapshot
-    │       └─ todo: 待辦查詢 → Notepad
+    ├─→ 意图识别 (Intent Classifier)
+    │       ├─ fact: 事实查询 → 向量 + 关键词
+    │       ├─ decision: 决策查询 → ProjectMemory + 标签
+    │       ├─ impact: 影响分析 → KnowledgeGraph
+    │       ├─ context: 上下文恢复 → ContextSnapshot
+    │       └─ todo: 待办查询 → Notepad
     │
-    ├─→ 並行檢索
-    │       ├─ Vector Search (語義相似)
-    │       ├─ Keyword Search (BM25/關鍵詞)
-    │       ├─ Graph Traversal (圖鄰域)
-    │       └─ Structured Filter (類型/標籤/時間)
+    ├─→ 并行检索
+    │       ├─ Vector Search (语义相似)
+    │       ├─ Keyword Search (BM25/关键词)
+    │       ├─ Graph Traversal (图邻域)
+    │       └─ Structured Filter (类型/标签/时间)
     │
-    ├─→ 候選融合 (Reciprocal Rank Fusion)
+    ├─→ 候选融合 (Reciprocal Rank Fusion)
     │
     ├─→ 重排序
     │       ├─ Cross-Encoder 精排
-    │       ├─ 業務權重 (決策>約束>觀察)
-    │       ├─ 時間衰減 (近期優先)
-    │       └─ 來源可信度 (architect > user)
+    │       ├─ 业务权重 (决策>约束>观察)
+    │       ├─ 时间衰减 (近期优先)
+    │       └─ 来源可信度 (architect > user)
     │
     └─→ 上下文注入
-            ├─ 截斷適配 Token 預算
+            ├─ 截断适配 Token 预算
             ├─ 格式化注入模板
-            └─ 附帶引用來源
+            └─ 附带引用来源
 ```
 
 ---
 
-## 2. 多路檢索器
+## 2. 多路检索器
 
-### 2.1 向量檢索
+### 2.1 向量检索
 ```python
 class VectorRetriever:
     def __init__(self, index_path: str, embed_model: str = "bge-small-zh"):
@@ -63,7 +63,7 @@ class VectorRetriever:
         return results
 ```
 
-### 2.2 關鍵詞檢索 (BM25)
+### 2.2 关键词检索 (BM25)
 ```python
 class KeywordRetriever:
     def __init__(self, corpus_path: str):
@@ -85,18 +85,18 @@ class KeywordRetriever:
         return results
 ```
 
-### 2.3 圖鄰域檢索
+### 2.3 图邻域检索
 ```python
 class GraphRetriever:
     def __init__(self, graph: KnowledgeGraph):
         self.graph = graph
     
     def search(self, query: str, seed_entities: List[str], k: int = 10, max_hops: int = 2) -> List[RetrievalResult]:
-        # 1. 實體鏈接
+        # 1. 实体链接
         entities = link_entities(query, self.graph.nodes)
         seeds = entities + seed_entities
         
-        # 2. 圖擴散
+        # 2. 图扩散
         visited = set()
         results = []
         for seed in seeds:
@@ -111,7 +111,7 @@ class GraphRetriever:
         return sorted(results, key=lambda r: r.score, reverse=True)[:k]
 ```
 
-### 2.4 結構化過濾
+### 2.4 结构化过滤
 ```python
 class StructuredFilter:
     def filter(self, candidates: List[RetrievalResult], 
@@ -130,7 +130,7 @@ class StructuredFilter:
 
 ---
 
-## 3. 候選融合 (RRF)
+## 3. 候选融合 (RRF)
 
 ### 3.1 Reciprocal Rank Fusion
 ```python
@@ -155,7 +155,7 @@ def rrf_fusion(result_lists: List[List[RetrievalResult]], k: int = 60) -> List[R
     return fused
 ```
 
-### 3.2 加權融合 (可選)
+### 3.2 加权融合 (可选)
 ```python
 WEIGHTS = {"vector": 0.4, "keyword": 0.3, "graph": 0.2, "filter": 0.1}
 
@@ -191,14 +191,14 @@ class CrossEncoderReranker:
         return sorted(candidates, key=lambda x: x.rerank_score, reverse=True)[:top_k]
 ```
 
-### 4.2 業務感知重排序
+### 4.2 业务感知重排序
 ```python
 def business_rerank(results: List[RetrievalResult], query_intent: str) -> List[RetrievalResult]:
     for r in results:
         mem = load_memory(r.id)
         base = r.rerank_score or r.score
         
-        # 1. 類型權重
+        # 1. 类型权重
         type_weight = {
             "decision": 1.3, "constraint": 1.2, 
             "knowledge": 1.1, "observation": 1.0
@@ -207,16 +207,16 @@ def business_rerank(results: List[RetrievalResult], query_intent: str) -> List[R
         # 2. 置信度
         conf_weight = {"high": 1.2, "medium": 1.0, "low": 0.8}.get(mem.confidence, 1.0)
         
-        # 3. 來源可信度
+        # 3. 来源可信度
         source_weight = {
             "architect": 1.3, "planner": 1.1, "executor": 1.0, "user": 0.9
         }.get(mem.source, 1.0)
         
-        # 4. 時間衰減 (半衰期 90 天)
+        # 4. 时间衰减 (半衰期 90 天)
         days_old = (now() - parse(mem.timestamp)).days
         time_decay = 0.5 ** (days_old / 90)
         
-        # 5. 意圖匹配加成
+        # 5. 意图匹配加成
         intent_bonus = 1.2 if matches_intent(mem, query_intent) else 1.0
         
         r.final_score = base * type_weight * conf_weight * source_weight * time_decay * intent_bonus
@@ -228,22 +228,22 @@ def business_rerank(results: List[RetrievalResult], query_intent: str) -> List[R
 
 ## 5. 上下文注入
 
-### 5.1 Token 預算管理
+### 5.1 Token 预算管理
 ```python
 def inject_context(
     query: str,
     results: List[RetrievalResult],
-    token_budget: int = 4000,  # 預留給用戶查詢+回複
+    token_budget: int = 4000,  # 预留给用户查询+回复
     template: str = "default"
 ) -> InjectedContext:
-    """將檢索結果注入上下文，控制 Token 消耗"""
+    """将检索结果注入上下文，控制 Token 消耗"""
     
-    # 1. 估算各結果 Token
+    # 1. 估算各结果 Token
     for r in results:
         mem = load_memory(r.id)
         r.tokens = estimate_tokens(format_memory(mem, template))
     
-    # 2. 貪心選擇 (按 final_score 降序，直到填滿預算)
+    # 2. 贪心选择 (按 final_score 降序，直到填满预算)
     selected = []
     used = 0
     for r in results:
@@ -257,7 +257,7 @@ def inject_context(
     for r in selected:
         mem = load_memory(r.id)
         block = format_memory(mem, template)
-        block += f"\n[來源: {mem.id} | 類型: {mem.type} | 置信度: {mem.confidence} | 分數: {r.final_score:.3f}]"
+        block += f"\n[来源: {mem.id} | 类型: {mem.type} | 置信度: {mem.confidence} | 分数: {r.final_score:.3f}]"
         context_blocks.append(block)
     
     return InjectedContext(
@@ -274,27 +274,27 @@ def inject_context(
 TEMPLATES = {
     "default": """## {title}
 {content}
-標籤: {tags}
-類型: {type} | 置信度: {confidence} | 來源: {source} | 時間: {timestamp}""",
+标签: {tags}
+类型: {type} | 置信度: {confidence} | 来源: {source} | 时间: {timestamp}""",
     
     "compact": "[{type}] {title}: {content[:200]}... ({tags})",
     
-    "decision": """### 決策: {title}
-**內容**: {content}
-**依據**: {metadata.get('rationale', 'N/A')}
-**狀態**: {metadata.get('status', 'active')} | 置信度: {confidence}""",
+    "decision": """### 决策: {title}
+**内容**: {content}
+**依据**: {metadata.get('rationale', 'N/A')}
+**状态**: {metadata.get('status', 'active')} | 置信度: {confidence}""",
     
-    "graph": """實體: {title} (類型: {props.type})
-關係: {edges_summary}
-屬性: {props}""",
+    "graph": """实体: {title} (类型: {props.type})
+关系: {edges_summary}
+属性: {props}""",
 }
 ```
 
 ---
 
-## 6. 評估指標
+## 6. 评估指标
 
-### 6.1 離線評估
+### 6.1 离线评估
 ```python
 def evaluate_retrieval(test_set: List[TestCase]) -> EvalMetrics:
     """TestCase: {query, relevant_ids[], intent}"""
@@ -326,13 +326,13 @@ def evaluate_retrieval(test_set: List[TestCase]) -> EvalMetrics:
     )
 ```
 
-### 6.2 線上指標
-| 指標 | 目標 | 說明 |
+### 6.2 线上指标
+| 指标 | 目标 | 说明 |
 |------|------|------|
-| 檢索延遲 P99 | < 200ms | 端到端 |
-| 重排序延遲 P99 | < 100ms | Cross-Encoder 批量 |
-| 上下文注入 Token 利用率 | > 80% | 預算使用率 |
-| 用戶滿意度 | > 4.0/5.0 | 顯式反饋 |
+| 检索延迟 P99 | < 200ms | 端到端 |
+| 重排序延迟 P99 | < 100ms | Cross-Encoder 批量 |
+| 上下文注入 Token 利用率 | > 80% | 预算使用率 |
+| 用户满意度 | > 4.0/5.0 | 显式反馈 |
 
 ---
 
@@ -359,11 +359,11 @@ class MemoryRetrievalAPI:
         token_budget: int = 4000,
         template: str = "default"
     ) -> RetrievalResponse:
-        # 1. 意圖識別
+        # 1. 意图识别
         if intent == "auto":
             intent = classify_intent(query)
         
-        # 2. 並行檢索
+        # 2. 并行检索
         vector_r = self.vector.search(query, k=50)
         keyword_r = self.keyword.search(query, k=50)
         graph_r = self.graph.search(query, [], k=20)
@@ -371,14 +371,14 @@ class MemoryRetrievalAPI:
         # 3. 融合
         fused = rrf_fusion([vector_r, keyword_r, graph_r])
         
-        # 4. 過濾
+        # 4. 过滤
         filtered = self.filter.filter(fused, types=types, tags=tags)
         
         # 5. 重排序
         reranked = self.reranker.rerank(query, filtered, top_k=top_k*2)
         final = business_rerank(reranked, intent)
         
-        # 6. 截斷 + 注入
+        # 6. 截断 + 注入
         injected = self.injector.inject_context(query, final[:top_k], token_budget)
         
         return RetrievalResponse(
@@ -394,4 +394,4 @@ class MemoryRetrievalAPI:
 
 ---
 
-**文檔版本**: v1.0.0  **最後更新**: 2026-08-08
+**文档版本**: v1.0.0  **最后更新**: 2026-08-08
