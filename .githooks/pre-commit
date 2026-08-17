@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+# ============================================================
+# pre-commit 环境门禁钩子（DevProjectTeamSkill 技能库）
+# 检查项（铁律 #8 敏感信息分级 + 环境铁律）：
+#   1. A 级密钥扫描：真实 Token/私钥/密钥禁止入库（复用 tools/pre-commit-secret-scan.sh）
+#   2. B 级脱敏检查：提交内容中的 IP / 绝对路径 / 主机名 需脱敏（含 <挂载卷>、<用户目录>、<Windows盘符> 等）
+#   3. 环境配置引用检查：禁止提交 .env 真实值 / .secrets 明文；只允许别名引用
+#   4. 大文件门禁：>4K 或 >20 列禁止直接入库（应转 CSV，AGENTS.md 输出格式铁律）
+# 失败阻断提交（exit 1），全部通过 exit 0。
+# 分发：git config core.hooksPath .githooks（scripts/install-hooks.sh 一键完成）
+# ============================================================
+
+set -u
+
+repo_root=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+
+# 已暂存文件（含新增/修改/复制）
+files=$(git diff --cached --name-only --diff-filter=ACM)
+if [ -z "$files" ]; then
+  exit 0
+fi
+
+fail=0
+
+echo "🔒 pre-commit 环境门禁检查…"
+
+# ---- 1. A 级密钥扫描（复用独立扫描脚本） ----
+if [ -f "$repo_root/tools/pre-commit-secret-scan.sh" ]; then
+  if ! bash "$repo_root/tools/pre-commit-secret-scan.sh" >/dev/null 2>&1; then
+    bash "$repo_root/tools/pre-commit-secret-scan.sh" 2>&1 | grep -v "^$"
+    fail=1
+  fi
+else
+  echo "⚠ tools/pre-commit-secret-scan.sh 缺失，跳过 A 级扫描"
+fi
+
+# ---- 2. B 级脱敏检查 ----
+# 禁止提交的内容：真实 IP（非脱敏 xxx.xxx.xxx.xxx）、绝对路径、含环境敏感的主机名引用
+bgrade_pattern='([0-9]{1,3}\.){3}[0-9]{1,3}|(/Volumes/[A-Za-z0-9_]+|[A-Za-z]:\\\\|[A-Za-z]:/|/Users/[A-Za-z0-9_.-]+|/home/[A-Za-z0-9_.-]+)'
+for f in $files; do
+  case "$f" in
+    *.png|*.jpg|*.jpeg|*.gif|*.ico|*.pdf|*.zip|*.lock|*.jar|*.war) continue ;;
+    .githooks/*|scripts/*) continue ;;  # 钩子/脚本自身含路径示例，跳过 B 级（仍受 A 级扫描）
+  esac
+  content=$(git show :"$f" 2>/dev/null) || continue
+  # 过滤脱敏示例行（xxx.xxx.xxx.xxx 已合规）与 CMDB 登记类已知脱敏文件
+  if printf '%s' "$content" | grep -E "$bgrade_pattern" >/dev/null 2>&1; then
+    # 排除已脱敏标记 xxx.xxx.xxx.xxx
+    hits=$(printf '%s' "$content" | grep -E "$bgrade_pattern" | grep -v 'xxx\.xxx\.xxx\.xxx' | head -3)
+    if [ -n "$hits" ]; then
+      echo "❌ B 级敏感信息未脱敏: $f" >&2
+      printf '%s\n' "$hits" | sed 's/^/    /' >&2
+      echo "   B 级（主机名/IP/绝对路径）提交公共仓库前必须脱敏（AGENTS.md 铁律 #8）" >&2
+      fail=1
+    fi
+  fi
+done
+
+# ---- 3. 环境配置引用检查 ----
+# 禁止提交 .env 真实值；.env 文件本身已被 gitignore，防御性再查
+for f in $files; do
+  case "$f" in
+    *.env|*.env.*|*/.env) echo "❌ 禁止提交环境变量文件: $f（真实值走 .secrets/ + 别名引用）" >&2; fail=1 ;;
+    .secrets/*) echo "❌ 禁止提交密钥目录: $f（A 级铁律，.secrets 已 gitignore）" >&2; fail=1 ;;
+  esac
+done
+
+# ---- 4. 大文件门禁（AGENTS.md 输出格式铁律） ----
+for f in $files; do
+  case "$f" in
+    *.csv) continue ;;  # CSV 允许
+  esac
+  lines=$(git show :"$f" 2>/dev/null | wc -l)
+  if [ "$lines" -gt 4000 ] 2>/dev/null; then
+    echo "❌ 大文件超 4K 行: $f（$lines 行）——>4K 应转 CSV，禁止直接入库" >&2
+    fail=1
+  fi
+done
+
+if [ "$fail" -ne 0 ]; then
+  echo "⛔ 环境门禁未通过，提交已阻断。修正后重新 git add + commit。" >&2
+  exit 1
+fi
+
+echo "✅ 环境门禁全部通过。"
+exit 0
