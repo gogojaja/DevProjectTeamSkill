@@ -1,56 +1,58 @@
 # program_management.md — 项目群/项目集管理标准
 
-> 跨项目协同层标准（role-program-mgmt 依据）。来源：PMI《项目集管理标准》(SPM 5th)、MSP（Managing Successful Programmes）、Integrated Master Schedule（IMS）、EVM 挣值管理、PMO 治理实践。
+> 跨项目协同层标准（role-program-mgmt 依据）。来源：PMI《项目集管理标准》(SPM 5th, 2023)、MSP《成功管理项目群》(5th, 2020)、Integrated Master Schedule（IMS）、EVM 挣值管理（ANSI EIA-748）、SAFe、ISO 10007 配置管理 / ISO 15489 文档管理。
 
-## 1. 术语与定位
+## 1. 术语与三层治理定位
 
 - **项目（Project）**：为创造独特可交付成果而进行的临时性工作；
-- **项目集/项目群（Program）**：经过**协调管理以获取单独管理无法取得之收益**的一组相互关联的项目、子项目集与项目集活动；"互相关联"与"多个项目"是属性特征，"协调管理收获收益"是管理特征；
-- **项目组合（Portfolio）**：为战略目标而选择的全部项目/项目群的集合，投资决策层；
+- **项目集/项目群（Program）**：经过**协调管理以获取单独管理无法取得之收益**的一组相互关联的项目、子项目集与项目集活动；"互相关联"+"多个项目"是属性，"协调管理收获收益"是管理特征；
+- **项目组合（Portfolio）**：为战略目标而选择并优先级排序的全部项目/项目群集合，投资决策层；
 - **本仓库三层治理**：项目治理（role-governance 单项目总控）< **项目群治理（role-program-mgmt，Program Board 决策）** < 组合治理（战略投资层，不实现）。
+- **信息治理**：项目群所有工件纳入**文档与配置管理**（§9），单一信息源、受控版本、可追溯——这是 SPM/M并将其作为治理子域（Governance）的硬性要求。
 
-## 2. PMI《项目集管理标准》要点
+## 2. PMI《项目集管理标准》(SPM 5th) 要点
 
-### 2.1 8 项原则
-干系人、收益实现、协同、团队的团队、变更、领导力、风险、治理。
+### 2.1 八项原则（Principles）
+1. 干系人（Stakeholder）；2. 收益（Benefits）；3. 管理职责（Stewardship）；4. 协同（Collaboration）；5. 团队（Team）；6. 领导力（Leadership）；7. 治理（Governance）；8. 生命周期（Life Cycle）。
+> 注意：5th 版将"合作/协同"列为**原则**而非绩效域，绩效域收敛为 5 个。
 
-### 2.2 6 绩效域
-| 绩效域 | 核心 |
-|--------|------|
-| 战略一致 | 业务论证 / 项目集章程 / **项目集路线图** / 环境评估 / 风险管理策略 |
-| 收益管理 | 收益识别 → 分析与规划 → 交付 → 过渡 → 维持 |
-| 干系人参与 | 识别 → 分析 → 争取规划 → 争取 → 沟通 |
-| 治理框架 | 决策权 / 治理主体 / 设计与实施 |
-| 合作 | 收益与价值交付之间的合作、组件与活动之间协同 |
-| 生命周期管理 | 定义 → 交付 → 收尾 |
+### 2.2 五项绩效域（Performance Domains）
+| 绩效域 | 核心产出 |
+|--------|----------|
+| 战略一致（Strategy Alignment） | 业务论证 / 项目集章程 / **项目集路线图** / 环境评估 / 风险策略；确保组件贡献战略成果 |
+| 收益管理（Benefits Management） | 收益识别 → 分析与规划 → 交付 → 过渡 → 维持（Benefits Realization & Sustainment） |
+| 干系人参与（Stakeholder Engagement） | 识别 → 分析 → 争取规划 → 争取 → 沟通；持续承诺管理 |
+| 治理（Governance） | 决策权 / 治理主体 / 设计与实施；**含文档与配置管理**（§9）、门禁、审计 |
+| 生命周期管理（Life Cycle Management） | 定义 → 交付 → 收尾；tranche 波次管理 |
 
 ### 2.3 生命周期
-- **定义阶段**：构建活动 + 规划活动（业务论证/章程/路线图/tranche 计划/治理结构）；
+- **定义阶段**：构建活动 + 规划活动（业务论证/章程/路线图/tranche 计划/治理结构/收益档案）；
 - **交付阶段**：管理交付、绩效、收益维持与过渡、变更、沟通、财务、信息、采购、质量、资源、风险、进度、范围；
 - **收尾阶段**：收益确认、财务收尾、信息存档过渡、采购收尾、资源过渡、风险过渡。
 
-## 3. MSP（Managing Successful Programmes）要点
+## 3. MSP（Managing Successful Programmes 5th）要点
 
-### 3.1 原则
-与战略对齐、引领变革、清晰未来状态（愿景+蓝图）、聚焦收益及其威胁、增加价值（协同 > 项目之和）、设计迭代交付（tranche/波次）、从经验中学习。
+### 3.1 七项原则
+与战略对齐（Aligned to the corporate strategy）、目标引领（Lead with purpose）、聚焦成果（Focus on outcomes）、增加价值（Add value）、设计交付连贯能力（Design and deliver coherent capability）、从经验中学习（Learn from experience）、保持透明（Be transparent）。
 
-### 3.2 治理主题
-组织（角色/职责/决策权：SRO、Program Board、Program Manager、Business Change Managers）、愿景与蓝图、领导力与干系人、收益管理、蓝图设计与交付、计划与控制、商业论证、风险与问题管理、质量与保证。
+### 3.2 治理主题（Themes）
+组织（角色/职责/决策权：SRO、Program Board、Program Manager、Business Change Managers）、领导力与干系人、收益管理、蓝图设计与交付、计划与控制、商业论证、风险与问题管理、质量与保证。
 
 ### 3.3 Transformational Flow（转型流）
-识别项目群 → 定义项目群（蓝图/详细商业论证/治理/收益地图与档案/tranche 计划）→ **管理 tranche（分批交付产生能力增量，tranche 之间复盘调整）** → 交付能力 → 收益实现 → 收尾。
+识别项目群（Identify）→ 定义项目群（Define：蓝图/详细商业论证/治理/收益地图与档案/tranche 计划）→ **管理 tranche（Manage the Tranches，分批交付产生能力增量，tranche 之间复盘调整）** → 交付能力（Deliver the Capability）→ 收益实现（Realize the Benefits）→ 收尾（Close）。
 
 ### 3.4 关键：Program Board 决策
 Program Board 在 **tranche 边界**决策：**继续 / 转向 / 终止**；边界之间月度轻量跟踪。Program Manager 管理不决策、PMO 提供机制不决策。
 
 ## 4. IMS 集成主进度（时间信息一致核心）
 
-- **三层结构**：Program Master Schedule（概要时间线）→ Integrated Master Plan/IMP（里程碑级，含关键事件准则）→ 明细排期（滚动式规划：近端 2~6 周详细 + 远端里程碑概要）；
+- **三层结构**：Program Master Schedule（概要时间线）→ Integrated Master Plan/IMP（里程碑级，含关键事件准则）→ 明细排期（滚动式规划 rolling wave：近端 2~6 周详细 + 远端里程碑概要）；
 - **逻辑链接**：跨项目任务 cause-effect 链接，上游延期自动传导下游；
 - **关键路径**：最长依赖序列决定最短工期，零浮动任务延误直接影响结束日期；
 - **健康度**：SPI（=EV/PV）与总浮动每周监控，周更新 + 月评审；
-- **基线**：IMS 基线化 + 定期 re-baseline；
-- **敏捷项目群（可选）**：SAFe PI Planning——8~12 周 Program Increment 详细规划 + 同步规划仪式 + 增量评审。
+- **EVM 合规**：EVMS 对齐 ANSI EIA-748（CPI/SPI/AC/EV/PV 口径统一），CPI 与 SPI 合看不单读；
+- **基线**：IMS 基线化 + 定期 re-baseline（避免频繁或从不基线化两个极端），基线变更走 change_audit；
+- **敏捷项目群（可选）**：SAFe PI Planning——8~12 周 Program Increment 详细规划 + 同步规划仪式（跨团队对齐）+ 增量评审；价值流（Value Stream）映射对齐。
 
 ## 5. 统一执行标准与度量（执行标准一致核心）
 
@@ -63,10 +65,70 @@ Program Board 在 **tranche 边界**决策：**继续 / 转向 / 终止**；边�
 
 - 四类依赖：FS / SS / FF / SF；
 - 依赖对象：相互交付物、共享资源、顺序约束；
+- 依赖强度：**硬依赖（Hard，不可缓冲）** vs **软依赖（Soft，可缓冲）**——关键路径依赖为硬；
 - 传导分析：上游延期 → 下游风险；关键路径依赖（零浮动）与浮动依赖（可缓冲）区分；
-- 共享资源冲突衔接 `multi_project_isolation.md` §10 与 `25_环境资源清单.csv`。
+- 共享资源冲突衔接 `multi_project_isolation.md` §10 与 `25_环境资源清单.csv` / CMDB 仲裁。
 
-## 7. 本仓库落点
+## 7. 收益管理（Benefits Realization Management）
+
+- **收益地图**：能力 → 中间成果 → 最终收益（因果链），对齐战略目标；
+- **收益档案（Benefits Register）**：每项收益含 owner / metric / baseline / target / realization timeline / enabling changes / threats / sustainment plan；
+- **收益维持（Sustainment）**：移交运营后持续兑现，避免"交付即弃"；
+- **追踪**：按 KPI 与档案对照，威胁收益提前升级（衔接 `12_风险问题台账` P1~P4 升级阶梯）；
+- **商业论证"活文档"**：证据积累后持续更新，含敏感性分析（见 §9 文档生命周期）。
+
+## 8. 项目群评审（Program Board）
+
+- **tranche 边界决策**：继续（proceed）/ 转向（re-plan）/ 终止（close）；
+- 决策依据：收益是否兑现、当前工作包是否仍正确、业务论证是否仍成立；
+- **三层门禁叠加**：项目级 stage_review 通过 → 项目群评审三 Gate（时间对齐 / 依赖无冲突 / 标准一致）；
+- 评审节奏：tranche 边界正式决策 + 月度轻量跟踪（过长漂移、过频变交付团队）；
+- 决策留痕：评审纪要 + 决策记录，禁止无记录口头决策；
+- 仲裁衔接：跨项目冲突超出 Program Board 权限 → 升阶组合治理或 Sponsor 决策（衔接 `priority-arbitration` P0~P6 与 `change_audit`）。
+
+## 9. 文档与配置管理（Document & Configuration Management，行业最佳实践）
+
+> 作用：保障项目群**单一信息源、受控版本、可追溯、可审计**。对齐 ISO 15489（文档管理）、ISO 10007（配置管理）、PMI 治理子域。
+
+### 9.1 单一信息源与受控库
+- 所有项目群工件集中受控库（本仓库 `台账/` 或指定 PMO 库，本机为 `D:\trae\台账\`），**禁止分散多版本真相**；
+- 受控库纳入版本化（git）与定期快照（solidify），保障可回溯。
+
+### 9.2 文档分类与密级
+| 类别 | 工件示例 | 密级（对齐 iron_rules §3） |
+|------|----------|----------------------------|
+| 战略类 | 业务论证 / 章程 / 路线图 | B 脱敏入库（含环境/路径） |
+| 收益类 | 收益档案 / 收益追踪 | C 正常 |
+| 治理类 | 决策纪要 / 门禁记录 | C 正常 |
+| 计划类 | IMS / 依赖矩阵 | C 正常 |
+| 标准类 | 执行标准基线 | C 正常 |
+| 文档类 | 本文档 / 模板 | C 正常 |
+| 资产类 | 凭据/密钥别名 | A 禁止入库（仅别名） |
+
+### 9.3 命名规范
+`[项目群编号]_[类]_[工件]_v[主.次]_[状态].csv`
+- 状态 ∈ {Draft 草稿, Review 评审, Baseline 基线, Obsolete 作废}；
+- 例：`PG-LOCAL-001_计划_IMS_v1.0_Baseline.csv`。
+
+### 9.4 版本与状态生命周期
+`Draft → Review → Baseline（Program Board 批准）→ Obsolete（被新基线取代，保留归档）`；
+- 基线化需 Program Board 批准并记录；基线变更走 `change_audit`；
+- 历史基线**不得删除**，仅标记 Obsolete，满足审计与留存。
+
+### 9.5 配置管理（Configuration Management）
+- 识别**配置项 CI**：章程 / 路线图 / 收益档案 / IMS / 依赖矩阵 / 标准基线 / 环境资产；
+- 建立 CI 基线 + 版本历史；环境资产（端口/GPU/模型容器）经 CMDB 配置管理（`register_env_asset`）；
+- 配置项变更触发依赖/进度重算（传导分析）。
+
+### 9.6 变更控制与留存
+- 文档变更走 role-governance `change_audit`；重大工件（章程/路线图/收益档案）变更须经 Program Board 决策，禁止无记录口头修改；
+- 留存与归档：收尾时按 retention 归档（收益确认/移交/复盘），临时治理结构解散后文档进入**只读归档库**；保留期建议 ≥ 项目结束后 3 年或合规要求；
+- 访问与权限：按四角色 + 密级授权（`register_auth`），外部访问经 `26_访问边界.csv`。
+
+### 9.7 工具链
+台账 CSV（UTF-8 BOM，禁 .xlsx）+ git 版本化 + CMDB 资产登记 + solidify 快照。
+
+## 10. 本仓库落点
 
 | 环节 | action | 台账 |
 |------|--------|------|
@@ -75,19 +137,20 @@ Program Board 在 **tranche 边界**决策：**继续 / 转向 / 终止**；边�
 | 依赖管理 | map_dependencies | 29_项目依赖矩阵.csv |
 | 进度对齐 | align_schedule | 30_项目群主进度.csv |
 | 标准一致 | standardize_execution | 标准一致性检查清单 |
+| 文档与配置管理 | manage_documents | 31_文档配置管理.csv |
 | 项目群评审 | review_program | 评审记录 CSV |
 | 项目群收尾 | close_program | 收尾归档 |
 
 - 明细执行见 `role-program-mgmt/domain/program-management.md` 与 `program-management__resources/program_details.md`。
 
-## 8. 与现有机制衔接
-
-- **优先级仲裁**：跨项目资源/时间/依赖冲突超出 Program Board 权限 → 升阶组合治理或用户/Sponsor 决策（衔接 priority-arbitration P0~P6 与 change_audit）；
-- **问题升级**：项目群级问题走 12_风险问题台账 P1~P4 升级阶梯；
-- **环境资源**：跨项目共享资源冲突走 25_环境资源清单 + CMDB 仲裁；
-- **访问边界**：跨项目访问成员项目台账遵循 26_访问边界 + register_auth 授权。
+## 11. 与现有机制衔接
+- **优先级仲裁**：跨项目资源/时间/依赖冲突超出 Program Board 权限 → 升阶组合治理或 Sponsor 决策（衔接 `priority-arbitration` P0~P6 与 `change_audit`）；
+- **问题升级**：项目群级问题走 `12_风险问题台账` P1~P4 升级阶梯；
+- **环境资源**：跨项目共享资源冲突走 `25_环境资源清单` + CMDB 仲裁；
+- **文档与配置**：工件命名/版本/留存/密级统一走 §9，登记 `31_文档配置管理.csv`；
+- **访问边界**：跨项目访问成员项目台账遵循 `26_访问边界` + `register_auth` 授权。
 
 ---
 
-**文档版本**：v1.0.0　**最后更新**：2026-08-16
+**文档版本**：v1.1.0　**最后更新**：2026-08-17（优化：对齐 PMI SPM 5th 八原则/五绩效域、MSP 5th 七原则/转型流；新增 §9 文档与配置管理；新增 manage_documents action 与 31_文档配置管理.csv）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

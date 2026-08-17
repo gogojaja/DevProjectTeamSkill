@@ -1,6 +1,6 @@
 # program_details — 项目群管理明细
 
-> 角色包明细资源，配合 `../domain/program-management.md` 使用。来源：PMI《项目集管理标准》第5版（SPM 5th）、MSP（Managing Successful Programmes）、Integrated Master Schedule（IMS）、EVM 挣值管理。
+> 角色包明细资源，配合 `../domain/program-management.md` 使用。来源：PMI《项目集管理标准》第5版（SPM 5th, 2023）、MSP（Managing Successful Programmes 5th, 2020）、Integrated Master Schedule（IMS）、EVM 挣值管理（ANSI EIA-748）、SAFe、ISO 10007 配置管理 / ISO 15489 文档管理。
 
 ## 1. 治理模型（三层）
 
@@ -21,29 +21,31 @@
 | Sponsor / SRO（高级负责人） | 战略背书、资金、收益拥有者、主持 Program Board | 终止项目群、批准战略变更 |
 | Program Board | 授权每个 tranche 与预算、批准范围/收益/目标变更、裁决组件冲突、continuation 决策 | 继续/转向/终止 |
 | Program Manager | 协调多项目、监控风险、向 Board 报告 | 不决策（建议权） |
-| PMO | 标准化工具/流程/报告、强制一致性、绩效跟踪 | 不决策（机制与数据） |
+| PMO | 标准化工具/流程/报告、强制一致性、绩效跟踪、**文档与配置管理执行** | 不决策（机制与数据） |
 
-## 3. 项目群生命周期（对齐 SPM 5th + MSP）
+## 3. 项目群生命周期（对齐 SPM 5th + MSP Transformational Flow）
 
 | 阶段 | 关键活动 | 产物 |
 |------|----------|------|
-| 定义（Identify/Define） | 业务论证、章程、路线图、收益档案、tranche 计划、治理结构 | 28_项目群注册.csv |
+| 定义（Identify/Define） | 业务论证、章程、路线图、收益档案、tranche 计划、治理结构 | 28_项目群注册.csv + 31 基线 |
 | 交付（Manage Tranches / Deliver Capability） | 按 tranche 交付、依赖协调、IMS 更新、标准执行 | 29/30 CSV + 进度 |
-| 收益实现（Realize Benefits） | 对照收益档案核实兑现、嵌入运营 | 收益追踪 |
-| 收尾（Close） | 收益确认、移交、资源释放、复盘归档 | 收尾报告 |
+| 收益实现（Realize Benefits） | 对照收益档案核实兑现、嵌入运营、收益维持 | 收益追踪 |
+| 收尾（Close） | 收益确认、移交、资源释放、复盘归档、文档只读归档 | 收尾报告 |
 
 ## 4. 收益管理（BRM）
 
 - **收益地图**：能力 → 中间成果 → 最终收益（因果链），对齐战略目标；
-- **收益档案**（每项）：owner / metric / baseline / target / realization timeline / enabling changes / risks；owner 与业务线负责人签订；
-- **追踪**：按 KPI 与档案对照，威胁收益提前升级（衔接 12_风险问题台账 P1~P4 升级阶梯）；
-- **商业论证保持"活文档"**：证据积累后持续更新，含敏感性分析。
+- **收益档案（Benefits Register）**（每项）：owner / metric / baseline / target / realization timeline / enabling changes / threats / **sustainment plan**（维持计划）；owner 与业务线负责人签订；
+- **收益维持（Sustainment）**：移交运营后持续兑现，避免"交付即弃"；
+- **追踪**：按 KPI 与档案对照，威胁收益提前升级（衔接 `12_风险问题台账` P1~P4 升级阶梯）；
+- **商业论证"活文档"**：证据积累后持续更新，含敏感性分析（受 §9 文档生命周期约束）。
 
 ## 5. 依赖管理
 
-- 四类依赖：**FS**（Finish-to-Start 完成到开始）、**SS**（Start-to-Start 开始到开始）、**FF**（Finish-to-Finish 完成到完成）、**SF**（Start-to-Finish 开始到完成）；
+- 四类依赖：**FS**（Finish-to-Start）、**SS**（Start-to-Start）、**FF**（Finish-to-Finish）、**SF**（Start-to-Finish）；
+- 依赖强度：**硬依赖（Hard，不可缓冲，关键路径）** vs **软依赖（Soft，可缓冲）**；
 - 依赖对象：相互交付物、共享资源、顺序约束；
-- 传导分析：上游延期 → 下游风险自动识别；关键路径依赖（零浮动，延误直接拖期）与浮动依赖（可缓冲）区分；
+- 传导分析：上游延期 → 下游风险自动识别；硬依赖（零浮动）与软依赖（可缓冲）区分；
 - 共享资源冲突衔接 `25_环境资源清单.csv` 与 multi_project_isolation §10 仲裁。
 
 ## 6. IMS 三层集成主进度
@@ -56,9 +58,9 @@
 
 - 逻辑链接：任务间 cause-effect 链接，一处延期自动传导下游风险；
 - 关键路径：最长依赖序列决定最短工期，零浮动任务延误直接影响结束日期；
-- 健康度：SPI（=EV/PV，<1 落后）与总浮动每周监控；
-- 基线：IMS 基线化 + 定期 re-baseline（避免频繁或从不基线化两个极端）；
-- 敏捷项目群（可选）：SAFe PI Planning——8~12 周 Program Increment 详细规划 + 同步规划仪式（跨团队对齐）+ 增量评审。
+- 健康度：SPI（=EV/PV，<1 落后）与总浮动每周监控；EVM 对齐 ANSI EIA-748；
+- 基线：IMS 基线化 + 定期 re-baseline（避免频繁或从不基线化两个极端），基线变更走 change_audit；
+- 敏捷项目群（可选）：SAFe PI Planning——8~12 周 Program Increment 详细规划 + 同步规划仪式（跨团队对齐）+ 增量评审；价值流（Value Stream）映射对齐。
 
 ## 7. 统一度量口径（执行标准一致）
 
@@ -82,16 +84,58 @@
 - **三层门禁叠加**：项目级 stage_review 通过 → 项目群评审三 Gate（时间对齐 / 依赖无冲突 / 标准一致）；
 - 评审节奏：tranche 边界正式决策 + 月度轻量跟踪（过长漂移、过频变交付团队）；
 - 决策留痕：评审纪要 + 决策记录，禁止无记录口头决策；
-- 仲裁衔接：跨项目资源/时间/依赖冲突超出 Program Board 决策权限 → 升阶组合治理或用户/Sponsor 决策（衔接 priority-arbitration P0~P6 与 change_audit）。
+- 仲裁衔接：跨项目资源/时间/依赖冲突超出 Program Board 决策权限 → 升阶组合治理或 Sponsor 决策（衔接 `priority-arbitration` P0~P6 与 `change_audit`）。
 
-## 9. 收尾
+## 9. 文档与配置管理（Document & Configuration Management，行业最佳实践）
+
+> 对齐 ISO 15489（文档管理）、ISO 10007（配置管理）、PMI 治理子域。目标：单一信息源、受控版本、可追溯、可审计。
+
+### 9.1 单一信息源与受控库
+- 所有项目群工件集中受控库（本仓库 `台账/` 或指定 PMO 库，本机为 `D:\trae\台账\`），**禁止分散多版本真相**；
+- 受控库纳入 git 版本化与 solidify 定期快照，保障可回溯。
+
+### 9.2 文档分类与密级
+| 类别 | 工件示例 | 密级（iron_rules §3） |
+|------|----------|------------------------|
+| 战略类 | 业务论证 / 章程 / 路线图 | B 脱敏入库 |
+| 收益类 | 收益档案 / 收益追踪 | C 正常 |
+| 治理类 | 决策纪要 / 门禁记录 | C 正常 |
+| 计划类 | IMS / 依赖矩阵 | C 正常 |
+| 标准类 | 执行标准基线 | C 正常 |
+| 文档类 | 本文档 / 模板 | C 正常 |
+| 资产类 | 凭据/密钥别名 | A 禁止入库（仅别名） |
+
+### 9.3 命名规范
+`[项目群编号]_[类]_[工件]_v[主.次]_[状态]`
+- 状态 ∈ {Draft 草稿, Review 评审, Baseline 基线, Obsolete 作废}；
+- 例：`PG-LOCAL-001_计划_IMS_v1.0_Baseline.csv`。
+
+### 9.4 版本与状态生命周期
+`Draft → Review → Baseline（Program Board 批准）→ Obsolete（被新基线取代，保留归档）`
+- 基线化需 Program Board 批准并记录；基线变更走 `change_audit`；
+- 历史基线**不得删除**，仅标记 Obsolete，满足审计与留存。
+
+### 9.5 配置管理
+- 识别**配置项 CI**：章程 / 路线图 / 收益档案 / IMS / 依赖矩阵 / 标准基线 / 环境资产；
+- 建立 CI 基线 + 版本历史；环境资产（端口/GPU/模型容器）经 CMDB 配置管理（`register_env_asset`）；
+- 配置项变更触发依赖/进度重算（传导分析）。
+
+### 9.6 变更控制与留存
+- 文档变更走 role-governance `change_audit`；重大工件（章程/路线图/收益档案）变更须经 Program Board 决策，禁止无记录口头修改；
+- 留存与归档：收尾时按 retention 归档（收益确认/移交/复盘），临时治理结构解散后文档进入**只读归档库**；保留期建议 ≥ 项目结束后 3 年或合规要求；
+- 访问与权限：按四角色 + 密级授权（`register_auth`），外部访问经 `26_访问边界.csv`。
+
+### 9.7 工具链
+台账 CSV（UTF-8 BOM，禁 .xlsx）+ git 版本化 + CMDB 资产登记 + solidify 快照；所有工件登记 `31_文档配置管理.csv`。
+
+## 10. 收尾
 
 - 收益确认：对照收益档案逐项核实兑现并移交运营；
 - 资源释放：CMDB release + `25_环境资源清单` 释放登记；
 - 复盘归档：提炼可固化流程/复用工具/降 Token（衔接 `retrospect_harvest`）；
-- 结束临时治理结构（Program Board 解散）。
+- 文档只读归档：按 §9 留存期限进入归档库；结束临时治理结构（Program Board 解散）。
 
 ---
 
-**文档版本**：v1.0.0　**最后更新**：2026-08-16
+**文档版本**：v1.1.0　**最后更新**：2026-08-17（优化：对齐 PMI SPM 5th 八原则/五绩效域、MSP 5th 七原则/转型流；新增 §9 文档与配置管理；新增 manage_documents action 与 31_文档配置管理.csv）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

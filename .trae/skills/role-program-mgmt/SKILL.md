@@ -1,6 +1,6 @@
 ---
 name: "role-program-mgmt"
-description: "用户提到项目群、项目集、多项目协同、PMO 决策层、跨项目依赖、里程碑对齐、统一执行标准时加载本项目群管理角色包：负责项目群定义（业务论证/章程/路线图/治理四角色/tranche 划分）、收益管理（收益档案与追踪）、跨项目依赖矩阵、IMS 三层集成主进度（滚动式规划/关键路径/SAFe PI Planning）、统一执行标准与度量口径（CPI/SPI/里程碑准点率）、Program Board tranche 边界决策与收尾。用户说项目群/多项目协同/PMO 时加载。Load when the user manages a program/portfolio, multi-project coordination, PMO decisions, cross-project dependencies, or milestone alignment."
+description: "用户提到项目群、项目集、多项目协同、PMO 决策层、跨项目依赖、里程碑对齐、统一执行标准、文档与配置管理时加载本项目群管理角色包：负责项目群定义（业务论证/章程/路线图/治理四角色/tranche 划分）、收益管理（收益档案与维持）、跨项目依赖矩阵、IMS 三层集成主进度（滚动式规划/关键路径/SAFe PI Planning）、统一执行标准与度量口径（CPI/SPI/里程碑准点率）、文档与配置管理（单一信息源/版本/基线/CI/留存）、Program Board tranche 边界决策与收尾。用户说项目群/多项目协同/PMO/文档配置管理时加载。Load when the user manages a program/portfolio, multi-project coordination, PMO decisions, cross-project dependencies, milestone alignment, or document/configuration management."
 ---
 
 # role-program-mgmt 项目群管理角色包
@@ -9,8 +9,8 @@ description: "用户提到项目群、项目集、多项目协同、PMO 决策�
 
 ## 1. 元数据
 
-- **技能版本**：v1.0.0　**发布日期**：2026-08-16
-- **变更记录**：v1.0.0 新增项目群/项目集协同管理层（role-program-mgmt）——对齐 PMI《项目集管理标准》第5版（6 绩效域：战略一致/收益管理/干系人参与/治理框架/合作/生命周期管理）+ MSP（tranche 分批交付 + Program Board 决策）+ IMS/EVM（三层集成主进度 + 统一度量口径）；7 个 action：define_program / manage_benefits / map_dependencies / align_schedule / standardize_execution / review_program / close_program；新增 28_项目群注册 / 29_项目依赖矩阵 / 30_项目群主进度 台账；三层治理模型（项目治理 < 项目群治理 < 组合治理）。
+- **技能版本**：v1.1.0　**发布日期**：2026-08-17
+- **变更记录**：v1.0.0 新增项目群/项目集协同管理层（role-program-mgmt）——对齐 PMI SPM 5th / MSP + IMS/EVM；7 个 action；新增 28/29/30 台账；三层治理模型（项目治理 < 项目群治理 < 组合治理）。v1.1.0 优化：对齐 PMI SPM 5th 八原则/五绩效域 + MSP 5th 七原则/转型流；新增 **文档与配置管理** discipline（§9）与 `manage_documents` action + **31_文档配置管理.csv**；依赖矩阵增"强度(硬/软)"与"缓解措施"；主进度增"健康度/更新日期"；明密级/命名/版本生命周期/CI/留存最佳实践。
 - **参考标准**：PMI《项目集管理标准》(SPM 5th)、MSP（Managing Successful Programmes）、Integrated Master Schedule（IMS）、EVM 挣值管理
 
 ## 2. 触发规则
@@ -26,6 +26,7 @@ description: "用户提到项目群、项目集、多项目协同、PMO 决策�
 | 依赖管理 | map_dependencies（FS/SS/FF/SF 依赖矩阵 + 相互交付物 + 共享资源 + 传导分析） | `domain/program-management.md` |
 | 进度对齐 | align_schedule（IMS 三层主进度 + 滚动式规划 + 关键路径 + SAFe PI Planning 可选） | `domain/program-management.md` |
 | 标准一致 | standardize_execution（统一执行标准 + 统一度量口径 CPI/SPI/缺陷密度/里程碑准点率/变更计费率 + 报告 cadence） | `domain/program-management.md` |
+| 文档与配置管理 | manage_documents（单一信息源/命名规范/版本生命周期/CI 基线/密级/留存，登记 31_文档配置管理.csv，贯穿全程） | `domain/program-management.md` |
 | 项目群评审 | review_program（Program Board tranche 边界决策：继续/转向/终止 + 三层门禁叠加） | `domain/program-management.md` |
 | 项目群收尾 | close_program（收益确认/移交/资源释放/复盘归档） | `domain/program-management.md` |
 
@@ -95,5 +96,5 @@ description: "用户提到项目群、项目集、多项目协同、PMO 决策�
 
 ---
 
-**文档版本**：v1.0.0　**最后更新**：2026-08-16
+**文档版本**：v1.1.0　**最后更新**：2026-08-17
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

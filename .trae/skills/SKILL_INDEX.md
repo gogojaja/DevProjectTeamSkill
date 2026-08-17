@@ -40,10 +40,10 @@
 
 14. **启动治理（v21.5.9）**：启动阶段须完成组织架构与责任分配（`define_org_structure`，`27_组织架构.csv` RACI 矩阵）与问题解决与升级机制（`define_issue_escalation`，`12_风险问题台账.csv` 升级字段 P1~P4 分级 + 四级升级阶梯 + 单一 Owner）；`check_ready` 硬门禁（未明确不得 Go），详见 `role-project-init/SKILL.md`。
 
-15. **项目群协同（v21.6.0）**：多项目协同层由 `role-program-mgmt` 承载（对齐 PMI SPM 5th/MSP/IMS/EVM），7 环节 `define_program`/`manage_benefits`/`map_dependencies`/`align_schedule`/`standardize_execution`/`review_program`/`close_program`；治理三层模型（项目治理<项目群治理<组合治理），Program Board 在 tranche 边界决策（继续/转向/终止），Program Manager 管理不决策、PMO 提供机制不决策；新台账 28_项目群注册/29_项目依赖矩阵/30_项目群主进度；与项目级 check_ready/stage_review 叠加为双层门禁，不替代单项目治理，详见 `role-program-mgmt/SKILL.md` 与 `references/program_management.md`。
+15. **项目群协同（v1.1.0）**：多项目协同层由 `role-program-mgmt` 承载（对齐 PMI SPM 5th 八原则/五绩效域、MSP 5th 七原则/转型流、IMS/EVM）；8 环节 `define_program`/`manage_benefits`/`map_dependencies`/`align_schedule`/`standardize_execution`/`manage_documents`/`review_program`/`close_program`；治理三层模型（项目治理<项目群治理<组合治理），Program Board 在 tranche 边界决策（继续/转向/终止），Program Manager 管理不决策、PMO 提供机制不决策；新台账 28_项目群注册/29_项目依赖矩阵/30_项目群主进度/**31_文档配置管理**；**v1.1.0 新增文档与配置管理 discipline**（单一信息源/命名规范/版本生命周期/CI 基线/密级/留存，对齐 ISO 15489/ISO 10007）；与项目级 check_ready/stage_review 叠加为双层门禁，不替代单项目治理，详见 `role-program-mgmt/SKILL.md` 与 `references/program_management.md`。
 
 ---
 
-**文档版本**：v21.6.0
-**最后更新**：2026-08-16（新增项目群/项目集协同层 role-program-mgmt：7 环节 + 3 台账 + 治理三层模型 + Program Board tranche 决策）
+**文档版本**：v21.6.1
+**最后更新**：2026-08-17（role-program-mgmt 优化至 v1.1.0：对齐 PMI SPM 5th/MSP 5th，新增文档与配置管理 discipline 与 manage_documents action、31_文档配置管理.csv；依赖矩阵增强度/缓解措施、主进度增健康度/更新日期）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
