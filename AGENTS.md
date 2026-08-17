@@ -175,12 +175,26 @@ GitHub 为境外服务器，**网络访问不稳定 + 存在地缘政治风险**
 - 不要依赖「本机定时从 GitHub 拉取再推国内」作为唯一手段——本机访问 GitHub 本身会 flapping，反而单点失败。
 
 ### 2. 凭据（铁律 #3 A 级，禁止入库）
-- 国内 token（fine-grained PAT，Contents read/write）**只经环境变量或 `.secrets/` 提供**，脚本从 `GITEE_TOKEN` / `GITEE_USER` 读取并以 `url.<auth>@.insteadOf` 注入，**绝不写入仓库或硬编码**。
-- 推送命令示例（不落地 token）：
-  ```powershell
-  $env:GITEE_TOKEN="<从凭据管理器读取>"; $env:GITEE_USER="gogojaja"
-  py -3.11 tools/mirror_push.py          # 双推 origin + mirror
-  ```
+- 国内 token（fine-grained PAT，Contents read/write）**只经环境变量 / `.secrets/` 文件 / 系统钥匙串提供**，`tools/mirror_push.py` 通过 `tools/load_secret.py` 跨平台自动装载（env > `.secrets/<name>` > macOS Keychain），并以 `url.<auth>@.insteadOf` 注入，**绝不打印、不写入仓库、不硬编码**。
+- 三种提供方式（任选其一，脚本自动读取，无需手动 export）：
+  - **a) 环境变量**（临时、最常用）：
+    ```powershell
+    # Windows (PowerShell)
+    $env:GITEE_TOKEN="<从 Gitee 设置→私人令牌 读取>"; $env:GITEE_USER="gogojaja"
+    py -3.11 tools/mirror_push.py
+    ```
+    ```bash
+    # macOS / Linux (zsh/bash)
+    export GITEE_TOKEN="<从 Gitee 设置→私人令牌 读取>"; export GITEE_USER="gogojaja"
+    python3 tools/mirror_push.py
+    ```
+  - **b) 文件**（持久、gitignore 不入库）：写 `.secrets/gitee_token` 与 `.secrets/gitee_user`
+  - **c) macOS Keychain**（系统级安全存储）：
+    ```bash
+    security add-generic-password -s gitee_token -a gogojaja -w "<token>"
+    python3 tools/mirror_push.py     # 自动从钥匙串取密，无需 export
+    ```
+- 跨平台约定：本仓库 `tools/*.py` 均为跨平台脚本——Windows 用 `py -3.11`，macOS/Linux 用 `python3`，其余逻辑一致。
 
 ### 3. 初始化步骤（搭框架后由用户补全）
 1. 在 Gitee 建仓库 `DevProjectTeamSkill`（建议「从 GitHub 导入」或空仓）；

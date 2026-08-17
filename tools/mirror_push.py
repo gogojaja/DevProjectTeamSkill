@@ -9,13 +9,20 @@ mirror_push.py — 国内镜像同步（地缘风险对冲）双推工具
 安全约定（铁律 #3 A 级）：
 - 国内/境外 token 只经环境变量或 .secrets/ 提供，脚本从 GITEE_TOKEN/GITEE_USER 等读取，
   经 `git -c url.<auth>@.insteadOf=...` 注入，绝不打印、不写入仓库、不硬编码。
+- 凭据获取跨平台走 `load_secret.load()`：环境变量 > .secrets/<name> 文件 > macOS Keychain；
+  Windows 用 .secrets 文件或环境变量，macOS 额外支持系统钥匙串。
 - 远程 URL 入台账前一律脱敏（掩去 user:token）。
 
-用法：
-  py -3.11 tools/mirror_push.py                # 双推 origin + mirror（默认）
+用法（跨平台）：
+  py -3.11 tools/mirror_push.py                # Windows
+  python3 tools/mirror_push.py                 # macOS / Linux
   py -3.11 tools/mirror_push.py origin mirror  # 指定 remote 列表
   py -3.11 tools/mirror_push.py --verify       # 仅校验各 remote 与本地 HEAD 是否一致
-  $env:GITEE_TOKEN="xxx"; $env:GITEE_USER="gogojaja"; py -3.11 tools/mirror_push.py
+  # 凭据三种提供方式（任选，脚本自动装载，无需手动 export）：
+  #   a) 环境变量： $env:GITEE_TOKEN="xxx"; $env:GITEE_USER="gogojaja"   (Windows)
+  #                export GITEE_TOKEN="xxx"; export GITEE_USER="gogojaja" (macOS)
+  #   b) 文件：     .secrets/gitee_token 与 .secrets/gitee_user（gitignore，不入库）
+  #   c) macOS：    security add-generic-password -s gitee_token -a <user> -w <token>
 """
 import os
 import sys
@@ -90,6 +97,9 @@ def _push_one(remote, branch):
     elapsed = (datetime.datetime.now() - start).total_seconds()
     ok = res.returncode == 0
     out = (res.stdout + res.stderr).strip()
+    for s in (token, user):  # 铁律 #3 A 级：输出中抹除凭据，绝不回显/落盘
+        if s:
+            out = out.replace(s, "***")
     last = out.splitlines()[-1] if out else ""
     return ok, (last if last else ("成功" if ok else "失败")), elapsed
 
@@ -131,7 +141,27 @@ def _verify(remotes, branch):
     return 0 if all_ok else 1
 
 
+def _ensure_secrets():
+    """跨平台自动装载凭据到环境变量（env > .secrets 文件 > macOS Keychain）。"""
+    try:
+        import load_secret as ls
+    except Exception:
+        return
+    for n in ("gitee_token", "github_token"):
+        try:
+            u, t = ls.load(n)
+        except Exception:
+            continue
+        if not t:
+            continue
+        key = n.upper()  # GITEE_TOKEN / GITHUB_TOKEN
+        os.environ.setdefault(key, t)
+        if u:
+            os.environ.setdefault(key.replace("TOKEN", "USER"), u)
+
+
 def main():
+    _ensure_secrets()
     args = [a for a in sys.argv[1:] if not a.startswith("-")]
     remotes = args if args else DEFAULT_REMOTES
     verify = "--verify" in sys.argv[1:]
