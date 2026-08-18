@@ -1,0 +1,2 @@
+﻿编号,名称,战略目标,收益目标,成员项目清单,治理四角色,tranche划分,路线图,统一度量口径,执行标准基线,文档库路径,创建时间,版本,状态,收益档案
+PG-LOCAL-001,本机项目集(Douglas本地),统一管控本机全部软件项目实现跨项目时间与标准一致及协同收益,跨项目依赖可视/里程碑对齐/统一度量口径(CPI,SPI,准点率)/资源冲突仲裁,DevProjectTeamSkill;bank-it-pm-complete;lark-base;lark-doc;lark-shared;lark-slides;lark-training-ppt-generator;lark-wiki;Project-management,Sponsor=douglas;ProgramBoard=douglas+各项目负责人;ProgramManager=待定;PMO=DevProjectTeamSkill-role-program-mgmt,T1=项目集注册与依赖基线;T2=进度对齐与标准统一;T3=评审与收尾,见30_项目群主进度,CPI/SPI/里程碑准点率/变更计费率/资源负载≤80%,各项目沿用DevProjectTeamSkill角色包标准,D:\trae\台账,2026-08-17,v1.0,定义中,待manage_benefits补充
