@@ -64,6 +64,30 @@ def _append_ledger(row):
     _write_ledger(LEDGER, row)
 
 
+def _git_has_changes(path):
+    res = subprocess.run(["git", "diff", "--quiet", "--", path], cwd=ROOT, capture_output=True, text=True)
+    if res.returncode == 0:
+        # 若文件已跟踪且未修改；仍可能存在未追踪文件，则检查 status。
+        status = subprocess.run(["git", "status", "--short", "--", path], cwd=ROOT, capture_output=True, text=True)
+        return bool(status.stdout.strip())
+    return True
+
+
+def _safe_git_commit(rid):
+    env = dict(os.environ)
+    env["AGENT_LOOP_ACTIVE"] = "1"
+    if not _git_has_changes(LEDGER):
+        return False, "no_changes"
+    add = subprocess.run(["git", "add", LEDGER], cwd=ROOT, env=env, capture_output=True, text=True)
+    if add.returncode != 0:
+        return False, add.stderr.strip() or "git add failed"
+    commit = subprocess.run(["git", "commit", "-m", "chore(agent-loop): 控制环执行记录 %s" % rid],
+                            cwd=ROOT, env=env, capture_output=True, text=True)
+    if commit.returncode != 0:
+        return False, commit.stderr.strip() or commit.stdout.strip() or "git commit failed"
+    return True, "ok"
+
+
 def main():
     argv = sys.argv[1:]
     dry = "--dry-run" in argv
@@ -98,17 +122,16 @@ def main():
                     "通过" if v else "失败", "通过" if c else "失败",
                     "通过" if rel else "失败", push_txt, "%.1f" % elapsed, note])
 
-    # 仅门禁全过且非 dry-run 时自动提交台账记录；置环境变量防递归
+    commit_ok = True
+    commit_msg = "ok"
     if all_pass and not dry:
-        env = dict(os.environ)
-        env["AGENT_LOOP_ACTIVE"] = "1"
-        subprocess.run(["git", "add", LEDGER], cwd=ROOT, env=env)
-        subprocess.run(["git", "commit", "-m", "chore(agent-loop): 控制环执行记录 %s" % rid],
-                       cwd=ROOT, env=env)
+        commit_ok, commit_msg = _safe_git_commit(rid)
+        if not commit_ok:
+            print("[agent-loop] 自动提交失败: %s" % commit_msg)
 
-    print("[agent-loop] trigger=%s 版本=%s 闭环=%s 发布=%s 双推=%s (%.1fs)"
+    print("[agent-loop] trigger=%s 版本=%s 闭环=%s 发布=%s 双推=%s 提交=%s (%.1fs)"
           % (trigger, "PASS" if v else "FAIL", "PASS" if c else "FAIL",
-             "PASS" if rel else "FAIL", push_txt, elapsed))
+             "PASS" if rel else "FAIL", push_txt, "OK" if commit_ok else "SKIP/FAIL", elapsed))
     sys.exit(0 if all_pass else 1)
 
 

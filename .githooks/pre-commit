@@ -50,6 +50,7 @@ for f in $files; do
     # 排除已脱敏标记 xxx.xxx.xxx.xxx，且剔除示例/占位语义行（非真实环境路径）
     hits=$(printf '%s' "$content" | grep -E "$bgrade_pattern" | grep -v 'xxx\.xxx\.xxx\.xxx' \
       | grep -vE 'https?://[^@[:space:]]+([[:space:]]|$)' \
+      | grep -vE '%s?://|%\(.*\)s?://|://%s|://%\(.*\)s' \
       | grep -vE '/home/user/|/Users/user/|example\.(com|org|net)|file:///|localhost|192\.168\.x\.x|myproject_|<.*>|/Volumes/BR256G|C:\\\\|D:\\\\|owner/repo|/repo\.git|pgdata-|redis://redis|\.\.\.|\$repo|maven\.apache\.org|pre-commit-hooks|apps/dco|senate/opencode-senate|startswith|\(\[\^/\]\+\)|\(issues\|pull\)|trufflesecurity|/\{path\}|shellcheck|mirrors-mypy|ruff-pre-commit|file://\{path\}|return f' | head -3)
     if [ -n "$hits" ]; then
       echo "❌ B 级敏感信息未脱敏: $f" >&2

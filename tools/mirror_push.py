@@ -74,11 +74,18 @@ def _remote_exists(remote):
     return r.returncode == 0 and r.stdout.strip() != ""
 
 
+def _resolve_credentials(remote):
+    user_var, token_var = TOKEN_ENV.get(remote, (remote.upper() + "_USER", remote.upper() + "_TOKEN"))
+    user = os.environ.get(user_var) or os.environ.get(user_var.lower())
+    token = os.environ.get(token_var) or os.environ.get(token_var.lower())
+    if token and not user:
+        user = os.environ.get("GITEE_USER") or os.environ.get("GITHUB_USER")
+    return user, token
+
+
 def _push_one(remote, branch):
     """推送单个 remote；token 经 insteadOf 注入，不持久化。返回 (ok, msg, elapsed_sec)。"""
-    user_var, token_var = TOKEN_ENV.get(remote, (remote.upper() + "_USER", remote.upper() + "_TOKEN"))
-    token = os.environ.get(token_var)
-    user = os.environ.get(user_var)
+    user, token = _resolve_credentials(remote)
 
     extra_args = []
     if token:

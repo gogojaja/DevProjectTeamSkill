@@ -15,6 +15,7 @@ import subprocess
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import agent_loop as al
+import mirror_push as mp
 
 
 def _read_rows(path):
@@ -68,8 +69,29 @@ def test_dry_run_no_push(tmp_repo):
     pass
 
 
+def test_resolve_credentials_for_remote_aliases():
+    old = {
+        k: os.environ.get(k)
+        for k in ("GITEE_USER", "GITEE_TOKEN", "GITHUB_USER", "GITHUB_TOKEN")
+    }
+    try:
+        os.environ["GITEE_USER"] = "gogojaja"
+        os.environ["GITEE_TOKEN"] = "gitee-secret"
+        os.environ["GITHUB_USER"] = "gh-user"
+        os.environ["GITHUB_TOKEN"] = "gh-secret"
+        assert mp._resolve_credentials("mirror") == ("gogojaja", "gitee-secret")
+        assert mp._resolve_credentials("origin") == ("gh-user", "gh-secret")
+    finally:
+        for k, v in old.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+
+
 if __name__ == "__main__":
     test_write_ledger_bom_and_header()
     test_seq_increments()
     test_recursion_guard_env()
+    test_resolve_credentials_for_remote_aliases()
     print("ALL TESTS PASSED")
