@@ -1,7 +1,11 @@
 #!/bin/sh
 # .githooks/post-commit — 控制环自动化触发（Phase 1）
 # 仅当仓库根存在 .agent-loop-enabled 时激活；AGENT_LOOP_ACTIVE=1 防止 agent_loop 自提交台账时递归触发。
-PY=$(command -v python3 || command -v py || echo python3)
+PY=""
+for c in py py.exe python3 python; do
+  if command -v "$c" >/dev/null 2>&1; then PY="$c"; break; fi
+done
+[ -z "$PY" ] && PY=python3
 if [ -f .agent-loop-enabled ] && [ "$AGENT_LOOP_ACTIVE" != "1" ]; then
   AGENT_LOOP_ACTIVE=1 "$PY" tools/agent_loop.py --trigger hook || true
 fi
