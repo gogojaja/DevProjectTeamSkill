@@ -1,0 +1,45 @@
+{
+  "_comment": "自定义脱敏规则示例：复制为 custom_rules.json 后修改使用",
+  "b_ipv4": {
+    "enabled": true,
+    "_comment": "示例：保留 C 段，仅隐藏主机号（默认是完全脱敏）",
+    "patterns": [
+      {
+        "name": "ipv4_keep_c_segment",
+        "regex": "\\b((?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b",
+        "replacement": "\\1.x",
+        "example": "xxx.xxx.xxx.100 → xxx.xxx.xxx.x"
+      }
+    ]
+  },
+  "custom_internal_domain": {
+    "level": "B",
+    "description": "内部域名（B 级，自定义扩展）",
+    "enabled": true,
+    "patterns": [
+      {
+        "name": "corp_internal_domain",
+        "regex": "\\b[a-zA-Z0-9.-]*\\.corp\\.example\\.com\\b",
+        "replacement": "***.example.com",
+        "example": "api.corp.example.com → ***.example.com"
+      }
+    ]
+  },
+  "custom_project_secret": {
+    "level": "A",
+    "description": "项目专属密钥前缀（A 级，自定义扩展）",
+    "enabled": true,
+    "patterns": [
+      {
+        "name": "proj_api_key",
+        "regex": "\\bproj_[A-Za-z0-9]{20,}\\b",
+        "replacement": "proj_***",
+        "example": "proj_a1b2c3d4e5f6g7h8i9j0 → proj_***"
+      }
+    ]
+  },
+  "b_phone_cn": {
+    "enabled": false,
+    "_comment": "示例：禁用手机号脱敏规则"
+  }
+}

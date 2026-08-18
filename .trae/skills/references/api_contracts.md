@@ -47,7 +47,8 @@ DevProjectTeamSkill（总控）
 │   ├── release                 ← 投产执行：准备预演/执行监控/回滚
 │   └── handover                ← 评审总结交接：Go-Live/总结/交接/阶段评审
 ├── tools/
-│   └── cmdb/                   ← CMDB 轻量级资源管理工具（注册/查询/释放/冲突检测；SQLite 数据库；审计日志；CSV 导出）
+│   ├── cmdb/                   ← CMDB 轻量级资源管理工具（注册/查询/释放/冲突检测；SQLite 数据库；审计日志；CSV 导出）
+│   └── desensitize/            ← 文档脱敏工具（A/B/C三级扫描+替换+CSV报告；扫描模式/脱敏模式；自定义规则JSON）
 └── shared/
     ├── evolution.md            ← 桥接页（已并入 self-improve/self-diagnosis.md）
     └── authoring.md            ← 元技能，Skill 创建/修改，简化模式路由

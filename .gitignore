@@ -1,26 +1,26 @@
-# 冗余部署目录：仅 .trae/skills 入库为规范副本，其余可经 tools/deploy_skills 重新生成
+# å†—ä½™éƒ¨ç½²ç›®å½•ï¼šä»… .trae/skills å…¥åº“ä¸ºè§„èŒƒå‰¯æœ¬ï¼Œå…¶ä½™å¯ç» tools/deploy_skills é‡æ–°ç”Ÿæˆ
 .github/skills/
 .claude/skills/
 .agents/skills/
 
-# 备份与留档（可重新生成，不入库）
+# å¤‡ä»½ä¸Žç•™æ¡£ï¼ˆå¯é‡æ–°ç”Ÿæˆï¼Œä¸å…¥åº“ï¼‰
 skills_backup_*/
 skills_legacy_*/
 .backup/
 
-# 打包产物（可经 tools/package_skills 重新生成）
+# æ‰“åŒ…äº§ç‰©ï¼ˆå¯ç» tools/package_skills é‡æ–°ç”Ÿæˆï¼‰
 dist/
 _build_global/
 
-# CMDB 本地运行时数据库（不入库，含本地操作留痕）
+# CMDB æœ¬åœ°è¿è¡Œæ—¶æ•°æ®åº“ï¼ˆä¸å…¥åº“ï¼Œå«æœ¬åœ°æ“ä½œç•™ç—•ï¼‰
 tools/cmdb/cmdb.db
 
-# 临时产物
+# ä¸´æ—¶äº§ç‰©
 _pkg_tmp/
 _solidify_*.log
 .trae-html-share-packages/
 
-# 历史打包与旧方案材料
+# åŽ†å²æ‰“åŒ…ä¸Žæ—§æ–¹æ¡ˆææ–™
 *.zip
 requirements-analysis-skill-modification-plan.html.pdf
 skill-evolution-plan/
@@ -28,7 +28,7 @@ requirements-analysis-skill-modification-plan/
 SkillEvolutionSkill/
 .DS_Store
 
-# ===== 账号/密钥安全隔离（R5：不入库，防误提交）=====
+# ===== è´¦å·/å¯†é’¥å®‰å…¨éš”ç¦»ï¼ˆR5ï¼šä¸å…¥åº“ï¼Œé˜²è¯¯æäº¤ï¼‰=====
 .secrets/
 secrets/
 secrets-example/
@@ -49,9 +49,15 @@ secrets-example/
 *credentials*.json
 service-account*.json
 
-# Python 编译缓存
+# Python ç¼–è¯‘ç¼“å­˜
 __pycache__/
 *.pyc
 
-# ���ƻ��Զ������ؿ���(�����)
+# 控制环自动化本地开关(不入库)
 .agent-loop-enabled
+# 技能自动部署本地开关(不入库)
+.auto-deploy-enabled
+
+# 脱敏工具测试报告（不入库）
+desensitize_report_*.csv
+scan_report_*.csv

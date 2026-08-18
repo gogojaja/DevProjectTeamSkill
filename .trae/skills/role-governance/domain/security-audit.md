@@ -16,7 +16,7 @@ description: "Project security audit skill covering high-risk operation pre-audi
 - **定位**：项目管控子技能，负责高危操作前置审计、操作留痕（不可删除审计台账）、故障回滚优先逻辑与安全审计协同。
 - **调用主体**：ProjectMonitorSkill（薄路由壳按 action 分发）
 - **触发时机**：高危文件操作（修改入口脚本/目录、删除移动文件）、服务故障回滚、部署启停、核心架构文件变更。
-- **依赖工具**：project-scope-change-skill · project-governance-skill
+- **依赖工具**：project-scope-change-skill · project-governance-skill · `tools/desensitize/`（文档脱敏工具）
 - **核心约束**：仅由 ProjectMonitorSkill 路由分发加载；高风险操作强制 `user_confirm=同意`（5 分钟无回复自动驳回）；全操作不可删除留痕；用户连续 2 次拒绝同一操作永久终止。
 
 ---

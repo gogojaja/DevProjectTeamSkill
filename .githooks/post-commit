@@ -1,7 +1,44 @@
 #!/bin/sh
-# .githooks/post-commit — 控制环自动化触发（Phase 1）
-# 仅当仓库根存在 .agent-loop-enabled 时激活；AGENT_LOOP_ACTIVE=1 防止 agent_loop 自提交台账时递归触发。
-if [ ! -f .agent-loop-enabled ] || [ "$AGENT_LOOP_ACTIVE" = "1" ]; then
+# .githooks/post-commit — 提交后自动化钩子
+# 功能 1：控制环自动化（agent_loop）—— 存在 .agent-loop-enabled 时触发
+# 功能 2：技能自动部署（auto-deploy）—— 存在 .auto-deploy-enabled 时自动部署技能到全局
+
+ROOT="$(pwd)"
+
+# ============================================================
+# 功能 2：技能自动部署（opt-in，需创建 .auto-deploy-enabled）
+# 仅当 .trae/skills/ 下的源码有变更时才触发部署
+# ============================================================
+if [ -f "$ROOT/.auto-deploy-enabled" ] && [ "$AGENT_LOOP_ACTIVE" != "1" ]; then
+  # 检查最新提交是否包含技能源码变更
+  if git diff --name-only HEAD~1 HEAD 2>/dev/null | grep -q '^\.trae/skills/'; then
+    echo "post-commit: 检测到技能源码变更，自动部署到全局..."
+
+    # 查找 Python 解释器
+    PY=""
+    if PEXE=$(ls /c/Users/*/AppData/Local/Programs/Python/Python*/python.exe 2>/dev/null | head -1); [ -n "$PEXE" ]; then
+      PY="$PEXE"
+    elif PEXE=$(ls /c/Python*/python.exe /c/Program*/Python*/python.exe 2>/dev/null | head -1); [ -n "$PEXE" ]; then
+      PY="$PEXE"
+    elif command -v python3 >/dev/null 2>&1; then
+      PY="python3"
+    elif command -v python >/dev/null 2>&1; then
+      PY="python"
+    fi
+
+    if [ -n "$PY" ]; then
+      "$PY" "$ROOT/tools/deploy_skills.py" 2>&1 || echo "post-commit: 自动部署失败，请手动执行 solidify"
+    else
+      echo "post-commit: 未找到 Python，跳过自动部署"
+    fi
+  fi
+fi
+
+# ============================================================
+# 功能 1：控制环自动化触发（Phase 1）
+# 仅当仓库根存在 .agent-loop-enabled 时激活；AGENT_LOOP_ACTIVE=1 防止自提交递归触发。
+# ============================================================
+if [ ! -f "$ROOT/.agent-loop-enabled" ] || [ "$AGENT_LOOP_ACTIVE" = "1" ]; then
   exit 0
 fi
 

@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # =============================================================================
-# solidify.sh — 育权台结成果「断点固化」一键脚本（v21.0.0）
+# solidify.sh — 育权台结成果「断点固化」一键脚本（v21.7.0）
 # 依据: references/token_standard.md §2 / 方案 v21.0.1 §2.3-2.4
 #
-# 变更（v20 -> v21）:
-#   - 交接文档改名: 跨会话交接文档.md → 交接文档.md（P2-2，禁止双源并存）
-#   - 固化时强制刷新 交接文档.md 断点区；若文件缺失则用模板创建
-#   - 快照改用角色包粒度；打包/部署调用 v21 脚本
+# 变更:
+#   v21.7.0: 新增 3 个硬门禁（版本一致性/闭环执行/发布级），与 solidify.py 功能对齐
+#   v21.0.0: 交接文档改名 + 断点区刷新 + 角色包粒度快照 + v21 打包部署
+#   v20: 初代版本
 #
 # 用法:
 #   bash tools/solidify.sh
@@ -52,6 +52,36 @@ for r in "${ALL_ROLES[@]}"; do
   fi
 done
 echo "   共 ${SKILL_COUNT} 个角色包"
+
+# ---- 1a. 硬门禁：版本一致性校验 ----
+echo ""
+echo "[1a/6] 版本一致性校验（硬门禁）"
+if python3 "$ROOT/tools/check_version_consistency.py" 2>&1; then
+  echo "   ✓ 版本一致性校验通过"
+else
+  echo "   ✗ 版本一致性校验未通过，中止固化。请先统一各包元数据/页脚版本。" >&2
+  exit 1
+fi
+
+# ---- 1b. 硬门禁：闭环执行系统校验 ----
+echo ""
+echo "[1b/6] 闭环执行门禁校验（硬门禁）"
+if python3 "$ROOT/tools/check_skill_closure.py" 2>&1; then
+  echo "   ✓ 闭环执行门禁通过"
+else
+  echo "   ✗ 闭环执行门禁未通过，中止固化。请先补齐「闭环执行系统」章节与关键门禁项。" >&2
+  exit 1
+fi
+
+# ---- 1c. 硬门禁：发布级门禁校验 ----
+echo ""
+echo "[1c/6] 发布级门禁校验（硬门禁）"
+if python3 "$ROOT/tools/check_skill_release_gate.py" 2>&1; then
+  echo "   ✓ 发布级门禁通过"
+else
+  echo "   ✗ 发布级门禁未通过，中止固化。请先补齐 frontmatter、metadata 与闭环执行结构。" >&2
+  exit 1
+fi
 
 # ---- 2. 交接文档断点区强制刷新（缺失则模板创建） ----
 echo ""

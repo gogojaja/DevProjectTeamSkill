@@ -6,7 +6,8 @@ SKILLS_DIR = os.environ.get('SKILLS_DIR', os.path.join(ROOT, '.trae', 'skills'))
 HANDOFF = os.path.join(ROOT, '交接文档.md')
 TOOLS_DIR = os.path.join(ROOT, 'tools')
 ALL_ROLES = ['dev-project-team-skill','role-project-init','role-requirements-analysis',
-             'role-architecture','role-development','role-testing','role-deployment','role-governance']
+             'role-architecture','role-development','role-testing','role-deployment','role-governance',
+             'role-program-mgmt','role-mgmt-consulting']
 
 def _run_script(script, *args):
     """跨平台运行 tools/ 下脚本：使用当前 Python 解释器（Windows/macOS/Linux 通用）。"""
