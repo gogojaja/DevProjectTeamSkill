@@ -15,7 +15,7 @@ content,CR-004,multi-perspective-validation 版本落后,FAIL,medium,仅 v1.0.0/
 content,CR-005,description/正文语言不一致,FAIL,low,7 子技能 description 简体但 6 个正文繁体,统一简体
 content,CR-006,references 4 个文档缺版本页脚,FAIL,low,COPYRIGHT/api_contracts/common_standards/directory_structure 无 **文档版本**,补页脚
 content,CR-007,主库 references 与 shared 副本不同步,FAIL,high,api_contracts/model_selection/program_management 主库新、shared 旧；multi_project_isolation/github_access 缺失,明确单一真实源并同步
-security,SEC-001,tools/deploy_skills.py 硬编码真实用户名,FAIL,high,deploy_skills.py:8 与 deploy_skills.sh:24 C:/Users/gogoj 泄漏本机用户名（B级）,改用 %USERPROFILE% 占位符或经 load_secret
+security,SEC-001,tools/deploy_skills.py 硬编码真实用户名,FAIL,high,deploy_skills.py:8 与 deploy_skills.sh:24 <USERPROFILE> 泄漏本机用户名（B级）,改用 %USERPROFILE% 占位符或经 load_secret
 security,SEC-002,B级脱敏自检通过（其余）,PASS,high,github_access/AGENTS.md/docs IP 为 GitHub 公开候选 IP（豁免），iron_rules 示例合规,—
 compliance,COM-001,description 150~250 字符,FAIL,medium,16 个 SKILL.md 全部合规,—
 compliance,COM-002,version_consistency 校验,FAIL,medium,check_version_consistency.py 9 包全过但漏子技能,—

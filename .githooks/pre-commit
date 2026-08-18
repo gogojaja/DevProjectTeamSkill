@@ -81,10 +81,22 @@ for f in $files; do
   fi
 done
 
+# ---- 5. 仓库结构门禁（tools/lint_repo.py） ----
+echo "🧹 仓库结构门禁检查…"
+PY=$(ls /c/Users/*/AppData/Local/Programs/Python/Python*/python.exe 2>/dev/null | head -1)
+if [ -n "$PY" ] && [ -f "$repo_root/tools/lint_repo.py" ]; then
+  if ! "$PY" "$repo_root/tools/lint_repo.py" >/dev/null 2>&1; then
+    "$PY" "$repo_root/tools/lint_repo.py" 2>&1 | grep -v "^INFO"
+    fail=1
+  fi
+else
+  echo "⚠ 未定位到 python.exe，跳过结构门禁（手动运行: py -3.11 tools/lint_repo.py）" >&2
+fi
+
 if [ "$fail" -ne 0 ]; then
-  echo "⛔ 环境门禁未通过，提交已阻断。修正后重新 git add + commit。" >&2
+  echo "⛔ 提交门禁未通过，提交已阻断。修正后重新 git add + commit。" >&2
   exit 1
 fi
 
-echo "✅ 环境门禁全部通过。"
+echo "✅ 提交门禁全部通过。"
 exit 0
