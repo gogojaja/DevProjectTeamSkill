@@ -1,11 +1,19 @@
 #!/bin/sh
 # .githooks/post-commit — 控制环自动化触发（Phase 1）
 # 仅当仓库根存在 .agent-loop-enabled 时激活；AGENT_LOOP_ACTIVE=1 防止 agent_loop 自提交台账时递归触发。
+if [ ! -f .agent-loop-enabled ] || [ "$AGENT_LOOP_ACTIVE" = "1" ]; then
+  exit 0
+fi
+
+# 解析 Python 解释器：Windows git-bash 的 PATH 常不含 py/python3，需兜底探测。
 PY=""
-for c in py py.exe python3 python; do
+for c in py py.exe python3 python /c/Windows/py.exe /c/Windows/system32/py.exe; do
   if command -v "$c" >/dev/null 2>&1; then PY="$c"; break; fi
 done
-[ -z "$PY" ] && PY=python3
-if [ -f .agent-loop-enabled ] && [ "$AGENT_LOOP_ACTIVE" != "1" ]; then
+
+if [ -n "$PY" ]; then
   AGENT_LOOP_ACTIVE=1 "$PY" tools/agent_loop.py --trigger hook || true
+elif command -v cmd >/dev/null 2>&1; then
+  # Windows：git-bash 找不到 py 时，回退经 Windows cmd 调用 py 启动器
+  AGENT_LOOP_ACTIVE=1 cmd /c "py -3.11 tools/agent_loop.py --trigger hook" || true
 fi
