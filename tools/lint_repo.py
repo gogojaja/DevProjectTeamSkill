@@ -81,14 +81,19 @@ def check_root_scatter(root):
     except Exception as e:
         log.error(f'无法读取根目录: {e}')
         return ['无法读取根目录']
+    ignore_dirs = {'dist', '_pkg_tmp', '_build_global', '.trae-html-share-packages'}
     for name in entries:
         full = os.path.join(root, name)
         if os.path.isdir(full):
-            if name not in WHITELIST_DIRS:
-                errors.append(f'根目录散落目录（非白名单）: {name}/')
+            if name in WHITELIST_DIRS:
+                continue
+            if name.startswith('skills_backup_') or name in ignore_dirs:
+                continue
+            errors.append(f'根目录散落目录（非白名单）: {name}/')
         else:
-            if name not in WHITELIST_FILES:
-                errors.append(f'根目录散落文件（非白名单）: {name}')
+            if name in WHITELIST_FILES:
+                continue
+            errors.append(f'根目录散落文件（非白名单）: {name}')
     return errors
 
 
@@ -138,6 +143,9 @@ def check_root_kebab(root):
         if os.path.isdir(full) and name in WHITELIST_DIRS:
             continue
         if os.path.isfile(full) and name in WHITELIST_FILES:
+            continue
+        # gitignored 的 solidify/打包产物（dist/_pkg_tmp/skills_backup_* 等）豁免
+        if os.path.isdir(full) and (name.startswith('skills_backup_') or name in {'dist', '_pkg_tmp', '_build_global', '.trae-html-share-packages'}):
             continue
         # 中文文档名豁免（出现在 台账/、docs/ 内的子项另行处理，根级一般无中文）
         if CJK_RE.search(name):
