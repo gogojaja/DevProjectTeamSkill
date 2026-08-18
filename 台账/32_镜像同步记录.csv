@@ -23,3 +23,5 @@ SYNC-20260818-021,2026-08-18 11:20:54,63d347add0e4,origin,https://github.com/gog
 SYNC-20260818-022,2026-08-18 11:20:54,63d347add0e4,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,0.9,Everything up-to-date
 SYNC-20260818-023,2026-08-18 11:35:48,63d347add0e4,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,成功,1.6,Everything up-to-date
 SYNC-20260818-024,2026-08-18 11:35:48,63d347add0e4,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,1.4,Everything up-to-date
+SYNC-20260818-025,2026-08-18 11:37:06,ef1c5c639638,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,失败,21.3,fatal: unable to access 'https://github.com/***/DevProjectTeamSkill.git/': Failed to connect to github.com:443 after 21078 ms: Could not connect to server
+SYNC-20260818-026,2026-08-18 11:37:06,ef1c5c639638,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,1.8,   63d347a..ef1c5c6  main -> main
