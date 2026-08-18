@@ -41,7 +41,7 @@ for f in $files; do
   case "$f" in
     *.png|*.jpg|*.jpeg|*.gif|*.ico|*.pdf|*.zip|*.lock|*.jar|*.war) continue ;;
     .githooks/*|scripts/*) continue ;;  # 钩子/脚本自身含路径示例，跳过 B 级（仍受 A 级扫描）
-    AGENTS.md|docs/github_ip_records.csv|.trae/skills/dev-project-team-skill/skills/self-improve/domain/versioned-release.md) continue ;;  # GitHub 候选 IP 为公开基础设施 IP；versioned-release.md 含本仓库公开 URL（gogojaja/DevProjectTeamSkill，AGENTS.md 授权保留），豁免 B 级
+    AGENTS.md|交接文档.md|docs/github_ip_records.csv|.trae/skills/dev-project-team-skill/skills/self-improve/domain/versioned-release.md) continue ;;  # GitHub 候选 IP 为公开基础设施 IP；versioned-release.md 含本仓库公开 URL（gogojaja/DevProjectTeamSkill，AGENTS.md 授权保留），豁免 B 级；交接文档为本仓库跨会话断点+审计留痕，含必要真实路径，豁免 B 级
     .trae/skills/shared/references/*|.trae/skills/references/*) continue ;;  # references 标准文档含规范示例路径/IP（如 token_standard/iron_rules/github_access），主库与副本均已入库存证；评审 SEC-002 确认无真实泄漏
   esac
   content=$(git show :"$f" 2>/dev/null) || continue
