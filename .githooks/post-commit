@@ -5,14 +5,22 @@ if [ ! -f .agent-loop-enabled ] || [ "$AGENT_LOOP_ACTIVE" = "1" ]; then
   exit 0
 fi
 
+# 解析 Python：
+#  - POSIX 优先 python3；
+#  - Windows 下 git-bash 的 `py` 启动器对 POSIX 相对路径会异常(exit 49)，故优先直搜 python.exe 绝对路径（最稳），
+#    其次回退 `py -3.11` + `pwd -W` 得到的 Windows 绝对路径。
+PY=""
 if command -v python3 >/dev/null 2>&1; then
-  # macOS / Linux
-  AGENT_LOOP_ACTIVE=1 python3 tools/agent_loop.py --trigger hook || true
+  PY="python3"
+elif PEXE=$(ls /c/Users/*/AppData/Local/Programs/Python/Python*/python.exe 2>/dev/null | head -1); [ -n "$PEXE" ]; then
+  PY="$PEXE"
+elif PEXE=$(ls /c/Python*/python.exe /c/Program*/Python*/python.exe 2>/dev/null | head -1); [ -n "$PEXE" ]; then
+  PY="$PEXE"
+fi
+
+if [ -n "$PY" ]; then
+  AGENT_LOOP_ACTIVE=1 "$PY" tools/agent_loop.py --trigger hook || true
 elif command -v py >/dev/null 2>&1; then
-  # Windows git-bash：py 启动器对 POSIX 相对路径异常(exit 49)，改用 Windows 绝对路径
   WINP=$(pwd -W 2>/dev/null || pwd)
   AGENT_LOOP_ACTIVE=1 py -3.11 "$WINP/tools/agent_loop.py" --trigger hook || true
-elif command -v cmd >/dev/null 2>&1; then
-  # Windows 兜底：经原生 cmd 调用 py 启动器
-  AGENT_LOOP_ACTIVE=1 cmd /c "py -3.11 tools/agent_loop.py --trigger hook" || true
 fi
