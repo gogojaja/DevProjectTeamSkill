@@ -5,7 +5,7 @@
 #
 # 变更（v20 -> v21）:
 #   - 新增 --roles <role-a,role-b,...> 按需部署指定角色包（注入型工具防全量注入）
-#   - 不带 --roles 默认全量部署 8 个角色包
+#   - 不带 --roles 默认全量部署 10 个角色包
 #   - 部署时同步 SKILL_INDEX.md + references/
 #   - 注入型工具（TRAE 等递归读目录）推荐 --roles 只放需要的包
 #
@@ -36,7 +36,7 @@ DEFAULT_TARGETS=(
 usage() {
   echo "用法: $0 [--target <dir>]... [--roles <role,role,...>]" >&2
   echo "  --target  部署目标目录（可多次），缺省为 4 个默认目录" >&2
-  echo "  --roles   只部署指定角色包（逗号分隔），缺省全量 8 包" >&2
+  echo "  --roles   只部署指定角色包（逗号分隔），缺省全量 10 包" >&2
   echo "  示例: bash $0 --target .trae/skills --roles role-testing,role-deployment" >&2
   exit 1
 }
@@ -70,6 +70,7 @@ ALL_ROLES=(
   role-deployment
   role-governance
   role-program-mgmt
+  role-mgmt-consulting
 )
 
 if [[ ${#ROLES[@]} -eq 0 ]]; then

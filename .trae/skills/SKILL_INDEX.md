@@ -17,6 +17,7 @@
 | 6 | role-deployment | 投产 | 投产策略 / 投产计划 / Go-Live / 发布执行 / 回滚 / 运维交接 | role-deployment/ |
 | 7 | role-governance | 总控保障 | 台账读写 / 阶段评审 / 门禁 / 基线固化 / 变更审计 / 归档 / 交接 | role-governance/ |
 | 8 | role-program-mgmt | 项目群/项目集 | 项目群 / 项目集 / 多项目协同 / PMO / 依赖 / 里程碑对齐 / 收益 / IMS | role-program-mgmt/ |
+| 9 | role-mgmt-consulting | 项目管理咨询 | 项目管理咨询 / PMO 咨询 / 成熟度评估 / 差距分析 / 方法论定制 / 变革管理 / 咨询建议书 / PMO 蓝图 / 教练辅导 | role-mgmt-consulting/ |
 
 ## 使用规则
 
@@ -43,8 +44,10 @@
 
 15. **项目群协同（v1.1.1）**：多项目协同层由 `role-program-mgmt` 承载（对齐 PMI SPM 5th 八原则/五绩效域、MSP 5th 七原则/转型流、IMS/EVM）；8 环节 `define_program`/`manage_benefits`/`map_dependencies`/`align_schedule`/`standardize_execution`/`manage_documents`/`review_program`/`close_program`；治理三层模型（项目治理<项目群治理<组合治理），Program Board 在 tranche 边界决策（继续/转向/终止），Program Manager 管理不决策、PMO 提供机制不决策；新台账 28_项目群注册/29_项目依赖矩阵/30_项目群主进度/**31_文档配置管理**；**v1.1.0 新增文档与配置管理 discipline**（单一信息源/命名规范/版本生命周期/CI 基线/密级/留存，对齐 ISO 15489/ISO 10007）；**v1.1.1 将 CMDB 纳入程序管理范畴**——§9.8 环境与资产配置（CMDB=环境CI单一信息源、程序库仅引用不复制）、29 依赖矩阵增「关联CMDB资产ID」、评审增「环境就绪」第四 Gate（tranche 边界前查 CMDB 关键资产状态）、资源负载度量以 CMDB 实时占用为准；与项目级 check_ready/stage_review 叠加为双层门禁，不替代单项目治理，详见 `role-program-mgmt/SKILL.md` 与 `references/program_management.md`。
 
+16. **项目管理咨询（v1.0.0）**：咨询能力由 `role-mgmt-consulting` 承载（二级方法工程/诊断，独立于 SDLC 一级执行路由）；咨询全生命周期 5 环节 `assess_opportunity`/`draft_proposal`/`diagnose_as_is`/`assess_maturity`/`analyze_gap`/`design_solution`/`drive_change`/`coach_org`/`measure_value`/`asset_knowledge`；自建 5 维成熟度评估框架（治理/流程/组织/度量/工具，0~5 级，对齐 P3M3/CMMI/OPM3 裁剪，证据必填）；变革管理对齐 Kotter 8 步/ADKAR；新台账 33_商机管道/34_客户登记/35_建议书版本/36_成熟度基线/37_变革计划；**定位铁律**：咨询只提供建议不代客户决策、落地执行由客户组织或本库执行角色承接；**保密铁律**：客户组织信息按 iron_rules §3 A/B 级脱敏处理（台账只存别名）；标准见 `references/consulting_standards.md`，详见 `role-mgmt-consulting/SKILL.md`。
+
 ---
 
 **文档版本**：v21.7.0
-**最后更新**：2026-08-17（新增双套环境拓扑标准 environment_topology.md：每项目「非生产组 dev+test 共享基础软硬件 + 生产组独立隔离」，文件/端口隔离 + 基础软硬件共用边界 + RBAC，20_环境配置.csv 扩展列；SKILL_INDEX 第 5a 条）
+**最后更新**：2026-08-18（新增第 10 角色包 role-mgmt-consulting：项目管理咨询 v1.0.0——5 环节咨询生命周期 + 自建 5 维成熟度模型（治理/流程/组织/度量/工具）+ Kotter/ADKAR 变革 + 33~37 咨询台账 + consulting_standards 标准）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

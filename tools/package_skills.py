@@ -7,7 +7,7 @@ DIST = os.path.join(ROOT, 'dist')
 HANDOFF = os.path.join(ROOT, '交接文档.md')
 ALL_ROLES = ['dev-project-team-skill','role-project-init','role-requirements-analysis',
              'role-architecture','role-development','role-testing','role-deployment','role-governance',
-             'role-program-mgmt']
+             'role-program-mgmt','role-mgmt-consulting']
 
 VRE = re.compile(r'技能版本\*\*[：:]\s*(v[0-9]+\.[0-9]+\.[0-9]+)')
 
@@ -91,7 +91,7 @@ def parse_roles(argv):
         if a == '--role':
             roles.append(argv[i+1]); i += 2
         elif a in ('-h', '--help'):
-            print('用法: package_skills.py [--role <role-name>]...   # 无参=全部 8 包')
+            print('用法: package_skills.py [--role <role-name>]...   # 无参=全部 10 包')
             sys.exit(0)
         else:
             print(f'未知参数: {a}'); sys.exit(1)

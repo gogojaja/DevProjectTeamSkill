@@ -11,7 +11,7 @@
 #   - 子技能统一为 .md（不再 .md 化规避注入，P0-1）
 #
 # 用法:
-#   bash tools/package_skills.sh                # 打包全部 8 个角色包
+#   bash tools/package_skills.sh                # 打包全部 10 个角色包
 #   bash tools/package_skills.sh --role role-testing   # 只打包指定角色包
 #   bash tools/package_skills.sh --handoff 交接文档.md  # 指定交接文档来源
 # =============================================================================
@@ -46,6 +46,7 @@ ALL_ROLES=(
   role-deployment
   role-governance
   role-program-mgmt
+  role-mgmt-consulting
 )
 
 # 待处理角色

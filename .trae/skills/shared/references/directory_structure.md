@@ -11,7 +11,7 @@
 │   │   ├── cmdb_export.csv       资源导出 CSV（按需导出，供团队共享）
 │   │   ├── cmdb_audit.log        审计日志（操作留痕）
 │   │   └── README.md             CMDB 使用说明
-│   ├── package_skills.sh          打包全部 9 角色包到 dist/
+│   ├── package_skills.sh          打包全部 10 角色包到 dist/
 │   ├── package_skills.sh --role role-testing  打包单个角色包
 │   ├── deploy_skills.sh --roles role-a,role-b  部署到目标目录
 │   ├── solidify.sh "<说明>"      固化到目标目录并提交 Git

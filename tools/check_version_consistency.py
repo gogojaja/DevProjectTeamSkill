@@ -4,7 +4,7 @@
 硬门禁：
 1) 每个角色包 SKILL.md 元数据「技能版本」行 == 文档页脚「文档版本」行（必须一致）；
 2) 每个维护产出的技能必须具备闭环执行系统与关键执行门禁（任务入口/执行状态/验收门禁/失败处理/产出交接/审计）。
-软提示：变更记录最新一条是否含元数据版本号；8 包版本横向分布。
+软提示：变更记录最新一条是否含元数据版本号；10 包版本横向分布。
 返回码 0=通过，1=硬门禁不一致/闭环门禁不通过（供 solidify 中止）。
 """
 import os, sys, re
@@ -15,7 +15,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKILLS_DIR = os.environ.get('SKILLS_DIR', os.path.join(ROOT, '.trae', 'skills'))
 ALL_ROLES = ['dev-project-team-skill','role-project-init','role-requirements-analysis',
              'role-architecture','role-development','role-testing','role-deployment','role-governance',
-             'role-program-mgmt']
+             'role-program-mgmt','role-mgmt-consulting']
 
 VRE = re.compile(r'技能版本\*\*[：:]\s*(v[0-9]+\.[0-9]+\.[0-9]+)')       # 元数据行
 FRE = re.compile(r'\*\*文档版本\*\*[：:]\s*(v[0-9]+\.[0-9]+\.[0-9]+)')   # 页脚

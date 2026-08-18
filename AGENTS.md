@@ -2,13 +2,13 @@
 
 ## 项目定位
 
-DevProjectTeamSkill：软件研发全生命周期多角色编排技能库（9 个角色包 + 1 个编排器）。本体即技能源码，不是业务应用。AI Agent 在本仓库的职责是**维护技能库本身**（skill 编写/结构/打包/部署），不是执行软件项目业务。
+DevProjectTeamSkill：软件研发全生命周期多角色编排技能库（10 个角色包 + 1 个编排器）。本体即技能源码，不是业务应用。AI Agent 在本仓库的职责是**维护技能库本身**（skill 编写/结构/打包/部署），不是执行软件项目业务。
 
 ## 仓库结构
 
 ```
 .trae/skills/         技能源码（唯一事实来源）
-  SKILL_INDEX.md      8 包路由索引
+  SKILL_INDEX.md      10 包路由索引
   references/         公共标准（token/csv/api 契约等）
   shared/             单源共享库：governance/evolution/authoring + references 副本
   dev-project-team-skill/   编排器（薄壳）
@@ -33,7 +33,7 @@ opencode.json         opencode 技能注册
 ## 命令
 
 ```sh
-bash tools/package_skills.sh            # 打包全部 9 角色包到 dist/
+bash tools/package_skills.sh            # 打包全部 10 角色包到 dist/
 bash tools/package_skills.sh --role role-testing
 bash tools/deploy_skills.sh --roles role-a,role-b
 bash tools/solidify.sh "说明"

@@ -9,6 +9,7 @@
 ```
 DevProjectTeamSkill（总控）
 ├── role-program-mgmt          ← 跨项目协同层：项目群/项目集（定义/收益/依赖/IMS 进度/标准一致/Program Board 评审/收尾）
+├── role-mgmt-consulting       ← 咨询层：项目管理咨询（商机评估/投标/现状诊断/成熟度评估/差距分析/方案设计/变革实施/成效评估/知识资产化）
 ├── role-project-init          ← 第 0 阶段：项目启动（章程/干系人/范围初定/基线）
 ├── role-governance             ← 所有角色共享：路由分发至 6 子域（评审/门禁/审计/台账/归档/交接）
 │   ├── governance              ← 治理：基线/固化/归档/交接
@@ -87,6 +88,16 @@ DevProjectTeamSkill（总控）
 | `standardize_execution` | role-program-mgmt | 统一执行标准与度量口径（CPI/SPI/缺陷密度/里程碑准点率/变更计费率/资源负载 + 报告 cadence） | 项目群协同（standardize_execution 环节） |
 | `review_program` | role-program-mgmt | Program Board tranche 边界决策（继续/转向/终止 + 三层门禁叠加：时间对齐/依赖无冲突/标准一致） | 项目群协同（review_program 环节） |
 | `close_program` | role-program-mgmt | 项目群收尾（收益确认/移交/资源释放/复盘归档） | 项目群协同（close_program 环节） |
+| `assess_opportunity` | role-mgmt-consulting | 商机评估与投标策略（33_商机管道.csv：需求/预算/时间窗口/赢率/阶段） | 咨询（商机评估环节） |
+| `draft_proposal` | role-mgmt-consulting | 咨询建议书（35_建议书版本.csv：SOW/交付物/里程碑/报价/风险，客户名脱敏） | 咨询（建议书环节） |
+| `diagnose_as_is` | role-mgmt-consulting | 现状诊断（组织访谈/流程采集/痛点识别） | 咨询（现状诊断环节） |
+| `assess_maturity` | role-mgmt-consulting | 成熟度评估（36_成熟度基线.csv：自建 5 维框架 0~5 级，证据必填） | 咨询（成熟度评估环节） |
+| `analyze_gap` | role-mgmt-consulting | 差距分析（As-Is vs To-Be 矩阵/根因/优先级） | 咨询（差距分析环节） |
+| `design_solution` | role-mgmt-consulting | 方案设计（PMO 蓝图/治理模型/方法论定制/绩效体系，落咨询资产/） | 咨询（方案设计环节） |
+| `drive_change` | role-mgmt-consulting | 变革实施（37_变革计划.csv：Kotter 8 步/ADKAR/干系人/试点推广） | 咨询（变革实施环节） |
+| `coach_org` | role-mgmt-consulting | 能力建设（培训/教练辅导/认证路径） | 咨询（教练辅导环节） |
+| `measure_value` | role-mgmt-consulting | 成效评估（价值实现测量/结项评估，落咨询资产/） | 咨询（成效评估环节） |
+| `asset_knowledge` | role-mgmt-consulting | 知识资产沉淀（案例库/模板/IP 复用登记，更新 33~37 台账） | 咨询（资产化环节） |
 
 ### 1.1 governance（项目治理子域）
 
@@ -574,9 +585,64 @@ DevProjectTeamSkill（总控）
 
 **多项目共享环境（第 5 层）**：环境资产注册与冲突仲裁规则详见 `multi_project_isolation.md` §10；台账 `25_环境资源清单.csv` 为跨项目共享登记表。
 
+---
+
+## 10. role-mgmt-consulting（项目管理咨询路由包）
+
+**调用方**：DevProjectTeamSkill 管理咨询模式 / 用户直接触发（"做项目管理咨询/诊断成熟度/设计 PMO"）
+**核心 action**：按咨询 5 环节分发（详见 §10.1~§10.3）。**定位铁律**：咨询只提供建议不代客户决策，落地执行由客户组织或本库执行角色承接；**保密铁律**：客户组织信息按 iron_rules §3 A/B 级脱敏（台账只存别名，真实信息走 `.secrets/`）。
+
+| action | 用途 | 典型调用时机 |
+|--------|------|-------------|
+| `assess_opportunity` | 商机评估与投标策略（33_商机管道.csv） | 客户需求表达 |
+| `draft_proposal` | 咨询建议书（35_建议书版本.csv） | 商机评估后 |
+| `diagnose_as_is` | 现状诊断（访谈/流程采集/痛点） | 中标或委托后 |
+| `assess_maturity` | 成熟度评估（36_成熟度基线.csv：自建 5 维框架 0~5 级，证据必填） | 现状诊断后 |
+| `analyze_gap` | 差距分析（As-Is vs To-Be 矩阵/根因/优先级） | 成熟度评估后 |
+| `design_solution` | 方案设计（PMO 蓝图/治理模型/方法论定制/绩效体系，落咨询资产/） | 差距分析后 |
+| `drive_change` | 变革实施（37_变革计划.csv：Kotter 8 步/ADKAR/干系人/试点推广） | 方案设计后 |
+| `coach_org` | 能力建设（培训/教练辅导/认证路径） | 变革实施中 |
+| `measure_value` | 成效评估（价值实现测量/结项评估，落咨询资产/） | 变革完成后 |
+| `asset_knowledge` | 知识资产沉淀（案例库/模板/IP 复用登记，更新 33~37 台账） | 成效评估后 |
+
+### 10.1 商机与投标（assess_opportunity + draft_proposal）
+
+**调用方**：role-mgmt-consulting（路由包）  
+**核心 action**：
+
+| action | 用途 | 典型调用时机 |
+|--------|------|-------------|
+| `assess_opportunity` | 机会评估（需求清晰度/预算/时间窗口/赢率）+ 竞标策略 | 客户需求表达 |
+| `draft_proposal` | 建议书（SOW/交付物/里程碑/报价/风险/有效期，客户名脱敏） | 商机评估后 |
+
+### 10.2 诊断与方案（diagnose_as_is → assess_maturity → analyze_gap → design_solution）
+
+**调用方**：role-mgmt-consulting（路由包）  
+**核心 action**：
+
+| action | 用途 | 典型调用时机 |
+|--------|------|-------------|
+| `diagnose_as_is` | 现状诊断（组织访谈/流程采集/痛点识别） | 中标或委托后 |
+| `assess_maturity` | 成熟度评估（5 维评分 + 证据，36_成熟度基线.csv） | 现状诊断后 |
+| `analyze_gap` | 差距矩阵（As-Is vs To-Be/根因/优先级） | 成熟度评估后 |
+| `design_solution` | 方案设计（PMO 蓝图/治理/方法论定制/绩效体系，落咨询资产/） | 差距分析后 |
+
+### 10.3 变革与资产化（drive_change + coach_org → measure_value → asset_knowledge）
+
+**调用方**：role-mgmt-consulting（路由包）  
+**核心 action**：
+
+| action | 用途 | 典型调用时机 |
+|--------|------|-------------|
+| `drive_change` | 变革实施（Kotter 8 步/ADKAR/干系人/试点推广，37_变革计划.csv） | 方案设计后 |
+| `coach_org` | 能力建设（培训/教练辅导/认证路径） | 变革实施中 |
+| `measure_value` | 成效评估（价值实现测量/结项评估，落咨询资产/） | 变革完成后 |
+| `asset_knowledge` | 知识资产沉淀（案例库/模板/IP 复用登记） | 成效评估后 |
+
+**保密与授权**：访问客户方信息/外部系统经 `register_auth` 登记；客户数据脱敏复核通过后才允许固化/打包。
 
 ---
 
 **文档版本**：v21.1.0
-**最后更新**：2026-08-18（技能库本体评审补版本页脚）
+**最后更新**：2026-08-18（新增 §10 role-mgmt-consulting 项目管理咨询路由包：10 个 action + 3 子域，33~37 咨询台账）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
