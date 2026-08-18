@@ -1,0 +1,12 @@
+﻿perspective,check_id,check_name,status,severity,evidence,confidence
+architect,ARCH-001,架构分层合理性,PASS,,"四层(控制环/记忆/多Agent/自愈/质量门)清晰,边界明确",high
+architect,ARCH-002,宿主依赖可行性,CHANGES_REQUESTED,medium,"P4 依赖 opencode Task 原语,建议 P1 前先做可行性探针",medium
+code_reviewer,CR-001,文档与可实施性,PASS,,"分阶段独立可交付,验收标准清晰",high
+code_reviewer,CR-002,新增工具测试要求,CHANGES_REQUESTED,low,建议每个 Phase 的 tool 配单元测试,medium
+security,SEC-001,令牌A级合规,PASS,,load_secret+不入仓+定期轮换,high
+security,SEC-002,系统文件/hosts 铁律#7,PASS,,--write-hosts 提权+备份+台账留痕,high
+security,SEC-003,消息总线脱敏,CHANGES_REQUESTED,medium,P4 台账/35 需明确脱敏规范,medium
+test_engineer,TE-001,阶段验收可验证性,PASS,,每 Phase 有验收标准+里程碑 M1-M5,high
+test_engineer,TE-002,自动化验收脚本,CHANGES_REQUESTED,medium,P1/P3 需固化端到端/分叉复现测试,medium
+performance,PERF-001,控制环/记忆开销,PASS,,"门禁秒级,SQLite/JSONL 轻量",high
+performance,PERF-002,多Agent并发与token预算,CHANGES_REQUESTED,low,P4 需定义并发上限与预算,medium
