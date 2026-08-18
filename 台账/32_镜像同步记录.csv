@@ -11,3 +11,9 @@ SYNC-20260818-009,2026-08-18 08:55:24,d8e22d1a4499,mirror,https://***@gitee.com/
 SYNC-20260818-010,2026-08-18 09:54:05,dfeac7257a2d,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,成功,3.5,   1d5aff2..dfeac72  main -> main
 SYNC-20260818-011,2026-08-18 09:54:05,dfeac7257a2d,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,2.3,   8ace923..dfeac72  main -> main
 SYNC-20260818-012,2026-08-18 10:05:19,b4ce03a75392,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,成功,2.5,b4ce03a 新增role-mgmt-consulting;SYNC-20260818-013,2026-08-18 10:05:19,b4ce03a75392,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,2.3,b4ce03a 新增role-mgmt-consulting
+SYNC-20260818-013,2026-08-18 10:18:51,c91701b31b81,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,失败,94.8,fatal: unable to access 'https://github.com/gogojaja/DevProjectTeamSkill.git/': Recv failure: Connection was reset
+SYNC-20260818-014,2026-08-18 10:18:51,c91701b31b81,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,1.9,   db8d1dc..c91701b  main -> main
+SYNC-20260818-015,2026-08-18 10:51:44,709c7f0bafdc,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,成功,4.0,   db8d1dc..709c7f0  main -> main
+SYNC-20260818-016,2026-08-18 10:51:44,709c7f0bafdc,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,1.1,Everything up-to-date
+SYNC-20260818-017,2026-08-18 11:00:33,606a1acd5716,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,失败,21.3,fatal: unable to access 'https://github.com/gogojaja/DevProjectTeamSkill.git/': Failed to connect to github.com:443 after 21104 ms: Could not connect to server
+SYNC-20260818-018,2026-08-18 11:00:33,606a1acd5716,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,失败,27.3,fatal: Authentication failed for 'https://gitee.com/gogojaja/DevProjectTeamSkill.git/'

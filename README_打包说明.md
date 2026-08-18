@@ -1,13 +1,13 @@
-# DevProjectTeamSkill v21.3.2 技能库
+# DevProjectTeamSkill v21.7.0 技能库
 
-**版本**：v21.3.2 ｜ **发布日期**：2026-08-07 ｜ **结构**：8 角色包 + 1 编排器
+**版本**：v21.7.0 ｜ **发布日期**：2026-08-18 ｜ **结构**：9 角色包 + 1 编排器
 
 ## 内容结构
 
 - `.trae/skills/`：技能源码（**唯一事实来源**）
-  - `SKILL_INDEX.md`：8 包路由索引
+  - `SKILL_INDEX.md`：9 包路由索引
   - `dev-project-team-skill/`：编排器（薄壳，含路由表 + 调度/压缩规则）
-  - `role-*/`：7 角色包（启动 / 需求 / 架构 / 开发 / 测试 / 投产 / 总控），各含 SKILL.md + domain/ 流程 + *__resources/ 明细
+  - `role-*/`：9 角色包（启动 / 需求 / 架构 / 开发 / 测试 / 投产 / 总控 / 项目群 / 管理咨询），各含 SKILL.md + domain/ 流程 + *__resources/ 明细
   - `references/`：公共标准（token / csv / api 契约 / 环境标准 / 模型选型 / 铁律卡等）
   - `shared/`：单源共享库（governance / evolution / authoring + references 副本）
 - `tools/`：package_skills.sh / deploy_skills.sh / solidify.sh（另有 .py 双实现）及 excel_to_csv.py / check_version_consistency.py
@@ -16,7 +16,7 @@
 ## 打包与部署
 
 ```sh
-bash tools/package_skills.sh               # 打包全部 8 角色包到 dist/
+bash tools/package_skills.sh               # 打包全部 9 角色包到 dist/
 bash tools/package_skills.sh --role role-testing
 bash tools/deploy_skills.sh --roles role-a,role-b   # 部署到 .github/.claude/.agents/ 及全局库
 bash tools/solidify.sh "说明"               # 快照→刷新交接断点→打包→部署
