@@ -98,7 +98,7 @@
 
 ## 6. 双平台兼容规则（Windows + macOS 强制）
 
-本技能库所有启用项目**必须同时支持 Windows 与 macOS 双平台**（编排器 §2.2-5 / iron_rules §6）。
+本技能库所有启用项目**必须同时支持 Windows 与 macOS 双平台**（编排器 §2.2-6 / iron_rules §6）。
 
 ### 6.1 路径规则
 
