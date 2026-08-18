@@ -7,14 +7,19 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 
 > 版权声明：`../references/COPYRIGHT.md`　Token 标准：`../references/token_standard.md`　索引：`../SKILL_INDEX.md`
 
+## 目标与触发
+- **目标**：编排软件研发全生命周期多角色协同，按阶段渐进加载角色包并驱动阶段门禁、基线固化与跨会话交接；支撑从「技能库」演进为「自主 Agent 运行时」。
+- **触发**：用户启用全生命周期/启用某角色/多角色联合/项目管控/阶段评审/基线固化/交接文档时加载；用户说「启动生命周期」「启用角色」即触发。
+
 ---
 
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
 - **技能版本**：v21.7.0
-- **版本发布日期**：2026-08-17
+- **版本发布日期**：2026-08-18
 - **版本变更记录**：
+  - v21.7.0：新增项目管理咨询层（2026-08-18）——新增第 10 角色包 `role-mgmt-consulting`（商机/诊断/方案/变革/成效 5 环节 + 自建 5 维成熟度模型 + Kotter/ADKAR 变革），独立于 SDLC 一级执行路由；新台账 33~37；标准见 `references/consulting_standards.md`。
   - v21.7.0：双套环境拓扑（2026-08-17）——新增 `environment_topology.md` 标准；`environment_standard.md` v21.3.1 衔接；`20_环境配置.csv` 扩展列。
   - v21.6.0：新增项目群/项目集协同层（2026-08-16）——新增第 9 角色包 `role-program-mgmt`（定义/收益/依赖/IMS 进度/标准一致/评审/收尾，Program Board Tranche 边界决策）；新台账 28/29/30。
   - v21.5.9：项目启动治理完善（2026-08-16）——`role-project-init` 新增 `define_org_structure`（组织架构 + RACI，`27_组织架构.csv`）与 `define_issue_escalation`（问题升级：P1~P4 + 四级升级阶梯 + 单一 Owner）；`create_charter` 补成功标准/PM 任命职权/签字批准；`check_ready` 新增治理硬门禁；台账 26→27；`role-project-init` v21.2.0。
@@ -78,6 +83,7 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 | **角色组合加载** | 单角色「启用需求分析师」/多角色「需求分析师+测试工程师」/双角色业务人员「需求+测试」 | 按用户指令加载对应角色包数量与组合：单角色=仅 1 包；多角色=加载多包；双角色裁剪=业务人员预设组合（需求+测试），台账按使用/简化/不使用裁剪 |
 | **技能维护** | 「手工编写/修改 SKILL.md」「skill-authoring」 | 维护技能库本身，非执行项目业务；按 role-governance 的 `skill-authoring`（`../shared/authoring.md`）六步流程（定义→建模→编写→校验→验证→打包发布），且所有维护产出必须具备 `闭环执行系统` 章节与终审门禁（任务入口/状态机/验收门禁/失败恢复/交接审计） |
 | **项目群协同** | 「项目群/项目集/多项目协同/PMO 决策层」 | 多项目协同层：`role-program-mgmt` 承载（对齐 PMI SPM 5th/MSP/IMS/EVM），7 环节定义/收益/依赖/IMS 进度/标准一致/Program Board 评审/收尾；治理三层模型，Program Board 在 tranche 边界决策（继续/转向/终止）；与项目级 check_ready/stage_review 叠加双层门禁，不替代单项目治理 |
+| **管理咨询** | 「项目管理咨询/PMO咨询/成熟度评估/方法论定制/变革管理」 | 咨询层：`role-mgmt-consulting` 承载（二级方法工程/诊断，独立于 SDLC 一级执行路由），5 环节商机/诊断/方案/变革/成效；自建 5 维成熟度模型（0~5 级，证据必填）+ Kotter/ADKAR 变革；咨询只提建议不代客户决策，落地执行交接本库执行角色；客户数据按 iron_rules §3 A/B 级脱敏 |
 
 ---
 
@@ -93,6 +99,7 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 | 6 | role-deployment | 投产 | 投产策略/计划/Go-Live/发布/回滚/交接 | role-deployment/ |
 | 7 | role-governance | 总控保障 | 台账/评审/门禁/基线固化/变更/归档/交接 | role-governance/ |
 | 8 | role-program-mgmt | 项目群/项目集 | 项目群/项目集/多项目协同/PMO/依赖/里程碑对齐/收益/IMS | role-program-mgmt/ |
+| 9 | role-mgmt-consulting | 项目管理咨询 | 项目管理咨询/PMO咨询/成熟度评估/差距分析/方法论定制/变革管理/咨询建议书/PMO蓝图/教练辅导 | role-mgmt-consulting/ |
 
 - **元技能自省**：`shared/evolution.md`（SkillEvolutionSkill）按需触发，执行完毕即卸载；
 - **角色隔离**：各角色任务必须在对应角色包内完成，禁止跨角色执行；§2 公共底座对全角色强制生效；
@@ -125,7 +132,7 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 
 | 文档 | 路径 | 说明 |
 |------|------|------|
-| 角色包索引 | `../SKILL_INDEX.md` | 8 角色包选择入口 |
+| 角色包索引 | `../SKILL_INDEX.md` | 10 角色包选择入口 |
 | Token 标准 | `../references/token_standard.md` | 角色包模型/description/CSV 规则/压缩铁律/交接优先 |
 | 知识产权 | `../references/COPYRIGHT.md` | 版权声明 |
 | 接口契约 | `../references/api_contracts.md` | action 接口清单 |
@@ -191,5 +198,5 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 
 ---
 
-**文档版本**：v21.7.0　**最后更新**：2026-08-17（双套环境拓扑标准：非生产组 dev+test / 生产组隔离 + 文件端口隔离 + 共用边界 + RBAC）
+**文档版本**：v21.7.0　**最后更新**：2026-08-18（新增项目管理咨询层：role-mgmt-consulting 第 10 角色包）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

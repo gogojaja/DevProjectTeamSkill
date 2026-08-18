@@ -52,3 +52,6 @@ service-account*.json
 # Python 缂栬瘧缂撳瓨
 __pycache__/
 *.pyc
+
+# 控制环自动化本地开关(不入库)
+.agent-loop-enabled

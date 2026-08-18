@@ -2,9 +2,9 @@
 
 - 文档编号：PG-LOCAL-001-PLAN-001
 - 归属项目群：PG-LOCAL-001（本机多项目协同）
-- 版本：v1.0.0
+- 版本：v1.1.0
 - 最后更新：2026-08-18
-- 状态：方案评审中（待 multi-perspective-validation 五视角签署）
+- 状态：评审通过（条件签署），P1 执行中
 - 知识产权所有：段波（验证邮箱：duanbo.douglas@163.com）
 
 ---
@@ -38,7 +38,7 @@
 
 ## 三、核心模块设计
 
-1. **`tools/agent_loop.py`（控制环）**：接收触发（git hook / 定时 / 手动）→ 加载对应角色技能 → 跑门禁（version/closure/release）→ 调 `mirror_push` 双推 → 写 `台账/34_控制环执行记录.csv`。
+1. **`tools/agent_loop.py`（控制环）**：接收触发（git hook / 定时 / 手动）→ 加载对应角色技能 → 跑门禁（version/closure/release）→ 全过则调 `mirror_push` 双推 → 写 `台账/34_控制环执行记录.csv` → 防递归自提交记录（`AGENT_LOOP_ACTIVE` 环境变量）。支持 `--dry-run`（只跑门禁+记录、不双推不提交，安全验证）与 `--trigger hook`。钩子 `.githooks/post-commit` 由根目录 `.agent-loop-enabled` 开关激活，默认 HITL 不开。
 2. **`tools/memory_store.py` + project_memory 实例化**：把 `交接文档.md` 升级为结构化记忆（SQLite/JSONL，UTF-8 BOM 导出），会话启动自动恢复上下文、决策、待办。
 3. **`tools/dispatch.py`（多 Agent）**：封装 opencode `Task` 派生并行角色 worker（如 arch/dev/test），用 `台账/35_任务消息总线.csv` 做 handoff；team-orchestration 由剧本升级为运行时。
 4. **`tools/self_heal.py`（自愈）**：监听 push 拒绝/分叉 → 自动 `fetch+rebase+force-sync(mirror)`；监听 GitHub flapping → 自动 `github_ip_refresh --write-hosts`（需提权）。
@@ -51,7 +51,7 @@
 | 阶段 | 目标 | 交付物 | 验收标准 | 涉及文件 |
 |------|------|--------|----------|----------|
 | **P0 基础** | 已具备 | 门禁/镜像/TLS 探测 | 三端一致、双推可用 | 已完成 |
-| **P1 控制环 MVP** | 提交即自动门禁+双推 | `tools/agent_loop.py`、`.githooks` 触发、`台账/34_控制环执行记录.csv` | 一次 commit 自动跑通三道门禁+双推并留痕 | `tools/agent_loop.py`、`.githooks/`、`SKILL_INDEX.md` |
+| **P1 控制环 MVP** | 提交即自动门禁+双推 | `tools/agent_loop.py`、`.githooks/post-commit`、`.agent-loop-enabled` 开关、`台账/34_控制环执行记录.csv`、配套单测 | 一次 commit（启用后）自动跑通三道门禁+双推并留痕；`--dry-run` 可安全验证；门禁未过不双推；含 `tests/test_agent_loop.py` | `tools/agent_loop.py`、`.githooks/`、`tests/`、`台账/34_*` |
 | **P2 记忆服务** | 跨会话上下文自动恢复 | `tools/memory_store.py`、`project_memory` 实例化 | 新会话自动载入决策/待办，无需手工读交接文档 | `tools/memory_store.py`、`台账/`、`role-project-init` 衔接 |
 | **P3 自愈** | Git 分叉/flapping 自动修复 | `tools/self_heal.py`、控制环挂载 | 复现本次分叉场景可全自动恢复 | `tools/self_heal.py`、`台账/34_*` |
 | **P4 多 Agent 运行时** | 并行派工真实化 | `tools/dispatch.py`、`台账/35_任务消息总线.csv` | 单需求自动派生并行角色 worker 并汇总结论 | `tools/dispatch.py`、`台账/35_*`、`team-orchestration` |
@@ -92,14 +92,29 @@
 
 ---
 
-## 八、评审结论（待填）
+## 八、评审结论（五视角，2026-08-18）
 
-| 视角 | 评审人 | 结论 | 签署 |
-|------|--------|------|------|
-| Architect | — | 待评审 | — |
-| CodeReviewer | — | 待评审 | — |
-| SecurityReviewer | — | 待评审 | — |
-| TestEngineer | — | 待评审 | — |
-| PerformanceEngineer | — | 待评审 | — |
+决策：**条件签署（CHANGES_REQUESTED → 可接受风险），可进入 P1**；非阻塞改进项已纳入 v1.1.0 方案（见第九节）。
 
-> 评审通过后进入 P1（控制环 MVP）实现；评审意见与修改记录见 `台账/37_方案评审记录.csv`。
+| 视角 | 结论 | 关键发现 |
+|------|------|----------|
+| Architect | ✅ PASS | 四层架构清晰、边界明确、复用既有 tools 无接口冲突 |
+| CodeReviewer | ✅ PASS | 分阶段可交付、验收清晰；建议每 Phase 的 tool 配单元测试 |
+| SecurityReviewer | ✅ PASS | 令牌 A 级（load_secret/不入仓/轮换）、hosts 走铁律 #7、URL 脱敏均合规 |
+| TestEngineer | ⚠️ CHANGES_REQUESTED | 每 Phase 有验收标准，但缺自动化验收脚本（P1 端到端触发、P3 分叉复现） |
+| PerformanceEngineer | ✅ PASS | 门禁秒级、SQLite/JSONL 轻量；P4 需定并发上限与 token 预算 |
+
+> 详细 check 级记录见 `台账/37_方案评审记录.csv`。
+
+---
+
+## 九、评审采纳与方案完善（v1.1.0）
+
+针对第八节非阻塞项，方案完善如下，并在 P1 起落地：
+
+1. **宿主依赖可行性探针（ARCH-002）**：P4 前先做 opencode `Task` 子 Agent 可行性探针（最小派生 worker→回传），验证宿主能力再扩 P4，降风险。
+2. **每 Phase 工具配单元测试（CR-002 / TE-002）**：P1 起每个新增 `tools/*.py` 配套 `tests/test_*.py`，至少覆盖门禁编排、双推失败降级、台账写入与防递归自提交；P3 固化「制造分叉→自动 fetch+rebase+force-sync」复现测试。
+3. **消息总线脱敏规范（SEC-003）**：P4 的 `台账/35_任务消息总线.csv` 明确禁止承载 A 级信息，上下文 handoff 仅传引用/脱敏摘要，token/凭据一律不落总线。
+4. **并发与 token 预算（PERF-002）**：P4 定义并行 worker 上限（建议 ≤4）与单轮 token 预算（≤12000），避免宿主限流与成本失控。
+
+P1 本次交付已落实项 2 的测试骨架（`tests/test_agent_loop.py`）与 hook 安全开关（`.agent-loop-enabled`）。
