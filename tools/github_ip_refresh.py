@@ -16,16 +16,27 @@
    这 3 个站点是「当前 DNS Resource Records」的可人工核验权威来源；
    本工具把补充过程变成可复现、可审计的操作。
 
-产出：
-    - 把新发现的 A 记录追加进 docs/github_ip_records.csv（去重，保留历史）；
-    - 对 github.com 候选 IP 做可达性探测（curl --resolve），报告当前可达 IP；
-    - 打印 hosts 覆盖块与 restore_github_push.sh 恢复命令。
+ 产出：
+     - 把新发现的 A 记录追加进 docs/github_ip_records.csv（去重，保留历史）；
+     - 对 github.com 候选 IP 做**可达性 + TLS 证书合法性**双重探测（SNI=github.com）：
+       仅「可达且签发合法 github.com 证书」的 IP 才能用于 hosts 覆盖（经验证，部分存活 IP
+       如 140.82.112.4 证书主体不匹配，git/schannel 会 SEC_E_WRONG_PRINCIPAL 失败）；
+     - 打印仅含证书合法+可达 IP 的 hosts 覆盖块；`--write-hosts` 可自动备份并写入
+       （需以管理员/root 权限运行 opencode，否则仅备份并提示授权）。
+
+ 用法：
+     py -3.11 tools/github_ip_refresh.py                 # Windows
+     python3 tools/github_ip_refresh.py                  # macOS / Linux
+     py -3.11 tools/github_ip_refresh.py --write-hosts   # 自动备份+写入证书合法IP(需提权)
+     py -3.11 tools/github_ip_refresh.py --doh --manual github.com=20.205.243.166,...
 """
 from __future__ import annotations
 
 import csv
 import json
 import re
+import socket
+import ssl
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -108,6 +119,64 @@ def probe_reachability(ip: str) -> str:
         return "ERR"
 
 
+def probe_tls(ip: str, host: str = "github.com", timeout: int = 8):
+    """返回 (tcp_ok, cert_ok, err)。跨平台（Python ssl 用各系统 CA 库）。"""
+    try:
+        ctx = ssl.create_default_context()
+        with socket.create_connection((ip, 443), timeout=timeout) as sock:
+            try:
+                with ctx.wrap_socket(sock, server_hostname=host):
+                    pass
+                return True, True, ""
+            except ssl.SSLError as e:
+                return True, False, f"SSL:{e}"
+            except Exception as e:  # 其它 TLS 层异常
+                return True, False, f"TLS:{e}"
+    except (socket.timeout, OSError) as e:
+        return False, False, f"TCP:{e}"
+
+
+def _hosts_path() -> Path:
+    import platform
+    return Path("/etc/hosts") if platform.system() != "Windows" else \
+        Path(r"C:\Windows\System32\drivers\etc\hosts")
+
+
+def write_hosts(ip: str, host: str = "github.com") -> None:
+    """备份 hosts 并覆盖/追加 `ip host` 行（铁律 #7：系统文件需提权+备份+留痕）。"""
+    import platform
+    hosts = _hosts_path()
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    backup = hosts.with_name(f"hosts_{ts}.bak")
+    try:
+        data = hosts.read_text(encoding="utf-8", errors="ignore")
+    except Exception as e:
+        print(f"  [write-hosts] 读取 hosts 失败：{e}")
+        return
+    backup.write_text(data, encoding="utf-8")
+    print(f"  [write-hosts] hosts 已备份至 {backup}")
+    new_lines, replaced = [], False
+    pat = re.compile(rf"^\s*[\d.]+[ \t]+\S*{re.escape(host)}\b")
+    for ln in data.splitlines():
+        if pat.match(ln):
+            if not replaced:
+                new_lines.append(f"{ip} {host}")
+                replaced = True
+            continue  # 丢弃旧行
+        new_lines.append(ln)
+    if not replaced:
+        new_lines.append(f"{ip} {host}")
+    try:
+        hosts.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
+        print(f"  [write-hosts] 已写入 `{ip} {host}` 到 hosts")
+    except PermissionError:
+        print("  [write-hosts] PermissionError：写入被拒——请以管理员/root 权限运行 "
+              "opencode 后重试（备份已留存，未改动 hosts）")
+        return
+    print("  [write-hosts] ⚠️ 系统文件已修改：按铁律 #7 需登记 "
+          "13_安全审计台账.csv / 14_授权登记.csv（备份在 .backup/）")
+
+
 def main(argv: list[str]) -> int:
     doh = "--doh" in argv
     manual: dict[str, list[str]] = {}
@@ -161,11 +230,32 @@ def main(argv: list[str]) -> int:
         print("[ok] 已登记来自 ipaddress.com 的人工抄录记录")
 
     gh_ips = [r["ip_address"] for r in rows if r["domain"] == "github.com"]
-    print("\n[探测] github.com 候选 IP 可达性（curl --resolve github.com:443:<ip>，仅探前 3）：")
-    for ip in gh_ips[:3]:
-        print(f"  {ip} -> {probe_reachability(ip)}")
+    write_flag = "--write-hosts" in argv
+    print("\n[探测] github.com 候选 IP：可达性 + TLS 证书合法性（SNI=github.com）：")
+    good = []
+    for ip in gh_ips[:8]:
+        tcp, cert_ok, err = probe_tls(ip)
+        if tcp and cert_ok:
+            tag = "GOOD(可达+证书合法)"
+            good.append(ip)
+        elif tcp:
+            tag = f"TCP可达但证书非法({err})"
+        else:
+            tag = f"不可达({err})"
+        print(f"  {ip} -> TCP={tcp} 证书合法={cert_ok}  {tag}")
 
-    print("\n[恢复] 若仍不可达，使用 hosts 覆盖或 SSH/443 恢复：")
+    if good:
+        best = good[0]
+        print("\n[恢复] 推荐 hosts 覆盖（仅证书合法且可达的 IP）：")
+        print(f"  {best} github.com")
+        if write_flag:
+            print("  [write-hosts] 执行备份+写入：")
+            write_hosts(best)
+    else:
+        print("\n[恢复] 无「可达+证书合法」IP；请等待 GitHub 恢复，或改从镜像(mirror)拉取：")
+        print("  git pull mirror main   # 镜像与 GitHub 历史一致")
+
+    print("\n[恢复] 也可使用 SSH-over-443 恢复脚本：")
     print("  bash tools/restore_github_push.sh --dry-run   # 预览")
     print("  bash tools/restore_github_push.sh             # 执行 SSH-over-443 恢复+push")
     return 0

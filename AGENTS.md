@@ -57,7 +57,7 @@ git commit                              # 每原子改动一次提交（钩子�
    py -3.11 tools/github_ip_refresh.py            # 系统解析器(nslookup) 动态补充
    py -3.11 tools/github_ip_refresh.py --doh      # 追加 DNS-over-HTTPS(1.1.1.1/dns.google)
    ```
-   工具经系统解析器 / DoH 动态解析 `github.com / api.github.com / gist.github.com / codeload.github.com / raw.githubusercontent.com / github.global.ssl.fastly.net / assets-cdn.github.com / fastly.net / github.io` 的当前 A 记录，去重追加进 `docs/github_ip_records.csv`，并对 `github.com` 候选 IP 做可达性探测（`curl --resolve`），打印 hosts 覆盖块与 `restore_github_push.sh` 恢复命令。
+    工具经系统解析器 / DoH 动态解析 `github.com / api.github.com / gist.github.com / codeload.github.com / raw.githubusercontent.com / github.global.ssl.fastly.net / assets-cdn.github.com / fastly.net / github.io` 的当前 A 记录，去重追加进 `docs/github_ip_records.csv`，并对 `github.com` 候选 IP 做**可达性 + TLS 证书合法性双重探测**（SNI=github.com，仅「可达且签发合法 github.com 证书」的 IP 才能用于 hosts 覆盖——部分存活 IP 如 140.82.112.4 证书主体不匹配，git/schannel 会 `SEC_E_WRONG_PRINCIPAL` 失败）；打印仅含证书合法 IP 的 hosts 覆盖块，并可 `py -3.11 tools/github_ip_refresh.py --write-hosts` 自动备份+写入（需管理员/root 权限）。
 2. **权威站点人工核验**（页面受 Cloudflare 挑战保护，无法自动抓取，可人工抄录后登记）：
    - https://sites.ipaddress.com/github.com/
    - https://sites.ipaddress.com/fastly.net/
@@ -67,7 +67,7 @@ git commit                              # 每原子改动一次提交（钩子�
    ```powershell
    py -3.11 tools/github_ip_refresh.py --manual github.com=20.205.243.166,140.82.112.4 assets-cdn.github.com=185.199.108.153 fastly.net=151.101.0.0
    ```
-3. **刷新后仍不可达**：走 §3 token 推送或 §4 VPN/代理；必要时按铁律 #7 临时 hosts 覆盖 `github.com <可达IP>`（先备份、留痕 `13_安全审计台账.csv`）。
+3. **刷新后仍不可达**：走 §3 token 推送或 §4 VPN/代理；必要时按铁律 #7 临时 hosts 覆盖 `github.com <可达且证书合法IP>`（先备份、留痕 `13_安全审计台账.csv`）。最简方式：`py -3.11 tools/github_ip_refresh.py --write-hosts`（自动挑「可达+证书合法」IP、备份 `hosts`、写入；**需管理员/root 权限运行 opencode**，否则仅备份并提示授权）。镜像兜底：直接 `git pull mirror main`（Gitee 与 GitHub 历史一致）。
 
 > 设计原则：**DNS 解析与 TCP/443 可达性解耦**——`nslookup` 能解析说明 DNS 正常、问题在路由；动态刷新保证候选池始终是最新「DNS Resource Records」，而非依赖过期快照。
 
