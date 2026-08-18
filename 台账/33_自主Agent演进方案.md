@@ -118,3 +118,21 @@
 4. **并发与 token 预算（PERF-002）**：P4 定义并行 worker 上限（建议 ≤4）与单轮 token 预算（≤12000），避免宿主限流与成本失控。
 
 P1 本次交付已落实项 2 的测试骨架（`tests/test_agent_loop.py`）与 hook 安全开关（`.agent-loop-enabled`）。
+
+---
+
+## 十、实施进度（截至 2026-08-18）
+
+| 阶段 | 状态 | 交付物 | 备注 |
+|------|------|--------|------|
+| **P0 基础** | ✅ 已完成（前序） | 门禁 / 镜像 / TLS 探测 | 三端一致、双推可用 |
+| **P1 控制环 MVP** | ✅ 已完成 | `tools/agent_loop.py` + `.githooks/post-commit` + `台账/34_控制环执行记录.csv` + 单测 | 三道门禁全过自动双推；hook 默认关闭（HITL），建 `.agent-loop-enabled` 即激活 |
+| **P2 记忆服务** | ✅ 已完成 | `tools/memory_store.py` + `台账/38_项目记忆.jsonl` + 单测 | 跨会话决策/待办/风险结构化记忆，UTF-8 BOM 导出 |
+| **P3 自愈** | ✅ 已完成 | `tools/self_heal.py` + 单测 | 分叉自动 fetch+rebase+`--force-with-lease`（强制前备份）+ GitHub 探测修复 |
+| **P4 多 Agent 运行时** | ✅ 脚手架完成 | `tools/dispatch.py` + `台账/35_任务消息总线.csv` + 单测 | 任务登记/状态流转/派工指令；真实 worker 派工依赖宿主 `Task` 原语（ARCH-002 可行性已验证可行） |
+| **P5 质量门 + 自改进** | ✅ 脚手架完成 | `tools/quality_gate.py` + `台账/36_质量门记录.csv` + 单测 | Architect/CodeReviewer 由既有 check 脚本代理；Security/Test/Performance 标记「待宿主 LLM」（host seam） |
+
+**收尾状态**：
+- 全部新增 `tools/*.py` 配 `tests/test_*.py`，单测全过；version/closure/release 三道门禁全绿。
+- 提交已双推至 Gitee（mirror）；GitHub（origin）因访问 flapping 偶发滞后，恢复后由 `mirror_push`/`self_heal` 补齐。
+- 待办：①轮换已在对话明文暴露的 Gitee token（A 级）；②清理工作树中前序遗留的未提交改动（含 `role-mgmt-consulting` 等）；③激活控制环自动双推（建 `.agent-loop-enabled`）。
