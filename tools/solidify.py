@@ -39,6 +39,13 @@ def run_release_gate():
     return r.returncode
 
 
+def run_deprecation_cleanup():
+    """第 4 硬门禁：废弃清理门禁，ADR 废弃后必须移除资产，失败中止固化。"""
+    r = _run_script('check_deprecation_cleanup.py')
+    print('   ✓ 废弃清理门禁执行完毕' if r.returncode == 0 else '   ✗ 废弃清理门禁失败')
+    return r.returncode
+
+
 def run_deploy():
     return _run_script('deploy_skills.py').returncode
 
@@ -133,6 +140,10 @@ if __name__ == '__main__':
     print('[1c/5] 发布级门禁校验（硬门禁）')
     if run_release_gate() != 0:
         print('❌ 发布级门禁未通过，中止固化。请先补齐 frontmatter、metadata 与闭环执行结构。')
+        sys.exit(1)
+    print('[1d/5] 废弃清理门禁校验（硬门禁）')
+    if run_deprecation_cleanup() != 0:
+        print('❌ 废弃清理门禁未通过，中止固化。请先彻底移除废弃资产残留（引用/端口/进程/LaunchAgent）。')
         sys.exit(1)
     print('[2/5] 刷新交接文档断点区')
     if not dry_run:

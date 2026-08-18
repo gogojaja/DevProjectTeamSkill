@@ -4,6 +4,7 @@
 # 依据: references/token_standard.md §2 / 方案 v21.0.1 §2.3-2.4
 #
 # 变更:
+#   v21.7.1: 新增第 4 硬门禁「废弃清理门禁」（ADR 废弃后强制移除资产，见 check_deprecation_cleanup.py）
 #   v21.7.0: 新增 3 个硬门禁（版本一致性/闭环执行/发布级），与 solidify.py 功能对齐
 #   v21.0.0: 交接文档改名 + 断点区刷新 + 角色包粒度快照 + v21 打包部署
 #   v20: 初代版本
@@ -80,6 +81,16 @@ if python3 "$ROOT/tools/check_skill_release_gate.py" 2>&1; then
   echo "   ✓ 发布级门禁通过"
 else
   echo "   ✗ 发布级门禁未通过，中止固化。请先补齐 frontmatter、metadata 与闭环执行结构。" >&2
+  exit 1
+fi
+
+# ---- 1d. 硬门禁：废弃清理门禁校验 ----
+echo ""
+echo "[1d/6] 废弃清理门禁校验（硬门禁）"
+if python3 "$ROOT/tools/check_deprecation_cleanup.py" 2>&1; then
+  echo "   ✓ 废弃清理门禁通过"
+else
+  echo "   ✗ 废弃清理门禁未通过，中止固化。请先彻底移除废弃资产残留（引用/端口/进程/LaunchAgent）。" >&2
   exit 1
 fi
 
