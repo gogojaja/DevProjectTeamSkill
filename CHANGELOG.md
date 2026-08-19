@@ -63,4 +63,14 @@
 
 ---
 
-**文档版本**：v21.7.0 ｜ **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
+## [v21.7.1] - 2026-08-19 - multi-perspective-validation 评审实践模式
+
+- **multi-perspective-validation 升 v1.2.0**：新增 §6 评审实践模式，沉淀自 quiz-extraction-skill 评审能力增强实践（五视角评审 → 修订 → 实施）。
+  - 评审四层模型（结构 / 语义 / 统计 / 决策）；
+  - 关键模式：抽样复审（`min(10, 题数×20%)` + 可复现 seed）、阈值参数化、性能分桶降 O(n²)、评审报告脱敏（相对路径）、回归固化（正反例 + golden fixture）；
+  - 落地建议：门禁（阻断）与评审报告（不阻断）分离为两步，报告含 schema 可校验。
+- 同步 `.trae/skills` → `.github/skills` / `.claude/skills` / `.agents/skills` 部署副本。
+
+---
+
+**文档版本**：v21.7.1 ｜ **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
