@@ -51,7 +51,8 @@ for f in $files; do
     hits=$(printf '%s' "$content" | grep -E "$bgrade_pattern" | grep -v 'xxx\.xxx\.xxx\.xxx' \
       | grep -vE 'https?://[^@[:space:]]+([[:space:]]|$)' \
       | grep -vE '%s?://|%\(.*\)s?://|://%s|://%\(.*\)s' \
-      | grep -vE '/home/user/|/Users/user/|example\.(com|org|net)|file:///|localhost|192\.168\.x\.x|myproject_|<.*>|/Volumes/BR256G|C:\\\\|D:\\\\|owner/repo|/repo\.git|pgdata-|redis://redis|\.\.\.|\$repo|maven\.apache\.org|pre-commit-hooks|apps/dco|senate/opencode-senate|startswith|\(\[\^/\]\+\)|\(issues\|pull\)|trufflesecurity|/\{path\}|shellcheck|mirrors-mypy|ruff-pre-commit|file://\{path\}|return f' | head -3)
+      | grep -vE '/home/user/|/Users/user/|example\.(com|org|net)|file:///|localhost|192\.168\.x\.x|myproject_|<.*>|/Volumes/BR256G|C:\\\\|D:\\\\|owner/repo|/repo\.git|pgdata-|redis://redis|\.\.\.|\$repo|maven\.apache\.org|pre-commit-hooks|apps/dco|senate/opencode-senate|startswith|\(\[\^/\]\+\)|\(issues\|pull\)|trufflesecurity|/\{path\}|shellcheck|mirrors-mypy|ruff-pre-commit|file://\{path\}|return f' \
+      | grep -vE 'skill://|ref://|custom://|tool://|thread://|://\{' | head -3)
     if [ -n "$hits" ]; then
       echo "❌ B 级敏感信息未脱敏: $f" >&2
       printf '%s\n' "$hits" | sed 's/^/    /' >&2

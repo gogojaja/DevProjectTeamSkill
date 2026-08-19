@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "dev-project-team-skill": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--python", "3.10",
+        "--with", "mcp[cli]",
+        "python3",
+        "${workspaceFolder}/tools/mcp_server.py"
+      ],
+      "env": {
+        "START_MCP_TIMEOUT_MS": "60000",
+        "RUN_MCP_TIMEOUT_MS": "300000"
+      }
+    }
+  }
+}

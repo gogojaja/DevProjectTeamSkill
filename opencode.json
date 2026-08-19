@@ -3,6 +3,17 @@
   "skills": {
     "paths": [".trae/skills"]
   },
+  "mcp": {
+    "dev-project-team-skill": {
+      "type": "local",
+      "command": ["uv", "run", "--python", "3.10", "--with", "mcp[cli]", "python3", "tools/mcp_server.py"],
+      "enabled": true,
+      "environment": {
+        "START_MCP_TIMEOUT_MS": "60000",
+        "RUN_MCP_TIMEOUT_MS": "300000"
+      }
+    }
+  },
   "permission": {
     "edit": "allow",
     "bash": "allow",
