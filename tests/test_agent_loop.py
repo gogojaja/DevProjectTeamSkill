@@ -89,9 +89,42 @@ def test_resolve_credentials_for_remote_aliases():
                 os.environ[k] = v
 
 
+def test_classify_failure():
+    assert mp._classify_failure("fatal: Authentication failed for 'https://gitee.com/***/'") == "auth"
+    assert mp._classify_failure("fatal: could not read Username for 'https://gitee.com'") == "auth"
+    assert mp._classify_failure("remote: Repository not found.") == "auth"
+    assert mp._classify_failure("fatal: Failed to connect to github.com port 443") == "network"
+    assert mp._classify_failure("fatal: Recv failure: Connection was reset") == "network"
+    assert mp._classify_failure("fatal: unable to access: Operation timed out") == "network"
+    assert mp._classify_failure("some other unknown error") == "other"
+
+
+def test_token_hash_stable_and_null():
+    assert mp._token_hash("secret-a") == mp._token_hash("secret-a")
+    assert mp._token_hash("secret-a") != mp._token_hash("secret-b")
+    assert mp._token_hash(None) is None
+    assert mp._token_hash("") is None
+
+
+def test_state_roundtrip(tmpdir=None):
+    tmp = tmpdir or tempfile.mkdtemp()
+    old = mp.STATE_FILE
+    mp.STATE_FILE = os.path.join(tmp, "state.json")
+    try:
+        mp._save_state({"mirror": {"blocked": True, "reason": "auth"}})
+        st = mp._load_state()
+        assert st.get("mirror", {}).get("blocked") is True
+        assert mp._load_state() == st, "state 往返一致"
+    finally:
+        mp.STATE_FILE = old
+
+
 if __name__ == "__main__":
     test_write_ledger_bom_and_header()
     test_seq_increments()
     test_recursion_guard_env()
     test_resolve_credentials_for_remote_aliases()
+    test_classify_failure()
+    test_token_hash_stable_and_null()
+    test_state_roundtrip(tempfile.mkdtemp())
     print("ALL TESTS PASSED")

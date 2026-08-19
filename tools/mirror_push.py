@@ -6,6 +6,17 @@ mirror_push.py — 国内镜像同步（地缘风险对冲）双推工具
 策略：每次提交同时推送 origin(GitHub) + mirror(Gitee) 等多个 remote。
 单目标失败不阻断另一个；每次同步追加 台账/32_镜像同步记录.csv 留痕。
 
+熔断器（避免反复重试缺陷）：
+- 认证失败（Authentication failed / 403 / 等）→ 对目标 remote 置「阻断」状态，
+  后续运行**直接跳过不再重试**，也不写 32 台账（凭据留痕不入库）。
+  仅当凭据更新（token 哈希变化）或显式 --force/--unblock 才解除。
+- 网络/其他失败（连接重置/超时/DNS 等）→ 置「冷却」状态（默认 15 分钟），
+  冷却期内跳过不重试（避免 flapping 时每次提交都重试并污染台账）。
+- 状态存于 .secrets/mirror_push_state.json（gitignore，不入库）。
+- 退出码：0=全部成功；1=存在本次尝试失败；2=全部被阻断/冷却跳过（未尝试）。
+- 辅助命令：--force（无视阻断/冷却立即尝试）、--unblock <remote|all>（解除）、
+  --status（查看当前状态）。
+
 安全约定（铁律 #3 A 级）：
 - 国内/境外 token 只经环境变量或 .secrets/ 提供，脚本从 GITEE_TOKEN/GITEE_USER 等读取，
   经 `git -c url.<auth>@.insteadOf=...` 注入，绝不打印、不写入仓库、不硬编码。
@@ -16,8 +27,12 @@ mirror_push.py — 国内镜像同步（地缘风险对冲）双推工具
 用法（跨平台）：
   py -3.11 tools/mirror_push.py                # Windows
   python3 tools/mirror_push.py                 # macOS / Linux
-  py -3.11 tools/mirror_push.py origin mirror  # 指定 remote 列表
-  py -3.11 tools/mirror_push.py --verify       # 仅校验各 remote 与本地 HEAD 是否一致
+py -3.11 tools/mirror_push.py origin mirror  # 指定 remote 列表
+   py -3.11 tools/mirror_push.py --verify       # 仅校验各 remote 与本地 HEAD 是否一致
+   py -3.11 tools/mirror_push.py --force        # 无视阻断/冷却，立即重试
+   py -3.11 tools/mirror_push.py --status       # 查看各 remote 阻断/冷却状态
+   py -3.11 tools/mirror_push.py --unblock mirror  # 解除指定 remote 阻断/冷却
+   py -3.11 tools/mirror_push.py --unblock      # 解除全部
   # 凭据三种提供方式（任选，脚本自动装载，无需手动 export）：
   #   a) 环境变量： $env:GITEE_TOKEN="xxx"; $env:GITEE_USER="gogojaja"   (Windows)
   #                export GITEE_TOKEN="xxx"; export GITEE_USER="gogojaja" (macOS)
@@ -29,13 +44,26 @@ import sys
 import re
 import csv
 import io
+import json
+import hashlib
 import datetime
 import subprocess
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LEDGER = os.path.join(ROOT, "台账", "32_镜像同步记录.csv")
+STATE_FILE = os.path.join(ROOT, ".secrets", "mirror_push_state.json")
 BOM = b"\xef\xbb\xbf"
 DEFAULT_REMOTES = ["origin", "mirror"]
+NETWORK_COOLDOWN = 15 * 60  # 秒：网络/其他失败后的冷却期
+
+AUTH_FAIL_RE = re.compile(
+    r"Authentication failed|Authentication succeeded but authorization failed"
+    r"|access denied|forbidden|invalid credential|bad credentials|could not read (Username|Password)"
+    r"|Repository not found", re.IGNORECASE)
+NET_FAIL_RE = re.compile(
+    r"Failed to connect|Could not connect|Connection was reset|Recv failure|timed? out"
+    r"|Could not resolve host|Name or service not known|network is unreachable|Connection refused"
+    r"|Operation timed out|Temporary failure in name resolution", re.IGNORECASE)
 
 # remote -> (user_env, token_env)
 TOKEN_ENV = {
@@ -51,7 +79,9 @@ def _run(cmd, extra_env=None):
     env = dict(os.environ)
     if extra_env:
         env.update(extra_env)
-    return subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, env=env)
+    # encoding=utf-8 + errors=replace：避免 Windows 默认 GBK 解码 git UTF-8 输出时抛 UnicodeDecodeError
+    return subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True,
+                          encoding="utf-8", errors="replace", env=env)
 
 
 def _branch():
@@ -109,6 +139,73 @@ def _push_one(remote, branch):
             out = out.replace(s, "***")
     last = out.splitlines()[-1] if out else ""
     return ok, (last if last else ("成功" if ok else "失败")), elapsed
+
+
+def _classify_failure(msg):
+    """把 git push 失败信息归类为 auth / network / other，供熔断器决策。"""
+    m = msg or ""
+    if AUTH_FAIL_RE.search(m):
+        return "auth"
+    if NET_FAIL_RE.search(m):
+        return "network"
+    return "other"
+
+
+def _token_hash(token):
+    """凭据指纹：用于检测 token 是否更新，从而自动解除阻断。"""
+    if not token:
+        return None
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()[:16]
+
+
+def _load_state():
+    if not os.path.exists(STATE_FILE):
+        return {}
+    try:
+        with io.open(STATE_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+
+def _save_state(state):
+    try:
+        d = os.path.dirname(STATE_FILE)
+        if not os.path.isdir(d):
+            os.makedirs(d)
+        with io.open(STATE_FILE, "w", encoding="utf-8") as f:
+            json.dump(state, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print("  (状态文件写入失败: %s)" % e)
+
+
+def _status(remotes):
+    state = _load_state()
+    shown = remotes if remotes else (list(state.keys()) if state else DEFAULT_REMOTES)
+    for r in shown:
+        st = state.get(r)
+        if not st:
+            print("[%s] 正常（无阻断/冷却）" % r)
+        else:
+            print("[%s] %s" % (r, json.dumps(st, ensure_ascii=False)))
+    return 0
+
+
+def _unblock(remotes):
+    state = _load_state()
+    if not remotes:
+        state = {}
+        print("已解除全部 remote 的阻断/冷却状态")
+    else:
+        for r in remotes:
+            if r in state:
+                del state[r]
+                print("已解除 %s 的阻断/冷却状态" % r)
+            else:
+                print("%s 无阻断/冷却状态" % r)
+    _save_state(state)
+    return 0
 
 
 def _next_seq():
@@ -169,44 +266,109 @@ def _ensure_secrets():
 
 def main():
     _ensure_secrets()
-    args = [a for a in sys.argv[1:] if not a.startswith("-")]
-    remotes = args if args else DEFAULT_REMOTES
-    verify = "--verify" in sys.argv[1:]
+    argv = sys.argv[1:]
+    args = [a for a in argv if not a.startswith("-")]
+    verify = "--verify" in argv
+    force = "--force" in argv
+    status_only = "--status" in argv
+    unblock = "--unblock" in argv
 
+    if status_only:
+        return _status(args)
+    if unblock:
+        return _unblock(args)
+    remotes = args if args else DEFAULT_REMOTES
     if verify:
         return _verify(remotes, _branch())
 
     branch = _branch()
     head = _head()
     now = datetime.datetime.now()
+    now_str = now.strftime("%Y-%m-%d %H:%M:%S")
     seq = _next_seq()
     rows = []
-    all_ok = True
+    state = _load_state()
+    attempted = 0
+    failed = 0
+    skipped = 0
 
     for remote in remotes:
         if not _remote_exists(remote):
             sid = "SYNC-%s-%03d" % (now.strftime("%Y%m%d"), seq)
             seq += 1
-            rows.append([sid, now.strftime("%Y-%m-%d %H:%M:%S"), head[:12], remote, "",
+            rows.append([sid, now_str, head[:12], remote, "",
                          "跳过(未配置)", "0.0", "remote 未配置，待用户在 Gitee 建仓后 git remote add mirror"])
             print("[跳过] %s：remote 未配置" % remote)
             continue
+
+        st = state.get(remote, {})
+        user, token = _resolve_credentials(remote)
+
+        # ---- 熔断：认证失败阻断（凭据更新后自动解除）----
+        if st.get("blocked") and not force:
+            cur_hash = _token_hash(token)
+            if token and st.get("token_hash") and cur_hash != st.get("token_hash"):
+                print("[解除] %s：检测到凭据变更，自动解除阻断" % remote)
+                st = {}
+            else:
+                print("[阻断] %s：%s（已停止重试；更新凭据后自动解除，或 --force 立即重试，或 --unblock 手动解除）"
+                      % (remote, st.get("message", "凭据认证失败")))
+                skipped += 1
+                continue
+
+        # ---- 熔断：网络/其他失败冷却期 ----
+        if st.get("cooldown_until") and not force:
+            try:
+                cu = datetime.datetime.strptime(st["cooldown_until"], "%Y-%m-%d %H:%M:%S")
+            except Exception:
+                cu = None
+            if cu and now < cu:
+                left = int((cu - now).total_seconds() // 60) + 1
+                print("[冷却] %s：%s，约 %d 分钟后重试（--force 立即重试）"
+                      % (remote, st.get("message", "网络不可达"), left))
+                skipped += 1
+                continue
+            st = {}
+
+        # ---- 实际推送 ----
+        attempted += 1
         url = _run(["git", "remote", "get-url", remote]).stdout.strip()
         ok, msg, elapsed = _push_one(remote, branch)
-        status = "成功" if ok else "失败"
-        all_ok = all_ok and ok
         sid = "SYNC-%s-%03d" % (now.strftime("%Y%m%d"), seq)
         seq += 1
-        rows.append([sid, now.strftime("%Y-%m-%d %H:%M:%S"), head[:12], remote, _mask(url),
-                     status, "%.1f" % elapsed, msg])
-        print("[%s] %s：%s (%.1fs)" % (status, remote, msg, elapsed))
-        if not ok:
-            print("  详情：%s" % msg)
 
-    _append_ledger(rows)
-    print("\n台账已更新：%s" % LEDGER)
-    print("本地 HEAD=%s  全部成功=%s" % (head[:12], all_ok))
-    sys.exit(0 if all_ok else 1)
+        if ok:
+            state.pop(remote, None)
+            rows.append([sid, now_str, head[:12], remote, _mask(url),
+                         "成功", "%.1f" % elapsed, msg])
+            print("[成功] %s：%s (%.1fs)" % (remote, msg, elapsed))
+        else:
+            cls = _classify_failure(msg)
+            if cls == "auth":
+                # 凭据问题：阻断重试，不入 32 台账（铁律：凭据失败留痕不入库，避免污染工作区）
+                state[remote] = {"blocked": True, "reason": "auth",
+                                 "token_hash": _token_hash(token),
+                                 "message": "凭据认证失败（需提供新 token）", "updated_at": now_str}
+                print("[阻断] %s：凭据认证失败，已停止重试。请更新凭据（.secrets/<remote>_token 或环境变量）后自动解除，"
+                      "或 --force 立即重试，或 --unblock 手动解除。" % remote)
+            else:
+                state[remote] = {"blocked": False, "reason": cls, "message": msg,
+                                 "cooldown_until": (now + datetime.timedelta(seconds=NETWORK_COOLDOWN)).strftime("%Y-%m-%d %H:%M:%S"),
+                                 "updated_at": now_str}
+                failed += 1
+                rows.append([sid, now_str, head[:12], remote, _mask(url),
+                             "失败", "%.1f" % elapsed, msg])
+                print("[失败] %s：%s (%.1fs)" % (remote, msg, elapsed))
+                print("  详情：%s" % msg)
+
+    _save_state(state)
+    if rows:
+        _append_ledger(rows)
+        print("\n台账已更新：%s" % LEDGER)
+    print("本地 HEAD=%s  尝试=%d  失败=%d  跳过=%d" % (head[:12], attempted, failed, skipped))
+    if attempted == 0:
+        sys.exit(2)  # 全部被阻断/冷却跳过（未尝试）——agent_loop 记为「跳过(阻断)」
+    sys.exit(0 if failed == 0 else 1)
 
 
 if __name__ == "__main__":

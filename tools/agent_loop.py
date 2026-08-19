@@ -38,7 +38,13 @@ def _gate_ok(name):
 
 
 def _push():
-    return _run("mirror_push.py").returncode == 0
+    """调用 mirror_push 双推。返回 (rc, label)：rc=0 成功 / 1 失败 / 2 全部被阻断/冷却跳过。"""
+    r = _run("mirror_push.py")
+    if r.returncode == 0:
+        return 0, "成功"
+    if r.returncode == 2:
+        return 2, "跳过(阻断)"
+    return 1, "失败"
 
 
 def _next_seq():
@@ -106,8 +112,7 @@ def main():
     all_pass = v and c and rel
 
     if all_pass and not dry:
-        push_ok = _push()
-        push_txt = "成功" if push_ok else "失败"
+        push_rc, push_txt = _push()
     else:
         push_txt = "跳过(dry-run)" if dry else "跳过(门禁未过)"
 
@@ -118,6 +123,8 @@ def main():
     note = "门禁全过" if all_pass else "门禁未过，未双推，待人工处置"
     if all_pass and not dry and push_txt == "失败":
         note = "门禁全过但双推失败(网络/凭据)，见 32 台账"
+    elif all_pass and not dry and push_txt == "跳过(阻断)":
+        note = "双推被熔断(凭据/网络)，已停止重试；见 tools/mirror_push.py --status"
     _append_ledger([rid, now, trigger,
                     "通过" if v else "失败", "通过" if c else "失败",
                     "通过" if rel else "失败", push_txt, "%.1f" % elapsed, note])

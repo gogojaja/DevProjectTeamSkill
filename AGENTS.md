@@ -201,6 +201,7 @@ GitHub 为境外服务器，**网络访问不稳定 + 存在地缘政治风险**
 
 ### 1. 同步策略（双推为主，定时校验为辅）
 - **主策略：每次提交双推** `origin`(GitHub) + `mirror`(Gitee)。用 `tools/mirror_push.py` 逐目标推送，**单目标失败不阻断另一个**，并写 `台账/32_镜像同步记录.csv` 留痕。
+- **熔断器（杜绝反复重试）**：`mirror_push.py` 内置熔断，凭据认证失败（Authentication failed/403 等）→ 对目标 remote 置**阻断**状态，此后直接跳过**不再重试**、也不写 32 台账（凭据失败留痕不入库）；仅当凭据更新（token 哈希变化）或 `--force`/`--unblock` 才解除。网络/其他失败（连接重置/超时/DNS）→ 置**冷却**（默认 15 分钟），冷却期内跳过不重试。状态存 `.secrets/mirror_push_state.json`（gitignore）。辅助命令：`--force`（立即重试）、`--status`（查看状态）、`--unblock <remote|all>`（解除）。退出码 0=成功 / 1=本次尝试失败 / 2=全部被阻断或冷却跳过。
 - **辅策略：Gitee 侧「仓库同步」** 周期性从 GitHub 拉取兜底（即使本机某次双推遗漏，也能补回）；也可在 Gitee 创建仓库时「从 GitHub 导入」。
 - 不要依赖「本机定时从 GitHub 拉取再推国内」作为唯一手段——本机访问 GitHub 本身会 flapping，反而单点失败。
 
