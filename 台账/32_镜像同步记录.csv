@@ -83,3 +83,5 @@ SYNC-20260819-081,2026-08-19 17:59:57,4457a6dc6b37,origin,https://github.com/gog
 SYNC-20260819-082,2026-08-19 17:59:57,4457a6dc6b37,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,1.9,   6af19f2..4457a6d  main -> main
 SYNC-20260819-083,2026-08-19 18:01:03,79f270a3e39f,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,失败,69.3,fatal: unable to access 'https://github.com/***/DevProjectTeamSkill.git/': Recv failure: Connection was reset
 SYNC-20260819-084,2026-08-19 18:01:03,79f270a3e39f,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,1.6,   4457a6d..79f270a  main -> main
+SYNC-20260819-085,2026-08-19 21:10:32,8eaef037afa5,origin,git@github.com:gogojaja/DevProjectTeamSkill.git,失败,1.8,and the repository exists.（SSH 公钥被拒，随后改 HTTPS 成功推送）
+SYNC-20260819-086,2026-08-19 21:11:05,8eaef037afa5,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,成功,3.2,   6af19f2..8eaef03  main -> main
