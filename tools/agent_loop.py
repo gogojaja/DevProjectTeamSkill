@@ -71,10 +71,12 @@ def _append_ledger(row):
 
 
 def _git_has_changes(path):
-    res = subprocess.run(["git", "diff", "--quiet", "--", path], cwd=ROOT, capture_output=True, text=True)
+    res = subprocess.run(["git", "diff", "--quiet", "--", path], cwd=ROOT,
+                         capture_output=True, text=True, encoding="utf-8", errors="replace")
     if res.returncode == 0:
         # 若文件已跟踪且未修改；仍可能存在未追踪文件，则检查 status。
-        status = subprocess.run(["git", "status", "--short", "--", path], cwd=ROOT, capture_output=True, text=True)
+        status = subprocess.run(["git", "status", "--short", "--", path], cwd=ROOT,
+                                capture_output=True, text=True, encoding="utf-8", errors="replace")
         return bool(status.stdout.strip())
     return True
 
@@ -84,11 +86,13 @@ def _safe_git_commit(rid):
     env["AGENT_LOOP_ACTIVE"] = "1"
     if not _git_has_changes(LEDGER):
         return False, "no_changes"
-    add = subprocess.run(["git", "add", LEDGER], cwd=ROOT, env=env, capture_output=True, text=True)
+    add = subprocess.run(["git", "add", LEDGER], cwd=ROOT, env=env,
+                         capture_output=True, text=True, encoding="utf-8", errors="replace")
     if add.returncode != 0:
         return False, add.stderr.strip() or "git add failed"
     commit = subprocess.run(["git", "commit", "-m", "chore(agent-loop): 控制环执行记录 %s" % rid],
-                            cwd=ROOT, env=env, capture_output=True, text=True)
+                            cwd=ROOT, env=env, capture_output=True, text=True,
+                            encoding="utf-8", errors="replace")
     if commit.returncode != 0:
         return False, commit.stderr.strip() or commit.stdout.strip() or "git commit failed"
     return True, "ok"

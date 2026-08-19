@@ -18,6 +18,13 @@
 # =============================================================================
 import os, re, sys, subprocess
 
+# 强制 stdout/stderr 按 UTF-8 输出（errors=replace），避免 GBK 控制台打印 ✓ 等字符时崩溃
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 EXCLUDE_DIRS = {'.git', 'dist', 'skills_backup', 'node_modules', '__pycache__',
@@ -114,30 +121,32 @@ def repo_grep(asset):
 
 
 def port_listening(port):
+    kw = dict(capture_output=True, text=True, timeout=10, encoding="utf-8", errors="replace")
     try:
-        r = subprocess.run(['lsof', '-nP', '-iTCP:%s' % port, '-sTCP:LISTEN'],
-                           capture_output=True, text=True, timeout=10)
+        r = subprocess.run(['lsof', '-nP', '-iTCP:%s' % port, '-sTCP:LISTEN'], **kw)
         return r.returncode == 0 and bool(r.stdout.strip())
     except (OSError, subprocess.SubprocessError):
         # 非 macOS / lsof 缺失 → 退回 netstat
         try:
-            r = subprocess.run(['netstat', '-an'], capture_output=True, text=True, timeout=10)
+            r = subprocess.run(['netstat', '-an'], **kw)
             return (':%s ' % port) in r.stdout
         except (OSError, subprocess.SubprocessError):
             return False
 
 
 def process_running(name):
+    kw = dict(capture_output=True, text=True, timeout=10, encoding="utf-8", errors="replace")
     try:
-        r = subprocess.run(['pgrep', '-f', name], capture_output=True, text=True, timeout=10)
+        r = subprocess.run(['pgrep', '-f', name], **kw)
         return r.returncode == 0 and bool(r.stdout.strip())
     except (OSError, subprocess.SubprocessError):
         return False
 
 
 def launchagent_loaded(ident):
+    kw = dict(capture_output=True, text=True, timeout=10, encoding="utf-8", errors="replace")
     try:
-        r = subprocess.run(['launchctl', 'list'], capture_output=True, text=True, timeout=10)
+        r = subprocess.run(['launchctl', 'list'], **kw)
         if r.returncode == 0 and ident in r.stdout:
             return True
     except (OSError, subprocess.SubprocessError):
