@@ -1,0 +1,7 @@
+﻿keyword,level,replacement,type,description
+
+internal-dev-host-01,B,<hostname>,hostname,内部开发主机名（示例）
+intranet.corp.local,B,<internal-domain>,domain,内部域名（示例）
+proj-omega,B,<project-codename>,project,内部项目代号（示例）
+alice.smith,B,<internal-username>,username,内部用户名（示例）
+HRDB_conn,B,<conn-alias>,secret_alias,内部连接串别名（示例）

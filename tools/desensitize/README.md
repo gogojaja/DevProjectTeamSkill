@@ -1,13 +1,14 @@
 # 文档脱敏工具（desensitize）
 
-> 版本：v1.0.0  
-> 依据：`iron_rules.md` §3 敏感信息三级处理（A/B/C 级）
+> 版本：v1.1.0  
+> 依据：`iron_rules.md` §3 敏感信息三级处理（A/B/C 级）＋ 脱敏字典文档
 
-通用文档脱敏小工具，可在各项目中独立调用。支持扫描检测、批量脱敏、自定义规则、生成 CSV 报告。
+通用文档脱敏小工具，可在各项目中独立调用。支持扫描检测、批量脱敏、自定义规则、**脱敏字典**、生成 CSV 报告。
 
 ## 功能特性
 
 - **三级分级**：A 级（密钥/Token/密码，告警）、B 级（IP/路径/邮箱，脱敏入库）、可扩展 C 级
+- **脱敏字典**：`desensitize_dictionary.csv` 关键字集（子串匹配）+ `--dictionary` 参数自动并入，见 `DESENSITIZE_DICTIONARY.md`
 - **两种模式**：扫描模式（只读检测）+ 脱敏模式（自动替换）
 - **批量处理**：支持单个文件或整个目录，自动识别文本文件
 - **报告输出**：CSV 格式（UTF-8 with BOM），含位置/级别/类型/替换统计
@@ -41,6 +42,22 @@ python tools/desensitize/desensitize.py --in-place config.yaml
 # 预览将替换的内容（不写入）
 python tools/desensitize/desensitize.py --dry-run ./src
 ```
+
+### 脱敏字典（关键字集）
+
+```bash
+# 单文件脱敏到输出目录（规则 + 字典联合替换）
+python tools/desensitize/desensitize.py --dictionary desensitize_dictionary.csv ./doc.md -o ./doc_safe
+
+# 扫描时同时按字典检测
+python tools/desensitize/desensitize.py --dictionary desensitize_dictionary.csv --scan ./docs
+
+# 字典 + 命令行临时关键字
+python tools/desensitize/desensitize.py --dictionary desensitize_dictionary.csv --keywords "内部代号,张三" ./doc.md
+```
+
+- 字典文件格式与维护详见 **[脱敏字典文档 `DESENSITIZE_DICTIONARY.md`](./DESENSITIZE_DICTIONARY.md)**
+- CSV 列：`keyword, level, replacement, type, description`（UTF-8 with BOM，`#` 开头为注释）
 
 ### 自定义规则
 
@@ -105,6 +122,7 @@ python tools/desensitize/desensitize.py --rules my_rules.json --scan ./docs
 | `-o, --output` | 输出目录 |
 | `--report` | 报告 CSV 路径（默认自动生成） |
 | `--rules` | 自定义规则 JSON 文件 |
+| `--dictionary` | 脱敏字典 CSV（关键字集，UTF-8 with BOM） |
 | `--level A/B/C` | 仅处理指定级别及以上 |
 | `--dry-run` | 预览模式，不写入 |
 | `--include-ext` | 额外包含的扩展名，逗号分隔 |

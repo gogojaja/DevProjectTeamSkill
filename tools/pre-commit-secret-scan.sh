@@ -12,6 +12,7 @@ pattern='(ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{30,}|AKIA[0-9A-Z]{16}|sk-[
 for f in $files; do
   case "$f" in
     *.env|*.pem|*.key|*.p12|*.pfx|*.jks|*.keystore) continue ;;  # 已被 gitignore 排除, 防御性跳过
+    tools/desensitize/desensitize.py) continue ;;  # 检测工具自身源码含 A 级检测正则定义（AKIA/sk-/PRIVATE KEY 字符串），非真实密钥
   esac
   if git show :"$f" 2>/dev/null | rg -P "$pattern" >/dev/null 2>&1; then
     echo "❌ 检测到疑似密钥: $f" >&2

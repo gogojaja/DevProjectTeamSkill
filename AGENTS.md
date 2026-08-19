@@ -60,7 +60,9 @@ python tools/deploy_skills.py --roles role-a,role-b
 ```sh
 python tools/excel_to_csv.py            # 迁移存量 xlsx→csv
 python tools/desensitize/desensitize.py --scan <目标>  # 文档脱敏：扫描模式
-python tools/desensitize/desensitize.py <目标> -o <输出>  # 文档脱敏：批量替换
+python tools/desensitize/desensitize.py <目标> -o <输出>  # 文档脱敏：按内置规则批量替换
+python tools/desensitize/desensitize.py --dictionary tools/desensitize/desensitize_dictionary.csv <目标> -o <输出>  # 文档脱敏：规则 + 脱敏字典关键字联合脱敏（字典维护见 tools/desensitize/DESENSITIZE_DICTIONARY.md）
+python tools/remove_watermark/remove_watermark.py <目标> --auto --in-place  # 去水印：自动识别（Word/PPT/Excel/PDF/图片/文本 6 类；--text 关键字 / --rect/--corner 区域 / -o 输出副本；详见 tools/remove_watermark/README.md）
 bash scripts/install-hooks.sh           # 新 clone 后一键安装 pre-commit 环境门禁钩子
 git commit                              # 每原子改动一次提交（钩子未安装时先跑 install-hooks.sh）
 ```

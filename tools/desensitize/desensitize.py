@@ -16,6 +16,7 @@ desensitize.py — 文档脱敏小工具（v1.0.0）
   python tools/desensitize/desensitize.py <文件或目录> -o <输出目录>
   python tools/desensitize/desensitize.py --in-place <文件>
   python tools/desensitize/desensitize.py --rules custom_rules.json <目标>
+  python tools/desensitize/desensitize.py --dictionary desensitize_dictionary.csv <目标>
 """
 
 import os
@@ -467,6 +468,58 @@ def add_keyword_rules(rules, keywords, level="B", replacement="***"):
     return rules
 
 
+def load_dictionary_rules(rules, csv_path):
+    """
+    从脱敏字典 CSV（UTF-8 with BOM）读取关键字集并入规则集。
+    CSV 列：keyword, level, replacement, type, description
+      - keyword：要脱敏的关键字（直接子串匹配，兼容中文）
+      - level：A/B/C（默认 B）
+      - replacement：替换文本（默认 ***）
+    - 以 # 开头的行视为注释跳过；空行跳过。
+    返回更新后的规则集（新增 dictionary_keywords 规则组）。
+    """
+    if not os.path.isfile(csv_path):
+        print(f"  ⚠ 脱敏字典文件不存在: {csv_path}", file=sys.stderr)
+        return rules
+
+    # 按 A→B→C 分三组，便于 --level 过滤
+    by_level = {"A": [], "B": [], "C": []}
+    loaded = 0
+    with open(csv_path, 'r', encoding='utf-8-sig') as f:
+        reader = csv.reader(f)
+        for raw in reader:
+            if not raw:
+                continue
+            row = [c.strip() for c in raw]
+            if not row[0] or row[0].startswith('#'):
+                continue
+            if row[0].lower() == 'keyword' or (len(row) > 1 and row[1].lower() == 'level'):
+                continue  # 跳过表头
+            level = (row[1].upper() if len(row) > 1 and row[1].upper() in ("A", "B", "C") else "B")
+            replacement = (row[2] if len(row) > 2 and row[2] else "***")
+            _type = (row[3] if len(row) > 3 else "other")
+            by_level[level].append({
+                "name": f"dict_{_type}_{row[0]}",
+                "regex": re.escape(row[0]),
+                "replacement": replacement,
+                "example": f"{row[0]} → {replacement}",
+            })
+            loaded += 1
+
+    if loaded:
+        for lvl, patterns_l in by_level.items():
+            if patterns_l:
+                rules[f"dictionary_{lvl}"] = {
+                    "level": lvl,
+                    "description": f"脱敏字典关键字（{lvl} 级，来自 --dictionary）",
+                    "enabled": True,
+                    "patterns": patterns_l,
+                }
+        print(f" 已加载脱敏字典 {loaded} 个关键字（{csv_path}）")
+
+    return rules
+
+
 # =============================================================================
 # CLI 主入口
 # =============================================================================
@@ -492,6 +545,12 @@ def main():
   # 使用自定义规则
   python desensitize.py --rules my_rules.json --scan ./src
 
+  # 使用脱敏字典（关键字集 CSV）
+  python desensitize.py --dictionary desensitize_dictionary.csv ./src -o ./src_safe
+
+  # 脱敏字典 + 命令行临时关键词 组合使用
+  python desensitize.py --dictionary desensitize_dictionary.csv --keywords "内部代号,张三" ./doc.md
+
   # 仅启用 A 级检测
   python desensitize.py --scan --level A ./secrets
 """
@@ -502,6 +561,7 @@ def main():
     parser.add_argument("-o", "--output", help="输出目录（脱敏模式下使用，不指定则在同目录生成 .desensitized 副本）")
     parser.add_argument("--report", help="报告输出路径（CSV），默认自动生成")
     parser.add_argument("--rules", help="自定义规则 JSON 文件路径（与默认规则合并）")
+    parser.add_argument("--dictionary", help="脱敏字典 CSV 路径（keyword,level,replacement,type,description；UTF-8 with BOM；# 开头为注释）")
     parser.add_argument("--level", choices=["A", "B", "C"], help="仅处理指定级别及以上（A=仅A级，B=A+B，C=全部）")
     parser.add_argument("--dry-run", action="store_true", help="预览模式：显示将替换的内容，但不写入文件")
     parser.add_argument("--include-ext", help="额外包含的扩展名，逗号分隔（如 .env,.cfg）")
@@ -531,6 +591,10 @@ def main():
             print(f"❌ 自定义规则文件不存在: {args.rules}", file=sys.stderr)
             return 1
         rules = load_custom_rules(args.rules)
+
+    # 脱敏字典（关键字集，UTF-8 with BOM CSV）
+    if args.dictionary:
+        rules = load_dictionary_rules(rules, args.dictionary)
 
     # 命令行自定义关键词
     if args.keywords:
