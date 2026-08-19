@@ -12,6 +12,8 @@ mirror_push.py — 国内镜像同步（地缘风险对冲）双推工具
   仅当凭据更新（token 哈希变化）或显式 --force/--unblock 才解除。
 - 网络/其他失败（连接重置/超时/DNS 等）→ 置「冷却」状态（默认 15 分钟），
   冷却期内跳过不重试（避免 flapping 时每次提交都重试并污染台账）。
+- 无新提交（Everything up-to-date）→ 视为「已同步」，跳过且不写台账，
+  避免每次提交后钩子自动双推时再留痕造成脏工作区。
 - 状态存于 .secrets/mirror_push_state.json（gitignore，不入库）。
 - 退出码：0=全部成功；1=存在本次尝试失败；2=全部被阻断/冷却跳过（未尝试）。
 - 辅助命令：--force（无视阻断/冷却立即尝试）、--unblock <remote|all>（解除）、
@@ -339,6 +341,10 @@ def main():
 
         if ok:
             state.pop(remote, None)
+            if "up-to-date" in msg:
+                # 无新提交可推：视为「已同步」，不写台账，避免每次提交后钩子再留痕造成脏工作区
+                print("[跳过] %s：已同步（无新提交，不写台账）" % remote)
+                continue
             rows.append([sid, now_str, head[:12], remote, _mask(url),
                          "成功", "%.1f" % elapsed, msg])
             print("[成功] %s：%s (%.1fs)" % (remote, msg, elapsed))
@@ -346,6 +352,7 @@ def main():
             cls = _classify_failure(msg)
             if cls == "auth":
                 # 凭据问题：阻断重试，不入 32 台账（铁律：凭据失败留痕不入库，避免污染工作区）
+                failed += 1
                 state[remote] = {"blocked": True, "reason": "auth",
                                  "token_hash": _token_hash(token),
                                  "message": "凭据认证失败（需提供新 token）", "updated_at": now_str}

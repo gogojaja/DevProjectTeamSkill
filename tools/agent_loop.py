@@ -122,7 +122,7 @@ def main():
     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     note = "门禁全过" if all_pass else "门禁未过，未双推，待人工处置"
     if all_pass and not dry and push_txt == "失败":
-        note = "门禁全过但双推失败(网络/凭据)，见 32 台账"
+        note = "门禁全过但双推失败(网络/凭据)，已按熔断处理；mirror_push --status 查看状态"
     elif all_pass and not dry and push_txt == "跳过(阻断)":
         note = "双推被熔断(凭据/网络)，已停止重试；见 tools/mirror_push.py --status"
     _append_ledger([rid, now, trigger,
