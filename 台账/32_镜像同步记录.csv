@@ -65,3 +65,5 @@ SYNC-20260819-063,2026-08-19 17:18:43,81a3d985b3c0,origin,https://github.com/gog
 SYNC-20260819-064,2026-08-19 17:18:43,81a3d985b3c0,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,失败,1.1,fatal: Authentication failed for 'https://gitee.com/***/DevProjectTeamSkill.git/'
 SYNC-20260819-065,2026-08-19 17:19:15,3486670e1839,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,失败,48.3,fatal: unable to access 'https://github.com/***/DevProjectTeamSkill.git/': Recv failure: Connection was reset
 SYNC-20260819-066,2026-08-19 17:19:15,3486670e1839,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,失败,0.9,fatal: Authentication failed for 'https://gitee.com/***/DevProjectTeamSkill.git/'
+SYNC-20260819-067,2026-08-19 17:21:26,233fd14366df,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,失败,21.3,fatal: unable to access 'https://github.com/***/DevProjectTeamSkill.git/': Failed to connect to github.com:443 after 21084 ms: Could not connect to server
+SYNC-20260819-068,2026-08-19 17:21:26,233fd14366df,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,失败,0.8,fatal: Authentication failed for 'https://gitee.com/***/DevProjectTeamSkill.git/'
