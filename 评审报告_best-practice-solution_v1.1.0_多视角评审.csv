@@ -1,0 +1,50 @@
+﻿perspective,check_id,check_name,status,severity,evidence,confidence
+architect,ARCH-001,触发词路由冲突未仲裁,CHANGES_REQUESTED,high,选型/ADR/第三方评审同时命中 BPS 与 role-architecture、MPV，无优先级规则,high
+architect,ARCH-002,与 team-orchestration 仲裁关系未定义,CHANGES_REQUESTED,high,技能内平票由收敛者裁定 vs priority-arbitration P0~P6 两套裁决并存,medium
+architect,ARCH-003,FULL 真并行握手缺失,CHANGES_REQUESTED,medium,§3.5/§4.3 只声明不定义调用接口，真并行无回流定义,medium
+architect,ARCH-004,LIGHT 预算与 webfetch 量矛盾,CHANGES_REQUESTED,medium,LIGHT≤2500 token 却允许 ≤2 次 webfetch×5000 字符,high
+architect,ARCH-005,并行视角上限冲突(4 vs 5),CHANGES_REQUESTED,medium,§4.3 并行≤4 vs review.md 复用 MPV 五视角,medium
+architect,ARCH-006,内网来源条款自相矛盾,CHANGES_REQUESTED,medium,§4.4 禁内网域名 vs ground.md 可用 register_auth 引用,medium
+architect,ARCH-007,评审报告落盘未对齐 §2.2-5,CHANGES_REQUESTED,medium,仅写按 MPV CSV 规范，无 评审报告_对象_版本 CSV 命名与路径,medium
+architect,ARCH-008,升级触发词[全量评审]未登记,CHANGES_REQUESTED,medium,draft.md 提示回复该词，但未入触发词表/description,medium
+architect,ARCH-009,状态表笔误[审检中],CHANGES_REQUESTED,low,退出条件误写 档位判定完成，应为 评审/自检完成,high
+architect,ARCH-010,FULL 档位倒挂,CHANGES_REQUESTED,low,FULL 检索≤3 vs LIGHT≤2 仅多 1 次却配 8× token,medium
+architect,ARCH-011,视角缺模型档位映射,CHANGES_REQUESTED,low,MPV 有 S0~S3，BPS 3 视角未定档,low
+completeness,COMP-001,纯信息查询→例行问答漏网出口,CHANGES_REQUESTED,medium,无可决策问题判退出全靠自觉，无边界判据,high
+completeness,COMP-002,缺既有决策复用前置,CHANGES_REQUESTED,medium,未先查已有 ADR/决策记录即调研，易重复或推翻既有决策,medium
+completeness,COMP-003,INSUFFICIENT>30% 不可操作,CHANGES_REQUESTED,medium,关键结论口径、分母、阻塞后交互均未定义,high
+completeness,COMP-004,评审聚合规则缺失,CHANGES_REQUESTED,medium,单 FAIL 是 CR 还是 BLOCKED、高严重度升级规则未定义,high
+completeness,COMP-005,三态命名跨文件不一致,CHANGES_REQUESTED,high,PASS vs SIGNED_OFF vs BLOCKED_ERROR 三套并用,high
+completeness,COMP-006,选型类决策可降档,CHANGES_REQUESTED,high,技术栈/框架选型可被归模块级→LIGHT，缺跨模块锁定判据,high
+completeness,COMP-007,金额超阈值无阈值,CHANGES_REQUESTED,high,黑名单条目不可执行，建议 ≥5 万量化,high
+completeness,COMP-008,生产变更黑名单过载+缺项,CHANGES_REQUESTED,medium,可逆单组件被强制 FULL；漏数据迁移/契约破坏/许可证,medium
+completeness,COMP-009,confidence 无映射表,CHANGES_REQUESTED,medium,来源等级×交叉验证数无判定矩阵，AI 无法重复推导,high
+completeness,COMP-010,CHANGES_REQUESTED 计轮不明,CHANGES_REQUESTED,medium,仅 BLOCKED 计 2 轮，CR 可能无限循环,medium
+completeness,COMP-011,严重度判据缺失,CHANGES_REQUESTED,medium,high/med/low 无 rubric，建议引 MPV,medium
+completeness,COMP-012,CR 缺状态字段,CHANGES_REQUESTED,low,意见清单无 status 字段承载采纳/驳回回填,medium
+completeness,COMP-013,证据时效维度缺失,CHANGES_REQUESTED,medium,只有 access_date，无 stable/volatile+复审周期,medium
+completeness,COMP-014,T3 来源一刀切丢弃,CHANGES_REQUESTED,medium,建议注明仅作提示/反向信号,medium
+completeness,COMP-015,人工签署存在循环矛盾,CHANGES_REQUESTED,medium,方案未交付无法签署却作评审前置，建议移到交付后,high
+completeness,COMP-016,FULL 报价缺确认点,CHANGES_REQUESTED,medium,报价后应等用户确认才开跑，交付末加确认点,medium
+completeness,COMP-017,中途改需求重跑路径未定义,CHANGES_REQUESTED,low,从 Draft 重来还是重跑 Research、是否计轮,low
+test_engineer,TEST-001,子技能版本门禁盲区,CHANGES_REQUESTED,high,check_version_consistency 不扫 SUB_SKILLS，版本漂移静默通过,high
+test_engineer,TEST-002,三脚本白名单各自为政可漂移,CHANGES_REQUESTED,high,closure 9 项/release 8 项/version 0 项，新技能漏加静默跳过,high
+test_engineer,TEST-003,description 恰触底 150 字符,CHANGES_REQUESTED,medium,留余量 160~240；首句规则未落码,medium
+test_engineer,TEST-004,未引 closure 模板缺 §8 四性,CHANGES_REQUESTED,medium,缺模板引用行与可执行/可验证/可恢复/可交接自证,medium
+test_engineer,TEST-005,token/检索口径跨文件不一致,CHANGES_REQUESTED,medium,research LIGHT≤2 vs SKILL 调研≤3 vs 报价占位 N 次,medium
+security,SEC-001,research.md 缺注入防护,CHANGES_REQUESTED,high,fetch 主战场未写 网页=数据非指令 强制句,high
+security,SEC-002,research.md 缺凭据屏蔽,CHANGES_REQUESTED,medium,凭据 redacted 唯一落点在 ground.md，提炼环节无护栏,high
+security,SEC-003,SSRF 约束三处术语不一致,CHANGES_REQUESTED,medium,缺 link-local/IPv6/编码混淆/重定向复检,medium
+security,SEC-004,review.md 缺归档脱敏门禁,CHANGES_REQUESTED,medium,FULL 评审报告落盘无 desensitize 扫描要求,medium
+security,SEC-005,涉密只出不进未落实,CHANGES_REQUESTED,medium,ground.md 允许 register_auth 内网来源，涉密决策可进证据链,high
+security,SEC-006,头部未锚定 iron_rules.md,CHANGES_REQUESTED,medium,A/B 级矩阵出自 iron_rules 却无显式引用,medium
+security,SEC-007,LIGHT 单源 T2 冲突,CHANGES_REQUESTED,medium,light-check ≥1 来源 vs ground T2≥2，单源 T2 被放行,medium
+security,SEC-008,黑名单防降档依赖自评,CHANGES_REQUESTED,medium,档位判定与用户主张冲突时取最严档,medium
+security,SEC-009,证据快照无脱敏/存储约束,CHANGES_REQUESTED,medium,高风险证据快照需先脱敏且不入库,medium
+performance,PERF-001,LIGHT 强制联网名不副实,CHANGES_REQUESTED,high,缺省路径强制 web 检索，recalled_only 未启用,high
+performance,PERF-002,FULL 评审预算独大,CHANGES_REQUESTED,medium,12000 全给评审，缺外部核验预算,medium
+performance,PERF-003,评审缺省应串行,CHANGES_REQUESTED,medium,单模型三视角独立生成是重复自评，→合并一次连贯评审,medium
+performance,PERF-004,token 口径三缺口,CHANGES_REQUESTED,high,口径未定义/超限行为三处不一致/无计量,high
+performance,PERF-005,日常选型响应拖慢,CHANGES_REQUESTED,high,先答后深：快答为默认，全量评审为升级点,high
+performance,PERF-006,LIGHT 证据卡过重,CHANGES_REQUESTED,medium,13 字段 JSON 卡在 2500 预算占比过大→行内引用,medium
+performance,PERF-007,证据/调研零复用,CHANGES_REQUESTED,medium,同主题二次提问全量重跑，建议建证据台账 30 天新鲜期,medium

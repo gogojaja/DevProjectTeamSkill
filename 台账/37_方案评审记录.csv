@@ -10,3 +10,32 @@ test_engineer,TE-001,阶段验收可验证性,PASS,,每 Phase 有验收标准+�
 test_engineer,TE-002,自动化验收脚本,CHANGES_REQUESTED,medium,P1/P3 需固化端到端/分叉复现测试,medium
 performance,PERF-001,控制环/记忆开销,PASS,,"门禁秒级,SQLite/JSONL 轻量",high
 performance,PERF-002,多Agent并发与token预算,CHANGES_REQUESTED,low,P4 需定义并发上限与预算,medium
+architect,ARCH-004,LIGHT预算与webfetch量矛盾,CHANGES_REQUESTED,medium,已修复：LIGHT webfetch≤1×2000字符，输出≤2500 口径明确定义,high
+architect,ARCH-007,评审报告落盘未对齐§2.2-5,CHANGES_REQUESTED,medium,已落地：review.md/converge.md 定义 评审报告_对象_版本_….csv 存项目根,medium
+architect,ARCH-008,升级触发词[全量评审]未登记,CHANGES_REQUESTED,medium,已落地：触发词表+description 登记全量评审,medium
+architect,ARCH-009,状态表笔误[审检中],CHANGES_REQUESTED,low,已修复：退出条件改为 评审/自检完成,high
+completeness,COMP-001,例行问答漏网出口,CHANGES_REQUESTED,medium,已落地：triage 退出前强制过一关（将被直接采用则不可退出）,high
+completeness,COMP-003,INSUFFICIENT>30%不可操作,CHANGES_REQUESTED,medium,已落地：分母=影响设计全部结论，含用户不回复降级交付,high
+completeness,COMP-004/005,评审聚合规则与三态命名,CHANGES_REQUESTED,high,已落地：统一 SIGNED_OFF/CHANGES_REQUESTED/BLOCKED + MPV 决策矩阵引用,high
+completeness,COMP-006/008,选型锁定判据与金额阈值,CHANGES_REQUESTED,high,已落地：Triage 第4问（选型跨模块/长期锁定→FULL）+ 金额≥5万量化,high
+completeness,COMP-009,confidence无映射表,CHANGES_REQUESTED,medium,已落地：T1×n→confidence 五档映射表,high
+completeness,COMP-010,CR计轮不明,CHANGES_REQUESTED,medium,已修复：CHANGES_REQUESTED 与 BLOCKED 均计入≤2轮,high
+completeness,COMP-011,严重度判据缺失,CHANGES_REQUESTED,medium,已落地：review.md 引 MPV rubric（high=大范围/不可逆）,medium
+completeness,COMP-012,CR缺状态字段,CHANGES_REQUESTED,low,已落地：CR status: new|ack|closed|deferred,medium
+completeness,COMP-013,证据时效维度,CHANGES_REQUESTED,medium,已落地：证据卡 timeliness stable|volatile（volatile 90天重验）,high
+completeness,COMP-014,T3一刀切丢弃,CHANGES_REQUESTED,medium,已优化：T3 作反向信号不无痕丢弃,medium
+completeness,COMP-015,人工签署循环矛盾,CHANGES_REQUESTED,medium,已修复：人工签署移到交付后作最终 sign-off,high
+completeness,COMP-016,FULL报价缺确认点,CHANGES_REQUESTED,medium,已落地：报价后支持继续/降级（非黑名单项）,medium
+test_engineer,TEST-001/002,子技能版本门禁盲区+白名单漂移,CHANGES_REQUESTED,high,已落地：check_version_consistency 扫 SUB_SKILLS + domain头版本行===SKILL版本,high
+test_engineer,TEST-003,description触底150,CHANGES_REQUESTED,medium,已确认合规（150~250 内），暂留；首句规则未落码待后续,medium
+test_engineer,TEST-005,token/检索口径跨文件不一致,CHANGES_REQUESTED,medium,已落地：口径统一至 SKILL.md §3.1 并删除 research.md 残句,high
+security,SEC-001/002,research.md缺注入防护/凭据屏蔽,CHANGES_REQUESTED,high,已落地：research.md §3 独立强制句+redacted（不依赖 ground 加载）,high
+security,SEC-004,review.md缺归档脱敏,CHANGES_REQUESTED,medium,已落地：review.md §5 desensitize 扫描门禁,high
+security,SEC-005,涉密只出不进,CHANGES_REQUESTED,medium,已落地：涉密禁内网来源，register_auth 仅限非涉密,high
+security,SEC-006,技能头部未锚定iron_rules,CHANGES_REQUESTED,medium,已落地：SKILL.md 头部引用 iron_rules.md + closure 模板,high
+security,SEC-007,LIGHT单源T2冲突,CHANGES_REQUESTED,medium,已落地：recalled_only 合法；T2 仍须≥2 独立源（light-check 引用 ground 表）,high
+security,SEC-008,黑名单防降档依赖自评,CHANGES_REQUESTED,medium,已落地：档位判定与用户冲突取最严；黑名单豁免留痕,medium
+performance,PERF-001/005,LIGHT强制联网,CHANGES_REQUESTED,high,已落地：LIGHT-P0 纯本地档（references+recalled_only，0网络调用）+ 先答后深,high
+performance,PERF-003,评审缺省应串行,CHANGES_REQUESTED,medium,已落地：缺省串行合并一次连贯评审，真并行仅 team 模式,high
+performance,PERF-004,token口径三缺口,CHANGES_REQUESTED,high,已落地：口径单处定义+超限行为统一规则+删除残句,high
+performance,PERF-006,LIGHT证据卡过重,CHANGES_REQUESTED,medium,已落地：LIGHT 行内引用，完整 JSON 卡仅 FULL,high

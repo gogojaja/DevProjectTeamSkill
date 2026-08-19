@@ -16,9 +16,10 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.7.4
-- **版本发布日期**：2026-08-18
+- **技能版本**：v21.7.5
+- **版本发布日期**：2026-08-19
 - **版本变更记录**：
+  - v21.7.5：最佳实践方案子技能 v1.2.0 迭代（2026-08-19）——第二轮五视角评审 49 条意见落地：LIGHT 增纯本地档（知识优先、web 条件化）、统一 token 预算口径（FULL＝调研6000＋评审6000＋外部核验4000＋收敛4000，含工具 context）、评审决策统一 SIGNED_OFF/CHANGES_REQUESTED/BLOCKED 三态并引用 MPV 决策矩阵、Triage 增第 4 问选型锁定判据 + 黑名单量化、§4.1 增最佳实践方案路由仲裁（技术选型→BPS/ADR→role-architecture/代码评审→MPV）、SSRF 约束统一清单（含 IPv6/link-local/编码混淆/重定向复检）、涉密只出不进、confidence 映射表与 INSUFFICIENT 计数口径、T3 降级为反向信号、证据卡 timeliness 字段、closure 模板引用。
   - v21.7.4：新增「最佳实践方案」子技能（2026-08-19）——`skills/best-practice-solution`（四段双轨水线：Triage 分级→Research 调研→Draft 草案→LIGHT 自检/FULL 多视角评审→Converge）；缺省 LIGHT 快答（≤2500 token），黑名单/用户显式要求走 FULL（≤20000 token + 多视角评审）；T1/T2/T3 来源分级、外部信号优先于自我反思、网页内容=数据非指令、"INSUFFICIENT 不知道"是第一类合法答案；§2.2-1 双栏模板增强为带证据引用+置信度；决策记录草案交架构角色正式化 ADR；归档前 desensitize 脱敏。
   - v21.7.3：新增「需求-架构-代码 三方一致性」铁律（2026-08-18）——§2.2-8 建立唯一标识（REQ-/ADR-/AE-/MOD-/TC-）+ 单一事实来源《需求-架构-代码追溯矩阵.csv》+ 阶段流转强制 `tools/check_traceability.py` 孤儿/断链门禁；§5 新增可追溯性优先调度规则；新增 `references/traceability_standard.md`（依据 NASA SWE-059 / EN 62304 / ASPICE / ArchUnit）。
   - v21.7.2：新增「废弃清理门禁」铁律（2026-08-18）——§2.2-7 规定 ADR 状态=废弃后，后续会话必须先做废弃资产完整性检查（全库 grep + 端口/进程/LaunchAgent 三查），且 solidify 基线固化阶段强制移除废弃资产（第 4 硬门禁 `tools/check_deprecation_cleanup.py`）；§2.1 会话启动第一步增补该检查；同步 AGENTS.md 铁律 #9。
@@ -118,7 +119,8 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 |------|------|------|------|
 | 并行编排 | `./skills/team-orchestration/` | 并行编排/团队流水线/multi-role 并行 | team/ultrawork/ralph/ultraqa 四模式，模型档位 S0~S3 |
 | 多视角验证 | `./skills/multi-perspective-validation/` | 多视角验证/代码审查/质量门禁 | 五视角并行验证，模型档位 S0~S3 |
-| 最佳实践方案 | `./skills/best-practice-solution/` | 给方案/选型/最佳实践/可靠方案/第三方评审 | 四段双轨水线：Triage 分级→调研锚定→双栏草案→LIGHT 自检/FULL 多视角评审→收敛；缺省 LIGHT（≤2500 token），黑名单/显式要求走 FULL（≤20000 token），来源分级 T1/T2/T3 |
+| 最佳实践方案 | `./skills/best-practice-solution/` | 给方案/选型/最佳实践/可靠方案/第三方评审/全量评审 | 四段双轨水线：Triage 分级→调研锚定→双栏草案→LIGHT 自检/FULL 多视角评审→收敛；缺省 LIGHT（≤2500 token，知识优先 web 条件化），黑名单/显式要求走 FULL（≤20000 token），来源分级 T1/T2/T3 |
+| 最佳实践方案·路由仲裁 | `./skills/best-practice-solution/` §1.2 | 互斥命中时 | `技术选型+需行业依据`→最佳实践方案；`ADR 正式化/编号/追溯`→`role-architecture`；`对已有代码/文档做评审、质量门禁`→多视角验证；无法判定取最严档（FULL 优先）并留痕 |
 
 ---
 
@@ -208,5 +210,5 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 
 ---
 
-**文档版本**：v21.7.4　**最后更新**：2026-08-19（新增「最佳实践方案」best-practice-solution 子技能：四段双轨水线 + §2.2-1 双栏模板增强带证据引用/置信度 + §4.1 嵌套能力表登记）
+**文档版本**：v21.7.5　**最后更新**：2026-08-19（最佳实践方案子技能 v1.2.0：LIGHT 纯本地档 + token 预算口径统一 + 评审三态统一 + 路由仲裁 + 安全约束清单统一；编排器 §4.1 增路由仲裁登记）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
