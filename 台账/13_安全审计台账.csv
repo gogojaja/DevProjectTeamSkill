@@ -23,3 +23,4 @@ OP-AUDIT-021,全局启用技能(macOS),~/.trae-cn/skills/ 重新同步最新源�
 OP-AUDIT-022,系统文件改写+推送(github),C:\Windows\System32\drivers\etc\hosts(github.com→140.82.112.4 拟覆盖),高,用户明确授权(方案2:临时hosts覆盖推送),是,D:\trae\DevProjectTeamSkill\.backup\hosts_20260817_145537.bak,2026-08-17 14:57:29,因权限不足未改写hosts；改用既有hosts覆盖(140.82.114.4 github.com)+flushdns，git push 成功(fa5c147..8dd06c0)；hosts维持原状无需还原
 OP-AUDIT-023,移动并改名项目外目录,D:\trae下两个中文目录(项目群管理csv)迁入DevProjectTeamSkill/program-management且文件名改英文+UTF-8,中,用户明确授权(改名+迁移指令),是,DevProjectTeamSkill/.backup/trae_external_20260818_151608/,2026-08-18 15:18:00,成功(4个csv迁入program-management;乱码副本丢弃;源目录已删除)
 OP-AUDIT-024,删除项目外文件,D:\trae\DevProjectTeamSkill_push.bundle(过时git bundle快照,2026-08-13,已落后origin/main),低,用户明确授权(清除多余文件),是,DevProjectTeamSkill/.backup/bundle_push_20260818_153110.bundle,2026-08-18 15:31:00,成功(冗余过时bundle已删;当前数据已在GitHub/Gitee同步)
+OP-AUDIT-025,修改项目外文件,~/.config/opencode/opencode.jsonc 配置 MCP 全局生效,中,用户明确授权,是,.backup/opencode.jsonc.bak.*,2026-08-20,成功
