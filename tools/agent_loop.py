@@ -26,6 +26,7 @@ import subprocess
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TOOLS = os.path.join(ROOT, "tools")
 LEDGER = os.path.join(ROOT, "台账", "34_控制环执行记录.csv")
+SYNC_LEDGER = os.path.join(ROOT, "台账", "32_镜像同步记录.csv")
 BOM = b"\xef\xbb\xbf"
 
 
@@ -84,9 +85,12 @@ def _git_has_changes(path):
 def _safe_git_commit(rid):
     env = dict(os.environ)
     env["AGENT_LOOP_ACTIVE"] = "1"
-    if not _git_has_changes(LEDGER):
+    # 连带提交 32_镜像同步记录（mirror_push 留痕），避免每次提交后台账脏残留；
+    # 凭据认证失败已由熔断器阻断不入台账，故无 Gitee 失败留痕被连带提交的风险。
+    changed = _git_has_changes(LEDGER) or _git_has_changes(SYNC_LEDGER)
+    if not changed:
         return False, "no_changes"
-    add = subprocess.run(["git", "add", LEDGER], cwd=ROOT, env=env,
+    add = subprocess.run(["git", "add", LEDGER, SYNC_LEDGER], cwd=ROOT, env=env,
                          capture_output=True, text=True, encoding="utf-8", errors="replace")
     if add.returncode != 0:
         return False, add.stderr.strip() or "git add failed"
