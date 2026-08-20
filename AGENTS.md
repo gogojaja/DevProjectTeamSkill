@@ -66,6 +66,8 @@ python tools/publish_production.py                # 跨平台/Windows 主推
 ```
 
 - 留档：`~/dev-project-team-skill/v<版本>/`（不可变）+ `~/dev-project-team-skill/current`（软链=最新稳定版）
+- **发布集（source of truth = 源码单源 + 配套工具/文档）**：角色包 ×10 + `references/` + `shared/` + `SKILL_INDEX.md` + **`tools/` + `docs/`**（SKILL_INDEX/SKILL.md 引用大量 `tools/*` 与 `docs/*`，必须随发布集输出，否则消费端按文档调用脚本路径不存在）。`publish_production`/`deploy_skills`/`solidify` 三套复制集统一（若改发布集必须三处同步）。
+- **脱敏门禁语义**：脱敏扫描覆盖**发布集全部源头**（`.trae/skills/` + `tools/` + `docs/`）；A 级**真实凭据**硬拦截（中止发布）；A 级**占位符**（`<...>`）与 `desensitize/desensitize.py` 规则定义示例输入、B 级**示例/公开信息**（GitHub 公网 IP、example 邮箱、示例路径）仅告警+清单，不阻断发布。
 - 其他项目 opencode 通过全局库自动发现生产技能；本项目开发用项目级三目录
 - 生产发布为外部目录操作，按铁律 #7/#7a `register_auth` 授权 + `.backup/` 备份 + 台账留痕
 

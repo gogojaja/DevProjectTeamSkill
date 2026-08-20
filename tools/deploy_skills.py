@@ -86,6 +86,13 @@ def deploy_target(target, roles):
     idx = os.path.join(SKILLS_DIR, 'SKILL_INDEX.md')
     if os.path.isfile(idx):
         shutil.copy(idx, os.path.join(target, 'SKILL_INDEX.md'))
+    # 配套工具与文档：SKILL_INDEX/SKILL.md 引用 tools/* 与 docs/*，随部署集一起输出
+    for extra in ('tools', 'docs'):
+        s = os.path.join(ROOT, extra)
+        if os.path.isdir(s):
+            shutil.copytree(s, os.path.join(target, extra),
+                            ignore=shutil.ignore_patterns('__pycache__', '*.pyc',
+                                                          '.DS_Store', 'dist', '_pkg_tmp'))
     ok = all(os.path.isfile(os.path.join(target, r, 'SKILL.md')) for r in roles)
     if ok:
         print(f'  ✓ 部署完成（{len(roles)} 包 + references + SKILL_INDEX.md）')

@@ -110,6 +110,9 @@ else
     for sub in references shared; do
       [[ -d "$SKILLS_DIR/$sub" ]] && cp -R "$SKILLS_DIR/$sub" "$VER_DIR/"
     done
+    for extra in tools docs; do
+      [[ -d "$ROOT/$extra" ]] && cp -R "$ROOT/$extra" "$VER_DIR/"
+    done
     [[ -f "$SKILLS_DIR/SKILL_INDEX.md" ]] && cp "$SKILLS_DIR/SKILL_INDEX.md" "$VER_DIR/"
     echo "  ✓ 版本目录已构建"
   fi
@@ -120,10 +123,8 @@ CURRENT="$TARGET_ROOT/current"
 if [[ $DRY_RUN -eq 1 ]]; then
   echo "  (dry-run) 将设置 current -> v$VERSION"
 else
-  TMP_LINK="$TARGET_ROOT/.current.tmp.$$"
-  rm -f "$TMP_LINK"
-  ln -s "v$VERSION" "$TMP_LINK"
-  mv -f "$TMP_LINK" "$CURRENT"
+  # macOS `mv -f` 覆盖符号链接会跟随目标而非替换链接，改用 ln -sfn 原子替换
+  ln -sfn "v$VERSION" "$CURRENT"
   echo "  ✓ current -> $(readlink "$CURRENT")"
 fi
 
@@ -138,6 +139,9 @@ else
   done
   for sub in references shared; do
     [[ -d "$SKILLS_DIR/$sub" ]] && cp -R "$SKILLS_DIR/$sub" "$GLOBAL_SKILLS/"
+  done
+  for extra in tools docs; do
+    [[ -d "$ROOT/$extra" ]] && cp -R "$ROOT/$extra" "$GLOBAL_SKILLS/"
   done
   [[ -f "$SKILLS_DIR/SKILL_INDEX.md" ]] && cp "$SKILLS_DIR/SKILL_INDEX.md" "$GLOBAL_SKILLS/"
   echo "  ✓ 已发布到全局库 $GLOBAL_SKILLS"

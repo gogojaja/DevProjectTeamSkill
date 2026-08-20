@@ -54,5 +54,5 @@
 ---
 
 **文档版本**：v21.8.0
-**最后更新**：2026-08-20（工具固化与真实 IP 推送固定动作：`tools/github_push.py` 一键真实 IP 推送 + `_gh_ip_probe.py` 公共探测 + `mirror_push --github-realip/--verify` 增强 + SYNC 幂等 + MCP 环境校准；编排器升 v21.8.0，见 `docs/复盘与工具固化方案_v21.8.0.md`）
+**最后更新**：2026-08-20（v21.8.1 生产发布集补全缺陷修复：`tools/` 与 `docs/` 纳入发布/部署/固化复制集，脱敏门禁扫描范围扩展并豁免规则示例，全局库按文档调用 `tools/github_push.py` 等路径可用）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

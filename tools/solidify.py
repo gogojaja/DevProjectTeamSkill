@@ -98,6 +98,13 @@ def snapshot(ver):
     idx = os.path.join(SKILLS_DIR, 'SKILL_INDEX.md')
     if os.path.isfile(idx):
         shutil.copy(idx, os.path.join(snap, 'SKILL_INDEX.md'))
+    # 配套工具与文档（SKILL_INDEX/SKILL.md 引用 tools/* 与 docs/*）
+    for extra in ('tools', 'docs'):
+        src = os.path.join(ROOT, extra)
+        if os.path.isdir(src):
+            shutil.copytree(src, os.path.join(snap, extra),
+                            ignore=shutil.ignore_patterns('__pycache__', '*.pyc',
+                                                          '.DS_Store', 'dist', '_pkg_tmp'))
     print(f'   ✓ 快照已生成 → {snap}')
 
 if __name__ == '__main__':

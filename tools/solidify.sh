@@ -179,6 +179,10 @@ else
     [[ -d "$SKILLS_DIR/$r" ]] && cp -R "$SKILLS_DIR/$r" "$SNAP_DIR/$r"
   done
   [[ -d "$SKILLS_DIR/references" ]] && cp -R "$SKILLS_DIR/references" "$SNAP_DIR/references"
+  # 配套工具与文档（SKILL_INDEX/SKILL.md 引用 tools/* 与 docs/*）
+  for extra in tools docs; do
+    [[ -d "$ROOT/$extra" ]] && cp -R "$ROOT/$extra" "$SNAP_DIR/$extra"
+  done
   [[ -f "$SKILLS_DIR/SKILL_INDEX.md" ]] && cp "$SKILLS_DIR/SKILL_INDEX.md" "$SNAP_DIR/SKILL_INDEX.md"
   echo "   ✓ ${SKILL_COUNT} 角色包 + references + SKILL_INDEX 快照已生成"
 fi

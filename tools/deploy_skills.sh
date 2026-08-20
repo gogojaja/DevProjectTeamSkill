@@ -151,6 +151,17 @@ deploy_target() {
     cp "$SKILLS_DIR/SKILL_INDEX.md" "$target/SKILL_INDEX.md"
   fi
 
+  # 同步配套工具与文档（SKILL_INDEX/SKILL.md 引用 tools/* 与 docs/*）
+  for extra in tools docs; do
+    if [[ -d "$ROOT/$extra" ]]; then
+      mkdir -p "$target/$extra"
+      while IFS= read -r -d '' f; do
+        rel="${f#"$ROOT/$extra/"}"; mkdir -p "$target/$extra/$(dirname "$rel")"
+        cp "$f" "$target/$extra/$rel"
+      done < <(find "$ROOT/$extra" -type f \( -name '*.pyc' -o -name '*.DS_Store' \) -prune -o -type f -print0 2>/dev/null)
+    fi
+  done
+
   # 部署校验
   local ok=1
   for r in "${ROLES[@]}"; do

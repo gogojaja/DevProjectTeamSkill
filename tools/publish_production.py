@@ -119,6 +119,14 @@ def copy_skills_to(dest):
     idx = os.path.join(SKILLS_DIR, "SKILL_INDEX.md")
     if os.path.isfile(idx):
         shutil.copy2(idx, os.path.join(dest, "SKILL_INDEX.md"))
+    # 配套工具与文档：SKILL_INDEX/SKILL.md 大量引用 tools/* 与 docs/*，
+    # 必须随发布集一起输出，否则消费端按文档调用脚本时路径不存在。
+    for extra in ("tools", "docs"):
+        s = os.path.join(ROOT, extra)
+        if os.path.isdir(s):
+            shutil.copytree(s, os.path.join(dest, extra), dirs_exist_ok=True,
+                            ignore=shutil.ignore_patterns("__pycache__", "*.pyc",
+                                                          ".DS_Store", "dist", "_pkg_tmp"))
     ok = all(os.path.isfile(os.path.join(dest, r, "SKILL.md")) for r in ALL_ROLES)
     if not ok:
         print("  ✗ 版本目录复制校验失败"); sys.exit(1)
@@ -139,7 +147,7 @@ def dir_hash(path):
 
 
 def is_placeholder(text):
-    """判断敏感匹配是否为占位符形式（<...> 或 ... 示例占位）。"""
+    """判断敏感匹配是否为占位符形式（<...>、示例值、规则样例输入等）。"""
     t = text.strip().strip('"\'')
     # 去掉 key= / key: 前缀后再判值是否为占位符
     if re.match(r'^[A-Za-z_][A-Za-z0-9_]*\s*[=:]\s*', t):
@@ -153,9 +161,16 @@ def is_placeholder(text):
         return True
     if re.fullmatch(r'\d+\.\d+\.\d+\.x', t):
         return True
-    if 'example' in t.lower() or 'sample' in t.lower() or 'placeholder' in t.lower():
+    # 规则定义/文档中的示例输入（正则样例值，非真实凭据）
+    if 'EXAMPLE' in t.upper() or 'sample' in t.lower() or 'placeholder' in t.lower():
         return True
-    if 'localhost' in t.lower() or t.startswith('/home/') or '/home/user/' in t:
+    if re.search(r'(\*{3}|\.{3})$', t):          # 掩码/截断样（*** 或 ...）
+        return True
+    if 'example' in t.lower() or 'localhost' in t.lower():
+        return True
+    if re.search(r'^-----BEGIN.*PRIVATE KEY-----', t):   # 私钥示例头
+        return True
+    if t.startswith('/home/') or '/home/user/' in t:
         return True
     return False
 
@@ -179,8 +194,14 @@ def parse_scan_report(path):
     return findings
 
 
+def is_rule_example(source):
+    """规则定义文件中的敏感命中视为示例输入（非真实凭据）。"""
+    s = source.replace("\\", "/")
+    return s.endswith("desensitize/desensitize.py") or "/desensitize/desensitize.py" in s
+
+
 def run_desensitize_gate(skills_dir=None, report_path=None):
-    """脱敏门禁：
+    """脱敏门禁（扫描发布集全部源头：skills + tools + docs）：
     - A 级真实凭据（非占位符）→ 返回 False（中止发布）
     - B 级 → 告警 + 清单，返回 True
     - A 级占位符（<...>）→ 提示，返回 True
@@ -193,19 +214,30 @@ def run_desensitize_gate(skills_dir=None, report_path=None):
         return True
     skills_dir = skills_dir or SKILLS_DIR
     report_path = report_path or os.path.join(ROOT, "scan_report_publish.csv")
-    if os.path.isfile(report_path):
-        os.remove(report_path)
-    subprocess.run([sys.executable, ds, "--scan", skills_dir, "--report", report_path],
-                   cwd=ROOT)
+    scan_targets = [skills_dir,
+                    os.path.join(ROOT, "tools"),
+                    os.path.join(ROOT, "docs")]
+    findings = []
+    for i, tgt in enumerate(scan_targets):
+        if not os.path.isdir(tgt):
+            continue
+        tmp_report = f"{report_path}.{i}"
+        if os.path.isfile(tmp_report):
+            os.remove(tmp_report)
+        subprocess.run([sys.executable, ds, "--scan", tgt, "--report", tmp_report],
+                       cwd=ROOT)
+        findings.extend(parse_scan_report(tmp_report))
+        if os.path.isfile(tmp_report):
+            os.remove(tmp_report)
     # A 级：真实凭据（非占位符）硬拦截
     a_real = []
     a_placeholder = []
     b_findings = []
-    if os.path.isfile(report_path):
-        findings = parse_scan_report(report_path)
-        a_real = [f for f in findings if f["level"] == "A" and not is_placeholder(f["match"])]
-        a_placeholder = [f for f in findings if f["level"] == "A" and is_placeholder(f["match"])]
-        b_findings = [f for f in findings if f["level"] == "B"]
+    a_real = [f for f in findings if f["level"] == "A" and not is_placeholder(f["match"])
+              and not is_rule_example(f["source"])]
+    a_placeholder = [f for f in findings if f["level"] == "A"
+                     and (is_placeholder(f["match"]) or is_rule_example(f["source"]))]
+    b_findings = [f for f in findings if f["level"] == "B"]
     passed = True
     if a_real:
         print(f"  ✗ 脱敏扫描发现 {len(a_real)} 处 A 级真实凭据，发布中止：")

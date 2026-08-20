@@ -16,8 +16,10 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.8.0
+- **技能版本**：v21.8.1
 - **版本发布日期**：2026-08-20
+- **版本变更记录**：
+  - v21.8.1：生产发布集补全缺陷修复（2026-08-20）——修复 `tools/`（github_push.py/_gh_ip_probe.py 等）与 `docs/`（github_ip_records.csv 等）未纳入发布/部署/固化复制集、全局库按文档调用工具路径不存在的缺陷；`publish_production`/`deploy_skills`/`solidify` 复制集统一纳入 tools+docs，脱敏门禁扫描范围扩展至 tools/docs 并豁免规则定义示例与占位符；版本目录、项目级三目录、全局库同步生效。
 - **版本变更记录**：
   - v21.8.0：工具固化与真实 IP 推送固定动作（2026-08-20）——新增 `tools/github_push.py`（候选 IP→可达+TLS 证书合法探测→绑定真实 IP push origin，`--dry-run` 预览）与公共探测模块 `tools/_gh_ip_probe.py`（供 github_ip_refresh/github_push 复用）；`mirror_push.py --github-realip` 双推时 origin 网络失败自动真实 IP 回退且推送成功后清除熔断冷却；`--verify` 增强为「启动即双端同步检查」（fetch+对比领先/落后，分叉即阻断推送）；SYNC 台账编号幂等（解析 max 编号取 +1）；opencode.json MCP 命令 uv→py 环境校准；AGENTS.md 登记固定动作 P-001（减少反复手动操作）。
   - v21.7.5：最佳实践方案子技能 v1.2.0 迭代（2026-08-19）——第二轮五视角评审 49 条意见落地：LIGHT 增纯本地档（知识优先、web 条件化）、统一 token 预算口径（FULL＝调研6000＋评审6000＋外部核验4000＋收敛4000，含工具 context）、评审决策统一 SIGNED_OFF/CHANGES_REQUESTED/BLOCKED 三态并引用 MPV 决策矩阵、Triage 增第 4 问选型锁定判据 + 黑名单量化、§4.1 增最佳实践方案路由仲裁（技术选型→BPS/ADR→role-architecture/代码评审→MPV）、SSRF 约束统一清单（含 IPv6/link-local/编码混淆/重定向复检）、涉密只出不进、confidence 映射表与 INSUFFICIENT 计数口径、T3 降级为反向信号、证据卡 timeliness 字段、closure 模板引用。
@@ -211,5 +213,5 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 
 ---
 
-**文档版本**：v21.8.0　**最后更新**：2026-08-20（工具固化与真实 IP 推送固定动作：github_push.py + _gh_ip_probe.py 公共探测 + mirror_push --github-realip/--verify 增强 + SYNC 幂等 + MCP 环境校准）
+**文档版本**：v21.8.1　**最后更新**：2026-08-20（生产发布集补全缺陷修复：tools/docs 纳入发布/部署/固化复制集 + 脱敏门禁扫描范围扩展与规则示例豁免）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
