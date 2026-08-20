@@ -114,3 +114,7 @@ SYNC-20260820-112,2026-08-20 06:49:40,5f64d569267d,origin,https://github.com/gog
 SYNC-20260820-113,2026-08-20 06:49:40,5f64d569267d,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,1.5,   8441001..5f64d56  main -> main
 SYNC-20260820-114,2026-08-20 07:31:38,1a1a29392fc7,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,失败,60.4,fatal: unable to access 'https://github.com/gogojaja/DevProjectTeamSkill.git/': Operation too slow. Less than 1000 bytes/sec transferred the last 60 seconds
 SYNC-20260820-115,2026-08-20 07:31:38,1a1a29392fc7,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,1.2,   5f64d56..1a1a293  main -> main
+SYNC-20260820-116,2026-08-20 08:57:23,5d75dbdb7b58,origin,https://github.com/***/DevProjectTeamSkill.git,失败,2.7,hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+SYNC-20260820-117,2026-08-20 08:57:23,5d75dbdb7b58,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,失败,1.2,hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+SYNC-20260820-118,2026-08-20 09:01:51,84fdc0117037,origin,https://github.com/***/DevProjectTeamSkill.git,失败,2.0,hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+SYNC-20260820-119,2026-08-20 09:01:51,84fdc0117037,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,失败,1.1,hint: See the 'Note about fast-forwards' in 'git push --help' for details.
