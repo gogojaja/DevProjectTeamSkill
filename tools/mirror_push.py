@@ -10,7 +10,9 @@ mirror_push.py — 国内镜像同步（地缘风险对冲）双推工具
 - 认证失败（Authentication failed / 403 / 等）→ 对目标 remote 置「阻断」状态，
   后续运行**直接跳过不再重试**，也不写 32 台账（凭据留痕不入库）。
   仅当凭据更新（token 哈希变化）或显式 --force/--unblock 才解除。
-- 网络/其他失败（连接重置/超时/DNS 等）→ 置「冷却」状态（默认 15 分钟），
+- 网络/其他失败（连接重置/超时/DNS 等）→ **默认自动真实 IP 回退**（P-001：
+  origin/github 先试上次成功 IP 缓存，失效则探测候选「可达+TLS 证书合法」IP 绑定推送，
+  `--no-realip` 关闭）→ 仍失败才置「冷却」状态（默认 15 分钟），
   冷却期内跳过不重试（避免 flapping 时每次提交都重试并污染台账）。
 - 无新提交（Everything up-to-date）→ 视为「已同步」，跳过且不写台账，
   避免每次提交后钩子自动双推时再留痕造成脏工作区。
@@ -27,11 +29,12 @@ mirror_push.py — 国内镜像同步（地缘风险对冲）双推工具
 - 远程 URL 入台账前一律脱敏（掩去 user:token）。
 
 用法（跨平台）：
-  py -3.11 tools/mirror_push.py                # Windows
-  python3 tools/mirror_push.py                 # macOS / Linux
+  py -3.11 tools/mirror_push.py                # Windows（默认网络失败自动真实 IP 回退）
+  python3 tools/mirror_push.py                 # macOS / Linux（同上）
 py -3.11 tools/mirror_push.py origin mirror  # 指定 remote 列表
    py -3.11 tools/mirror_push.py --verify       # 仅校验各 remote 与本地 HEAD 是否一致
    py -3.11 tools/mirror_push.py --force        # 无视阻断/冷却，立即重试
+   py -3.11 tools/mirror_push.py --no-realip    # 关闭 origin/github 网络失败时的真实 IP 自动回退（默认开启）
    py -3.11 tools/mirror_push.py --status       # 查看各 remote 阻断/冷却状态
    py -3.11 tools/mirror_push.py --unblock mirror  # 解除指定 remote 阻断/冷却
    py -3.11 tools/mirror_push.py --unblock      # 解除全部
@@ -84,13 +87,17 @@ TOKEN_ENV = {
 }
 
 
-def _run(cmd, extra_env=None):
+def _run(cmd, extra_env=None, timeout=None):
     env = dict(os.environ)
     if extra_env:
         env.update(extra_env)
-    # encoding=utf-8 + errors=replace：避免 Windows 默认 GBK 解码 git UTF-8 输出时抛 UnicodeDecodeError
-    return subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True,
-                          encoding="utf-8", errors="replace", env=env)
+    try:
+        # encoding=utf-8 + errors=replace：避免 Windows 默认 GBK 解码 git UTF-8 输出时抛 UnicodeDecodeError
+        return subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True,
+                              encoding="utf-8", errors="replace", env=env, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        from types import SimpleNamespace
+        return SimpleNamespace(returncode=124, stdout="", stderr="[timeout %ss]" % timeout)
 
 
 def _branch():
@@ -137,9 +144,13 @@ def _push_one(remote, branch):
             orig = "%s://%s/" % (proto, host)
             extra_args = ["-c", "url.%s.insteadOf=%s" % (instead, orig)]
 
-    cmd = ["git", *extra_args, "push", remote, branch]
+    cmd = ["git", *extra_args,
+           "-c", "http.connectTimeout=12",
+           "-c", "http.lowSpeedLimit=1000",
+           "-c", "http.lowSpeedTime=30",
+           "push", remote, branch]
     start = datetime.datetime.now()
-    res = _run(cmd)
+    res = _run(cmd, timeout=40)
     elapsed = (datetime.datetime.now() - start).total_seconds()
     ok = res.returncode == 0
     out = (res.stdout + res.stderr).strip()
@@ -158,6 +169,47 @@ def _classify_failure(msg):
     if NET_FAIL_RE.search(m):
         return "network"
     return "other"
+
+
+IP_CACHE_FILE = os.path.join(ROOT, ".secrets", "gh_push_ip_cache.txt")
+
+
+def _read_ip_cache():
+    """读取上次真实 IP 回退成功的 github.com IP（加速后续回退，避免每次全量探测）。"""
+    try:
+        with io.open(IP_CACHE_FILE, "r", encoding="utf-8") as f:
+            ip = f.read().strip()
+        return ip if ip else None
+    except Exception:
+        return None
+
+
+def _write_ip_cache(ip):
+    try:
+        os.makedirs(os.path.dirname(IP_CACHE_FILE), exist_ok=True)
+        with io.open(IP_CACHE_FILE, "w", encoding="utf-8") as f:
+            f.write(ip)
+    except Exception:
+        pass
+
+
+def _real_ip_push(remote, branch, token, user, cached_ip):
+    """真实 IP 回退推送 github 类 remote。先试缓存 IP（免探测），失败则探测候选。
+    返回 (ok, msg, elapsed)；ok=False 时 msg 为最终失败信息。"""
+    if cached_ip:
+        ok, msg, el = gp._push_with_ip(cached_ip, branch, token, user, timeout=15)
+        if ok:
+            return True, "PUSH_OK %s (cached): %s" % (cached_ip, msg), el
+        print("[回退] 缓存 IP %s 失效：%s" % (cached_ip, msg))
+    print("[回退] %s 网络失败，探测 github.com 真实 IP ..." % remote)
+    ip = gp.probe_best_github_ip()
+    if not ip:
+        return False, "无可用 github.com 真实 IP（候选全部不可达）", 0.0
+    ok, msg, el = gp._push_with_ip(ip, branch, token, user, timeout=40)
+    if ok:
+        _write_ip_cache(ip)
+        return True, "PUSH_OK %s: %s" % (ip, msg), el
+    return False, "IP=%s: %s" % (ip, msg), el
 
 
 def _token_hash(token):
@@ -298,7 +350,11 @@ def main():
     force = "--force" in argv
     status_only = "--status" in argv
     unblock = "--unblock" in argv
-    github_realip = "--github-realip" in argv
+    github_realip = True
+    if "--no-realip" in argv or "-r" in argv:
+        github_realip = False
+    elif "--github-realip" in argv:
+        github_realip = True
 
     if status_only:
         return _status(args)
@@ -384,23 +440,19 @@ def main():
                 print("[阻断] %s：凭据认证失败，已停止重试。请更新凭据（.secrets/<remote>_token 或环境变量）后自动解除，"
                       "或 --force 立即重试，或 --unblock 手动解除。" % remote)
             else:
-                # ---- 网络类失败：启用 --github-realip 且为 GitHub 类 remote 时，真实 IP 回退（P-001）----
+                # ---- 网络类失败：默认自动真实 IP 回退（P-001，--no-realip 可关）----
                 ok2 = False
                 if github_realip and remote in ("origin", "github"):
                     print("[回退] %s 网络失败，尝试真实 IP 推送 ..." % remote)
-                    ip = gp.probe_best_github_ip()
-                    if ip:
-                        ok2, msg2, elapsed2 = gp._push_with_ip(ip, branch, token, user)
-                        if ok2:
-                            state.pop(remote, None)
-                            rows.append([sid, now_str, head[:12], remote, _mask(url),
-                                         "成功", "%.1f" % elapsed2,
-                                         "真实IP回退 PUSH_OK %s: %s" % (ip, msg2)])
-                            print("[成功] %s：真实IP回退 PUSH_OK %s (%.1fs)" % (remote, ip, elapsed2))
-                            continue
-                        msg = msg2
-                        elapsed = elapsed2
-                        print("[回退失败] IP=%s：%s" % (ip, msg2))
+                    ok2, msg2, elapsed2 = _real_ip_push(
+                        remote=remote, branch=branch, token=token, user=user,
+                        cached_ip=_read_ip_cache())
+                    if ok2:
+                        state.pop(remote, None)
+                        rows.append([sid, now_str, head[:12], remote, _mask(url),
+                                     "成功", "%.1f" % elapsed2, msg2])
+                        print("[成功] %s：真实IP回退 %s (%.1fs)" % (remote, msg2, elapsed2))
+                        continue
                 if not ok2:
                     state[remote] = {"blocked": False, "reason": cls, "message": msg,
                                      "cooldown_until": (now + datetime.timedelta(seconds=NETWORK_COOLDOWN)).strftime("%Y-%m-%d %H:%M:%S"),

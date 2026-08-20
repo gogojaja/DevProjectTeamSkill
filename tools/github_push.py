@@ -47,12 +47,16 @@ except ImportError:
     from _gh_ip_probe import probe_best_github_ip
 
 
-def _run(cmd, extra_env=None):
+def _run(cmd, extra_env=None, timeout=None):
     env = dict(os.environ)
     if extra_env:
         env.update(extra_env)
-    return subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True,
-                          encoding="utf-8", errors="replace", env=env)
+    try:
+        return subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True,
+                              encoding="utf-8", errors="replace", env=env, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        from types import SimpleNamespace
+        return SimpleNamespace(returncode=124, stdout="", stderr="[timeout %ss]" % timeout)
 
 
 def _branch():
@@ -117,7 +121,7 @@ def _clear_proxy():
         os.environ.pop(k, None)
 
 
-def _push_with_ip(ip, branch, token, user):
+def _push_with_ip(ip, branch, token, user, timeout=40):
     """用指定 IP 绑定推送 origin（token 经 insteadOf 注入，不持久化）。返回 (ok, msg, elapsed)。"""
     extra_args = []
     if token:
@@ -131,9 +135,12 @@ def _push_with_ip(ip, branch, token, user):
             extra_args = ["-c", "url.%s.insteadOf=%s" % (instead, orig)]
     cmd = ["git", *extra_args,
            "-c", "http.curloptResolve=github.com:443:%s" % ip,
+           "-c", "http.connectTimeout=12",
+           "-c", "http.lowSpeedLimit=1000",
+           "-c", "http.lowSpeedTime=30",
            "push", "origin", branch]
     start = datetime.datetime.now()
-    res = _run(cmd)
+    res = _run(cmd, timeout=timeout)
     elapsed = (datetime.datetime.now() - start).total_seconds()
     ok = res.returncode == 0
     out = (res.stdout + res.stderr).strip()

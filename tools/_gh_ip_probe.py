@@ -10,6 +10,7 @@
 """
 from __future__ import annotations
 
+import os
 import socket
 import ssl
 import subprocess
@@ -37,10 +38,11 @@ def probe_tls(ip: str, host: str = "github.com", timeout: int = 8):
 
 
 def probe_reachability(ip: str, host: str = "github.com") -> str:
-    """curl 可达性探测，返回 HTTP 状态码字符串或 ERR。"""
+    """curl 可达性探测，返回 HTTP 状态码字符串或 ERR。跨平台：Windows 用 curl.exe，其它平台用 curl。"""
+    curl = "curl.exe" if os.name == "nt" else "curl"
     try:
         r = subprocess.run(
-            ["curl.exe", "-s", "-o", "NUL", "-w", "%{http_code}",
+            [curl, "-s", "-o", "NUL", "-w", "%{http_code}",
              "--connect-timeout", "6", "--resolve", "%s:443:%s" % (host, ip),
              "https://%s" % host],
             capture_output=True, text=True, timeout=12,

@@ -78,7 +78,7 @@ python tools/excel_to_csv.py            # 迁移存量 xlsx→csv
 python tools/github_push.py --dry-run   # GitHub 真实 IP 推送：dry-run 预览（仅探测，不推送）
 python tools/github_push.py             # GitHub 真实 IP 一键推送（固定动作：候选IP→可达+TLS证书合法探测→绑定真实IP push origin）
 python tools/mirror_push.py --verify    # 双端同步检查（会话启动必经步骤：fetch origin+mirror → 对比领先/落后，分叉即阻断推送）
-python tools/mirror_push.py --github-realip  # 双推时 origin 网络失败自动真实 IP 回退（推送成功后清除冷却）
+python tools/mirror_push.py             # 双推：origin(GitHub) 网络失败默认自动真实 IP 回退（先缓存 IP 再探测；--no-realip 关闭）
 python tools/desensitize/desensitize.py --scan <目标>  # 文档脱敏：扫描模式
 python tools/desensitize/desensitize.py <目标> -o <输出>  # 文档脱敏：按内置规则批量替换
 python tools/desensitize/desensitize.py --dictionary tools/desensitize/desensitize_dictionary.csv <目标> -o <输出>  # 文档脱敏：规则 + 脱敏字典关键字联合脱敏（字典维护见 tools/desensitize/DESENSITIZE_DICTIONARY.md）
@@ -97,7 +97,7 @@ git commit                              # 每原子改动一次提交（钩子�
 
 ## GitHub 访问异常处理规则（win32 / macOS / PowerShell / zsh 环境）
 
-> **固定动作（P-001，减少反复操作）**：GitHub push 一律优先用 `py -3.11 tools/github_push.py`（自动探测可达+证书合法 IP → 绑定真实 IP push origin）；双推场景用 `py -3.11 tools/mirror_push.py --github-realip`（origin 网络失败自动回退真实 IP）。手动 `git push origin` 仅在该命令失效后用于人工兜底。
+> **固定动作（P-001，减少反复操作）**：GitHub push 一律优先用 `py -3.11 tools/github_push.py`（自动探测可达+证书合法 IP → 绑定真实 IP push origin）；双推场景用 `py -3.11 tools/mirror_push.py`（origin 网络失败**默认自动**回退真实 IP——先试上次成功 IP 缓存、失效再探测候选；`--no-realip` 才关闭）。手动 `git push origin` 仅在该命令失效后用于人工兜底。
 
 本机访问 `github.com:443` 偶发 DNS 解析到坏 IP 或全部候选 IP 不可达，最常见根因是 DNS 实效，导致远端环境无法访问。故障现象：`Failed to connect` / `Could not connect` / `Recv failure: Connection was reset` / `nc: connection failed, SOCKS error 2`。
 
@@ -227,7 +227,7 @@ GitHub 为境外服务器，**网络访问不稳定 + 存在地缘政治风险**
 
 ### 1. 同步策略（双推为主，定时校验为辅）
 - **主策略：每次提交双推** `origin`(GitHub) + `mirror`(Gitee)。用 `tools/mirror_push.py` 逐目标推送，**单目标失败不阻断另一个**，并写 `台账/32_镜像同步记录.csv` 留痕。
-- **熔断器（杜绝反复重试）**：`mirror_push.py` 内置熔断，凭据认证失败（Authentication failed/403 等）→ 对目标 remote 置**阻断**状态，此后直接跳过**不再重试**、也不写 32 台账（凭据失败留痕不入库）；仅当凭据更新（token 哈希变化）或 `--force`/`--unblock` 才解除。网络/其他失败（连接重置/超时/DNS）→ 置**冷却**（默认 15 分钟），冷却期内跳过不重试。状态存 `.secrets/mirror_push_state.json`（gitignore）。辅助命令：`--force`（立即重试）、`--status`（查看状态）、`--unblock <remote|all>`（解除）。退出码 0=成功 / 1=本次尝试失败 / 2=全部被阻断或冷却跳过。
+- **熔断器（杜绝反复重试）**：`mirror_push.py` 内置熔断，凭据认证失败（Authentication failed/403 等）→ 对目标 remote 置**阻断**状态，此后直接跳过**不再重试**、也不写 32 台账（凭据失败留痕不入库）；仅当凭据更新（token 哈希变化）或 `--force`/`--unblock` 才解除。网络/其他失败（连接重置/超时/DNS）→ **默认自动真实 IP 回退**（先试 `.secrets/gh_push_ip_cache.txt` 成功 IP，失效探测候选；`--no-realip` 关闭）→ 仍失败才置**冷却**（默认 15 分钟），冷却期内跳过不重试。状态存 `.secrets/mirror_push_state.json`（gitignore）。辅助命令：`--force`（立即重试）、`--status`（查看状态）、`--unblock <remote|all>`（解除）。退出码 0=成功 / 1=本次尝试失败 / 2=全部被阻断或冷却跳过。
 - **辅策略：Gitee 侧「仓库同步」** 周期性从 GitHub 拉取兜底（即使本机某次双推遗漏，也能补回）；也可在 Gitee 创建仓库时「从 GitHub 导入」。
 - 不要依赖「本机定时从 GitHub 拉取再推国内」作为唯一手段——本机访问 GitHub 本身会 flapping，反而单点失败。
 
