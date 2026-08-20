@@ -69,11 +69,24 @@ def read_github_ips(max_candidates: int = 12) -> list:
 
 
 def probe_best_github_ip(max_candidates: int = 8, timeout: int = 8):
-    """返回首个「可达+证书合法」的 github.com IP；无则返回 None（命中即短路，不串行探测全部）。"""
+    """返回首个「可达+证书合法」的 github.com IP；无则返回 None（命中即短路，不串行探测全部）。
+
+    双重探测：TLS 证书合法（SNI=github.com）仅为前提，还必须 curl 实际 HTTP 请求成功
+    （返回真实状态码 2xx/3xx/4xx）——仅 TCP/TLS 握手成功但路由会丢弃真实请求的 IP
+    视为不可用（如 20.205.243.166 曾出现 TLS 可握手、push 却 Connection reset）。
+    """
     for ip in read_github_ips(max_candidates):
         tcp, cert_ok, _ = probe_tls(ip, timeout=timeout)
-        if tcp and cert_ok:
-            return ip
+        if not (tcp and cert_ok):
+            continue
+        code = probe_reachability(ip)
+        if code in ("ERR", "000", ""):
+            continue
+        try:
+            if 200 <= int(code) < 500:
+                return ip
+        except ValueError:
+            continue
     return None
 
 
