@@ -1,0 +1,7 @@
+﻿决策编号,决策名称,决策类型,状态,采纳方案,替代方案,关键权衡,相关ADR,影响的质量属性,风险等级,登记日期
+ADR-001,核心调度引擎选型,技术选型,已采纳,APScheduler 3.x,系统cron/Celery Beat/Airflow/自研,功能丰富度 vs 资源消耗,ADR-001-scheduler-engine,可靠性/可维护性/跨平台兼容性,低,2026-08-21
+ADR-002,存储策略选型,技术选型,已采纳,SQLite+CSV分层存储,纯SQLite/纯CSV/JSON/外部数据库,性能 vs 可读性/一致性,ADR-002-storage-strategy,可靠性/可维护性/性能,低,2026-08-21
+ADR-003,幂等校验策略,架构决策,已采纳,框架层强制幂等校验,业务自行实现/可选使用,可靠性 vs 易用性,ADR-003-idempotency-enforcement,可靠性/安全性/可维护性,中,2026-08-21
+ADR-004,重试与死信策略,架构决策,已采纳,指数退避+抖动+死信队列,固定延迟/无限重试/无死信,可靠性 vs 资源消耗,ADR-004-retry-dlq-strategy,可靠性/性能/可观测性,低,2026-08-21
+ADR-005,部署架构选择,架构决策,已采纳,单进程架构,分布式架构/多进程架构,简单性 vs 可扩展性,ADR-005-single-process-architecture,可靠性/可维护性/性能/可扩展性,中,2026-08-21
+ADR-006,TRAE集成方案,架构决策,已采纳,双层架构(TRAE入口+APScheduler引擎),纯TRAE/纯APScheduler,用户体验 vs 可靠性,ADR-006-trae-schedule-dual-layer,可维护性/可靠性/易用性,中,2026-08-21
