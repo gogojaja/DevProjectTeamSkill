@@ -156,3 +156,5 @@ SYNC-20260820-155,2026-08-20 21:46:13,f4e5116097b0,origin,https://github.com/gog
 SYNC-20260820-156,2026-08-20 21:46:13,f4e5116097b0,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,2.5,   5557ac2..f4e5116  main -> main
 SYNC-20260821-157,2026-08-21 06:29:32,472715dfd8c1,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,成功,2.5,   f4e5116..472715d  main -> main
 SYNC-20260821-158,2026-08-21 06:29:32,472715dfd8c1,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,2.7,   f4e5116..472715d  main -> main
+SYNC-20260821-159,2026-08-21 06:38:49,e0e91ff19ee3,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,失败,60.4,fatal: unable to access 'https://github.com/gogojaja/DevProjectTeamSkill.git/': Operation too slow. Less than 1000 bytes/sec transferred the last 60 seconds
+SYNC-20260821-160,2026-08-21 06:38:49,e0e91ff19ee3,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,1.1,   472715d..e0e91ff  main -> main
