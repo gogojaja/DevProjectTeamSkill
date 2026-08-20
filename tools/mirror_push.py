@@ -51,6 +51,13 @@ import hashlib
 import datetime
 import subprocess
 
+# GitHub 真实 IP 推送公共逻辑（P-001）：网络失败时 origin/github 走真实 IP 回退
+try:
+    import github_push as gp
+except ImportError:
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import github_push as gp
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LEDGER = os.path.join(ROOT, "台账", "32_镜像同步记录.csv")
 STATE_FILE = os.path.join(ROOT, ".secrets", "mirror_push_state.json")
@@ -211,12 +218,16 @@ def _unblock(remotes):
 
 
 def _next_seq():
+    """幂等序号（P-005）：解析 SYNC-YYYYMMDD-NNN 取 max+1，避免双端并发追加冲突。"""
     if not os.path.exists(LEDGER):
         return 1
+    maxn = 0
     with io.open(LEDGER, "r", encoding="utf-8-sig") as f:
-        lines = [l for l in f.read().splitlines() if l.strip()]
-    # 数据行数（去掉表头）
-    return max(0, len(lines) - 1) + 1
+        for line in f:
+            m = re.search(r"SYNC-\d{8}-(\d+)", line)
+            if m:
+                maxn = max(maxn, int(m.group(1)))
+    return maxn + 1
 
 
 def _append_ledger(rows):
@@ -231,6 +242,7 @@ def _append_ledger(rows):
 
 
 def _verify(remotes, branch):
+    """启动即双端同步检查（P-002）：fetch 后对比本地与各远端领先/落后，存在分叉即阻断推送。"""
     head = _head()
     print("本地 HEAD: %s" % head[:12])
     all_ok = True
@@ -241,9 +253,21 @@ def _verify(remotes, branch):
         _run(["git", "fetch", remote, branch])
         r = _run(["git", "rev-parse", "%s/%s" % (remote, branch)])
         rh = r.stdout.strip()
-        same = rh == head
-        all_ok = all_ok and same
-        print("  [%s] remote=%s -> %s" % (remote, rh[:12] if rh else "?", "一致" if same else "不一致(待推送)"))
+        if not rh:
+            print("  [%s] ⚠️ remote 无该分支，无法对比" % remote)
+            all_ok = False
+            continue
+        if rh == head:
+            print("  [%s] 与本地一致 (HEAD=%s)" % (remote, head[:12]))
+            continue
+        behind = _run(["git", "rev-list", "--count", "HEAD..%s/%s" % (remote, branch)]).stdout.strip()
+        ahead = _run(["git", "rev-list", "--count", "%s/%s..HEAD" % (remote, branch)]).stdout.strip()
+        if behind and behind != "0":
+            print("  [%s] ⚠️ 远端领先 %s 提交（本地落后）——存在分叉，禁止直接推送！" % (remote, behind))
+            print("      处理：git fetch %s && git merge %s/%s（或 rebase）后再推" % (remote, remote, branch))
+            all_ok = False
+        else:
+            print("  [%s] 本地领先 %s 提交，可推送 (远端=%s)" % (remote, ahead, rh[:12]))
     return 0 if all_ok else 1
 
 
@@ -274,6 +298,7 @@ def main():
     force = "--force" in argv
     status_only = "--status" in argv
     unblock = "--unblock" in argv
+    github_realip = "--github-realip" in argv
 
     if status_only:
         return _status(args)
@@ -359,14 +384,32 @@ def main():
                 print("[阻断] %s：凭据认证失败，已停止重试。请更新凭据（.secrets/<remote>_token 或环境变量）后自动解除，"
                       "或 --force 立即重试，或 --unblock 手动解除。" % remote)
             else:
-                state[remote] = {"blocked": False, "reason": cls, "message": msg,
-                                 "cooldown_until": (now + datetime.timedelta(seconds=NETWORK_COOLDOWN)).strftime("%Y-%m-%d %H:%M:%S"),
-                                 "updated_at": now_str}
-                failed += 1
-                rows.append([sid, now_str, head[:12], remote, _mask(url),
-                             "失败", "%.1f" % elapsed, msg])
-                print("[失败] %s：%s (%.1fs)" % (remote, msg, elapsed))
-                print("  详情：%s" % msg)
+                # ---- 网络类失败：启用 --github-realip 且为 GitHub 类 remote 时，真实 IP 回退（P-001）----
+                ok2 = False
+                if github_realip and remote in ("origin", "github"):
+                    print("[回退] %s 网络失败，尝试真实 IP 推送 ..." % remote)
+                    ip = gp.probe_best_github_ip()
+                    if ip:
+                        ok2, msg2, elapsed2 = gp._push_with_ip(ip, branch, token, user)
+                        if ok2:
+                            state.pop(remote, None)
+                            rows.append([sid, now_str, head[:12], remote, _mask(url),
+                                         "成功", "%.1f" % elapsed2,
+                                         "真实IP回退 PUSH_OK %s: %s" % (ip, msg2)])
+                            print("[成功] %s：真实IP回退 PUSH_OK %s (%.1fs)" % (remote, ip, elapsed2))
+                            continue
+                        msg = msg2
+                        elapsed = elapsed2
+                        print("[回退失败] IP=%s：%s" % (ip, msg2))
+                if not ok2:
+                    state[remote] = {"blocked": False, "reason": cls, "message": msg,
+                                     "cooldown_until": (now + datetime.timedelta(seconds=NETWORK_COOLDOWN)).strftime("%Y-%m-%d %H:%M:%S"),
+                                     "updated_at": now_str}
+                    failed += 1
+                    rows.append([sid, now_str, head[:12], remote, _mask(url),
+                                 "失败", "%.1f" % elapsed, msg])
+                    print("[失败] %s：%s (%.1fs)" % (remote, msg, elapsed))
+                    print("  详情：%s" % msg)
 
     _save_state(state)
     if rows:

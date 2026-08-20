@@ -100,4 +100,11 @@
 
 ---
 
-**文档版本**：v21.7.5 ｜ **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
+## [v21.8.0] - 2026-08-20 - 工具固化与 GitHub 真实 IP 推送固定动作
+
+- **dev-project-team-skill 升 v21.8.0**（2026-08-20）：新增 `tools/github_push.py`（候选 IP→可达+TLS 证书合法探测→绑定真实 IP push origin，`--dry-run` 预览）+ 公共探测模块 `tools/_gh_ip_probe.py`（供 github_ip_refresh/github_push 复用）；`mirror_push.py --github-realip` 双推时 origin 网络失败自动真实 IP 回退且推送成功清除熔断冷却；`--verify` 增强为「启动即双端同步检查」（fetch+对比领先/落后，分叉即阻断推送）；SYNC 台账编号幂等（解析 max 编号取 +1）；opencode.json MCP 命令 uv→py 环境校准；AGENTS.md 登记固定动作 P-001（GitHub push 优先真实 IP，减少反复操作）。
+- **复盘与工具固化方案 v21.8.0**：`docs/复盘与工具固化方案_v21.8.0.md`（5 项提案 P-001~P-005）+ 五视角评审报告（SIGNED_OFF，评审报告 CSV）。
+
+---
+
+**文档版本**：v21.8.0 ｜ **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

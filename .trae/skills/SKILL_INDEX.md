@@ -53,6 +53,6 @@
 
 ---
 
-**文档版本**：v21.7.5
-**最后更新**：2026-08-19（新增去水印工具 v1.0.0 `tools/remove_watermark`：6 类格式处理器 + .sh/.ps1 封装；文档脱敏工具 v1.1.0：新增脱敏字典 `DESENSITIZE_DICTIONARY.md` + `desensitize_dictionary.csv` + `--dictionary` 参数；best-practice-solution 升级 v1.2.0：4 问分级 + LIGHT 纯本地档 + 预算口径统一 + 三态聚合矩阵 + 路由仲裁）
+**文档版本**：v21.8.0
+**最后更新**：2026-08-20（工具固化与真实 IP 推送固定动作：`tools/github_push.py` 一键真实 IP 推送 + `_gh_ip_probe.py` 公共探测 + `mirror_push --github-realip/--verify` 增强 + SYNC 幂等 + MCP 环境校准；编排器升 v21.8.0，见 `docs/复盘与工具固化方案_v21.8.0.md`）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

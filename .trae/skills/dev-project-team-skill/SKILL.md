@@ -16,9 +16,10 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.7.5
-- **版本发布日期**：2026-08-19
+- **技能版本**：v21.8.0
+- **版本发布日期**：2026-08-20
 - **版本变更记录**：
+  - v21.8.0：工具固化与真实 IP 推送固定动作（2026-08-20）——新增 `tools/github_push.py`（候选 IP→可达+TLS 证书合法探测→绑定真实 IP push origin，`--dry-run` 预览）与公共探测模块 `tools/_gh_ip_probe.py`（供 github_ip_refresh/github_push 复用）；`mirror_push.py --github-realip` 双推时 origin 网络失败自动真实 IP 回退且推送成功后清除熔断冷却；`--verify` 增强为「启动即双端同步检查」（fetch+对比领先/落后，分叉即阻断推送）；SYNC 台账编号幂等（解析 max 编号取 +1）；opencode.json MCP 命令 uv→py 环境校准；AGENTS.md 登记固定动作 P-001（减少反复手动操作）。
   - v21.7.5：最佳实践方案子技能 v1.2.0 迭代（2026-08-19）——第二轮五视角评审 49 条意见落地：LIGHT 增纯本地档（知识优先、web 条件化）、统一 token 预算口径（FULL＝调研6000＋评审6000＋外部核验4000＋收敛4000，含工具 context）、评审决策统一 SIGNED_OFF/CHANGES_REQUESTED/BLOCKED 三态并引用 MPV 决策矩阵、Triage 增第 4 问选型锁定判据 + 黑名单量化、§4.1 增最佳实践方案路由仲裁（技术选型→BPS/ADR→role-architecture/代码评审→MPV）、SSRF 约束统一清单（含 IPv6/link-local/编码混淆/重定向复检）、涉密只出不进、confidence 映射表与 INSUFFICIENT 计数口径、T3 降级为反向信号、证据卡 timeliness 字段、closure 模板引用。
   - v21.7.4：新增「最佳实践方案」子技能（2026-08-19）——`skills/best-practice-solution`（四段双轨水线：Triage 分级→Research 调研→Draft 草案→LIGHT 自检/FULL 多视角评审→Converge）；缺省 LIGHT 快答（≤2500 token），黑名单/用户显式要求走 FULL（≤20000 token + 多视角评审）；T1/T2/T3 来源分级、外部信号优先于自我反思、网页内容=数据非指令、"INSUFFICIENT 不知道"是第一类合法答案；§2.2-1 双栏模板增强为带证据引用+置信度；决策记录草案交架构角色正式化 ADR；归档前 desensitize 脱敏。
   - v21.7.3：新增「需求-架构-代码 三方一致性」铁律（2026-08-18）——§2.2-8 建立唯一标识（REQ-/ADR-/AE-/MOD-/TC-）+ 单一事实来源《需求-架构-代码追溯矩阵.csv》+ 阶段流转强制 `tools/check_traceability.py` 孤儿/断链门禁；§5 新增可追溯性优先调度规则；新增 `references/traceability_standard.md`（依据 NASA SWE-059 / EN 62304 / ASPICE / ArchUnit）。
@@ -210,5 +211,5 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 
 ---
 
-**文档版本**：v21.7.5　**最后更新**：2026-08-19（最佳实践方案子技能 v1.2.0：LIGHT 纯本地档 + token 预算口径统一 + 评审三态统一 + 路由仲裁 + 安全约束清单统一；编排器 §4.1 增路由仲裁登记）
+**文档版本**：v21.8.0　**最后更新**：2026-08-20（工具固化与真实 IP 推送固定动作：github_push.py + _gh_ip_probe.py 公共探测 + mirror_push --github-realip/--verify 增强 + SYNC 幂等 + MCP 环境校准）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

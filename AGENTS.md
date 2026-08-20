@@ -59,6 +59,10 @@ python tools/deploy_skills.py --roles role-a,role-b
 
 ```sh
 python tools/excel_to_csv.py            # 迁移存量 xlsx→csv
+python tools/github_push.py --dry-run   # GitHub 真实 IP 推送：dry-run 预览（仅探测，不推送）
+python tools/github_push.py             # GitHub 真实 IP 一键推送（固定动作：候选IP→可达+TLS证书合法探测→绑定真实IP push origin）
+python tools/mirror_push.py --verify    # 双端同步检查（会话启动必经步骤：fetch origin+mirror → 对比领先/落后，分叉即阻断推送）
+python tools/mirror_push.py --github-realip  # 双推时 origin 网络失败自动真实 IP 回退（推送成功后清除冷却）
 python tools/desensitize/desensitize.py --scan <目标>  # 文档脱敏：扫描模式
 python tools/desensitize/desensitize.py <目标> -o <输出>  # 文档脱敏：按内置规则批量替换
 python tools/desensitize/desensitize.py --dictionary tools/desensitize/desensitize_dictionary.csv <目标> -o <输出>  # 文档脱敏：规则 + 脱敏字典关键字联合脱敏（字典维护见 tools/desensitize/DESENSITIZE_DICTIONARY.md）
@@ -74,6 +78,8 @@ git commit                              # 每原子改动一次提交（钩子�
 > **提交后自动部署（可选）**：在仓库根创建 `.auto-deploy-enabled` 文件后，每次提交若包含 `.trae/skills/` 下的变更，`post-commit` 钩子会自动执行 `deploy_skills.py` 将技能同步到 opencode 全局库（轻量部署，不含门禁/快照/打包）。启用方式：`touch .auto-deploy-enabled`（macOS/Linux）或 `New-Item .auto-deploy-enabled`（PowerShell）。
 
 ## GitHub 访问异常处理规则（win32 / macOS / PowerShell / zsh 环境）
+
+> **固定动作（P-001，减少反复操作）**：GitHub push 一律优先用 `py -3.11 tools/github_push.py`（自动探测可达+证书合法 IP → 绑定真实 IP push origin）；双推场景用 `py -3.11 tools/mirror_push.py --github-realip`（origin 网络失败自动回退真实 IP）。手动 `git push origin` 仅在该命令失效后用于人工兜底。
 
 本机访问 `github.com:443` 偶发 DNS 解析到坏 IP 或全部候选 IP 不可达，最常见根因是 DNS 实效，导致远端环境无法访问。故障现象：`Failed to connect` / `Could not connect` / `Recv failure: Connection was reset` / `nc: connection failed, SOCKS error 2`。
 

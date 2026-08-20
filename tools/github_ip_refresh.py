@@ -106,34 +106,13 @@ def load_existing() -> list[dict]:
         return list(csv.DictReader(h))
 
 
-def probe_reachability(ip: str) -> str:
-    try:
-        r = subprocess.run(
-            ["curl.exe", "-s", "-o", "NUL", "-w", "%{http_code}",
-             "--connect-timeout", "6", "--resolve", f"github.com:443:{ip}",
-             "https://github.com"],
-            capture_output=True, text=True, timeout=12,
-        )
-        return r.stdout.strip() or "ERR"
-    except Exception:
-        return "ERR"
-
-
-def probe_tls(ip: str, host: str = "github.com", timeout: int = 8):
-    """返回 (tcp_ok, cert_ok, err)。跨平台（Python ssl 用各系统 CA 库）。"""
-    try:
-        ctx = ssl.create_default_context()
-        with socket.create_connection((ip, 443), timeout=timeout) as sock:
-            try:
-                with ctx.wrap_socket(sock, server_hostname=host):
-                    pass
-                return True, True, ""
-            except ssl.SSLError as e:
-                return True, False, f"SSL:{e}"
-            except Exception as e:  # 其它 TLS 层异常
-                return True, False, f"TLS:{e}"
-    except (socket.timeout, OSError) as e:
-        return False, False, f"TCP:{e}"
+# 探测逻辑统一走公共模块 tools/_gh_ip_probe.py（供 github_push.py 复用，避免双维护）
+try:
+    from _gh_ip_probe import probe_reachability, probe_tls
+except ImportError:
+    import sys as _sys
+    _sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from _gh_ip_probe import probe_reachability, probe_tls
 
 
 def _hosts_path() -> Path:
