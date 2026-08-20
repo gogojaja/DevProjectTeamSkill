@@ -19,6 +19,7 @@ def parse_args(argv):
     roles = []
     dry_run = False
     as_json = False
+    skip_global = False
     i = 0
     while i < len(argv):
         a = argv[i]
@@ -26,16 +27,23 @@ def parse_args(argv):
             targets.append(argv[i+1]); i += 2
         elif a == '--roles':
             roles += [x for x in argv[i+1].split(',') if x]; i += 2
+        elif a == '--skip-global':
+            skip_global = True; i += 1
         elif a == '--dry-run':
             dry_run = True; i += 1
         elif a == '--json':
             as_json = True; i += 1
         elif a in ('-h', '--help'):
-            print('用法: package_skills.py [--target <dir>]... [--roles <role,role,...>] [--dry-run] [--json]')
+            print('用法: deploy_skills.py [--target <dir>]... [--roles <role,role,...>] [--skip-global] [--dry-run] [--json]')
             sys.exit(0)
         else:
             print(f'未知参数: {a}'); sys.exit(1)
-    return (targets or DEFAULT_TARGETS), (roles or ALL_ROLES), dry_run, as_json
+    if not targets:
+        if skip_global:
+            targets = [os.path.join(ROOT, t) for t in ('.github/skills', '.claude/skills', '.agents/skills')]
+        else:
+            targets = DEFAULT_TARGETS
+    return targets, roles, dry_run, as_json
 
 def check_names(roles):
     fail = 0

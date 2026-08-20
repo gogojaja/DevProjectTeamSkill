@@ -21,10 +21,10 @@ opencode.json         opencode 技能注册
 ## 核心规则（违反即返工）
 
 1. **源码单源**：`.trae/skills/` 是唯一事实来源，`tools/deploy_skills.py`/`solidify.py` 均以它为源；共享内容只存 `shared/`，角色包用 `../shared/...` 相对引用；**禁止手工复制** shared/references 进角色包（打包时自动内嵌）。
-2. **源码不备覆盖**：deploy 目标是 `.github/skills/`、`.claude/skills/`、`.agents/skills/` 及全局库（Windows：`C:\Users\<user>\.config\opencode\skills`；macOS/Linux：`~/.config/opencode/skills`），**永不覆盖 `.trae/skills/`**；改技能只在 `.trae/skills/` 源操作，改完即跑 `solidify` 部署到目标目录。
+2. **源码不备覆盖**：deploy 目标是 `.github/skills/`、`.claude/skills/`、`.agents/skills/`（开发固化）与全局库（生产载体，Windows：`C:\Users\<user>\.config\opencode\skills`；macOS/Linux：`~/.config/opencode/skills`），**永不覆盖 `.trae/skills/`**；改技能只在 `.trae/skills/` 源操作，改完即跑 `solidify` 部署到项目级三目录，生产发布走 `publish_production`。
 3. **新增/修改技能**：必须同步 `SKILL_INDEX.md` + `references/api_contracts.md`；description 150~250 字符（`做什么。<触发词>。Load when...`）。
 4. **输出格式**：>4K token 或 >20 列 → CSV（UTF-8 with BOM）；仅回显首 5 行 + 行数。禁止 .xlsx。
-5. **改动后固化**：任务完成执行固化脚本并刷新 `交接文档.md` 断点区，然后 git commit。macOS/Linux 用 `bash tools/solidify.sh "<说明>"`，Windows 用 `python tools/solidify.py "<说明>"` 或 `.\tools\solidify.ps1 "<说明>"`。固化后 TRAE 项目级（`.trae/skills/` 源码单源）与 opencode 全局（`~/.config/opencode/skills/`）同步生效。
+5. **改动后固化**：任务完成执行固化脚本并刷新 `交接文档.md` 断点区，然后 git commit。macOS/Linux 用 `bash tools/solidify.sh "<说明>"`，Windows 用 `python tools/solidify.py "<说明>"` 或 `.\tools\solidify.ps1 "<说明>"`。固化后 TRAE 项目级（`.trae/skills/` 源码单源）与项目级三目录同步生效；生产消费需另行 `publish_production`（全局库 `~/.config/opencode/skills/`）。
 6. **文件保护**：无明确指令禁止删除/移动/重命名文件。
 7. **系统/项目外文件铁律**：修改、删除**系统文件（如 %windir%\System32、hosts、注册表）或项目外部文件（仓库之外路径，含其他项目目录）**必须：①先获得用户明确授权；②操作前强制备份到项目内 `.backup/`（含时间戳）；③操作留痕至 `13_安全审计台账.csv`。未获授权或未备份，一律禁止执行。该操作必须经 `security_audit` 前置审计。
 7a. **目录访问边界铁律**：本项目可读写/删除范围=本项目所在目录（启动时经 `declare_access_boundary` 声明入 `台账/26_访问边界.csv`）；本项目目录之外的任何访问一律经 `register_auth` 授权（`台账/14_授权登记.csv`），**未填有效期默认仅本次对话有效**，会话结束自动失效；跨会话须用户显式指定到期时间并留痕。操作目标在本项目目录外 → 先查 `26_访问边界.csv` + `14_授权登记.csv`，无授权禁止。
@@ -43,7 +43,7 @@ opencode.json         opencode 技能注册
 bash tools/package_skills.sh            # 打包全部 10 角色包到 dist/
 bash tools/package_skills.sh --role role-testing
 bash tools/deploy_skills.sh --roles role-a,role-b
-bash tools/solidify.sh "说明"           # 一键固化：3 硬门禁+交接刷新+快照+打包+部署四目录
+bash tools/solidify.sh "说明"           # 一键固化：3 硬门禁+交接刷新+快照+打包+部署项目级三目录(不碰全局库)
 ```
 
 **Windows（PowerShell / Python，主推）：**
@@ -54,6 +54,20 @@ python tools/solidify.py "说明"
 python tools/package_skills.py
 python tools/deploy_skills.py --roles role-a,role-b
 ```
+
+### 生产发布（环境/版本隔离，2026-08-20 起）
+
+> **生产消费载体 = 全局库 `~/.config/opencode/skills`**（opencode 仅扫描 6 个固定位置，`skills.paths` 实测不生效）。开发固化（`solidify`）**只部署项目级 `.github/.claude/.agents` 三目录**，不再自动触碰全局库；生产技能由 `publish_production` 独占发布，防开发版本污染生产。
+
+```sh
+bash tools/publish_production.sh                  # 门禁(版本/闭环/发布级/废弃/脱敏)→留档~dev 版本目录→current软链→发布全局库
+bash tools/publish_production.sh --dry-run        # 仅探测
+python tools/publish_production.py                # 跨平台/Windows 主推
+```
+
+- 留档：`~/dev-project-team-skill/v<版本>/`（不可变）+ `~/dev-project-team-skill/current`（软链=最新稳定版）
+- 其他项目 opencode 通过全局库自动发现生产技能；本项目开发用项目级三目录
+- 生产发布为外部目录操作，按铁律 #7/#7a `register_auth` 授权 + `.backup/` 备份 + 台账留痕
 
 ### 其他工具
 
@@ -73,7 +87,9 @@ git commit                              # 每原子改动一次提交（钩子�
 
 > **环境门禁钩子**：`.githooks/pre-commit` 提交前自动检查 A 级密钥/B 级脱敏/.env 与 .secrets 禁提交/大文件 >4K。失败阻断提交（`git commit --no-verify` 仅应急，不推荐）。
 >
-> **固化闭环说明**：`solidify` 内置 3 个硬门禁（版本一致性/闭环执行/发布级），门禁未过则中止；通过后自动刷新交接文档断点区、生成版本快照、打包 dist、部署到 4 个目标目录（项目级 .github/.claude/.agents + opencode 全局库）。TRAE 项目级直接从 `.trae/skills/` 读取（源码单源），opencode 全局从 `~/.config/opencode/skills/` 读取，两者由 solidify 同步保持一致。
+> **固化闭环说明**：`solidify` 内置 3 个硬门禁（版本一致性/闭环执行/发布级），门禁未过则中止；通过后自动刷新交接文档断点区、生成版本快照、打包 dist、部署到项目级 3 个目标目录（项目级 .github/.claude/.agents）。TRAE 项目级直接从 `.trae/skills/` 读取（源码单源）；opencode 全局生产载体（`~/.config/opencode/skills/`）由 `publish_production` 独占发布，`solidify` 不再触碰，防开发版本污染生产。
+>
+> **Auto-deploy 注意**：`post-commit` 钩子的自动部署（`.auto-deploy-enabled`）默认同步到项目级三目录；如需同步全局库请改跑 `publish_production`（生产发布才应更新全局库）。
 >
 > **提交后自动部署（可选）**：在仓库根创建 `.auto-deploy-enabled` 文件后，每次提交若包含 `.trae/skills/` 下的变更，`post-commit` 钩子会自动执行 `deploy_skills.py` 将技能同步到 opencode 全局库（轻量部署，不含门禁/快照/打包）。启用方式：`touch .auto-deploy-enabled`（macOS/Linux）或 `New-Item .auto-deploy-enabled`（PowerShell）。
 

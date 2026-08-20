@@ -156,6 +156,9 @@ DEFAULT_RULES = {
         "level": "B",
         "description": "邮箱地址（B 级，脱敏用户名）",
         "enabled": True,
+        "exempt_patterns": [
+            r'duanbo\.douglas@163\.com',
+        ],
         "patterns": [
             {
                 "name": "email_mask",

@@ -43,6 +43,7 @@ usage() {
 
 TARGETS=()
 ROLES=()
+SKIP_GLOBAL=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --target)
@@ -52,11 +53,19 @@ while [[ $# -gt 0 ]]; do
       [[ $# -ge 2 ]] || usage
       IFS=',' read -ra R <<< "$2"
       ROLES+=("${R[@]}"); shift 2 ;;
+    --skip-global)
+      SKIP_GLOBAL=1; shift ;;
     -h|--help) usage ;;
     *) echo "未知参数: $1" >&2; usage ;;
   esac
 done
-[[ ${#TARGETS[@]} -eq 0 ]] && TARGETS=("${DEFAULT_TARGETS[@]}")
+if [[ ${#TARGETS[@]} -eq 0 ]]; then
+  if [[ $SKIP_GLOBAL -eq 1 ]]; then
+    TARGETS=("$ROOT/.github/skills" "$ROOT/.claude/skills" "$ROOT/.agents/skills")
+  else
+    TARGETS=("${DEFAULT_TARGETS[@]}")
+  fi
+fi
 
 [[ -d "$SKILLS_DIR" ]] || { echo "错误: 技能库目录不存在: $SKILLS_DIR" >&2; exit 1; }
 

@@ -1,7 +1,8 @@
 #!/bin/sh
 # .githooks/post-commit — 提交后自动化钩子
 # 功能 1：控制环自动化（agent_loop）—— 存在 .agent-loop-enabled 时触发
-# 功能 2：技能自动部署（auto-deploy）—— 存在 .auto-deploy-enabled 时自动部署技能到全局
+# 功能 2：技能自动部署（auto-deploy）—— 存在 .auto-deploy-enabled 时自动部署技能到项目级三目录
+# 注意: 全局库由 publish_production 独占（生产载体），自动部署仅同步项目级开发目录；如需生产发布请跑 publish_production
 
 ROOT="$(pwd)"
 
@@ -12,7 +13,7 @@ ROOT="$(pwd)"
 if [ -f "$ROOT/.auto-deploy-enabled" ] && [ "$AGENT_LOOP_ACTIVE" != "1" ]; then
   # 检查最新提交是否包含技能源码变更
   if git diff --name-only HEAD~1 HEAD 2>/dev/null | grep -q '^\.trae/skills/'; then
-    echo "post-commit: 检测到技能源码变更，自动部署到全局..."
+    echo "post-commit: 检测到技能源码变更，自动部署到项目级三目录..."
 
     # 查找 Python 解释器
     PY=""
@@ -27,7 +28,7 @@ if [ -f "$ROOT/.auto-deploy-enabled" ] && [ "$AGENT_LOOP_ACTIVE" != "1" ]; then
     fi
 
     if [ -n "$PY" ]; then
-      "$PY" "$ROOT/tools/deploy_skills.py" 2>&1 || echo "post-commit: 自动部署失败，请手动执行 solidify"
+      "$PY" "$ROOT/tools/deploy_skills.py" --skip-global 2>&1 || echo "post-commit: 自动部署失败，请手动执行 solidify"
     else
       echo "post-commit: 未找到 Python，跳过自动部署"
     fi

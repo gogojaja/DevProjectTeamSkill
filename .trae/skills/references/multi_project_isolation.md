@@ -263,7 +263,7 @@ services:
     environment:
       POSTGRES_DB: myproject_a_dev
       POSTGRES_USER: dev
-      POSTGRES_PASSWORD: dev123
+      POSTGRES_PASSWORD: <dev_pass>
     volumes:
       - pgdata-dev:/var/lib/postgresql/data
 
@@ -274,7 +274,7 @@ services:
     environment:
       POSTGRES_DB: myproject_a_test
       POSTGRES_USER: test
-      POSTGRES_PASSWORD: test123
+      POSTGRES_PASSWORD: <test_pass>
     volumes:
       - pgdata-test:/var/lib/postgresql/data
 
@@ -388,7 +388,7 @@ services:
     environment:
       POSTGRES_DB: myproject_a_dev
       POSTGRES_USER: dev
-      POSTGRES_PASSWORD: dev123
+      POSTGRES_PASSWORD: <dev_pass>
 
   redis:
     image: redis:7-alpine
@@ -416,7 +416,7 @@ services:
     environment:
       POSTGRES_DB: myproject_a_test
       POSTGRES_USER: test
-      POSTGRES_PASSWORD: test123
+      POSTGRES_PASSWORD: <test_pass>
 ```
 
 **启动不同环境**：
@@ -448,7 +448,7 @@ jobs:
         env:
           POSTGRES_DB: myproject_a_test
           POSTGRES_USER: test
-          POSTGRES_PASSWORD: test123
+          POSTGRES_PASSWORD: <test_pass>
         ports:
           - 5432:5432
     steps:

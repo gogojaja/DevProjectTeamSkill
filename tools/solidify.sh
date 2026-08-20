@@ -190,8 +190,8 @@ bash "$ROOT/tools/package_skills.sh" --handoff "$HANDOFF" 2>&1 | tail -3
 
 # ---- 5. 部署 ----
 echo ""
-echo "[5/6] 全量部署四目录 (deploy_skills.sh v21)"
-bash "$ROOT/tools/deploy_skills.sh" 2>&1 | tail -6
+echo "[5/6] 部署项目级三目录 (deploy_skills.sh --skip-global；全局库由 publish_production 独占)"
+bash "$ROOT/tools/deploy_skills.sh" --skip-global 2>&1 | tail -6
 
 echo ""
 echo "=============================================================="

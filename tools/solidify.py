@@ -47,7 +47,8 @@ def run_deprecation_cleanup():
 
 
 def run_deploy():
-    return _run_script('deploy_skills.py').returncode
+    # 开发固化仅部署项目级三目录；全局库（生产消费载体）由 publish_production 独占
+    return _run_script('deploy_skills.py', '--skip-global').returncode
 
 def refresh_handoff(stamp, note):
     MARK = '## 1. 工作断点'
@@ -165,7 +166,7 @@ if __name__ == '__main__':
         print('   ✓ package_skills.py 完成')
     else:
         print('   (dry-run) package_skills.py skipped')
-    print('[5/5] 部署四目录')
+    print('[5/5] 部署项目级三目录 (全局库由 publish_production 独占)')
     if not dry_run:
         if run_deploy() != 0:
             print('   ✗ deploy_skills.py 失败'); sys.exit(1)
