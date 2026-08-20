@@ -1,0 +1,14 @@
+﻿perspective,check_id,check_name,status,severity,evidence,confidence
+architect,ARCH-001,方案边界与复用性,PASS,,探测逻辑抽公共模块 tools/_gh_ip_probe.py 复用；范围限定 skill 维护不越界,high
+architect,ARCH-002,与现有工具链一致性,PASS,,mirror_push 熔断状态机/32台账格式/AGENTS 命令区兼容,high
+code_reviewer,CR-001,公共函数复用避免双维护,PASS,,github_ip_refresh 与 github_push 共用 _gh_ip_probe.py,high
+code_reviewer,CR-002,熔断状态机兼容,PASS,,github-realip 推送成功后清除 origin 冷却/阻断状态,high
+code_reviewer,CR-003,台账脱敏与 BOM 格式,PASS,,URL 脱敏(掩 token)+SYNC 编号幂等追加,high
+security,SEC-001,凭据不落库,PASS,,token 仅 .secrets/env 注入，脚本不打印不改凭据,high
+security,SEC-002,TLS 证书校验防 MITM,PASS,,SNI=github.com 证书合法探测，证书不匹配 IP 跳过,high
+security,SEC-003,默认不写系统文件,PASS,,仅 curloptResolve 进程级绑定，不触发 hosts 写改,high
+test_engineer,TE-001,dry-run 可回归,PASS,,--dry-run 仅探测+打印将用 IP，不下发远端变更,high
+test_engineer,TE-002,正负向验收用例,PASS,,正向 PUSH_OK；负向全 IP 不可达退出 1；TLS 非法 IP 跳过,high
+performance,PERF-001,探测超时与短路,PASS,,单 IP connect+握手≤8s，首个可用即短路不串行,high
+performance,PERF-002,台账追加 O(1),PASS,,追加前读 max SYNC 编号取 max+1,high
+decision,AGG-001,聚合决策,SIGNED_OFF,,五视角全 PASS，修订意见已并入方案，待用户批准执行,high

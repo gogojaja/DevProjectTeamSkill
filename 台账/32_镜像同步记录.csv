@@ -114,7 +114,41 @@ SYNC-20260820-112,2026-08-20 06:49:40,5f64d569267d,origin,https://github.com/gog
 SYNC-20260820-113,2026-08-20 06:49:40,5f64d569267d,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,1.5,   8441001..5f64d56  main -> main
 SYNC-20260820-114,2026-08-20 07:31:38,1a1a29392fc7,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,失败,60.4,fatal: unable to access 'https://github.com/gogojaja/DevProjectTeamSkill.git/': Operation too slow. Less than 1000 bytes/sec transferred the last 60 seconds
 SYNC-20260820-115,2026-08-20 07:31:38,1a1a29392fc7,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,1.2,   5f64d56..1a1a293  main -> main
-SYNC-20260820-116,2026-08-20 08:08:25,6e5adeab227e,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,失败,60.8,fatal: unable to access 'https://github.com/gogojaja/DevProjectTeamSkill.git/': Operation too slow. Less than 1000 bytes/sec transferred the last 60 seconds
+SYNC-20260820-116,2026-08-20 08:08:25,6e5adeab227e,origin,https://github.com/***/DevProjectTeamSkill.git,失败,60.8,fatal: unable to access 'https://github.com/***/DevProjectTeamSkill.git/': Operation too slow. Less than 1000 bytes/sec transferred the last 60 seconds
 SYNC-20260820-117,2026-08-20 08:08:25,6e5adeab227e,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,1.2,   1a1a293..6e5adea  main -> main
-SYNC-20260820-118,2026-08-20 09:05:42,64b20f20830a,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,成功,2.2,   1a1a293..64b20f2  main -> main
-SYNC-20260820-119,2026-08-20 09:05:42,64b20f20830a,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,1.2,   6e5adea..64b20f2  main -> main
+SYNC-20260820-118,2026-08-20 08:57:23,5d75dbdb7b58,origin,https://github.com/***/DevProjectTeamSkill.git,失败,2.7,hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+SYNC-20260820-119,2026-08-20 08:57:23,5d75dbdb7b58,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,失败,1.2,hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+SYNC-20260820-120,2026-08-20 09:01:51,84fdc0117037,origin,https://github.com/***/DevProjectTeamSkill.git,失败,2.0,hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+SYNC-20260820-121,2026-08-20 09:01:51,84fdc0117037,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,失败,1.1,hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+SYNC-20260820-122,2026-08-20 11:31:07,d4ea7a6063df,origin,https://github.com/***/DevProjectTeamSkill.git,失败,2.2,hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+SYNC-20260820-123,2026-08-20 11:31:07,d4ea7a6063df,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,失败,1.5,hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+SYNC-20260820-124,2026-08-20 11:31:57,b27cc96877c3,origin,https://github.com/***/DevProjectTeamSkill.git,失败,2.2,hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+SYNC-20260820-125,2026-08-20 11:31:57,b27cc96877c3,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,失败,1.4,hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+SYNC-20260820-126,2026-08-20 11:37:31,f03d7b60fe33,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,失败,50.2,fatal: unable to access 'https://github.com/***/DevProjectTeamSkill.git/': Recv failure: Connection was reset
+SYNC-20260820-127,2026-08-20 11:37:31,f03d7b60fe33,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,4.2,   64b20f2..f03d7b6  main -> main
+SYNC-20260820-128,2026-08-20 11:39:09,fe256cec4f71,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,2.5,   f03d7b6..fe256ce  main -> main
+SYNC-20260820-129,2026-08-20 11:47:56,5d5686c25e04,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,2.2,   87b5acb..5d5686c  main -> main
+SYNC-20260820-130,2026-08-20 14:02:24,1023bcc84ccf,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,失败,60.4,fatal: unable to access 'https://github.com/***/DevProjectTeamSkill.git/': Recv failure: Connection was reset
+SYNC-20260820-131,2026-08-20 14:02:24,1023bcc84ccf,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,4.4,   478c7a9..1023bcc  main -> main
+SYNC-20260820-132,2026-08-20 14:19:27,8b56072b32f7,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,失败,55.7,fatal: unable to access 'https://github.com/***/DevProjectTeamSkill.git/': Recv failure: Connection was reset
+SYNC-20260820-133,2026-08-20 14:19:27,8b56072b32f7,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,2.9,   1023bcc..8b56072  main -> main
+SYNC-20260820-134,2026-08-20 14:21:05,5527d475e093,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,失败,21.2,真实IP推送失败 IP=20.205.243.166: fatal: unable to access 'https://github.com/***/DevProjectTeamSkill.git/': Failed to connect to github.com:443 after 21038 ms: Could not connect to server
+SYNC-20260820-136,2026-08-20 14:36:06,5527d475e093,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,2.5,   8b56072..5527d47  main -> main
+SYNC-20260820-137,2026-08-20 14:38:41,64a26f02678d,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,成功,3.5,   5527d47..64a26f0  main -> main
+SYNC-20260820-138,2026-08-20 14:38:41,64a26f02678d,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,2.2,   5527d47..64a26f0  main -> main
+SYNC-20260820-139,2026-08-20 14:39:14,37ab18d882c8,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,成功,4.0,   64a26f0..37ab18d  main -> main
+SYNC-20260820-140,2026-08-20 14:39:14,37ab18d882c8,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,2.1,   64a26f0..37ab18d  main -> main
+SYNC-20260820-141,2026-08-20 14:39:48,8961ac920930,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,成功,3.8,   37ab18d..8961ac9  main -> main
+SYNC-20260820-142,2026-08-20 14:39:48,8961ac920930,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,2.5,   37ab18d..8961ac9  main -> main
+SYNC-20260820-143,2026-08-20 14:40:32,db2aa877ec91,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,成功,3.9,   8961ac9..db2aa87  main -> main
+SYNC-20260820-144,2026-08-20 14:40:32,db2aa877ec91,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,2.0,   8961ac9..db2aa87  main -> main
+SYNC-20260820-145,2026-08-20 14:40:56,beb45a5aaf49,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,成功,3.8,   db2aa87..beb45a5  main -> main
+SYNC-20260820-146,2026-08-20 14:40:56,beb45a5aaf49,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,1.9,   db2aa87..beb45a5  main -> main
+SYNC-20260820-147,2026-08-20 14:41:16,3d8cca2941ed,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,成功,6.0,   beb45a5..3d8cca2  main -> main
+SYNC-20260820-148,2026-08-20 14:41:16,3d8cca2941ed,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,2.6,   beb45a5..3d8cca2  main -> main
+SYNC-20260820-149,2026-08-20 14:44:34,336786c9ad0c,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,成功,4.5,   3d8cca2..336786c  main -> main
+SYNC-20260820-150,2026-08-20 14:44:34,336786c9ad0c,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,1.9,   3d8cca2..336786c  main -> main
+SYNC-20260820-151,2026-08-20 14:44:53,0ad2e633fef8,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,成功,5.5,   336786c..0ad2e63  main -> main
+SYNC-20260820-152,2026-08-20 14:44:53,0ad2e633fef8,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,2.4,   336786c..0ad2e63  main -> main
+SYNC-20260820-153,2026-08-20 14:45:19,e530a35f1586,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,成功,4.1,   0ad2e63..e530a35  main -> main
+SYNC-20260820-154,2026-08-20 14:45:19,e530a35f1586,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,2.3,   0ad2e63..e530a35  main -> main

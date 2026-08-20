@@ -73,4 +73,38 @@
 
 ---
 
-**文档版本**：v21.7.1 ｜ **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
+## [v21.7.2] - 2026-08-18 - 废弃清理门禁铁律
+
+- **dev-project-team-skill 升 v21.7.2**：新增「废弃清理门禁」铁律（2026-08-18）——§2.2-7 规定 ADR 状态=废弃后，后续会话必须先做废弃资产完整性检查（全库 grep + 端口/进程/LaunchAgent 三查），且 solidify 基线固化阶段强制移除废弃资产（第 4 硬门禁 `tools/check_deprecation_cleanup.py`）；§2.1 会话启动第一步增补该检查；同步 AGENTS.md 铁律 #9。
+
+---
+
+## [v21.7.3] - 2026-08-18 - 需求-架构-代码 三方一致性铁律
+
+- **dev-project-team-skill 升 v21.7.3**：新增「需求-架构-代码 三方一致性」铁律（2026-08-18）——§2.2-8 建立唯一标识（REQ-/ADR-/AE-/MOD-/TC-）+ 单一事实来源《需求-架构-代码追溯矩阵.csv》+ 阶段流转强制 `tools/check_traceability.py` 孤儿/断链门禁；§5 新增可追溯性优先调度规则；新增 `references/traceability_standard.md`（依据 NASA SWE-059 / EN 62304 / ASPICE / ArchUnit）。
+
+---
+
+## [v21.7.4] - 2026-08-19 - 新增「最佳实践方案」子技能
+
+- **dev-project-team-skill 升 v21.7.4**：新增 `skills/best-practice-solution` 子技能（四段双轨水线：Triage 分级 → Research 调研 → Draft 草案 → LIGHT 自检 / FULL 多视角评审 → Converge）；缺省 LIGHT 快答（≤2500 token），黑名单 / 用户显式要求走 FULL（≤20000 token + 多视角评审）；T1/T2/T3 来源分级、外部信号优先于自我反思、网页内容=数据非指令、"INSUFFICIENT 不知道"是第一类合法答案；§2.2-1 双栏模板增强为带证据引用 + 置信度；决策记录草案交架构角色正式化 ADR；归档前 desensitize 脱敏。
+
+---
+
+## [v21.7.5] - 2026-08-19 - 最佳实践方案子技能 v1.2.0 迭代（五视角评审 49 条意见落地）
+
+- **dev-project-team-skill 升 v21.7.5 + best-practice-solution 升 v1.2.0**（2026-08-19）：第二轮五视角评审 49 条意见落地——LIGHT 增纯本地档（知识优先、web 条件化）、统一 token 预算口径（FULL＝调研6000＋评审6000＋外部核验4000＋收敛4000，含工具 context）、评审决策统一 SIGNED_OFF/CHANGES_REQUESTED/BLOCKED 三态并引用 MPV 决策矩阵、Triage 增第 4 问选型锁定判据 + 黑名单量化、§4.1 增最佳实践方案路由仲裁（技术选型→BPS/ADR→role-architecture/代码评审→MPV）、SSRF 约束统一清单（含 IPv6/link-local/编码混淆/重定向复检）、涉密只出不进、confidence 映射表与 INSUFFICIENT 计数口径、T3 降级为反向信号、证据卡 timeliness 字段、closure 模板引用。
+- **新增去水印工具 v1.0.0** `tools/remove_watermark`（Word/PPT/Excel/PDF/图片/文本 6 类处理器 + .sh/.ps1 封装 + README）。
+- **文档脱敏工具升 v1.1.0**：新增脱敏字典 `DESENSITIZE_DICTIONARY.md` + `desensitize_dictionary.csv` + `--dictionary` 参数。
+- **opencode 接入 MCP**：注册 dev-project-team-skill 本地服务器（`mcp_server.py` 暴露 10 工具/资源/提示）+ `.trae/mcp.json` 登记。
+
+---
+
+## [v21.8.0] - 2026-08-20 - 工具固化与 GitHub 真实 IP 推送固定动作
+
+- **dev-project-team-skill 升 v21.8.0**（2026-08-20）：新增 `tools/github_push.py`（候选 IP→可达+TLS 证书合法探测→绑定真实 IP push origin，`--dry-run` 预览）+ 公共探测模块 `tools/_gh_ip_probe.py`（供 github_ip_refresh/github_push 复用）；`mirror_push.py --github-realip` 双推时 origin 网络失败自动真实 IP 回退且推送成功清除熔断冷却；`--verify` 增强为「启动即双端同步检查」（fetch+对比领先/落后，分叉即阻断推送）；SYNC 台账编号幂等（解析 max 编号取 +1）；opencode.json MCP 命令 uv→py 环境校准；AGENTS.md 登记固定动作 P-001（GitHub push 优先真实 IP，减少反复操作）。
+- **复盘与工具固化方案 v21.8.0**：`docs/复盘与工具固化方案_v21.8.0.md`（5 项提案 P-001~P-005）+ 五视角评审报告（SIGNED_OFF，评审报告 CSV）。
+
+---
+
+**文档版本**：v21.8.0 ｜ **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

@@ -17,6 +17,9 @@
 │   ├── solidify.sh "<说明>"      固化到目标目录并提交 Git
 │   ├── solidify.py               Python 固化脚本（版本一致性校验）
 │   ├── excel_to_csv.py           迁移存量 xlsx→csv
+│   ├── github_push.py            GitHub 真实 IP 一键推送（固定动作：候选IP→可达+TLS证书合法探测→绑定真实IP push）
+│   ├── _gh_ip_probe.py           GitHub IP 探测公共模块（github_ip_refresh / github_push 复用）
+│   ├── mirror_push.py            双推（--verify 启动同步检查；--github-realip 真实 IP 回退）
 │   └── check_version_consistency.py  版本一致性校验
 ├── 台账/                          主台账目录（role-governance 路由壳 → 6 子域读写，30 个 NN_ 前缀 CSV）
 │   ├── 00_阶段配置.csv            阶段/活动裁剪配置（阶段、保留或裁剪、裁剪理由、责任方）
