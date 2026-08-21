@@ -24,7 +24,7 @@ log = logging.getLogger('lint_repo')
 WHITELIST_DIRS = {
     '.git', '.trae', '.agents', '.claude', '.github', '.secrets', '.backup',
     '.githooks', '.vscode', 'docs', 'tools', 'scripts', 'security',
-    'requirements', 'tests', '台账', '.trae-html-share-packages',
+    'requirements', 'tests', '台账', '.trae-html-share-packages', '架构资产',
 }
 # 根目录白名单（文件）
 WHITELIST_FILES = {
