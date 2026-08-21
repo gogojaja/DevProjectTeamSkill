@@ -39,7 +39,7 @@ fi
 bgrade_pattern='([0-9]{1,3}\.){3}[0-9]{1,3}|(/Volumes/[A-Za-z0-9_]+|[A-Za-z]:\\\\|[A-Za-z]:/|/Users/[A-Za-z0-9_.-]+|/home/[A-Za-z0-9_.-]+)'
 for f in $files; do
   case "$f" in
-    *.png|*.jpg|*.jpeg|*.gif|*.ico|*.pdf|*.zip|*.lock|*.jar|*.war) continue ;;
+    *.png|*.jpg|*.jpeg|*.gif|*.ico|*.pdf|*.zip|*.lock|*.jar|*.war|*.ttf|*.otf|*.woff|*.woff2|*.eot) continue ;;
     .githooks/*|scripts/*) continue ;;  # 钩子/脚本自身含路径示例，跳过 B 级（仍受 A 级扫描）
     AGENTS.md|交接文档.md|docs/github_ip_records.csv|tools/github_ip_refresh.py|tools/_gh_ip_probe.py|tools/github_push.py|.trae/skills/dev-project-team-skill/skills/self-improve/domain/versioned-release.md) continue ;;  # GitHub 候选 IP 为公开基础设施 IP；github_push/_gh_ip_probe/github_ip_refresh 为 GitHub IP 处理工具（含候选 IP 功能必需）；versioned-release.md 含本仓库公开 URL（gogojaja/DevProjectTeamSkill，AGENTS.md 授权保留），豁免 B 级；交接文档为本仓库跨会话断点+审计留痕，含必要真实路径，豁免 B 级
     .trae/skills/shared/references/*|.trae/skills/references/*) continue ;;  # references 标准文档含规范示例路径/IP（如 token_standard/iron_rules/github_access），主库与副本均已入库存证；评审 SEC-002 确认无真实泄漏
