@@ -82,11 +82,13 @@ def _git_has_changes(path):
     return True
 
 
-def _safe_git_commit(rid):
+def _safe_git_commit(rid, msg=None):
     env = dict(os.environ)
     env["AGENT_LOOP_ACTIVE"] = "1"
     # 连带提交 32_镜像同步记录（mirror_push 留痕），避免每次提交后台账脏残留；
     # 凭据认证失败已由熔断器阻断不入台账，故无 Gitee 失败留痕被连带提交的风险。
+    # 注：32 台账写入时已脱敏（mirror_push/github_push 的 _append_ledger 对 IP 脱敏），
+    # 故提交不触发 B 级门禁（铁律 #8）。
     changed = _git_has_changes(LEDGER) or _git_has_changes(SYNC_LEDGER)
     if not changed:
         return False, "no_changes"
@@ -94,7 +96,8 @@ def _safe_git_commit(rid):
                          capture_output=True, text=True, encoding="utf-8", errors="replace")
     if add.returncode != 0:
         return False, add.stderr.strip() or "git add failed"
-    commit = subprocess.run(["git", "commit", "-m", "chore(agent-loop): 控制环执行记录 %s" % rid],
+    commit_msg = msg or ("chore(agent-loop): 控制环执行记录 %s" % rid)
+    commit = subprocess.run(["git", "commit", "-m", commit_msg],
                             cwd=ROOT, env=env, capture_output=True, text=True,
                             encoding="utf-8", errors="replace")
     if commit.returncode != 0:
@@ -105,6 +108,7 @@ def _safe_git_commit(rid):
 def main():
     argv = sys.argv[1:]
     dry = "--dry-run" in argv
+    commit_only = "--commit-only" in argv
     trigger = "manual"
     if "--trigger" in argv:
         i = argv.index("--trigger")
@@ -112,6 +116,14 @@ def main():
             trigger = argv[i + 1]
         else:
             trigger = "hook"
+
+    # ---- commit-only：仅由 mirror_push/github_push 写账后调用，统一收口 32/34 台账 ----
+    if commit_only:
+        rid = "AL-%s-%03d" % (datetime.date.today().strftime("%Y%m%d"), _next_seq())
+        commit_ok, commit_msg = _safe_git_commit(
+            rid, msg="chore(ledger): 镜像同步留痕(agent-loop 统一提交)")
+        print("[agent-loop] commit-only: 提交=%s %s" % ("OK" if commit_ok else "SKIP/FAIL", commit_msg))
+        sys.exit(0)
 
     start = datetime.datetime.now()
     v = _gate_ok("check_version_consistency.py")

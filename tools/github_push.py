@@ -39,6 +39,12 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LEDGER = os.path.join(ROOT, "台账", "32_镜像同步记录.csv")
+# 铁律 #8：32 台账入库前对真实 IP 脱敏，避免 B 级门禁拦截与敏感泄露。
+_IP_RE = re.compile(r'(\d{1,3}\.){3}\d{1,3}')
+
+
+def _mask_ip(s):
+    return _IP_RE.sub('xxx.xxx.xxx.xxx', s) if isinstance(s, str) else s
 
 try:
     from _gh_ip_probe import probe_best_github_ip
@@ -112,7 +118,30 @@ def _append_ledger(row):
         w = csv.writer(f)
         if new:
             w.writerow(header)
-        w.writerow(row)
+        w.writerow([_mask_ip(c) for c in row])
+
+
+def _commit_ledger_via_agent_loop():
+    """写账后若启用 agent-loop（根目录 .agent-loop-enabled 且非递归上下文），
+    交由 agent_loop.py --commit-only 统一提交 32 台账，消除手动推送后的工作区脏残留。
+    32 台账写入已脱敏，提交不触发 B 级门禁（铁律 #8）。"""
+    if os.environ.get("AGENT_LOOP_ACTIVE") == "1":
+        return
+    if not os.path.exists(os.path.join(ROOT, ".agent-loop-enabled")):
+        return
+    agent_loop = os.path.join(ROOT, "tools", "agent_loop.py")
+    if not os.path.exists(agent_loop):
+        return
+    env = dict(os.environ)
+    env["AGENT_LOOP_ACTIVE"] = "1"
+    try:
+        r = subprocess.run([sys.executable, agent_loop, "--commit-only"], cwd=ROOT,
+                           env=env, capture_output=True, text=True,
+                           encoding="utf-8", errors="replace")
+        if r.returncode != 0:
+            print("  (agent-loop 收口提交失败: %s)" % (r.stderr.strip() or r.stdout.strip() or "unknown"))
+    except Exception as e:
+        print("  (agent-loop 收口调用异常: %s)" % e)
 
 
 def _clear_proxy():
@@ -193,12 +222,14 @@ def main(argv=None):
         _append_ledger([sid, now_str, head[:12], "origin", _mask(url),
                         "成功", "%.1f" % elapsed, "真实IP推送 PUSH_OK %s: %s" % (ip, msg)])
         print("PUSH_OK %s  (%.1fs)" % (ip, elapsed))
+        _commit_ledger_via_agent_loop()
         return 0
 
     _append_ledger([sid, now_str, head[:12], "origin", _mask(url),
                     "失败", "%.1f" % elapsed, "真实IP推送失败 IP=%s: %s" % (ip, msg)])
     print("[失败] IP=%s 推送失败：%s" % (ip, msg))
     print("       提示：可尝试 `py -3.11 tools/github_ip_refresh.py --doh --write-hosts` 覆盖 hosts 后重试。")
+    _commit_ledger_via_agent_loop()
     return 1
 
 

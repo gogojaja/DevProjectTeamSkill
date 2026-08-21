@@ -65,6 +65,12 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LEDGER = os.path.join(ROOT, "台账", "32_镜像同步记录.csv")
 STATE_FILE = os.path.join(ROOT, ".secrets", "mirror_push_state.json")
 BOM = b"\xef\xbb\xbf"
+# 铁律 #8：32 台账入库前对真实 IP 脱敏，避免 B 级门禁拦截与敏感泄露。
+_IP_RE = re.compile(r'(\d{1,3}\.){3}\d{1,3}')
+
+
+def _mask_ip(s):
+    return _IP_RE.sub('xxx.xxx.xxx.xxx', s) if isinstance(s, str) else s
 DEFAULT_REMOTES = ["origin", "mirror"]
 NETWORK_COOLDOWN = 15 * 60  # 秒：网络/其他失败后的冷却期
 
@@ -290,7 +296,30 @@ def _append_ledger(rows):
         if new:
             w.writerow(header)
         for row in rows:
-            w.writerow(row)
+            w.writerow([_mask_ip(c) for c in row])
+
+
+def _commit_ledger_via_agent_loop():
+    """写账后若启用 agent-loop（根目录 .agent-loop-enabled 且非递归上下文），
+    交由 agent_loop.py --commit-only 统一提交 32/34 台账，消除手动推送后的工作区脏残留。
+    32 台账写入已脱敏，提交不触发 B 级门禁（铁律 #8）。"""
+    if os.environ.get("AGENT_LOOP_ACTIVE") == "1":
+        return
+    if not os.path.exists(os.path.join(ROOT, ".agent-loop-enabled")):
+        return
+    agent_loop = os.path.join(ROOT, "tools", "agent_loop.py")
+    if not os.path.exists(agent_loop):
+        return
+    env = dict(os.environ)
+    env["AGENT_LOOP_ACTIVE"] = "1"
+    try:
+        r = subprocess.run([sys.executable, agent_loop, "--commit-only"], cwd=ROOT,
+                           env=env, capture_output=True, text=True,
+                           encoding="utf-8", errors="replace")
+        if r.returncode != 0:
+            print("  (agent-loop 收口提交失败: %s)" % (r.stderr.strip() or r.stdout.strip() or "unknown"))
+    except Exception as e:
+        print("  (agent-loop 收口调用异常: %s)" % e)
 
 
 def _verify(remotes, branch):
@@ -467,6 +496,7 @@ def main():
     if rows:
         _append_ledger(rows)
         print("\n台账已更新：%s" % LEDGER)
+        _commit_ledger_via_agent_loop()
     print("本地 HEAD=%s  尝试=%d  失败=%d  跳过=%d" % (head[:12], attempted, failed, skipped))
     if attempted == 0:
         sys.exit(2)  # 全部被阻断/冷却跳过（未尝试）——agent_loop 记为「跳过(阻断)」
