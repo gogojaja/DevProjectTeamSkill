@@ -1,0 +1,9 @@
+﻿反模式,检查结论,严重度,证据,整改建议
+God Object,通过,,"单机承载三环境+CI 有中心化倾向,但职责经Docker Compose项目化拆分(R-09缓解),未达God级",无
+Spaghetti Architecture,通过,,"依赖单向:本机→仓库→Webhook→CI→结果回传(§1.1),无混乱依赖",无
+Big Ball of Mud,部分通过,主要,方案文档章节完整,但无C4/4+1视图支撑,仅文字描述,补架构视图
+Vendor Lock-in,通过,,"Drone→多Runner→Argo可升级(§10.2),Traefik/Docker均为开放标准,无厂商锁定",无
+Gold Plating,部分通过,主要,方案含Prod高可用/监控/备份等对技能库过重(§6),技能库场景仅需CI/CD闭环部分,裁剪非必要环境
+Not Invented Here,通过,,"CI选Drone/CD复用成熟方案(ADR-003),未自研,符合",无
+Architecture by Implication,部分通过,严重,方案经ATAM评审有ADRs支撑但ADR编号与仓库既有ADR-001~006冲突,方案ADR改编号(ADR-SKILL-001~006)防污染
+Hot Potato,通过,,"异常处理/回滚机制明确(§8.2/§15),未推责",无

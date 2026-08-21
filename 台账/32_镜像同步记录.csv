@@ -187,3 +187,7 @@ SYNC-20260821-189,2026-08-21 14:11:51,9a5a3c209beb,origin,https://github.com/gog
 SYNC-20260821-190,2026-08-21 14:11:51,9a5a3c209beb,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,2.7,   d1b94e2..9a5a3c2  main -> main
 SYNC-20260821-191,2026-08-21 21:57:50,c36efe18a450,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,失败,2.4,error: failed to push some refs to 'https://github.com/gogojaja/DevProjectTeamSkill.git'
 SYNC-20260821-192,2026-08-21 21:57:50,c36efe18a450,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,失败,0.6,hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+SYNC-20260821-193,2026-08-21 22:09:17,63fa0f2247ef,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,失败,2.7,error: failed to push some refs to 'https://github.com/gogojaja/DevProjectTeamSkill.git'
+SYNC-20260821-194,2026-08-21 22:09:17,63fa0f2247ef,mirror,https://gitee.com/gogojaja/DevProjectTeamSkill.git,成功,2.6,   19ddb9a..63fa0f2  main -> main
+SYNC-20260821-195,2026-08-21 22:37:34,63fa0f2247ef,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,失败,2.7,error: failed to push some refs to 'https://github.com/gogojaja/DevProjectTeamSkill.git'
+SYNC-20260821-196,2026-08-21 22:38:14,63fa0f2247ef,origin,https://github.com/gogojaja/DevProjectTeamSkill.git,成功,2.3,真实IP推送 PUSH_OK xxx.xxx.xxx.xxx:    d1b94e2..63fa0f2  main -> main

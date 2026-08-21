@@ -39,3 +39,6 @@ performance,PERF-001/005,LIGHT强制联网,CHANGES_REQUESTED,high,已落地：LI
 performance,PERF-003,评审缺省应串行,CHANGES_REQUESTED,medium,已落地：缺省串行合并一次连贯评审，真并行仅 team 模式,high
 performance,PERF-004,token口径三缺口,CHANGES_REQUESTED,high,已落地：口径单处定义+超限行为统一规则+删除残句,high
 performance,PERF-006,LIGHT证据卡过重,CHANGES_REQUESTED,medium,已落地：LIGHT 行内引用，完整 JSON 卡仅 FULL,high
+architect,ARCH-081,外部方案多环境CI-CD ADR编号冲突(ADR-001~006与本仓库重复),CHANGES_REQUESTED,high,已闭环：ADR-007登记为外部方案命名空间引用,high
+architect,ARCH-082,外部方案跨平台假设失效(本机Windows→实为macOS、本机即Macmini),CHANGES_REQUESTED,high,"已闭环：归档文件头部标注事实修正,不落业务三环境",high
+architect,ARCH-083,外部方案采纳子集(仅CI/CD闭环+配置密钥分离+双仓库互备),SIGNED_OFF,medium,"已由既有GitHub Actions质量门禁承载,ADR-007登记",high
