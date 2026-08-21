@@ -4,3 +4,4 @@ AUTH-002,本机项目集PMO与项目根目录,目录,D:\trae,读/写,douglas\gog
 AUTH-003,临时hosts覆盖以推送GitHub,系统文件,C:\Windows\System32\drivers\etc\hosts,写(github.com→可达IP),douglas\gogojaja,2026-08-17,2026-08-17,有效(本次会话),方案2——临时hosts覆盖github.com至可达IP并推送后还原；实际因权限不足未改写，沿用既有覆盖(140.82.114.4)+flushdns推送成功
 AUTH-004,opencode全局配置(屏蔽不可用模型),文件,~/.config/opencode/opencode.jsonc,读/写,gogojaja(本机),2026-08-20,2026-08-20,有效(本次会话),用户指令-全provider白名单化并禁用deepseek；备份.onbackup/opencode.jsonc.bak.20260820_221223
 AUTH-005,生产技能库部署目录,目录,~/dev-project-team-skill,读/写/创建,gogojaja(本机),2026-08-20,2026-08-21,有效,用户指令-创建本技能生产目录供其他项目复用(仅最新版本v21.8.0)
+AUTH-006,三环境目录映射(Prod<HOME>/Dev<DEV_VOLUME>/Test<TEST_VOLUME>),目录,<脱敏占位>,读/登记,douglas\gogojaja,2026-08-21 23:09:31,2026-08-21 23:09:31,有效,用户指令:三环境真实映射脱敏登记(本会话有效)
