@@ -13,6 +13,7 @@
 >   - 严重项（更正后仅 1 项）：方案 ADR-001~006 与本仓库既存 ADR-001~006 编号冲突 → 登记为**外部方案命名空间引用**，不污染本仓库决策库（ADR-007）
 >   - 原严重项①「跨平台假设失效」【已撤销】：经用户澄清方案拓扑成立（Mac mini=本机、Windows=另台机），跨平台性改判通过
 >   - 采纳子集：仅**CI/CD 自动化闭环 + 配置/密钥分离 + 双仓库互备**思想（已由既有 GitHub Actions 质量门禁承载）；不落地 Dev/Test/Prod 业务三环境
+> - **落地状态（2026-08-21）**：方案 §7.2「提交即验证」已落地——`nightly-quality-gate.yml` 扩展 push/pull_request 触发（main push/PR=全量、feature push=轻量质量门禁），保留夜间 schedule + 手动；Commit Status/Check 回写权限已补。三环境/Drone 不落地，符合本仓库技能库定位（ADR-007）。
 
 ---
 
