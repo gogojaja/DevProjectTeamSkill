@@ -1,11 +1,21 @@
 # 夜间全项目质量门禁（评审 + 单元测试）设计方案
 
-> **状态**：草案 v1（评审通过，暂不落地）　**生成日期**：2026-08-21
+> **状态**：**已落地**（2026-08-21 实施完成）　**生成日期**：2026-08-21
 > **档位**：FULL（best-practice-solution，含行业最佳实践锚定 + 多视角评审）
 > **范围**：本仓库（DevProjectTeamSkill 技能库）及用户管理的多项目，每晚定时执行质量评审与单元测试
 > **铁律对齐**：A 级凭据（铁律 #3）/ B 级脱敏（铁律 #8）/ 源码单源（AGENTS.md 规则 #1-#2）
 
-> ⚠️ **暂不落地声明**：本文档为设计方案，不含任何可调度的实现代码。附录中的 CI 配置 / 脚本片段仅作「未来落地参考」，本仓库当前不创建 `.github/workflows/*.yml`、`tools/nightly_quality_gate.py` 或任何 crontab 条目。落地须另起实施任务。
+> ✅ **落地状态**：本文档已从「草案/暂不落地」转为「已落地」。实现产物：
+> - `tools/nightly_quality_gate.py`（编排器：registry 循环 → quality_gate + 单测 + 脱敏 + 36/39 台账 + 告警 + ENABLE_AI_REVIEW 开关）
+> - `projects_registry.csv`（多项目清单）
+> - `台账/39_待决策事项.csv`（Decision Backlog 队列）
+> - `.github/workflows/nightly-quality-gate.yml`（schedule cron UTC 19:00 + workflow_dispatch）
+>
+> **落地偏差修正（事实 > 文档铁律，2026-08-21）**：
+> 1. **调度载体**：设计原选「平台 CI」基于 EV-L03「无 scheduler」；实施时核实运行态已有 `tools/scheduler/`（APScheduler 全功能），但用户决策仍选**平台 CI**（GitHub Actions），本机 scheduler 作为可选备选。
+> 2. **决策队列编号**：设计用 `37_待决策事项.csv`，实际 `37_方案评审记录.csv` 已占用 → 改用 `39_待决策事项.csv`。
+> 3. **脱敏扫描范围**：设计「扫新增产物」；实施验证发现全仓扫描会命中 6530 处存量 B 级（IP/路径历史文档），已调整为**只扫本次新增产物（36/39 CSV）**避免误判。
+> 4. **单测存量缺陷**：`tests/test_agent_loop.py::test_dry_run_no_push` 缺 `tmp_repo` fixture（23 pass 1 error 存量问题，非本次引入），夜间门禁会将此记入 39 待决策，不阻断整体。
 
 ---
 

@@ -1,0 +1,84 @@
+# 夜间全项目质量门禁（评审 + 单元测试）——落地实现
+# 设计依据：docs/nightly-quality-gate-design.md（ADR-xxx / 决策点 B）
+# 铁律对齐：A 级凭据（#3，走 .secrets/load_secret）／B 级脱敏（#8，报告相对路径禁主机名/IP）
+#
+# 调度：schedule.cron + workflow_dispatch 手动触发
+# 注意：GitHub cron 为 UTC（本仓设定为 UTC 19:00 = 本地 Asia/Shanghai 次日 03:00，设计 §4.2）
+# 关键 schedule 建议由 service account / bot 拥有（EV-006）
+# 不指向需 required reviewers 的 protected environment（EV-008，人工审批留给 workflow_dispatch）
+name: nightly-quality-gate
+
+on:
+  schedule:
+    - cron: "0 19 * * *"
+  workflow_dispatch:
+    inputs:
+      target:
+        description: '指定项目别名（留空=全部）'
+        required: false
+        type: string
+      enable_ai_review:
+        description: '启用 AI 语义评审（默认关，仅记录非阻断）'
+        required: false
+        type: boolean
+        default: false
+      ai_budget:
+        description: 'AI 评审 token 预算上限（默认 0=不限）'
+        required: false
+        type: number
+        default: 0
+
+permissions:
+  contents: read
+
+jobs:
+  nightly:
+    runs-on: ubuntu-latest
+    environment: nightly   # 无 required reviewers 的自动环境（EV-008）
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install test deps
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f pytest.ini ] || [ -f pyproject.toml ]; then
+            python -m pip install pytest
+          fi
+
+      - name: Import runtime secrets into .secrets (A 级，经 GitHub Secrets)
+        env:
+          QG_TOKEN: ${{ secrets.QG_TOKEN }}
+          QG_SECRET_PATH: .secrets
+        run: |
+          mkdir -p .secrets
+          if [ -n "$QG_TOKEN" ]; then
+            printf '%s' "$QG_TOKEN" > .secrets/qg_token
+          fi
+
+      - name: Run nightly quality gate
+        env:
+          ENABLE_AI_REVIEW: ${{ github.event.inputs.enable_ai_review || 'false' }}
+          AI_BUDGET: ${{ github.event.inputs.ai_budget || '0' }}
+          TARGET: ${{ github.event.inputs.target || '' }}
+        run: |
+          ARGS=""
+          if [ -n "$TARGET" ]; then ARGS="--target $TARGET"; fi
+          python tools/nightly_quality_gate.py run $ARGS \
+            || echo "::warning::nightly quality gate 存在 FAIL/待决策项（见台账 36/39）"
+
+      - name: Upload quality gate reports (脱敏，仅本仓相对路径)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-gate-reports
+          path: |
+            台账/36_质量门记录.csv
+            台账/39_待决策事项.csv
+            台账/scan_report_nightly.csv
+          retention-days: 14

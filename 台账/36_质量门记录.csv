@@ -4,3 +4,21 @@ QG-001,2026-08-18 10:27:33,台账/33_自主Agent演进方案.md,CodeReviewer,PAS
 QG-001,2026-08-18 10:27:33,台账/33_自主Agent演进方案.md,SecurityReviewer,待宿主LLM,,需 opencode 强模型视角,host seam(ARCH-002)
 QG-001,2026-08-18 10:27:33,台账/33_自主Agent演进方案.md,TestEngineer,待宿主LLM,,需 opencode 强模型视角,host seam(ARCH-002)
 QG-001,2026-08-18 10:27:33,台账/33_自主Agent演进方案.md,PerformanceEngineer,待宿主LLM,,需 opencode 强模型视角,host seam(ARCH-002)
+QG-002,2026-08-21 21:44:48,dev-project-team-skill,Architect,PASS,,version+closure 门禁,结构/一致性自动校验
+QG-002,2026-08-21 21:44:48,dev-project-team-skill,CodeReviewer,PASS,,release_gate,发布级门禁自动校验
+QG-002,2026-08-21 21:44:48,dev-project-team-skill,SecurityReviewer,待宿主LLM,,需 opencode 强模型视角,host seam(ARCH-002)
+QG-002,2026-08-21 21:44:48,dev-project-team-skill,TestEngineer,待宿主LLM,,需 opencode 强模型视角,host seam(ARCH-002)
+QG-002,2026-08-21 21:44:48,dev-project-team-skill,PerformanceEngineer,待宿主LLM,,需 opencode 强模型视角,host seam(ARCH-002)
+QG-002,2026-08-21 21:44:48,dev-project-team-skill,Architect,PASS,,version+closure 门禁,quality_gate 自动校验
+QG-002,2026-08-21 21:44:48,dev-project-team-skill,CodeReviewer,PASS,,release_gate,quality_gate 自动校验
+QG-002,2026-08-21 21:44:48,dev-project-team-skill,TestEngineer,FAIL,high,python3 -m pytest tests -q,单测全量
+QG-002,2026-08-21 21:44:48,dev-project-team-skill,SecurityReviewer,AIDA,,desensitize --scan,脱敏扫描（只扫不改）
+QG-003,2026-08-21 21:48:36,dev-project-team-skill,Architect,PASS,,version+closure 门禁,结构/一致性自动校验
+QG-003,2026-08-21 21:48:36,dev-project-team-skill,CodeReviewer,PASS,,release_gate,发布级门禁自动校验
+QG-003,2026-08-21 21:48:36,dev-project-team-skill,SecurityReviewer,待宿主LLM,,需 opencode 强模型视角,host seam(ARCH-002)
+QG-003,2026-08-21 21:48:36,dev-project-team-skill,TestEngineer,待宿主LLM,,需 opencode 强模型视角,host seam(ARCH-002)
+QG-003,2026-08-21 21:48:36,dev-project-team-skill,PerformanceEngineer,待宿主LLM,,需 opencode 强模型视角,host seam(ARCH-002)
+QG-003,2026-08-21 21:48:36,dev-project-team-skill,Architect,PASS,,version+closure 门禁,quality_gate 自动校验
+QG-003,2026-08-21 21:48:36,dev-project-team-skill,CodeReviewer,PASS,,release_gate,quality_gate 自动校验
+QG-003,2026-08-21 21:48:36,dev-project-team-skill,TestEngineer,FAIL,high,python3 -m pytest tests -q,单测全量
+QG-003,2026-08-21 21:48:36,dev-project-team-skill,SecurityReviewer,WARN,,desensitize --scan(新增产物),脱敏扫描（只扫不改）

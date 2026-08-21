@@ -1,0 +1,2 @@
+﻿project_alias,project_path,test_cmd,secret_ref,enabled,note
+dev-project-team-skill,<repo-root>,python3 -m pytest tests -q,,y,本仓库自身（CI checkout 后 workspace 根目录）
