@@ -1,12 +1,9 @@
 {
   "mcpServers": {
     "dev-project-team-skill": {
-      "command": "uv",
+      "command": "py",
       "args": [
-        "run",
-        "--python", "3.10",
-        "--with", "mcp[cli]",
-        "python3",
+        "-3.11",
         "${workspaceFolder}/tools/mcp_server.py"
       ],
       "env": {
