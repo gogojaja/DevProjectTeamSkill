@@ -66,3 +66,6 @@ scan_report_*.csv
 NUL
 CON
 PRN
+
+# IDE 本地项目数据（会话/计划，不入库，lint 白名单保留本地目录）
+.codebuddy/

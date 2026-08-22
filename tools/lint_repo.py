@@ -25,12 +25,14 @@ WHITELIST_DIRS = {
     '.git', '.trae', '.agents', '.claude', '.github', '.secrets', '.backup',
     '.githooks', '.vscode', 'docs', 'tools', 'scripts', 'security',
     'requirements', 'tests', '台账', '.trae-html-share-packages', '架构资产', 'env-architecture-plan',
+    '.codebuddy',  # IDE 项目数据目录（含计划/会话状态），非临时缓存，禁止删除
 }
 # 根目录白名单（文件）
 WHITELIST_FILES = {
     'AGENTS.md', 'opencode.json', 'README.md', '交接文档.md',
     'CHANGELOG.md', 'CONTRIBUTING.md',
     '.gitattributes', '.gitignore', '.agent-loop-enabled',
+    'projects_registry.csv',  # nightly_quality_gate.py 硬编码依赖的 registry（登记测试命令等）
 }
 # 中文文档豁免命名检查的目录（以仓库根相对路径前缀匹配）
 CJK_NAME_DIRS = {'台账', 'docs', 'docs/program-control-ledger'}

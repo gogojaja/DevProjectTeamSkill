@@ -1,0 +1,22 @@
+﻿维度,编号,类别,严重度,发现项,现状证据(量化数据),行业基准对照,影响评估,修复建议,优先级
+一、项目定位与架构,1.1,优势,—,"10 包结构完整;.trae/skills/ 唯一事实来源,deploy 三目录(.github/.claude/.agents)结构对齐",源码 171 文件 vs 部署各 289 文件(含内嵌副本+tools/docs),"行业最佳实践(单一事实来源+多目标部署),达成;shared/references 4 文件不同步为唯一瑕疵","单源架构稳固,仅共享副本漂移待修",对齐 D-03 修复路径,高
+一、项目定位与架构,1.2,观察,—,version_consistency 门禁通过;8 个版本号(v1.0.0~v21.8.1)各包独立演进,SKILL_INDEX 页脚 v21.8.1(2026-08-22),"行业通常按包独立语义化版本+根索引汇总,多版本增加认知成本但门禁允许",已在 SKILL_INDEX 汇总口径,建议增加版本汇总表,中
+一、项目定位与架构,1.3,缺陷,P2,"台账/需求-架构-代码追溯矩阵.csv 不存在,铁律 #10 明确要求以该矩阵为单一事实来源且阶段流转前强制 check_traceability.py",check_traceability.py 报错:未找到追溯矩阵,NASA SWE-059/EN 62304/ASPICE 均要求需求-设计-测试双向追溯,当前无法满足铁律 #10 与行业追溯标准,需初始化追溯矩阵(check_traceability.py --init)并补录存量 REQ/AE/MOD/TC 条目,高
+二、技能内容质量,2.1,优势,—,"9 角色包 SKILL.md 96~108 行,编排器 216 行;上轮 273~1306 行离散已收敛",wc -l 逐包统计,行业成熟技能库要求各包职责边界清晰、篇幅均衡,"结构均衡,可维护性好",维持现状,低
+二、技能内容质量,2.2,缺陷,P2,"role-architecture description 146 字符,低于 150 下限 4 字符",check_skill_descriptions.py 测量 146,skill description 150~250 字符为仓库硬门禁;OpenAI/Anthropic 技能规范亦要求 description 精确触发、长度受控,"descriptions 门禁 3/4 未全绿,本轮不得固化",扩充 role-architecture description 至 ≥150(按门禁测量口径),高
+二、技能内容质量,2.3,优势,—,10 包 + 8 子技能均含「闭环执行系统」章节,check_skill_closure.py:18/18 通过,Agent 技能最佳实践要求可执行闭环(入口/状态/门禁/失败/产出/审计),维护模式硬门禁合规,维持,低
+三、工具代码质量,3.1,优势,—,核心脚本(solidify/deploy_skills/package_skills)含结构化错误处理、shebang 全覆盖、4 个 .sh 双实现,LSP 分析:solidify.py 33 符号/deploy_skills.py 16 符号;6 .sh 均 +x;tools/*.py 全 shebang,行业工具链要求跨平台+可测试+错误可诊断,"跨平台可执行性良好,小瑕疵不阻断",为 pre-commit-secret-scan/restore_github_push 补 .py 双实现,低
+三、工具代码质量,3.2,缺陷,P2,"references/ 与 shared/references/ 4 个同名文件内容不同,且 traceability_standard.md 仅存在于 references/",diff:COPYRIGHT/api_contracts/common_standards/directory_structure 4 文件不同;shared/references 14 项 vs references 15 项,行业要求共享库单源、副本由构建自动生成;违反源码单源铁律 #1(禁止手工复制),"打包产物与源不一致,破坏单源事实","运行打包脚本重新内嵌 shared 副本,使逐文件 diff 归零",高
+三、工具代码质量,3.3,待改进,P3,"tests/ 436 行 + tools/tests 1226 行 vs tools 源码 10,451 行,覆盖率约 4%~7%","find tests tools/tests 11 个 py(436+1226 行);tools 总行数 10,451",行业开源工具链通常要求关键路径 ≥60% 行覆盖,"门禁/部署/打包等关键脚本无单测保护,回归风险中","为 solidify/deploy/package/quality_gate 补单测,目标关键路径 ≥40%",中
+四、文档体系,4.1,优势,—,AGENTS.md 273 行含全命令表;SKILL_INDEX 索引 18 条;references 16 文档;docs 26 文件,wc -l 统计,行业最佳实践:索引+规范+执行分离,文档检索效率高,维持,低
+四、文档体系,4.2,待改进,P3,"评审报告 CSV(v21.8.1 三份+v21.8.2 三份)置于根目录,违反 lint_repo 命名/目录白名单(非 kebab-case)",lint_repo 23 项 error 之一,行业一般将评审产物归档至独立目录(如 docs/reviews/)并纳入 git,根目录卫生无法全绿,"建立 docs/reviews/ 目录收纳评审报告 CSV,并更新 lint_repo 白名单",中
+五、安全合规,5.1,通过,—,无真实凭据入库;10 处 A 级占位符(PASSWORD: <dev_pass>/<test_pass>)于 multi_project_isolation.md 示例,desensitize --scan:171 文件 119 处(A 10+B 109);tools/ A 6 处为规则示例,OWASP 密钥管理最佳实践:禁止真实凭据入库、示例用占位符,"安全合规,占位符不阻断发布",维持;可选将示例改为 B 级演示值,低
+五、安全合规,5.2,通过,—,"docs/ 85 处 B 级(github_ip_records.csv 84 处公开 IP)+源 109 处 B 级,均属公开信息/示例",desensitize --scan docs/ 85 处;--scan .trae/skills/ 109 处,IP 脱敏规范(192.168.x.x→xxx.xxx.xxx.xxx)适用真实内网 IP;github_ip_records 为公网 CDN 记录可公开,无真实内网 IP 泄露,维持,低
+五、安全合规,5.3,通过,—,"mirror_push/github_push 凭据经 load_secret.py 装载(env>.secrets>Keychain),不硬编码",tools/load_secret.py 存在;AGENTS.md 凭据铁律,OWASP 密钥管理:凭据经安全通道注入,凭据安全,维持,低
+六、运维成熟度,6.1,优势,—,"solidify(项目级三目录)+publish_production(全局库独占)+mirror_push(双推+熔断),链路完整",AGENTS.md 命令表;32_镜像同步记录.csv 留痕,行业成熟度:开发/生产环境隔离+发布留档+镜像冗余,运维链路完整,维持,低
+六、运维成熟度,6.2,缺陷,P2,"lint_repo 23 项 error:根目录散落 .DS_Store/.pytest_cache/.venv/scan_report×5/desensitize_report×2/评审报告×3/projects_registry.csv,命名非 kebab-case",lint_repo.py:23 项 error(散落文件 10+命名规范 10+),行业要求根目录整洁、产物归位,23 项 error 使 lint 门禁无法全绿,清理根目录散落物(垃圾文件删除、报告归档 docs/reviews/、registry 归位),中
+六、运维成熟度,6.3,缺陷,P4,"台账/32_镜像同步记录.csv 有未提交修改(git status M),铁律要求双推留痕纳入版本",git status: M 台账/32_镜像同步记录.csv,审计留痕要求台账与 git 同步,台账与仓库不同步,下次固化时一并提交 32_镜像同步记录.csv,低
+七、行业对标与竞争力,7.1,优势,—,引用 17 项标准(PMBOK 7th/IEEE 29119/42010/830/ISO 25010/21500/21503/21504/ISTQB/ITIL v4/OWASP/DORA/BABOK v3/P3M3/CMMI/OPM3/MSP 5th/PMI SPM 5th),全量 grep 统计,行业权威标准覆盖充分,行业对齐度高,维持,低
+七、行业对标与竞争力,7.2,优势,—,编排器 216 行 + 8 嵌套子技能(并行编排/多视角验证/工作树隔离/LSP-AST 集成/最佳实践方案),dev-project-team-skill/skills/ 8 子技能清单,对标业界 Agent 技能编排体系(Skills+Workflows 模式),差异化竞争力明显,维持,低
+七、行业对标与竞争力,7.3,待改进,P3,四门禁 3/4 + 追溯矩阵缺失 + lint 23 项 error;无 CI 集成(projects_registry 已登记测试命令但未见流水线配置),门禁运行结果汇总,"行业要求 CI 门禁自动阻断(如 GitHub Actions 全绿),当前门禁依赖人工触发","门禁自动化不足,回归依赖人工","配置 CI 流水线固化四门禁+lint+测试,失败即阻断",高
+八、综合评估,8.1,总体成熟度,—,结构/内容/安全/文档达标;四门禁 3/4、追溯矩阵缺失、shared 副本漂移、lint 23 项、测试覆盖低 5 项为待修复点,本报告 21 项结论汇总,"对照技能库成熟度模型(结构 5/5 内容 5/5 工具 3.5/5 安全 5/5 运维 3/5),总体 B+ 级",修复 D-01~D-05 后可 A 级,优先级排序:D-02 追溯矩阵>D-03 shared 漂移>D-01 description>D-04 lint>D-05 台账提交,高

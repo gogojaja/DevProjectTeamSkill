@@ -16,9 +16,10 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.8.1
-- **版本发布日期**：2026-08-20
+- **技能版本**：v21.8.2
+- **版本发布日期**：2026-08-22
 - **版本变更记录**：
+  - v21.8.2：本体全面评审 v21.8.2 缺陷修复批次（2026-08-22）——①`role-architecture` description 扩充至 150+ 字符（补「架构评估/技术选型」触发词）使 descriptions 门禁全绿；②初始化《需求-架构-代码追溯矩阵.csv》并补录存量 11 REQ/5 AE/17 MOD/6 TC 条目（铁律 #10 落地，`check_traceability.py` 通过）；③以 `references/` 为基准重建 `shared/references/` 副本消除 4 文件漂移 + 补 `traceability_standard.md` 副本（铁律 #1 单源合规，部署三目录同步）；④仓库卫生 lint 白名单更新（`.codebuddy/` IDE 数据目录 + `projects_registry.csv` 依赖文件），评审报告归档 `docs/reviews/`，清理 `.DS_Store/.pytest_cache/.venv/扫描报告×5`，lint 门禁 23 error→0；⑤`lint_repo.py` 白名单维护。
   - v21.8.1：生产发布集补全缺陷修复（2026-08-20）——修复 `tools/`（github_push.py/_gh_ip_probe.py 等）与 `docs/`（github_ip_records.csv 等）未纳入发布/部署/固化复制集、全局库按文档调用工具路径不存在的缺陷；`publish_production`/`deploy_skills`/`solidify` 复制集统一纳入 tools+docs，脱敏门禁扫描范围扩展至 tools/docs 并豁免规则定义示例与占位符；版本目录、项目级三目录、全局库同步生效。
 - **版本变更记录**：
   - v21.8.0：工具固化与真实 IP 推送固定动作（2026-08-20）——新增 `tools/github_push.py`（候选 IP→可达+TLS 证书合法探测→绑定真实 IP push origin，`--dry-run` 预览）与公共探测模块 `tools/_gh_ip_probe.py`（供 github_ip_refresh/github_push 复用）；`mirror_push.py --github-realip` 双推时 origin 网络失败自动真实 IP 回退且推送成功后清除熔断冷却；`--verify` 增强为「启动即双端同步检查」（fetch+对比领先/落后，分叉即阻断推送）；SYNC 台账编号幂等（解析 max 编号取 +1）；opencode.json MCP 命令 uv→py 环境校准；AGENTS.md 登记固定动作 P-001（减少反复手动操作）。
@@ -213,5 +214,5 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 
 ---
 
-**文档版本**：v21.8.1　**最后更新**：2026-08-20（生产发布集补全缺陷修复：tools/docs 纳入发布/部署/固化复制集 + 脱敏门禁扫描范围扩展与规则示例豁免）
+**文档版本**：v21.8.2　**最后更新**：2026-08-22（本体全面评审 v21.8.2 缺陷修复：description 门禁全绿 + 追溯矩阵初始化 + shared 副本漂移归零 + 仓库卫生 lint 全绿）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

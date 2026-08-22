@@ -1,0 +1,27 @@
+﻿perspective,check_id,check_name,status,severity,evidence,confidence
+architect,ARCH-01,源码单源一致性,WARNING,P2,".trae/skills/ 为唯一事实来源;部署三目录结构与源一致(角色包/shared/references 结构对齐);但 shared/references 与 references 存在 4 个文件不同步(见 D-03),traceability_standard.md 无 shared 副本;源 171 文件 vs .github/.claude/.agents 各 289 文件(部署含内嵌副本+tools/docs)",high
+architect,ARCH-02,目录结构完整性,PASS,P4,10 包(9 角色包+1 编排器)均含 SKILL.md;8 嵌套子技能完整存在;domain/ 与 __resources/ 齐全;dev-project-team-skill/skills/ 下 best-practice-solution/commit-protocol/lsp-ast-integration/multi-perspective-validation/project-memory/self-improve/team-orchestration/worktree-isolation 8 子技能存在,high
+architect,ARCH-03,版本元数据一致性,PASS,P4,check_version_consistency.py 硬门禁通过;跨包版本分布 8 个版本号(v1.0.0~v21.8.1)各包独立演进(允许差异);41 项软提示可人工确认,high
+architect,ARCH-04,需求-架构-代码追溯矩阵存在性,FAIL,P2,check_traceability.py 报错:未找到追溯矩阵 台账/需求-架构-代码追溯矩阵.csv;铁律 #10 要求的单一事实来源缺失,high
+architect,ARCH-05,相对引用路径完整性,PASS,P4,"67 个 md 文件含 ../shared/ 或 ../references/ 引用,逐路径验证全部存在,零断链",high
+architect,ARCH-06,角色包内容均衡度,PASS,P4,9 角色包 SKILL.md 行数 96~108 行分布均衡(role-testing 96/role-mgmt-consulting 97/role-architecture 98/role-program-mgmt 100/role-development 101/role-project-init 101/role-requirements-analysis 102/role-governance 108);编排器 216 行;上轮 273~1306 行离散已收敛,high
+code_reviewer,CR-01,核心脚本错误处理,PASS,P3,上轮「0 try 错误处理」已修复;solidify.py 33 符号含 _run_script/run_package/run_version_check/run_closure_check/run_release_gate/run_deprecation_cleanup/run_deploy/refresh_handoff/snapshot 结构化接口;deploy_skills.py 16 符号含 parse_args/check_names/deploy_target 校验,high
+code_reviewer,CR-02,脚本 shebang 覆盖,PASS,P4,"tools/*.py 全量 head -1 检查,0 文件无 shebang,直接执行可用",high
+code_reviewer,CR-03,双实现覆盖,WARNING,P3,6 个 .sh 中 4 个有 .py 双实现(package_skills/solidify/publish_production/deploy_skills);pre-commit-secret-scan 与 restore_github_push 仍仅 .sh(Windows 用户不可用);29 个 .py 无 .sh 对应(纯 py 工具正常),high
+code_reviewer,CR-04,测试覆盖率,WARNING,P3,"tests/ 6 文件 436 行 + tools/tests 3 文件 1226 行(含集成测试 276 行)vs tools 源码 10,451 行(54 py);覆盖率约 4%~7%,关键门禁脚本无单测保护",high
+code_reviewer,CR-05,脚本可执行权限,PASS,P4,"ls -l:6 个 .sh 均 -rwxr-xr-x(F-01 已修复),macOS/Linux 可直接执行",high
+code_reviewer,CR-06,工具代码结构清晰度,PASS,P4,"LSP documentSymbol 分析:solidify.py 33 符号/deploy_skills.py 16 符号,模块级常量+接口函数+嵌套工具函数分层清晰,职责内聚",high
+security,SEC-01,A 级密钥泄露检查,WARNING,P3,"desensitize --scan .trae/skills/:171 文件 119 处(A 级 10 处全部为占位符 PASSWORD: <dev_pass>/<test_pass> 于 references 与 shared/references 的 multi_project_isolation.md);tools/ A 级 6 处为 desensitize.py 规则示例;无真实凭据,按规则占位符仅告警不阻断",medium
+security,SEC-02,.secrets 禁提交检查,PASS,P4,"git ls-files .secrets/ 返回空,.secrets/ 目录无文件被 git 跟踪",high
+security,SEC-03,B 级脱敏扫描,WARNING,P4,"desensitize --scan docs/:85 处 B 级(github_ip_records.csv 84+复盘文档 1);--scan tools/:37 处 B 级;--scan .trae/skills/:109 处 B 级;均属公开信息/示例,无真实主机名/IP 泄露",medium
+security,SEC-04,敏感信息密度,WARNING,P4,"源 .trae/skills/ 119 处敏感匹配(10 A + 109 B),B 级占 91.6%,集中于 multi_project_isolation/github_access/iron_rules 等标准文档示例",high
+security,SEC-05,凭据外部化,PASS,P3,"mirror_push/github_push 凭据经 tools/load_secret.py 装载(env > .secrets > macOS Keychain),不硬编码入库",high
+test_engineer,TE-01,四硬门禁基线,WARNING,P2,"version_consistency ✅;release_gate ✅ 10 包+8 子技能;closure ✅ 10 包+8 子技能;descriptions ❌ role-architecture 146 字符(<150),四门禁 3/4",high
+test_engineer,TE-02,废弃资产清理门禁,PASS,P4,"check_deprecation_cleanup.py:未发现 status=废弃 的 ADR,通过(前向兼容)",high
+test_engineer,TE-03,仓库卫生 lint,FAIL,P2,lint_repo.py:23 项 error(根目录散落 .DS_Store/.pytest_cache/.venv/scan_report×5/desensitize_report×2/评审报告×3/projects_registry.csv 等 10+ 项 + 命名非 kebab-case 10+ 项),high
+test_engineer,TE-04,闭环执行系统覆盖,PASS,P4,check_skill_closure.py:18/18 通过(10 包+8 子技能均含闭环章节:任务入口/执行状态/验收门禁/失败处理/产出交接/审计记录),high
+test_engineer,TE-05,测试基础设施,medium,P3,tests/ 436 行 + tools/tests 1226 行;pytest 可执行;projects_registry.csv 登记 test_cmd:python3 -m pytest tests -q;但覆盖率未达质量门,high
+performance,PERF-01,大文件 token 效率,WARNING,P3,10+ 个 .md 超 16KB:api_contracts 40K(源)/32K(shared)/multi_project_isolation 28K×2/orchestrator SKILL.md 32K/best-practice-solution 24K/lsp-ast 3×20K/project-init domain 20K;dist/ zip 与 env-architecture-plan js 库(2.5MB/1MB)为大体积非 md 文件,high
+performance,PERF-02,dist 打包产物冗余,PASS,P3,"dist/ 留存 20+ zip(DevProjectTeamSkill-trae-v21.5.0 412K/role-*_v21.x 11 个/dev-project-team-skill_v21.6~v21.8.1 10 个),多版本产物占用空间",medium
+performance,PERF-03,门禁工具执行效率,PASS,P4,"四门禁+废弃清理+追溯+lint 单次执行均 <2s,工具链无性能瓶颈",high
+performance,PERF-04,嵌套子技能规模,WARNING,P4,"lsp-ast-integration/domain 3 文件各 20KB(ast-engine/code-generation/lsp-ast-integration),专项能力文档厚,加载成本高但内容专业",medium
