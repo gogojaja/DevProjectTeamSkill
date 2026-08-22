@@ -1,0 +1,20 @@
+perspective,check_id,check_name,status,severity,evidence,confidence
+architect,ARCH-001,源码单源规则,PASS,high,54处../shared/相对引用，无手工复制，high
+architect,ARCH-002,ADR一致性,PASS,high,7个ADR全部Accepted，无废弃状态，high
+architect,ARCH-003,角色包结构,PASS,medium,10个角色包索引完整，路径正确，high
+architect,ARCH-004,依赖方向,PASS,high,无循环依赖，分层正确，high
+code_reviewer,CR-001,工具脚本完整性,PASS,medium,54个脚本（.py/.sh双实现），high
+code_reviewer,CR-002,描述规范,WARNING,medium,部分SKILL.md description长度需核对，medium
+code_reviewer,CR-003,代码风格,PASS,low,遵循Python/Shell规范，medium
+code_reviewer,CR-004,测试覆盖,FAIL,medium,tools/目录缺少单元测试脚本，high
+security,SEC-001,敏感信息扫描,PASS,high,70个文件含敏感词（文档示例为主），无真实凭据，high
+security,SEC-002,凭据管理,PASS,high,.gitignore正确排除.secrets/，A/B级分级处理，high
+security,SEC-003,访问边界,PASS,high,26_访问边界.csv+14_授权登记.csv双重控制，high
+security,SEC-004,脱敏规则,PASS,high,iron_rules.md B级脱敏细则完善，high
+test_engineer,TE-001,门禁脚本,PASS,high,check_version_consistency.py等3个门禁脚本，high
+test_engineer,TE-002,Pre-commit钩子,PASS,medium,.githooks/pre-commit配置A/B级检查，high
+test_engineer,TE-003,单元测试,FAIL,high,tools/目录缺少pytest/unittest测试套件，high
+test_engineer,TE-004,集成测试,WARNING,medium,无端到端集成测试，medium
+performance,PERF-001,脚本执行,PASS,medium,双平台实现，执行效率良好，high
+performance,PERF-002,Token使用,PASS,medium,符合token_standard规范，high
+performance,PERF-003,资源消耗,PASS,low,脚本轻量化，无资源泄漏，medium

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os, sys, re, zipfile, shutil, glob
 sys.stdout.reconfigure(encoding='utf-8')
 
@@ -29,7 +30,11 @@ def pack_role(role):
     tmp = os.path.join(ROOT, '_pkg_tmp', role)
     if os.path.exists(tmp):
         shutil.rmtree(tmp)
-    os.makedirs(tmp)
+    try:
+        os.makedirs(tmp)
+    except OSError as e:
+        print(f'  ✗ 创建临时目录失败: {e}')
+        return False
 
     # 交接文档置包内第一项
     if os.path.isfile(HANDOFF):
@@ -68,7 +73,11 @@ def pack_role(role):
         shutil.copytree(ref_src, dst)
 
     out = os.path.join(DIST, f'{role}_{ver}.zip')
-    os.makedirs(DIST, exist_ok=True)
+    try:
+        os.makedirs(DIST, exist_ok=True)
+    except OSError as e:
+        print(f'  ✗ 创建 dist 目录失败: {e}')
+        return False
     if os.path.exists(out):
         os.remove(out)
     with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as z:

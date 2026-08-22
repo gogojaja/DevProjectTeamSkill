@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os, sys, shutil, re, glob, datetime, subprocess
 sys.stdout.reconfigure(encoding='utf-8')
 
@@ -11,8 +12,15 @@ ALL_ROLES = ['dev-project-team-skill','role-project-init','role-requirements-ana
 
 def _run_script(script, *args):
     """跨平台运行 tools/ 下脚本：使用当前 Python 解释器（Windows/macOS/Linux 通用）。"""
-    cmd = [sys.executable, os.path.join(TOOLS_DIR, script), *args]
-    return subprocess.run(cmd, cwd=ROOT)
+    try:
+        cmd = [sys.executable, os.path.join(TOOLS_DIR, script), *args]
+        return subprocess.run(cmd, cwd=ROOT)
+    except FileNotFoundError:
+        print(f'   ✗ 脚本不存在: {script}')
+        return subprocess.CompletedProcess(cmd, returncode=1)
+    except OSError as e:
+        print(f'   ✗ 执行 {script} 失败: {e}')
+        return subprocess.CompletedProcess(cmd, returncode=1)
 
 def run_package():
     r = _run_script('package_skills.py')
@@ -52,8 +60,15 @@ def run_deploy():
 
 def refresh_handoff(stamp, note):
     MARK = '## 1. 工作断点'
-    with open(HANDOFF, encoding='utf-8') as f:
-        c = f.read()
+    try:
+        with open(HANDOFF, encoding='utf-8') as f:
+            c = f.read()
+    except FileNotFoundError:
+        print(f'   ✗ 交接文档不存在: {HANDOFF}')
+        return
+    except OSError as e:
+        print(f'   ✗ 读取交接文档失败: {e}')
+        return
     n_roles = 0
     for r in ALL_ROLES:
         p = os.path.join(SKILLS_DIR, r, 'SKILL.md')
@@ -77,16 +92,23 @@ def refresh_handoff(stamp, note):
                  f'### 阻塞\n（如有风险/阻塞项）\n\n'
                  f'### 台账指针\n主台账 CSV 路径：待填　最近变更号：待填')
         updated = c.rstrip('\n') + block
-    with open(HANDOFF, 'w', encoding='utf-8') as f:
-        f.write(updated)
-    print(f'   ✓ 交接文档断点区已刷新（固化后必须反映磁盘最新状态）')
+    try:
+        with open(HANDOFF, 'w', encoding='utf-8') as f:
+            f.write(updated)
+        print(f'   ✓ 交接文档断点区已刷新（固化后必须反映磁盘最新状态）')
+    except OSError as e:
+        print(f'   ✗ 写入交接文档失败: {e}')
 
 def snapshot(ver):
     snap = os.path.join(ROOT, f'skills_backup_{ver}')
     if os.path.isdir(snap):
         print(f'   ⚠ 快照 {ver} 已存在（不覆盖）')
         return
-    os.makedirs(snap)
+    try:
+        os.makedirs(snap)
+    except OSError as e:
+        print(f'   ✗ 创建快照目录失败: {e}')
+        return
     for r in ALL_ROLES:
         src = os.path.join(SKILLS_DIR, r)
         if os.path.isdir(src):

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os, sys, shutil, glob
 sys.stdout.reconfigure(encoding='utf-8')
 
@@ -66,23 +67,36 @@ def check_names(roles):
 
 def deploy_target(target, roles):
     print(f'部署 → {target} ({",".join(roles)})')
-    if os.path.exists(target):
-        shutil.rmtree(target)
-    os.makedirs(target)
+    try:
+        if os.path.exists(target):
+            shutil.rmtree(target)
+        os.makedirs(target)
+    except OSError as e:
+        print(f'  ✗ 创建部署目录失败: {e}')
+        sys.exit(1)
     for r in roles:
         src = os.path.join(SKILLS_DIR, r)
         if os.path.isdir(src):
-            shutil.copytree(src, os.path.join(target, r),
-                            ignore=shutil.ignore_patterns('*.pyc'))
+            try:
+                shutil.copytree(src, os.path.join(target, r),
+                                ignore=shutil.ignore_patterns('*.pyc'))
+            except OSError as e:
+                print(f'  ✗ 复制 {r} 失败: {e}')
         else:
             print(f'  ✗ 技能库无角色包 {r}')
     ref = os.path.join(SKILLS_DIR, 'references')
     if os.path.isdir(ref):
-        shutil.copytree(ref, os.path.join(target, 'references'))
+        try:
+            shutil.copytree(ref, os.path.join(target, 'references'))
+        except OSError as e:
+            print(f'  ✗ 复制 references 失败: {e}')
     # 同步 shared/ 单源（角色包 ../shared/ 引用目标解析依赖此目录）
     shared = os.path.join(SKILLS_DIR, 'shared')
     if os.path.isdir(shared):
-        shutil.copytree(shared, os.path.join(target, 'shared'))
+        try:
+            shutil.copytree(shared, os.path.join(target, 'shared'))
+        except OSError as e:
+            print(f'  ✗ 复制 shared 失败: {e}')
     idx = os.path.join(SKILLS_DIR, 'SKILL_INDEX.md')
     if os.path.isfile(idx):
         shutil.copy(idx, os.path.join(target, 'SKILL_INDEX.md'))

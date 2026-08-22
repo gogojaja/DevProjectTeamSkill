@@ -1,0 +1,21 @@
+编号,维度,严重度,类别,发现项,影响范围,现状证据,修复建议,状态
+F-01,P0 工具链,P2,可执行权限,6 个 .sh 脚本缺可执行权限（package_skills/deploy_skills/solidify/desensitize/remove_watermark/pre-commit-secret-scan）,macOS/Linux 直接执行需 bash 前缀,"tools/*.sh 中 6 个无 +x 位",chmod +x 或保持 bash tools/xxx.sh 调用方式（AGENTS.md 命令表均带 bash 前缀，实际不影响使用）,接受风险
+F-02,P0 工具链,P3,shebang,3 个核心 .py 入口缺 shebang（deploy_skills/package_skills/solidify）,直接 ./tools/xxx.py 执行失败,"head -1 无 #!/usr/bin/env python3",加 shebang 行或保持 python3 tools/xxx.py 调用（文档均用显式 python3 调用，实际不影响使用）,接受风险
+F-03,P0 工具链,P3,双实现缺失,pre-commit-secret-scan.sh 与 restore_github_push.sh 无 .py 对应,Windows 用户无法使用,"2 个 .sh 无对应 .py",pre-commit 钩子为 git 专用（Windows 用 Python 版 quality_gate 替代）；restore 为一次性工具，可接受,接受风险
+F-04,P1 架构,P4,残留文件,根目录存在 NUL 文件（574KB HTML），疑似 Windows NUL 设备名冲突产物,工作区清洁度,"NUL 574KB untracked（??）",删除 NUL 文件（git clean 或 rm），加入 .gitignore 防复发,待修复
+F-05,P1 架构,P4,未提交变更,台账/32_镜像同步记录.csv 有未提交修改,台账与 git 不同步,"git status: M 台账/32_镜像同步记录.csv",下次固化时一并提交,待修复
+F-06,P2 内容,P2,description 长度,role-mgmt-consulting description 149 字符（门禁脚本测量值），低于 150 下限 1 字符,门禁 check_skill_descriptions.py 报 WARN,"SKILL.md 实际 180 字符但门禁脚本测 149",扩充 SKILL.md description 至 ≥150 字符（按门禁脚本测量口径），或调整 SKILL_INDEX 描述列,待修复
+F-07,P2 内容,P3,版本分散,9 角色包横跨 6 个版本号（v1.0.0~v21.3.4），编排器 v21.8.1,可维护性——版本跳跃增加认知成本,"role-architecture v21.0.0 / role-mgmt-consulting v1.0.0 / role-governance v21.3.4 等",非阻断——各包按实际变更独立升版是合理策略，但建议在 SKILL_INDEX 增加版本汇总表提升可读性,接受风险
+F-08,P2 内容,P3,大文件未 CSV 化,10 个 .md 文件超 16KB（最大 api_contracts.md 39KB），部分可拆为 CSV,Token 效率——AI 加载时占用过多 context,"api_contracts 39K / multi_project_isolation 26K / SKILL.md(orchestrator) 31K / best-practice-solution 21K",api_contracts 接口表部分可 CSV 化；其余为流程/架构文档，Markdown 格式更可读，按需裁剪,接受风险（建议后续迭代中优先 CSV 化 api_contracts 的接口明细表）
+F-09,P3 行业实践,P4,铁律双源一致性,iron_rules.md（11 节）与 AGENTS.md（11 条+子条）内容对齐但编号体系不同,维护时可能遗漏同步,"iron_rules §1~§7 + 子节 vs AGENTS #1~#10 + 7a",当前靠人工同步，建议 iron_rules.md 头部标注对应 AGENTS.md 条目编号,接受风险（建议改进）
+F-10,P4 安全,P4,A 级密钥扫描,发布集（.trae/skills/ + tools/ + docs/）零 A 级密钥泄露,安全合规,全量 grep 无匹配,通过,已验证
+F-11,P4 安全,P4,.secrets 禁提交检查,.secrets/ 目录无文件被 git 跟踪,安全合规,git ls-files .secrets/ 返回空,通过,已验证
+F-12,P4 安全,P4,B 级脱敏扫描,IP 地址模式匹配仅 1 处误报（github_ip_refresh.py 过滤逻辑中的字面常量）,安全合规,"192.168.0.1 出现在过滤条件中，非真实 IP",通过（误报已确认）,已验证
+F-13,门禁基线,P4,四硬门禁综合,"version_consistency 10/10 ✅ / release_gate 10/10 ✅ / closure 10/10 ✅ / descriptions 9/10 ⚠️",基线质量,orchestrator 软提示为历史遗留（HEAD 原版即存在，非本次引入）,descriptions 门禁 role-mgmt-consulting 需修复（见 F-06）,3/4 通过
+F-14,P0 工具链,P4,引用路径完整性,角色包内所有 ../shared/ ../references/ 相对引用均指向有效文件,架构完整性,grep + 路径验证零断链,通过,已验证
+F-15,P1 架构,P4,源码单源一致性,.trae/skills/ 与 .agents/skills/ 角色包目录结构完全一致,源码单源合规,diff 仅路径前缀差异,通过,已验证
+F-16,P1 架构,P4,shared/ 副本一致性,shared/references/ 与 references/ 所有同名文件 diff 为零,单源共享合规,逐文件 diff 无差异,通过,已验证
+F-17,P2 内容,P4,闭环执行系统覆盖,10/10 包（9 角色包 + 编排器）均含「闭环执行系统」章节,维护模式硬门禁合规,grep 全部匹配,通过,已验证
+F-18,P2 内容,P4,.xlsx 禁入检查,项目全域零 .xlsx 残留（排除 .venv/.git/backup）,格式规范合规,find 返回空,通过,已验证
+F-19,P3 行业实践,P4,参考标准覆盖,引用 17 项行业标准（PMBOK 7th / IEEE 29119/42010/830 / ISO 25010/21500/21503/21504 / ISTQB / ITIL v4 / OWASP / DORA / BABOK v3 / P3M3 / CMMI / OPM3 / MSP 5th / PMI SPM 5th）,行业对齐度,全量 grep 统计,覆盖充分,已验证
+F-20,P1 架构,P4,.gitattributes LF 强制,已配置 * text=auto eol=lf + *.sh/*.py 显式 LF,双平台兼容合规,文件内容正确,通过,已验证
