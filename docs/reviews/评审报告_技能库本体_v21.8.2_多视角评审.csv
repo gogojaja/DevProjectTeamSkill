@@ -11,7 +11,7 @@ code_reviewer,CR-03,双实现覆盖,WARNING,P3,6 个 .sh 中 4 个有 .py 双实
 code_reviewer,CR-04,测试覆盖率,WARNING,P3,"tests/ 6 文件 436 行 + tools/tests 3 文件 1226 行(含集成测试 276 行)vs tools 源码 10,451 行(54 py);覆盖率约 4%~7%,关键门禁脚本无单测保护",high
 code_reviewer,CR-05,脚本可执行权限,PASS,P4,"ls -l:6 个 .sh 均 -rwxr-xr-x(F-01 已修复),macOS/Linux 可直接执行",high
 code_reviewer,CR-06,工具代码结构清晰度,PASS,P4,"LSP documentSymbol 分析:solidify.py 33 符号/deploy_skills.py 16 符号,模块级常量+接口函数+嵌套工具函数分层清晰,职责内聚",high
-security,SEC-01,A 级密钥泄露检查,WARNING,P3,"desensitize --scan .trae/skills/:171 文件 119 处(A 级 10 处全部为占位符 PASSWORD: <dev_pass>/<test_pass> 于 references 与 shared/references 的 multi_project_isolation.md);tools/ A 级 6 处为 desensitize.py 规则示例;无真实凭据,按规则占位符仅告警不阻断",medium
+security,SEC-01,A 级密钥泄露检查,WARNING,P3,"desensitize --scan .trae/skills/:171 文件 119 处(A 级 10 处全部为占位符 PASSWORD 占位符(<dev_pass>/<test_pass>) 于 references 与 shared/references 的 multi_project_isolation.md);tools/ A 级 6 处为 desensitize.py 规则示例;无真实凭据,按规则占位符仅告警不阻断",medium
 security,SEC-02,.secrets 禁提交检查,PASS,P4,"git ls-files .secrets/ 返回空,.secrets/ 目录无文件被 git 跟踪",high
 security,SEC-03,B 级脱敏扫描,WARNING,P4,"desensitize --scan docs/:85 处 B 级(github_ip_records.csv 84+复盘文档 1);--scan tools/:37 处 B 级;--scan .trae/skills/:109 处 B 级;均属公开信息/示例,无真实主机名/IP 泄露",medium
 security,SEC-04,敏感信息密度,WARNING,P4,"源 .trae/skills/ 119 处敏感匹配(10 A + 109 B),B 级占 91.6%,集中于 multi_project_isolation/github_access/iron_rules 等标准文档示例",high

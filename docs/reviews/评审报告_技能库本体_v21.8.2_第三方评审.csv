@@ -10,7 +10,7 @@
 三、工具代码质量,3.3,待改进,P3,"tests/ 436 行 + tools/tests 1226 行 vs tools 源码 10,451 行,覆盖率约 4%~7%","find tests tools/tests 11 个 py(436+1226 行);tools 总行数 10,451",行业开源工具链通常要求关键路径 ≥60% 行覆盖,"门禁/部署/打包等关键脚本无单测保护,回归风险中","为 solidify/deploy/package/quality_gate 补单测,目标关键路径 ≥40%",中
 四、文档体系,4.1,优势,—,AGENTS.md 273 行含全命令表;SKILL_INDEX 索引 18 条;references 16 文档;docs 26 文件,wc -l 统计,行业最佳实践:索引+规范+执行分离,文档检索效率高,维持,低
 四、文档体系,4.2,待改进,P3,"评审报告 CSV(v21.8.1 三份+v21.8.2 三份)置于根目录,违反 lint_repo 命名/目录白名单(非 kebab-case)",lint_repo 23 项 error 之一,行业一般将评审产物归档至独立目录(如 docs/reviews/)并纳入 git,根目录卫生无法全绿,"建立 docs/reviews/ 目录收纳评审报告 CSV,并更新 lint_repo 白名单",中
-五、安全合规,5.1,通过,—,无真实凭据入库;10 处 A 级占位符(PASSWORD: <dev_pass>/<test_pass>)于 multi_project_isolation.md 示例,desensitize --scan:171 文件 119 处(A 10+B 109);tools/ A 6 处为规则示例,OWASP 密钥管理最佳实践:禁止真实凭据入库、示例用占位符,"安全合规,占位符不阻断发布",维持;可选将示例改为 B 级演示值,低
+五、安全合规,5.1,通过,—,无真实凭据入库;10 处 A 级占位符(PASSWORD 占位符(<dev_pass>/<test_pass>))于 multi_project_isolation.md 示例,desensitize --scan:171 文件 119 处(A 10+B 109);tools/ A 6 处为规则示例,OWASP 密钥管理最佳实践:禁止真实凭据入库、示例用占位符,"安全合规,占位符不阻断发布",维持;可选将示例改为 B 级演示值,低
 五、安全合规,5.2,通过,—,"docs/ 85 处 B 级(github_ip_records.csv 84 处公开 IP)+源 109 处 B 级,均属公开信息/示例",desensitize --scan docs/ 85 处;--scan .trae/skills/ 109 处,IP 脱敏规范(192.168.x.x→xxx.xxx.xxx.xxx)适用真实内网 IP;github_ip_records 为公网 CDN 记录可公开,无真实内网 IP 泄露,维持,低
 五、安全合规,5.3,通过,—,"mirror_push/github_push 凭据经 load_secret.py 装载(env>.secrets>Keychain),不硬编码",tools/load_secret.py 存在;AGENTS.md 凭据铁律,OWASP 密钥管理:凭据经安全通道注入,凭据安全,维持,低
 六、运维成熟度,6.1,优势,—,"solidify(项目级三目录)+publish_production(全局库独占)+mirror_push(双推+熔断),链路完整",AGENTS.md 命令表;32_镜像同步记录.csv 留痕,行业成熟度:开发/生产环境隔离+发布留档+镜像冗余,运维链路完整,维持,低
