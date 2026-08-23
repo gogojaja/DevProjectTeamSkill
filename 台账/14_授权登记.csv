@@ -5,3 +5,4 @@ AUTH-003,临时hosts覆盖以推送GitHub,系统文件,C:\Windows\System32\drive
 AUTH-004,opencode全局配置(屏蔽不可用模型),文件,~/.config/opencode/opencode.jsonc,读/写,gogojaja(本机),2026-08-20,2026-08-20,有效(本次会话),用户指令-全provider白名单化并禁用deepseek；备份.onbackup/opencode.jsonc.bak.20260820_221223
 AUTH-005,生产技能库部署目录,目录,~/dev-project-team-skill,读/写/创建,gogojaja(本机),2026-08-20,2026-08-21,有效,用户指令-创建本技能生产目录供其他项目复用(仅最新版本v21.8.0)
 AUTH-006,三环境目录映射(Prod<HOME>/Dev<DEV_VOLUME>/Test<TEST_VOLUME>),目录,<脱敏占位>,读/登记,douglas\gogojaja,2026-08-21 23:09:31,2026-08-21 23:09:31,有效,用户指令:三环境真实映射脱敏登记(本会话有效)
+AUTH-PROD-2026-08-23210953,全局openocode技能库,目录,/Users/gogo/.config/opencode/skills,改/删(rmtree重建),gogo,2026-08-23 21:09:53,2027-12-31,有效,publish_production v21.8.2 生产发布，用户已授权
