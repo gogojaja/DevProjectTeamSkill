@@ -1,3 +1,4 @@
+
 # AGENTS.md
 
 ## 项目定位
@@ -31,6 +32,8 @@ opencode.json         opencode 技能注册
 8. **敏感信息分级处理铁律**：敏感信息统一按三级处理（细则见 `.trae/skills/references/iron_rules.md` §3）——**A 级禁止入库**（密钥/凭据/Token 只存别名，真实值走 `.secrets/`+凭据管理器）；**B 级脱敏入库**（本机/环境专属信息——**主机名、IP、用户名、绝对路径**提交公共仓库前必须脱敏，IP 完全脱敏为默认 `192.168.x.x`→`xxx.xxx.xxx.xxx`，保留主机名须用户授权，脱敏后复查全文）；**C 级正常入库**。提交前一律自问属于哪级。违反即禁止提交。
 9. **废弃清理门禁铁律**：当 `架构资产/*/ADR` 任意决策状态标记为「废弃」后——①任何后续会话启动第一步必须先做「废弃资产完整性检查」（全库 grep 该资产引用 + 端口监听/进程运行/LaunchAgent 加载三查），发现残留立即登记并清理；②基线固化（`tools/solidify.sh` 第 4 硬门禁 `check_deprecation_cleanup.py`）强制移除废弃资产，存在引用或运行态残留则中止固化（未通过不得固化）。该规则随项目分发生效，与编排器 `dev-project-team-skill` §2.2-7 对齐。
 10. **需求-架构-代码 三方一致性铁律**：防止需求↔架构、架构↔代码 漂移——统一标识符（`REQ-/ADR-/AE-/MOD-/TC-`）；以《需求-架构-代码追溯矩阵.csv》为单一事实来源连续维护（禁止事后突击补表）；阶段流转前（尤其 需求→架构、架构→开发、开发→测试）强制运行 `tools/check_traceability.py`，孤儿（无父链接的需求/架构/代码/测试）或断链超容忍度则**驳回流转**；代码评审须含「孤儿代码」检查。依据 NASA SWE-059 / EN 62304 / ASPICE / ArchUnit，与编排器 `dev-project-team-skill` §2.2-8 对齐。
+11. **批量编辑铁律（防并行污染）**：对**多个文件**做同类批量修改（引路径替换、前缀补全、关键词替换）时——①**禁用并行 edit 工具**，必须用**单一 python 脚本**串行遍历每个文件、逐文件落盘；②脚本跑完**立即 `git diff --stat` + 抽查若干文件**校验无污染（防止成对替换写入他文件 / 中文标点误删）；③单文件微调用 `edit` 工具，**编辑后立即读回确认**；④发现误写立即 `git checkout -- <文件>` 还原，禁止带病继续。违反即可能污染源码（参考 DEV-001 事故：并行 edit 误把 governance 内容写入 8 个无关 domain 文件）。
+12. **运行时自变留痕不入库铁律（防推送死循环）**：由脚本每次运行**自动追加/自变**的日志/台账类产物（如 `32_镜像同步记录.csv` 被 `mirror_push.py` append）**必须 `git rm --cached` + 加入 `.gitignore`**，禁止 git 跟踪——否则每次运行产生未提交改动→又 commit→又要 push，形成无意义推送死循环（参考 DEV-002 事故：为归档镜像台账反复 push 了 3+ 次）。一次性人工登记的审计台账（`13/14/26` 等）不受限。
 
 ## 命令
 
@@ -74,6 +77,7 @@ python tools/publish_production.py                # 跨平台/Windows 主推
 ### 其他工具
 
 ```sh
+python tools/check_skill_links.py       # 技能库引用可达性门禁（拦截 .// 残留与 __resources 断链；已纳入 lint_repo ⑥）
 python tools/excel_to_csv.py            # 迁移存量 xlsx→csv
 python tools/github_push.py --dry-run   # GitHub 真实 IP 推送：dry-run 预览（仅探测，不推送）
 python tools/github_push.py             # GitHub 真实 IP 一键推送（固定动作：候选IP→可达+TLS证书合法探测→绑定真实IP push origin）

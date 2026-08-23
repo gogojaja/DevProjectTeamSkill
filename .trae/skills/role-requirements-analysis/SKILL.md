@@ -10,7 +10,7 @@ description: "用户提到收集需求、分析需求、编写SRS、需求规格
 ## 1. 元数据
 
 - **技能版本**：v21.0.1　**发布日期**：2026-08-04
-- **变更记录**：v21.0.1 新增需求基线权威铁律（2026-08-15）——需求基线为设计与开发唯一权威基准，设计/开发评审发现已实现功能≠需求基线一律以需求基线为准、偏差记缺陷返工、禁止以已实现内容逆向修正需求基线；变更来源限范围调整/接口变化/合规新规/新诉求/缺陷澄清，来源为「已实现内容」驳回；同步 `requirements_lifecycle_details.md` §2.1 与 `role-development/domain/review.md`、`role-governance/domain/scope-change.md`。v21.0.0 由 requirements-analysis-skill + 4 子技能重组为角色包
+- **变更记录**：v21.0.1 新增需求基线权威铁律（2026-08-15）——需求基线为设计与开发唯一权威基准，设计/开发评审发现已实现功能≠需求基线一律以需求基线为准、偏差记缺陷返工、禁止以已实现内容逆向修正需求基线；变更来源限范围调整/接口变化/合规新规/新诉求/缺陷澄清，来源为「已实现内容」驳回；同步 `domain/requirements-lifecycle-skill__resources/requirements_lifecycle_details.md` §2.1 与 `role-development/domain/review.md`、`role-governance/domain/scope-change.md`。v21.0.0 由 requirements-analysis-skill + 4 子技能重组为角色包
 - **参考标准**：BABOK v3 · IEEE 830 · MoSCoW
 
 ## 2. 触发规则

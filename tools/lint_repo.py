@@ -26,6 +26,7 @@ WHITELIST_DIRS = {
     '.githooks', '.vscode', 'docs', 'tools', 'scripts', 'security',
     'requirements', 'tests', '台账', '.trae-html-share-packages', '架构资产', 'env-architecture-plan',
     '.codebuddy',  # IDE 项目数据目录（含计划/会话状态），非临时缓存，禁止删除
+    '.idea',       # JetBrains IDE 本地配置（已 gitignore，保留本地磁盘，不入库）
 }
 # 根目录白名单（文件）
 WHITELIST_FILES = {
@@ -167,6 +168,29 @@ def check_program_mgmt(root):
     return errors
 
 
+def check_skill_links(root):
+    """⑥ 技能库 Markdown 引用可达性（复用 tools/check_skill_links.py，拦截 .// 残留与 __resources 断链）。"""
+    import subprocess as sp
+    errors = []
+    script = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'check_skill_links.py')
+    if not os.path.isfile(script):
+        errors.append('tools/check_skill_links.py 缺失（技能引用可达性门禁不可用）')
+        return errors
+    try:
+        r = sp.run([sys.executable, script, '--quiet'], cwd=find_repo_root() or root,
+                   capture_output=True, text=True, timeout=120)
+        if r.returncode != 0:
+            for line in (r.stdout or '').splitlines():
+                line = line.strip()
+                if line and ('✗' in line or '→' in line or '不可达' in line or '断链' in line):
+                    errors.append(f'技能引用断链: {line}')
+    except sp.TimeoutExpired:
+        errors.append('check_skill_links.py 执行超时（技能引用可达性门禁）')
+    except Exception as e:
+        errors.append(f'check_skill_links.py 执行异常: {e}')
+    return errors
+
+
 def check_doc_config_csv(root):
     """⑤ 提示性检查：31 文档配置管理台账（项目群文档与配置管理）是否存在。"""
     warnings = []
@@ -189,6 +213,7 @@ def main():
     all_errors += check_filename_mojibake(root)
     all_errors += check_root_kebab(root)
     all_errors += check_program_mgmt(root)
+    all_errors += check_skill_links(root)
 
     print('\n========== 仓库卫生门禁报告 ==========')
     if all_errors:
