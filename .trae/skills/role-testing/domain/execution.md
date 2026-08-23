@@ -34,7 +34,7 @@ description: "Test execution and defect management skill covering risk-driven ex
 - 测试用例已评审通过；测试数据已准备
 
 ### 3.2 执行内容
-风险驱动执行顺序（冒烟→功能→SIT→接口自动化→非功能→安全→探索→回归）+ 执行记录规范见 `.//test_execution_details.md` §一；探索性测试原则/章程/适用场景见 §二；缺陷生命周期/报告字段/严重程度 vs 优先级/度量指标见 §三。
+风险驱动执行顺序（冒烟→功能→SIT→接口自动化→非功能→安全→探索→回归）+ 执行记录规范见 `test-execution-skill__resources/test_execution_details.md` §一；探索性测试原则/章程/适用场景见 §二；缺陷生命周期/报告字段/严重程度 vs 优先级/度量指标见 §三。
 
 ### 3.3 Definition of Done
 - 所有计划用例已执行（含跳过/不适用，执行率100%）；执行记录完整可追溯

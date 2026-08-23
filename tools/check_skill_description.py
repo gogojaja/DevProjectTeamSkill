@@ -20,23 +20,13 @@ def extract_description(skill_md_path: Path) -> Tuple[str, str, int]:
     """
     content = skill_md_path.read_text(encoding="utf-8")
     
-    # 尝试多种格式提取 description
-    patterns = [
-        r"## 技能描述\s*\n\s*(.+?)(?:\n|$)",
-        r"技能描述[：:]\s*(.+?)(?:\n|$)",
-        r"description[：:]\s*(.+?)(?:\n|$)",
-        r"^##\s*技能描述\s*\n(.+?)\n",
-    ]
-    
-    description = ""
-    for pattern in patterns:
-        match = re.search(pattern, content, re.MULTILINE | re.IGNORECASE)
-        if match:
-            description = match.group(1).strip()
-            break
-    
-    # 清理 description
-    description = re.sub(r"[^\u4e00-\u9fa5a-zA-Z0-9\s\.\,\:\;\-\(\)]", "", description)
+    # 解析 frontmatter 中的 description 字段（单行引号形式），与 check_skill_descriptions.py 口径一致
+    fm = re.search(r'^description:\s*"(.+)"\s*$', content, re.M)
+    if not fm:
+        fm = re.search(r"^description:\s*'(.+)'\s*$", content, re.M)
+    description = fm.group(1).strip() if fm else ""
+
+    # 保留中文标点（、。：（）等），仅归一化空白；不得过滤中文标点而低估长度
     description = re.sub(r"\s+", " ", description).strip()
     
     length = len(description)

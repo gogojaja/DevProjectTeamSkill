@@ -32,7 +32,7 @@ description: "Test summary and review skill for writing test summary reports (10
 - 测试度量数据已采集
 
 ### 3.2 执行内容
-`测试总结报告.csv`：10 章结构见 `.//test_summary_details.md` §一；stage_review 四大维度见 §二；测试门禁准出标准（10 项）见 §三；报告评审检查清单见 §四。
+`测试总结报告.csv`：10 章结构见 `test-summary-skill__resources/test_summary_details.md` §一；stage_review 四大维度见 §二；测试门禁准出标准（10 项）见 §三；报告评审检查清单见 §四。
 
 ### 3.3 Definition of Done
 - `测试总结报告.csv` 已输出（含 10 章节）；度量数据已采集分析

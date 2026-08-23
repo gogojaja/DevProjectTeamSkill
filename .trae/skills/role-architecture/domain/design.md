@@ -38,7 +38,7 @@ description: "Architecture logical design sub-skill producing the 4+1 view model
 5. **部署设计**：物理视图、部署拓扑、平台抽象、容器化、配置外部化；
 6. **七原则落地检查**：逐条验证。
 
-详细表格见 `.//architecture_design_details.md`。
+详细表格见 `architecture-design-skill__resources/architecture_design_details.md`。
 
 **DoD（完成）**：4+1 五视图齐全（场景贯穿）；C4 四层完整；组件/接口/部署文档完成；七原则合规检查逐条 ✅。
 

@@ -23,7 +23,7 @@ description: "Requirements lifecycle management sub-skill covering requirement r
 
 ## 2. 流程
 
-**环节 1 评审**（`review_requirements`）：评审五维度（范围合规/功能逻辑质量/工程规范-结构与编号/风险安全-威胁建模与合规/范围跟踪-无缩水蔓延，详 §一 `.//requirements_lifecycle_details.md`）。前置门禁：追溯覆盖率 100% / 冲突消解记录为空或全部关闭 / 每条需求含量化验收标准 / 无合规违规。流程：自检门禁全通过 → 调 `stage_review` 传入 SRS 与校验报告 → 缺陷分级录入「质量缺陷台账」逐条整改 → 最多 2 轮整改复核 → 严重/主要缺陷闭环 + `check_gate` 通过后 `stage_close` 固化需求基线。
+**环节 1 评审**（`review_requirements`）：评审五维度（范围合规/功能逻辑质量/工程规范-结构与编号/风险安全-威胁建模与合规/范围跟踪-无缩水蔓延，详 §一 `requirements-lifecycle-skill__resources/requirements_lifecycle_details.md`）。前置门禁：追溯覆盖率 100% / 冲突消解记录为空或全部关闭 / 每条需求含量化验收标准 / 无合规违规。流程：自检门禁全通过 → 调 `stage_review` 传入 SRS 与校验报告 → 缺陷分级录入「质量缺陷台账」逐条整改 → 最多 2 轮整改复核 → 严重/主要缺陷闭环 + `check_gate` 通过后 `stage_close` 固化需求基线。
 
 **环节 2 变更分析**（`change_analysis`）：基线固化后任何新增/修改/删除/范围调整触发。变更登记至 `需求变更记录.csv` → 按已选维度逐项评估（触及必选维度 func/sec/data/env 时强制全维度扫描）→ 追溯矩阵影响评估 → 生成《需求变更影响评估表》转 `change_audit` 等用户「同意」→ 审批后 `update_traceability` 更新追溯矩阵。
 

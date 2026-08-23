@@ -27,7 +27,7 @@ description: "Test strategy analysis skill covering requirements testability ana
 
 ## 3. 测试策略分析流程
 
-> 详细内容（可测性等级表/风险矩阵/风险维度/方法选型矩阵）见 `.//test_strategy_details.md` §一~§三。
+> 详细内容（可测性等级表/风险矩阵/风险维度/方法选型矩阵）见 `test-strategy-skill__resources/test_strategy_details.md` §一~§三。
 
 ### 3.1 需求可测性分析
 对每条需求做四级可测性评估（可直接测试/需澄清后测试/间接测试/暂不可测试），输出《需求可测性分析清单》；不可测需求须标注阻塞条件。
@@ -36,7 +36,7 @@ description: "Test strategy analysis skill covering requirements testability ana
 **RBT 风险驱动测试**：风险值 = 影响程度 × 发生概率（1-16），按极高/高/中/低分配 P0/P1/P2/P3 用例优先级；风险等级须经项目经理/需求方确认后作为测试优先级依据。
 
 ### 3.3 测试方法选型
-按需求特征与风险结果选择方法组合（等价类/边界值/决策表/场景法/契约测试/负载测试等），方法选型矩阵详见 `.//test_strategy_details.md` §三。
+按需求特征与风险结果选择方法组合（等价类/边界值/决策表/场景法/契约测试/负载测试等），方法选型矩阵详见 `test-strategy-skill__resources/test_strategy_details.md` §三。
 
 ### 3.4 输出
 《测试策略分析报告》：可测性分析清单、风险评估矩阵、测试优先级分配表、方法选型矩阵、测试类型选择建议、资源与工时初步估算、关键风险与应对预案。
@@ -47,7 +47,7 @@ description: "Test strategy analysis skill covering requirements testability ana
 
 ## 4. 五大测试类型定义
 
-> 测试类型与测试级别（组件/集成/系统/验收）正交；完整定义见 `.//test_strategy_details.md` §四。
+> 测试类型与测试级别（组件/集成/系统/验收）正交；完整定义见 `test-strategy-skill__resources/test_strategy_details.md` §四。
 
 | 测试类型 | 定义 | 设计方法 | 准出条件 |
 |---------|------|---------|---------|
@@ -59,7 +59,7 @@ description: "Test strategy analysis skill covering requirements testability ana
 
 ## 5. 测试度量指标体系
 
-> 三类指标完整定义见 `.//test_strategy_details.md` §五；每类选 2-3 个建基线，趋势比绝对值更重要。
+> 三类指标完整定义见 `test-strategy-skill__resources/test_strategy_details.md` §五；每类选 2-3 个建基线，趋势比绝对值更重要。
 
 - **产品质量**：缺陷密度、缺陷DI值、缺陷逃逸率(<=5%)、需求覆盖率(核心100%)、代码覆盖率
 - **过程有效性**：缺陷移除效率(DRE)、重新打开率、平均修复时长(MTTR)、用例执行率、用例通过率

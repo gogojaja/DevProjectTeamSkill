@@ -32,7 +32,7 @@ description: "Test environment preparation skill for deploying environments, pre
 - 待测版本交付物
 
 ### 3.2 准备内容
-七项准备（测试环境/测试数据/第三方依赖/工具部署/CI流水线/环境配置管理/冒烟验证）+ 环境管理规范（隔离/版本/配置/快照/监控），详见 `.//test_preparation_details.md`。
+七项准备（测试环境/测试数据/第三方依赖/工具部署/CI流水线/环境配置管理/冒烟验证）+ 环境管理规范（隔离/版本/配置/快照/监控），详见 `test-preparation-skill__resources/test_preparation_details.md`。
 
 ### 3.3 Definition of Done
 - 测试环境已部署并验证可用；测试数据覆盖正常/边界/异常三类

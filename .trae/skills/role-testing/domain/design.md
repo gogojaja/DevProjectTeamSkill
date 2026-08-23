@@ -31,7 +31,7 @@ description: "Test case design skill for creating standardized test cases with r
 - 需求基线/架构设计文档（接口定义、数据模型）、RTM 已创建
 
 ### 3.2 输出
-`测试资产/测试用例集.csv`（按 7 类拆分）与 RTM（`测试资产/需求追溯矩阵.csv`）更新。用例标准字段（13 项）、设计方法（8 种）、方法选择矩阵、风险驱动用例分层、用例评审检查清单详见 `.//test_design_details.md`。
+`测试资产/测试用例集.csv`（按 7 类拆分）与 RTM（`测试资产/需求追溯矩阵.csv`）更新。用例标准字段（13 项）、设计方法（8 种）、方法选择矩阵、风险驱动用例分层、用例评审检查清单详见 `test-design-skill__resources/test_design_details.md`。
 
 ### 3.3 Definition of Done
 - 测试用例已编写完成（覆盖所有计划测试类型）；RTM 已更新（需求→用例映射完整）

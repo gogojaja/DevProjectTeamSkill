@@ -52,7 +52,7 @@ description: "Code development skill covering module implementation, coding stan
 ### 环节：代码开发（action = develop_code）
 
 - **DoR**：开发环境就绪 ✅ 编码规范已定稿 ✅ 开发任务清单已确认 ✅ 架构设计文档已可用 ✅
-- **执行内容**：功能模块实现、注释与文档、API 实现、数据库操作实现、安全编码实现、错误处理与日志，详见 `.//development_coding_details.md` §3。
+- **执行内容**：功能模块实现、注释与文档、API 实现、数据库操作实现、安全编码实现、错误处理与日志，详见 `development-coding-skill__resources/development_coding_details.md` §3。
 - **DoD**：功能模块全部实现 ✅ 注释符合规范 ✅ API 符合接口契约 ✅ 数据库用参数化查询 ✅ ASVS 安全编码映射项全部实现 ✅ 错误处理和日志符合规范 ✅
 - **规则**：按任务清单逐条完成不可跳过；每次提交是可编译完整代码；提交前过本地 Linter；安全编码逐条实现；发现架构问题记录反馈，不擅自修改架构。
 

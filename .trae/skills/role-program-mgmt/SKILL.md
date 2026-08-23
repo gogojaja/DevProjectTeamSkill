@@ -15,7 +15,7 @@ description: "用户提到项目群、项目集、多项目协同、PMO 决策�
 
 ## 2. 触发规则
 
-用户表达「项目群/项目集/多项目协同/PMO 决策层/跨项目依赖/里程碑对齐/统一执行标准/收益管理」时加载本包。单角色场景直接 Read 本文件；需要台账时调用 `../shared/governance.md`；明细按需 Read `domain/program-management.md` 与 `program-management__resources/program_details.md`。
+用户表达「项目群/项目集/多项目协同/PMO 决策层/跨项目依赖/里程碑对齐/统一执行标准/收益管理」时加载本包。单角色场景直接 Read 本文件；需要台账时调用 `../shared/governance.md`；明细按需 Read `domain/program-management.md` 与 `domain/program-management__resources/program_details.md`。
 
 ## 3. 流程（路由到 domain/）
 

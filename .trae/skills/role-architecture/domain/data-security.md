@@ -32,7 +32,7 @@ description: "Architecture data and security design sub-skill covering data arch
 - **3A 数据架构**：ER 模型；数据字典（字段/类型/约束/默认）；存储策略（选型/分库分表/读写分离/缓存）；数据流转（流向图/ETL）；生命周期（归档/销毁/保留/分级合规）；
 - **3B 安全架构**：STRIDE 威胁建模（六类全覆盖）；认证授权（OAuth2/JWT/SAML、RBAC/ABAC）；数据安全（TLS/存储加密/脱敏/密钥管理）；审计链；纵深防御（网络/应用/数据多层、最小权限）。
 
-详细表格见 `.//architecture_data_security_details.md`。
+详细表格见 `architecture-data-security-skill__resources/architecture_data_security_details.md`。
 
 **DoD（完成）**：数据/安全架构五项完成；认证授权方案确定；数据安全三要素覆盖；审计链与纵深防御完成；七原则检查逐条 ✅。
 

@@ -50,7 +50,7 @@ description: "Unit testing skill covering TDD/BDD, test case design, coverage ta
 ### 环节：单元测试（action = run_unit_test）
 
 - **DoR**：代码开发完成 ✅ 测试框架已配置（pytest/jest/junit）✅ 测试数据已准备 ✅
-- **执行内容**：TDD 三阶段（Red/Green/Refactor）+ 用例设计方法（等价类/边界值/错误推测/路径覆盖/状态迁移）、覆盖率目标、Mock/Stub 配置、自动化执行、回归测试，详见 `.//development_testing_details.md` §1-§5。
+- **执行内容**：TDD 三阶段（Red/Green/Refactor）+ 用例设计方法（等价类/边界值/错误推测/路径覆盖/状态迁移）、覆盖率目标、Mock/Stub 配置、自动化执行、回归测试，详见 `development-testing-skill__resources/development_testing_details.md` §1-§5。
 - **DoD**：用例覆盖全部功能点 ✅ 行覆盖率>=80%、分支>=70% ✅ 关键路径 100% ✅ 全部测试通过（0 失败）✅ Mock/Stub 完整 ✅ 回归测试通过 ✅
 - **规则**：开发完成后立即编写测试，推荐 TDD；覆盖率不达标不进入联调/质量环节；用例相互独立；外部依赖必须 Mock；每次 bug 修复同时编写回归用例。
 

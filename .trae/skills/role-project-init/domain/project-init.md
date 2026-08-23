@@ -109,7 +109,7 @@ description: "Project initiation skill covering startup foundations: charter & b
 
 - **登记范围**：本项目规划占用的端口、Docker compose 项目名/容器名（带项目前缀）、数据库实例名、大模型运行目标（本地轻量档或云端别名）；
 - **冲突预检**：调用 `cmdb-cli.py query --project <项目名>` 查询当前占用情况，资源标识命中「已占用」即冲突；独占资源（大模型容器/GPU/Docker 单一运行时/固定端口）冲突自动升阶 `change_audit` 留痕并交用户决策（等待释放/抢占授权/换资源）；
-- **单机独占约束**：一台服务器同一时间仅一个生成模型驻留（`OLLAMA_MAX_LOADED_MODELS=1`）、仅一个 Docker daemon 单实例；本地工具/脚本缺省运行目标 = 本地轻量模型档（`model_selection.md` §7.1）；
+- **单机独占约束**：一台服务器同一时间仅一个生成模型驻留（`OLLAMA_MAX_LOADED_MODELS=1`）、仅一个 Docker daemon 单实例；本地工具/脚本缺省运行目标 = 本地轻量模型档（`../../references/model_selection.md` §7.1）；
 - **未注册不放行**：资源未全部登记或存在未裁决冲突，不得进入后续可行性评估。
 
 **CMDB CLI 调用示例**：

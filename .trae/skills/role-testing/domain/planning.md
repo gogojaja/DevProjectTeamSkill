@@ -31,7 +31,7 @@ description: "Test planning skill for writing test plans based on approved test 
 - 需求基线/架构设计文档（已固化）、项目进度基准与里程碑
 
 ### 3.2 输出
-《测试方案》（14 章 + 测试数据管理策略），章节明细见 `.//test_planning_details.md` §一，数据管理策略见 §二。
+《测试方案》（14 章 + 测试数据管理策略），章节明细见 `test-planning-skill__resources/test_planning_details.md` §一，数据管理策略见 §二。
 
 ### 3.3 Definition of Done
 - 《测试方案》已输出（含 14 章节），进入/退出标准已明确

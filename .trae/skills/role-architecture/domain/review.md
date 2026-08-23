@@ -28,7 +28,7 @@ description: "Architecture decision and validation skill covering ADR decision r
 
 ## 3. 流程
 
-> 各环节详细执行内容（MADR 模板/ADR 类型/ATAM 步骤/技术选型矩阵/POC 计划/检查清单/反模式目录/质量属性场景/说明书 12 章/追溯矩阵）详见 `.//architecture_review_details.md`。
+> 各环节详细执行内容（MADR 模板/ADR 类型/ATAM 步骤/技术选型矩阵/POC 计划/检查清单/反模式目录/质量属性场景/说明书 12 章/追溯矩阵）详见 `architecture-review-skill__resources/architecture_review_details.md`。
 
 ### 环节 1：决策记录（record_decisions）
 - **内容**：ADR 编写（MADR 格式+编号+类型）；ATAM 权衡分析（六步骤+典型权衡场景）；技术选型决策矩阵（九维加权）；决策评审。

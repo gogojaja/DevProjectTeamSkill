@@ -24,7 +24,7 @@ description: "Requirements elicitation sub-skill covering requirement gathering 
 
 **环节 1 目录初始化**（`create_requirements_baseline`）：创建 `requirements/` 目录 → 生成 `需求收集清单_<对象>_<版本>_v2.csv`（字段见 §3，含来源载体/原子行为/验收标准）→ 确认项目启动基线已固化（总控 role-governance）。前置：台账「范围基准」已写入范围初定义。
 
-**环节 2 需求收集**（`gather_requirements`）：识别需求来源（业务方/访谈/现有系统/合规/技术约束）→ **来源载体 ≠ 需求条目**：基本原则/角色定义/权限矩阵/流程类均降级为「来源载体」（RB/RD/ORG/PRJ/FLOW/TODO），提炼为 EARS 风格原子需求（`[条件]+[角色]+动作+对象+数据范围`）登记「原子行为描述」→ MoSCoW 优先级 + 可量化「验收标准」必填 → 约束依据回标所属基本原则 → 对照七维度清单（func/sec/data/env 必选，nfr/if/ui 可选）校验收集盲区，输出《需求收集完整性检查表》。来源载体编码、原子化提炼模板（INVEST/EARS）、字段强制项详见 `requirements_elicitation_details.md` §2.2~§2.6。
+**环节 2 需求收集**（`gather_requirements`）：识别需求来源（业务方/访谈/现有系统/合规/技术约束）→ **来源载体 ≠ 需求条目**：基本原则/角色定义/权限矩阵/流程类均降级为「来源载体」（RB/RD/ORG/PRJ/FLOW/TODO），提炼为 EARS 风格原子需求（`[条件]+[角色]+动作+对象+数据范围`）登记「原子行为描述」→ MoSCoW 优先级 + 可量化「验收标准」必填 → 约束依据回标所属基本原则 → 对照七维度清单（func/sec/data/env 必选，nfr/if/ui 可选）校验收集盲区，输出《需求收集完整性检查表》。来源载体编码、原子化提炼模板（INVEST/EARS）、字段强制项详见 `requirements-elicitation-skill__resources/requirements_elicitation_details.md` §2.2~§2.6。
 
 ## 3. 输出规范
 

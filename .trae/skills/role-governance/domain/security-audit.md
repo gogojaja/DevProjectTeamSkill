@@ -57,13 +57,13 @@ description: "Project security audit skill covering high-risk operation pre-audi
 
 ## 4. 安全审计流程
 
-> 各环节详细执行内容详见 `.//project_security_audit_details.md` 对应章节。
+> 各环节详细执行内容详见 `project-security-audit-skill__resources/project_security_audit_details.md` 对应章节。
 
 ### 环节 1：高危操作前置审计（Pre-audit）
 
 **DoR**：高危操作已提出 ✅ · 操作范围明确 ✅
 
-**执行内容**：高危操作范围识别（入口脚本/文件操作/配置变更/发布操作）、《操作影响评估表》生成（操作 ID/受影响组件/风险等级/回滚方案）、审批规则执行，详见 `.//project_security_audit_details.md` §1。
+**执行内容**：高危操作范围识别（入口脚本/文件操作/配置变更/发布操作）、《操作影响评估表》生成（操作 ID/受影响组件/风险等级/回滚方案）、审批规则执行，详见 `project-security-audit-skill__resources/project_security_audit_details.md` §1。
 
 **DoD**：《操作影响评估表》完成 ✅ · 风险等级已评估 ✅ · 高风险已审批（同意/驳回）✅
 
@@ -73,7 +73,7 @@ description: "Project security audit skill covering high-risk operation pre-audi
 
 **DoR**：操作已执行或回滚完成 ✅
 
-**执行内容**：全操作留痕（修改/调整/启停/回滚追加「安全审计台账」CSV）、唯一操作 ID 生成（OP-YYYYMMDD-NNNN）、留痕不可删除，详见 `.//project_security_audit_details.md` §2。
+**执行内容**：全操作留痕（修改/调整/启停/回滚追加「安全审计台账」CSV）、唯一操作 ID 生成（OP-YYYYMMDD-NNNN）、留痕不可删除，详见 `project-security-audit-skill__resources/project_security_audit_details.md` §2。
 
 **DoD**：操作已留痕 ✅ · 操作 ID 已生成 ✅ · 留痕内容完整 ✅
 
@@ -83,7 +83,7 @@ description: "Project security audit skill covering high-risk operation pre-audi
 
 **DoR**：服务故障已识别 ✅ · 备份可调取 ✅
 
-**执行内容**：回滚优先逻辑（自动调取备份优先一键回滚，仅 `user_confirm=查错` 启动排查）、回滚步骤执行（读取备份→回滚→留痕→验证→根因分析），详见 `.//project_security_audit_details.md` §3。
+**执行内容**：回滚优先逻辑（自动调取备份优先一键回滚，仅 `user_confirm=查错` 启动排查）、回滚步骤执行（读取备份→回滚→留痕→验证→根因分析），详见 `project-security-audit-skill__resources/project_security_audit_details.md` §3。
 
 **DoD**：一键回滚已执行 ✅ · 回滚操作已留痕 ✅ · 服务已恢复 ✅ · 根因已记录 ✅
 
@@ -91,7 +91,7 @@ description: "Project security audit skill covering high-risk operation pre-audi
 
 ### 环节 4：安全审计协同（Coordination）
 
-**执行内容**：核心文件变更自动转发审计、安全审计结果纳入阶段门禁、归档时整合全部审计日志，详见 `.//project_security_audit_details.md` §4。
+**执行内容**：核心文件变更自动转发审计、安全审计结果纳入阶段门禁、归档时整合全部审计日志，详见 `project-security-audit-skill__resources/project_security_audit_details.md` §4。
 
 **DoD**：变更已审计 ✅ · 门禁已纳入 ✅ · 审计日志已归档 ✅
 

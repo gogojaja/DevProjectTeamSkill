@@ -52,14 +52,14 @@ description: "Development strategy and environment skill covering technical stac
 ### 环节 1：开发策略分析（action = analyze_strategy）
 
 - **DoR**：架构基线已固化 ✅ 架构设计说明书已评审（含开发指南）✅ 架构追溯矩阵已建立 ✅ 进度基准与开发窗口已明确 ✅
-- **执行内容**：技术栈确认、分支策略（Trunk-Based/Git Flow 决策树）、编码规范、任务拆解（WBS）、计划排期、OWASP ASVS 安全编码映射（V1-V14），详见 `.//development_strategy_details.md` §1。
+- **执行内容**：技术栈确认、分支策略（Trunk-Based/Git Flow 决策树）、编码规范、任务拆解（WBS）、计划排期、OWASP ASVS 安全编码映射（V1-V14），详见 `development-strategy-skill__resources/development_strategy_details.md` §1。
 - **DoD**：开发策略分析报告 ✅ 分支策略已选定 ✅ 编码规范文档完成 ✅ 开发任务清单 CSV（WBS）✅ 开发计划已排期 ✅ ASVS 安全编码映射清单完成 ✅
 - **规则**：策略分析是开发第一步；技术栈版本与架构基线一致，变更走变更流程；分支策略确定后不可随意变更；编码规范在环境准备前定稿作为审查依据；策略变更需 `change_audit`。
 
 ### 环节 2：开发环境准备（action = prepare_env）
 
 - **DoR**：开发策略已确认 ✅ 编码规范已定稿 ✅ 技术栈版本已确认 ✅
-- **执行内容**：环境搭建（本地/容器/远程）、依赖管理、工具链配置、CI/CD 流水线、数据库/中间件本地实例、安全工具配置，详见 `.//development_strategy_details.md` §2。
+- **执行内容**：环境搭建（本地/容器/远程）、依赖管理、工具链配置、CI/CD 流水线、数据库/中间件本地实例、安全工具配置，详见 `development-strategy-skill__resources/development_strategy_details.md` §2。
 - **环境配置抽取**：dev 环境配置项统一写入 `台账/20_环境配置.csv`（`../../shared/references/environment_standard.md`），密钥只存别名不存明文；供测试/部署引用与检查。
 - **DoD**：环境搭建完成 ✅ 依赖版本锁定文件生成 ✅ 工具链（Linter/Formatter/Git Hooks）完成 ✅ CI/CD 流水线完成 ✅ 数据库/中间件本地实例就绪 ✅ 安全工具配置完成 ✅ 环境配置已写入 `20_环境配置.csv` ✅
 - **规则**：开发环境与生产环境结构一致（配置外部化）；依赖版本锁定禁止 floating；CI/CD 在代码开发前配置完成；Git Hooks 配提交前检查；安全工具在首次提交前配置完成。

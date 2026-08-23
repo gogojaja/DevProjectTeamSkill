@@ -15,7 +15,7 @@ description: "用户提到项目管理咨询、PMO咨询、成熟度评估、差
 
 ## 2. 触发规则
 
-用户表达「项目管理咨询/PMO 咨询/成熟度评估/差距分析/方法论定制/变革管理/咨询建议书/PMO 蓝图/教练辅导」时加载本包。单角色场景直接 Read 本文件；需要台账时调用 `../shared/governance.md`；明细按需 Read `domain/consulting-lifecycle.md` 与 `consulting-lifecycle__resources/`。
+用户表达「项目管理咨询/PMO 咨询/成熟度评估/差距分析/方法论定制/变革管理/咨询建议书/PMO 蓝图/教练辅导」时加载本包。单角色场景直接 Read 本文件；需要台账时调用 `../shared/governance.md`；明细按需 Read `domain/consulting-lifecycle.md` 与 `domain/consulting-lifecycle__resources/`。
 
 ## 3. 流程（路由到 domain/）
 
@@ -29,7 +29,7 @@ description: "用户提到项目管理咨询、PMO咨询、成熟度评估、差
 
 > **定位铁律**：本包为「二级方法工程/诊断」能力，独立于 SDLC 一级执行路由；诊断与方案设计只提供建议，落地执行由客户组织或本库执行角色承接，咨询师不代行客户方决策。
 > **保密铁律**：咨询接触的客户组织信息（组织名/人名/财务数据/流程细节）一律按 `../references/iron_rules.md` §3 A/B 级处理，台账只存脱敏别名，真实信息走 `.secrets/`+凭据管理器，未经授权禁止入库。
-> **成熟度模型**：自建 5 维评估框架（治理/流程/组织/度量/工具，0~5 级）对齐 P3M3/CMMI 裁剪，评分细则见 `domain/consulting-lifecycle.md` §2 与 `consulting-lifecycle__resources/maturity_model.md`。
+> **成熟度模型**：自建 5 维评估框架（治理/流程/组织/度量/工具，0~5 级）对齐 P3M3/CMMI 裁剪，评分细则见 `domain/consulting-lifecycle.md` §2 与 `domain/consulting-lifecycle__resources/maturity_model.md`。
 
 ## 4. 输出规范与边界
 

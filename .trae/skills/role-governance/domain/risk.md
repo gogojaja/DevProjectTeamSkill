@@ -54,11 +54,11 @@ description: "Project risk management skill covering risk register initializatio
 
 ## 4. 风险管理流程
 
-> 各环节详细执行内容详见 `.//project_risk_details.md` 对应章节。
+> 各环节详细执行内容详见 `project-risk-skill__resources/project_risk_details.md` 对应章节。
 
 ### 环节 1：风险登记册初始化（Risk Register Init）
 
-**执行内容**：预设常见风险（范围/进度/成本/技术/质量/安全/人员七类）+ 应对策略，写入「风险&问题台账」CSV，详见 `.//project_risk_details.md` §1。
+**执行内容**：预设常见风险（范围/进度/成本/技术/质量/安全/人员七类）+ 应对策略，写入「风险&问题台账」CSV，详见 `project-risk-skill__resources/project_risk_details.md` §1。
 
 **DoD**：初始风险登记册完成 ✅ · 七类风险已预设 ✅
 
@@ -68,7 +68,7 @@ description: "Project risk management skill covering risk register initializatio
 
 **DoR**：风险台账可读 ✅ · 巡检范围明确 ✅
 
-**执行内容**：读取台账→状态复核→新风险识别（结合进度/成本/质量/安全数据）→等级评估→登记册更新，详见 `.//project_risk_details.md` §2。
+**执行内容**：读取台账→状态复核→新风险识别（结合进度/成本/质量/安全数据）→等级评估→登记册更新，详见 `project-risk-skill__resources/project_risk_details.md` §2。
 
 **DoD**：风险状态全部复核 ✅ · 新风险已识别 ✅ · 等级已评估 ✅ · 登记册已更新 ✅
 
@@ -76,7 +76,7 @@ description: "Project risk management skill covering risk register initializatio
 
 ### 环节 3：风险应对（Risk Response）
 
-**执行内容**：风险应对策略选择（规避/减轻/转移/接受/应急预案）、高风险预案预设，详见 `.//project_risk_details.md` §3。
+**执行内容**：风险应对策略选择（规避/减轻/转移/接受/应急预案）、高风险预案预设，详见 `project-risk-skill__resources/project_risk_details.md` §3。
 
 **DoD**：应对策略已确定 ✅ · 高风险预案已预设 ✅
 
@@ -84,7 +84,7 @@ description: "Project risk management skill covering risk register initializatio
 
 ### 环节 4：风险协同（Risk Coordination）
 
-**执行内容**：需求/架构变更同步风险影响、风险升级重大问题推送人工决策，详见 `.//project_risk_details.md` §4。
+**执行内容**：需求/架构变更同步风险影响、风险升级重大问题推送人工决策，详见 `project-risk-skill__resources/project_risk_details.md` §4。
 
 **DoD**：变更风险已评估 ✅ · 升级问题已推送 ✅
 

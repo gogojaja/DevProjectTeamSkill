@@ -69,11 +69,11 @@ description: "Program management skill aligned with PMI Standard for Program Man
 输出：《标准一致性检查清单》（统一标准项/度量口径/报告节奏/各项目达标状态），经 PMO 确认。
 
 ### 环节 6：文档与配置管理（manage_documents，贯穿）
-落实 `program_management.md` §9：单一信息源、受控库、命名规范、版本/状态生命周期（Draft→Review→Baseline→Obsolete）、CI 基线、留存与密级、变更控制。
+落实 `../../references/program_management.md` §9：单一信息源、受控库、命名规范、版本/状态生命周期（Draft→Review→Baseline→Obsolete）、CI 基线、留存与密级、变更控制。
 输出：《文档配置管理登记》写入 `31_文档配置管理.csv`（文档ID/项目群编号/文档类别/文档名称/版本/状态/密级/责任人/存放路径/基线日期/变更记录/留存期限/关联配置项），每次工件生成或变更时增量登记；受控库纳入 git 版本化与 solidify 快照。
 
 ### 环节 7：项目群评审（review_program）
-**Program Board 在 tranche 边界决策**——继续/转向/终止；**三层门禁叠加**：项目级 stage_review 通过 → 项目群评审（时间对齐 Gate / 依赖无冲突 Gate / 标准一致 Gate / **环境就绪 Gate**）；环境就绪 Gate 于 tranche 边界决策前查 CMDB 关键资产状态（端口已注册/模型服务在线/GPU 可用），环境未就绪则阻塞或降优先级（详见 `program_management.md` §9.8）；评审节奏：tranche 边界正式决策 + 月度轻量跟踪；决策留痕，禁止无记录口头决策。
+**Program Board 在 tranche 边界决策**——继续/转向/终止；**三层门禁叠加**：项目级 stage_review 通过 → 项目群评审（时间对齐 Gate / 依赖无冲突 Gate / 标准一致 Gate / **环境就绪 Gate**）；环境就绪 Gate 于 tranche 边界决策前查 CMDB 关键资产状态（端口已注册/模型服务在线/GPU 可用），环境未就绪则阻塞或降优先级（详见 `../../references/program_management.md` §9.8）；评审节奏：tranche 边界正式决策 + 月度轻量跟踪；决策留痕，禁止无记录口头决策。
 输出：《项目群评审决策》（继续/转向/终止 + 理由 + 门禁检查项 + 纪要入库），经 Program Board 与用户确认。
 
 ### 环节 8：项目群收尾（close_program）

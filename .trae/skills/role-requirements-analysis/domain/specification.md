@@ -21,7 +21,7 @@ description: "Requirements specification sub-skill writing IEEE 830 standard req
 
 ## 2. 流程（document_requirements）
 
-**SRS 结构**：10 Sheet 映射 IEEE 830 章节 → 需求编号规则 `REQ-<维度>-<模块>-<序号>` → 八项质量特性校验。详见 `.//requirements_specification_details.md`。
+**SRS 结构**：10 Sheet 映射 IEEE 830 章节 → 需求编号规则 `REQ-<维度>-<模块>-<序号>` → 八项质量特性校验。详见 `requirements-specification-skill__resources/requirements_specification_details.md`。
 
 **SRS Sheet 结构**：1-引言 / 2-总体描述 / 3-外部接口需求 / 4-功能需求 / 5-性能需求 / 6-设计约束 / 7-质量属性 / 8-其他需求 / 9-附录 / 10-追溯矩阵。
 

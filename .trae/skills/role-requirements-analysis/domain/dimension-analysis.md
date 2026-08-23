@@ -21,7 +21,7 @@ description: "Requirement dimension analysis sub-skill performing deep analysis 
 
 ## 2. 流程（analyze_requirements）
 
-**维度分级**：必选 func（功能）/ sec（安全）/ data（数据要求）/ env（系统运行环境），任何项目均须分析；可选 nfr（非功能，纯业务流程类可跳过）/ if（接口，无外部系统对接可跳过）/ ui（操作界面，无界面项目可跳过）。详细内容与输出 Sheet 见 `.//dimension_analysis_details.md` §一，项目类型推荐组合见 §二。
+**维度分级**：必选 func（功能）/ sec（安全）/ data（数据要求）/ env（系统运行环境），任何项目均须分析；可选 nfr（非功能，纯业务流程类可跳过）/ if（接口，无外部系统对接可跳过）/ ui（操作界面，无界面项目可跳过）。详细内容与输出 Sheet 见 `requirements-dimension-analysis-skill__resources/dimension_analysis_details.md` §一，项目类型推荐组合见 §二。
 
 **维度选择校验**：未传 dimensions 默认 7 维度；仅传 project_type 按推荐自动填充；必选维度不可移除（移除则报错并自动补回）；可选维度可增删；启动后已选维度不可中途移除（仅可新增）。
 

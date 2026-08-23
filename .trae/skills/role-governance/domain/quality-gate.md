@@ -57,11 +57,11 @@ description: "Project quality and gate management skill covering quality baselin
 
 ## 4. 质量与门禁流程
 
-> 各环节详细执行内容详见 `.//project_quality_gate_details.md` 对应章节。
+> 各环节详细执行内容详见 `project-quality-gate-skill__resources/project_quality_gate_details.md` 对应章节。
 
 ### 环节 1：质量基准建立（Quality Baseline）
 
-**执行内容**：缺陷分级标准、阶段验收标准、门禁指标写入「质量基准」CSV，详见 `.//project_quality_gate_details.md` §1。
+**执行内容**：缺陷分级标准、阶段验收标准、门禁指标写入「质量基准」CSV，详见 `project-quality-gate-skill__resources/project_quality_gate_details.md` §1。
 
 **DoD**：质量基准写入完成 ✅
 
@@ -71,7 +71,7 @@ description: "Project quality and gate management skill covering quality baselin
 
 **DoR**：阶段产出物定稿 ✅ · 评审范围明确 ✅
 
-**执行内容**：五维自动校验（范围合规/功能逻辑质量/工程规范/风险安全/范围跟踪）、**「文档-环境一致性校验」门禁项**（评审前校验交接文档 / 台账 / 架构资产 ADR 与本机运行态一致，发现漂移先按「事实 > 文档」铁律登记偏差再评审，防止过时文档进入交接）、**「需求-架构-代码 三方一致性」门禁项**（强制运行 `tools/check_traceability.py` 校验《需求-架构-代码追溯矩阵.csv》，出现孤儿需求/架构/代码/测试或断链超容忍度则驳回，依据 `references/traceability_standard.md`）、`评审报告_<对象>_<版本>_{摘要|缺陷清单|逐原则|范围跟踪|角色权限}.csv` 5 文件输出、缺陷追加「质量缺陷台账」CSV，详见 `.//project_quality_gate_details.md` §2。
+**执行内容**：五维自动校验（范围合规/功能逻辑质量/工程规范/风险安全/范围跟踪）、**「文档-环境一致性校验」门禁项**（评审前校验交接文档 / 台账 / 架构资产 ADR 与本机运行态一致，发现漂移先按「事实 > 文档」铁律登记偏差再评审，防止过时文档进入交接）、**「需求-架构-代码 三方一致性」门禁项**（强制运行 `tools/check_traceability.py` 校验《需求-架构-代码追溯矩阵.csv》，出现孤儿需求/架构/代码/测试或断链超容忍度则驳回，依据 `references/traceability_standard.md`）、`评审报告_<对象>_<版本>_{摘要|缺陷清单|逐原则|范围跟踪|角色权限}.csv` 5 文件输出、缺陷追加「质量缺陷台账」CSV，详见 `project-quality-gate-skill__resources/project_quality_gate_details.md` §2。
 
 **DoD**：评审报告 CSV 生成 ✅ · 缺陷已登记 ✅ · 评审结论输出 ✅
 
@@ -81,7 +81,7 @@ description: "Project quality and gate management skill covering quality baselin
 
 **DoR**：本阶段评审通过 ✅ · 各阶段追溯矩阵可读取 ✅
 
-**执行内容**：质量门禁强制校验（严重/主要缺陷闭环）、各阶段专项门禁细则（需求追溯矩阵/测试 RTM/投产 Go-Live 六维/架构 4+1+C4+ADR+七原则/开发 SonarQube 五维+SAST+SCA+审查+覆盖率）、**需求-架构-代码 三方一致性门禁**（`tools/check_traceability.py` 孤儿/断链校验，未通过驳回），详见 `.//project_quality_gate_details.md` §3。
+**执行内容**：质量门禁强制校验（严重/主要缺陷闭环）、各阶段专项门禁细则（需求追溯矩阵/测试 RTM/投产 Go-Live 六维/架构 4+1+C4+ADR+七原则/开发 SonarQube 五维+SAST+SCA+审查+覆盖率）、**需求-架构-代码 三方一致性门禁**（`tools/check_traceability.py` 孤儿/断链校验，未通过驳回），详见 `project-quality-gate-skill__resources/project_quality_gate_details.md` §3。
 
 **DoD**：门禁校验完成 ✅ · 结果写入「门禁验收记录」CSV ✅ · 门禁结论（通过/驳回）✅
 
@@ -89,7 +89,7 @@ description: "Project quality and gate management skill covering quality baselin
 
 ### 环节 4：缺陷管理（Defect Management）
 
-**执行内容**：缺陷全生命周期（发现→登记→修复→复核→闭环）、缺陷分级、闭环要求，详见 `.//project_quality_gate_details.md` §4。
+**执行内容**：缺陷全生命周期（发现→登记→修复→复核→闭环）、缺陷分级、闭环要求，详见 `project-quality-gate-skill__resources/project_quality_gate_details.md` §4。
 
 **DoD**：缺陷已登记 ✅ · 修复状态跟踪 ✅ · 闭环确认 ✅
 
