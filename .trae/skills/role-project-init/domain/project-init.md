@@ -31,7 +31,8 @@ description: "Project initiation skill covering startup foundations: charter & b
 | action | 作用 | 前置条件 |
 |--------|------|----------|
 | `init_kickoff` | 启动登记 | 无 |
-| `create_charter` | 输出项目章程 | init_kickoff |
+| `write_project_iron_rules` | 写入项目铁律（项目根 `项目铁律.md`，含语言/产物落盘等强制约束） | init_kickoff |
+| `create_charter` | 输出项目章程 | write_project_iron_rules |
 | `register_stakeholder` | 干系人登记册 | create_charter |
 | `define_org_structure` | 组织架构与 RACI 矩阵（27_组织架构.csv） | register_stakeholder |
 | `define_issue_escalation` | 问题解决与升级机制（12_风险问题台账.csv 升级字段） | define_org_structure |
@@ -47,7 +48,7 @@ description: "Project initiation skill covering startup foundations: charter & b
 
 ## 3. 项目启动流程
 
-流程主线：`init_kickoff → create_charter → register_stakeholder → define_org_structure → define_issue_escalation → define_scope_prelim → init_tailor → register_env_asset → declare_access_boundary → assess_feasibility → check_ready → (Go) → init_baseline → 需求阶段入场`；No-Go/暂缓 → 阻塞清单 + 建议行动，停止。
+流程主线：`init_kickoff → write_project_iron_rules → create_charter → register_stakeholder → define_org_structure → define_issue_escalation → define_scope_prelim → init_tailor → register_env_asset → declare_access_boundary → assess_feasibility → check_ready → (Go) → init_baseline → 需求阶段入场`；No-Go/暂缓 → 阻塞清单 + 建议行动，停止。
 
 - **门禁**：每环节产出经用户确认后进入下一环节；
 - **刹车**：章程确认连续 2 次未通过 → 停止并推送人工决策；
@@ -56,6 +57,17 @@ description: "Project initiation skill covering startup foundations: charter & b
 ### 环节 1：启动登记（init_kickoff）
 处理：生成项目编号（PRJ-XXX）与名称；登记 SMART 目标、背景、预期收益；判定项目类型，联动 RequirementsAnalysisSkill dimensions。
 输出：项目登记记录（写入台账「01_启动组.csv」候选行）。
+
+### 环节 1.5：写入项目铁律（write_project_iron_rules，强制必做）
+
+处理：在本项目根目录生成 `项目铁律.md`，固化本项目强制约束——**直接继承全局铁律卡**（`../../references/iron_rules.md` §0~§9）并**显式落地两条项目级硬约束**：
+
+1. **语言铁律**：本项目全程中文交流（对话/文档/台账/报告/注释说明一律中文，代码标识符可保留英文）；
+2. **产物落盘铁律**：所有生成产物必须落在**本项目目录内**，禁止写入系统盘 / C 盘等非项目路径；确需新建目录只能建在项目目录内且经用户确认。
+
+`项目铁律.md` 须包含：铁律锚点 `授权→备份→留痕`、全局铁律卡引用、本项目目录访问边界（可读写/删除=本项目目录）、语言与产物落盘两条硬约束、违反即阻断的声明。
+
+输出：《项目铁律》（写入本项目根目录 `项目铁律.md`），经用户确认；未写入不得进入 `create_charter`。
 
 ### 环节 2：项目章程（create_charter）
 处理：章程含**立项授权、目标（业务+交付，SMART）、成功标准、约束、预算上限、关键里程碑、项目经理任命与职权范围、签字批准**，对齐 PMBOK 章程六核心要素（目的/目标/成功标准、关键干系人与角色 RACI、PM 任命与职权、高层范围与交付物、预算时间、签字批准）；须经干系人确认；目标不清晰时输出「章程缺陷清单」，不强行通过。
@@ -163,7 +175,7 @@ python tools/cmdb/cmdb-cli.py release --type port --identifier 8000 --project ba
 输出：《可行性评估报告》（五维结论 + Go/No-Go 建议）。
 
 ### 环节 8：启动就绪检查（check_ready）
-处理：Gate 清单——章程确认 / 干系人登记（含权力-利益分析）/ **组织架构已明确（`27_组织架构.csv`，团队构成 + RACI 矩阵）** / **问题升级机制已确立（`12_风险问题台账.csv` 升级字段，P1~P4 分级 + 升级路径 + 响应时限 + Owner）** / 范围初定义 / 裁剪配置确认 / **环境资产已注册且无未裁决冲突（`25_环境资源清单.csv`）** / **访问边界已声明（`26_访问边界.csv`，可读写/删除范围=本项目目录）** / 可行性通过 / 预算里程碑明确 / 需求入场条件识别。判定 **Go**（全过）/ **No-Go**（任一不满足且无法调整）/ **暂缓**（条件暂缺，补足重查）；No-Go/暂缓输出阻塞清单与建议行动。
+处理：Gate 清单——章程确认 / 干系人登记（含权力-利益分析）/ **项目铁律已写入（`项目铁律.md`，含语言铁律 + 产物落盘铁律）** / **组织架构已明确（`27_组织架构.csv`，团队构成 + RACI 矩阵）** / **问题升级机制已确立（`12_风险问题台账.csv` 升级字段，P1~P4 分级 + 升级路径 + 响应时限 + Owner）** / 范围初定义 / 裁剪配置确认 / **环境资产已注册且无未裁决冲突（`25_环境资源清单.csv`）** / **访问边界已声明（`26_访问边界.csv`，可读写/删除范围=本项目目录）** / 可行性通过 / 预算里程碑明确 / 需求入场条件识别。判定 **Go**（全过）/ **No-Go**（任一不满足且无法调整）/ **暂缓**（条件暂缺，补足重查）；No-Go/暂缓输出阻塞清单与建议行动。
 输出：《启动就绪检查单》（Go/No-Go/暂缓 + 阻塞清单）。
 
 ### 环节 9：基线初始化（init_baseline）
@@ -194,7 +206,8 @@ python tools/cmdb/cmdb-cli.py release --type port --identifier 8000 --project ba
 4. **边界铁律**：不做需求细化、架构设计、写代码——范围初定义不等于需求规格说明书；
 5. **权限铁律**：范围/基线变更经 ProjectMonitorSkill 审计；
 6. **目录边界铁律**：本项目可读写/删除范围=本项目目录（`26_访问边界.csv`）；本项目目录之外（其他项目目录/系统文件）一律经 `register_auth` 授权，未填有效期默认仅本次对话有效，未授权禁止读写/删除（详见 `../../references/iron_rules.md` §1）；
-7. **治理铁律**：组织架构（RACI）与问题升级机制未明确（`27_组织架构.csv` / `12_风险问题台账.csv` 升级字段），禁止进入范围初定与就绪检查。
+7. **项目铁律铁律**：项目初始化必须生成本项目根目录 `项目铁律.md`（继承全局铁律卡 + 落地语言铁律/产物落盘铁律），未写入禁止进入 `create_charter`、禁止进入需求阶段（详见 `../../references/iron_rules.md` §8/§9）；
+8. **治理铁律**：组织架构（RACI）与问题升级机制未明确（`27_组织架构.csv` / `12_风险问题台账.csv` 升级字段），禁止进入范围初定与就绪检查。
 
 **禁用**：需求收集与规格编写（由 RequirementsAnalysisSkill 执行）；架构/开发/测试/部署等后续阶段；跳过就绪检查直接固化基线。
 
@@ -206,5 +219,5 @@ python tools/cmdb/cmdb-cli.py release --type port --identifier 8000 --project ba
 
 ---
 
-**文档版本**：v21.2.0（新增 define_org_structure 组织架构/RACI + define_issue_escalation 问题升级机制 + 章程补成功标准/PM 任命职权/签字批准，2026-08-16）
+**文档版本**：v21.2.1（新增 write_project_iron_rules 环节 1.5：项目初始化强制生成本项目根 `项目铁律.md`，落地语言铁律§8 + 产物落盘铁律§9，2026-08-25）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

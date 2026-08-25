@@ -25,6 +25,7 @@ description: "用户提到台账、阶段评审、门禁、变更审计、EVM、
 | 阶段评审 | stage_review | `../shared/governance.md`（输出 CSV） |
 | 门禁校验 | check_gate | `../shared/governance.md` |
 | 变更审计 | change_audit / register_change | `domain/scope-change.md` |
+| 范围门禁/跟踪 | scope_gate | `domain/scope-change.md`（工具 `tools/scope_tracker.py`，标准 `references/traceability_standard.md` v1.1.1） |
 | 进度成本 | progress_update | `domain/progress-cost.md`（里程碑/EVM） |
 | 质量门禁 | check_gate / 缺陷 | `domain/quality-gate.md` |
 | 风险扫描 | risk_scan | `domain/risk.md` |

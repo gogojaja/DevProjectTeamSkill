@@ -2,8 +2,9 @@
 # =============================================================================
 # scope_tracker.py — 项目范围跟踪与范围基准工具
 #
-# 依据：references/traceability_standard.md v1.1.0
+# 依据：references/traceability_standard.md v1.1.1
 #       对齐 PMBOK 范围管理 / IEEE 29148 / ISO 21500 / MoSCoW / CCB
+# 版本：v1.1.1（2026-08-25 审计整改：gate 结论留痕/健康分门禁/fail-closed/蔓延补 MOD·TC 孤儿/快照去重口径）
 #
 # 子命令：
 #   init    初始化《需求-架构-代码追溯矩阵》(扩展 RTM) 与 06/07 范围台账（含表头）
@@ -15,7 +16,7 @@
 # 用法：
 #   python3 tools/scope_tracker.py init
 #   python3 tools/scope_tracker.py metrics [--write]
-#   python3 tools/scope_tracker.py gate [--max-violations 0]
+#   python3 tools/scope_tracker.py gate [--max-violations 0] [--min-health 90]
 #   python3 tools/scope_tracker.py change --req REQ-001 --title "..." --type 范围调整 \
 #          --impact-scope 高 --severity 主要 --approver 用户 --baseline-from v1.0.0 --baseline-to v1.0.1
 # =============================================================================
@@ -65,8 +66,12 @@ def load_rtm(path):
         return list(reader)
 
 
-def consistency_violations(matrix_path):
-    """复用 check_traceability 的 analyze 计算孤儿/断链违规数。"""
+def consistency_violations(matrix_path, fail_closed=False):
+    """复用 check_traceability 的 analyze 计算孤儿/断链违规数。
+
+    返回 (violations, ok)。fail_closed=True 时校验异常返回 (None, False)，
+    供 gate 驳回（防门禁假绿）；False 时降级返回 ([], False)，不影响 metrics 指标。
+    """
     try:
         import importlib.util
         spec = importlib.util.spec_from_file_location(
@@ -75,10 +80,13 @@ def consistency_violations(matrix_path):
         spec.loader.exec_module(ct)
         rows = ct.load_matrix(matrix_path)
         violations, _ = ct.analyze(rows)
-        return violations
-    except Exception as e:  # 兜底：一致性工具不可用时不影响范围指标
+        return violations, True
+    except Exception as e:
+        if fail_closed:
+            print('   ✗ 一致性校验模块异常（门禁 fail-closed）: %s' % e, file=sys.stderr)
+            return None, False
         print('   ⚠ 一致性校验模块不可用: %s' % e, file=sys.stderr)
-        return []
+        return [], False
 
 
 def compute_metrics(rows):
@@ -147,6 +155,17 @@ def detect_creep_shrink(rows):
     for ae in ae_seen:
         if not ae_to_req.get(ae):
             creep.append('%s 孤儿架构(无回溯需求)' % ae)
+    # MOD/TC 孤儿（悬空新增能力 = 蔓延，v1.1.1 审计整改补全）
+    mod_to_ae = {}
+    for r in rows:
+        for mod in split_ids(r.get('MOD_ID')):
+            mod_to_ae.setdefault(mod, set()).update(split_ids(r.get('AE_ID')))
+    for mod in mod_seen:
+        if not mod_to_ae.get(mod):
+            creep.append('%s 孤儿代码(无归属架构)' % mod)
+    for tc in tc_seen:
+        if not tc_to_req.get(tc):
+            creep.append('%s 孤儿测试(无回溯需求)' % tc)
     return creep, shrink
 
 
@@ -207,31 +226,36 @@ def cmd_metrics(args):
         print('   ✗ 追溯矩阵为空', file=sys.stderr)
         return 1
     m = compute_metrics(rows)
-    violations = consistency_violations(DEFAULT_MATRIX)
+    violations, _ = consistency_violations(DEFAULT_MATRIX)
     creep, shrink = detect_creep_shrink(rows)
     health = health_score(m, violations, creep, shrink)
     print_scorecard(m, violations, creep, shrink, health)
     if args.write:
+        ensure_header(DEFAULT_TRACK, TRACK_COLS)
         _write_snapshot(m, violations, creep, shrink, health, '指标快照')
         print('   ✓ 已写范围快照到 %s' % DEFAULT_TRACK)
     return 0
 
 
-def _write_snapshot(m, violations, creep, shrink, health, detail):
+def _write_snapshot(m, violations, creep, shrink, health, detail, gate_result='指标快照'):
     baseline_ver = '—'
     rows = load_rtm(DEFAULT_MATRIX)
     vers = [r.get('BASELINE_VER', '').strip() for r in rows if (r.get('BASELINE_VER') or '').strip()]
     if vers:
         baseline_ver = Versorted(vers)
+    # 元素总数 = 去重计数（v1.1.1 审计整改，原为"含该列的行数"口径误导）
+    ae_uniq, mod_uniq, tc_uniq = set(), set(), set()
+    for r in rows:
+        ae_uniq.update(split_ids(r.get('AE_ID')))
+        mod_uniq.update(split_ids(r.get('MOD_ID')))
+        tc_uniq.update(split_ids(r.get('TC_ID')))
     sid = 'SN-%s' % datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     row = [sid, baseline_ver, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
            m['req_total'], m['impl'], m['ver'],
-           len([r for r in rows if split_ids(r.get('AE_ID'))]),
-           len([r for r in rows if split_ids(r.get('MOD_ID'))]),
-           len([r for r in rows if split_ids(r.get('TC_ID'))]),
+           len(ae_uniq), len(mod_uniq), len(tc_uniq),
            len(violations), len(creep), len(shrink),
            m['cov_ae'], m['cov_tc'], health,
-           '指标快照', detail]
+           gate_result, detail]
     with open(DEFAULT_TRACK, 'a', encoding='utf-8-sig', newline='') as f:
         csv.writer(f).writerow(row)
 
@@ -247,21 +271,32 @@ def cmd_gate(args):
     if not os.path.isfile(DEFAULT_MATRIX):
         print('   ✗ 未找到追溯矩阵，请先运行: python3 tools/scope_tracker.py init', file=sys.stderr)
         return 1
-    rows = load_rtm(DEFAULT_MATRIX)
+    try:
+        rows = load_rtm(DEFAULT_MATRIX)
+    except Exception as e:
+        print('   ✗ 追溯矩阵异常（fail-closed）: %s' % e, file=sys.stderr)
+        return 2
     if not rows:
         print('   ✗ 追溯矩阵为空', file=sys.stderr)
         return 1
     m = compute_metrics(rows)
-    violations = consistency_violations(DEFAULT_MATRIX)
+    violations, ok = consistency_violations(DEFAULT_MATRIX, fail_closed=True)
+    if not ok:
+        # 一致性校验异常：fail-closed 驳回（防门禁假绿），exit 2
+        _write_snapshot(m, [], [], [], 0.0, '一致性校验异常-fail-closed', '驳回')
+        print('   范围门禁结论: 驳回（一致性校验异常，fail-closed，exit 2）', file=sys.stderr)
+        return 2
     creep, shrink = detect_creep_shrink(rows)
     health = health_score(m, violations, creep, shrink)
     print_scorecard(m, violations, creep, shrink, health)
 
-    severe = len(violations) > args.max_violations or len(shrink) > 0
+    severe = (len(violations) > args.max_violations or len(shrink) > 0
+              or health < args.min_health)  # v1.1.1：健康分门禁（标准 §8 ≥90）
     warn = len(creep) > 0 or (0 < len(violations) <= args.max_violations)
     result = '通过' if not severe and not warn else ('驳回' if severe else '警告')
-    detail = '违规%d/蔓延%d/缩水%d' % (len(violations), len(creep), len(shrink))
-    _write_snapshot(m, violations, creep, shrink, health, detail)
+    detail = '违规%d/蔓延%d/缩水%d/健康%.1f' % (len(violations), len(creep), len(shrink), health)
+    ensure_header(DEFAULT_TRACK, TRACK_COLS)
+    _write_snapshot(m, violations, creep, shrink, health, detail, result)  # v1.1.1：门禁结论留痕
     print('   范围门禁结论: %s（写 %s）' % (result, DEFAULT_TRACK))
     return 1 if result == '驳回' else 0
 
@@ -294,6 +329,7 @@ def main():
     p_m.add_argument('--write', action='store_true', help='同时写 07 范围跟踪台账快照')
     p_g = sub.add_parser('gate', help='范围门禁（一致性+蔓延/缩水+健康分）')
     p_g.add_argument('--max-violations', type=int, default=0)
+    p_g.add_argument('--min-health', type=float, default=90, help='健康分门禁阈值（默认 90，低于则驳回）')
     p_c = sub.add_parser('change', help='登记变更请求')
     p_c.add_argument('--req', required=True, help='关联需求 ID（多值逗号分隔）')
     p_c.add_argument('--title', required=True, help='变更标题')

@@ -125,8 +125,20 @@ DevProjectTeamSkill（总控）
 | action | 用途 | 典型调用时机 |
 |--------|------|-------------|
 | `change_audit` | 范围/架构/核心文件变更审计（五维影响评估） | 变更、范围调整 |
+| `scope_gate` | 范围门禁（一致性 + 蔓延/缩水 + 健康分） | 阶段流转前 |
 
 > 范围门禁校验、产出物条目化比对、范围跟踪检查为 `check_gate`/`stage_review` 协同子步骤。
+
+**依赖工具契约**（范围跟踪自动化，标准 `references/traceability_standard.md` v1.1.1）：
+
+| 工具 | 子命令 | 用途 | 输出 / 退出码 |
+|------|--------|------|---------------|
+| `tools/scope_tracker.py` | `init` | 初始化 RTM（扩展列）+ `06/07_范围台账.csv` 表头 | 0 |
+| | `metrics [--write]` | 覆盖度/健康分卡；`--write` 追加 `07_范围跟踪台账.csv` 快照 | 0 成功 / 1 矩阵缺失 |
+| | `gate [--max-violations N] [--min-health 90]` | 三方一致性 + 蔓延/缩水 + 健康门禁，写 07 快照 | 0 通过 / 1 驳回 / 2 一致性校验异常 |
+| | `change --req --title --impact-* --baseline-*` | 登记 `CR-<nnn>` 至 `06_范围变更台账.csv`（五维影响） | 0 |
+
+> 数据源：`台账/需求-架构-代码追溯矩阵.csv`（11 列 = 5 基础 + 6 扩展）；`gate` 内部复用 `tools/check_traceability.py` 一致性校验，异常时 fail-closed（exit 2，防门禁假绿）。
 
 ### 1.3 progress-cost（项目进度与成本管理子域）
 

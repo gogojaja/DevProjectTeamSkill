@@ -1,7 +1,7 @@
 ﻿边界ID,目录,类别,授权ID,声明时间,状态,备注
-AB-001,D:\trae\DevProjectTeamSkill,项目内,-,2026-08-17,有效,技能库工作区(默认边界)
-AB-002,D:\trae,授权外,AUTH-002,2026-08-17,有效,用户授权-项目集台账与成员项目登记(本次会话)
-AB-003,C:\Users\gogoj\.workbuddy\skills,授权外,AUTH-003,2026-08-25,有效,用户授权-DevProjectTeamSkill全局安装目录(项目外,长期有效)
+AB-001,<repo>\DevProjectTeamSkill,项目内,-,2026-08-17,有效,技能库工作区(默认边界)
+AB-002,<repo>,授权外,AUTH-002,2026-08-17,有效,用户授权-项目集台账与成员项目登记(本次会话)
+AB-003,C:\Users\<user>\.workbuddy\skills,授权外,AUTH-003,2026-08-25,有效,用户授权-DevProjectTeamSkill全局安装目录(项目外,长期有效)
 AB-003,<HOME>目录(Prod环境),外部卷,AUTH-003,2026-08-21 23:09:31,有效,三环境之生产环境(用户提供映射,脱敏登记)
 AB-004,<DEV_VOLUME>BR256G卷(Dev环境),外部卷,AUTH-003,2026-08-21 23:09:31,有效,三环境之开发环境=本仓库所在卷(用户确认)
 AB-005,<TEST_VOLUME>KINGSTON卷(Test环境),外部卷,AUTH-003,2026-08-21 23:09:31,有效,三环境之测试环境(用户提供映射,脱敏登记)

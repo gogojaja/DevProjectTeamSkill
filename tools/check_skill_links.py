@@ -56,7 +56,7 @@ def is_exempt(ref):
     if re.search(r'[\*\{\}\<\>]', ref):
         return True
     # 运行态文档（项目根生成，非技能内文件）
-    if ref in ('交接文档.md', '跨会话交接文档.md', '00_交接文档.md'):
+    if ref in ('交接文档.md', '跨会话交接文档.md', '00_交接文档.md', '项目铁律.md'):
         return True
     # 根级锚定（references/、shared/ 及 ../ 越级）由打包内嵌 + 库根校验，本脚本不重复
     if ref.startswith('references/') or ref.startswith('shared/'):

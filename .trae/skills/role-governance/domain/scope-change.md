@@ -17,7 +17,7 @@ description: "Project scope and change management skill covering scope baseline 
 - **调用主体**：ProjectMonitorSkill（薄路由壳按 action 分发）；范围门禁校验、产出物条目化比对、范围跟踪检查为 `check_gate`/`stage_review` 协同子步骤，由 project-quality-gate-skill 门禁流程触发本技能。
 - **参考标准**：PMBOK 7th（范围管理）· ITIL v4（变更使能）· ISO 21500 · IEEE 29148
 - **依赖工具**：`tools/scope_tracker.py`（范围跟踪主工具，内含 `check_traceability.py` 一致性校验）· `tools/check_traceability.py`（三方一致性）
-- **标准文档**：`references/traceability_standard.md` v1.1.0（范围跟踪与追溯一致性标准）
+- **标准文档**：`references/traceability_standard.md` v1.1.1（范围跟踪与追溯一致性标准）
 
 ## 2. 流程
 
@@ -57,6 +57,6 @@ description: "Project scope and change management skill covering scope baseline 
 
 ---
 
-**文档版本**：v21.1.0
-**最后更新**：2026-08-25（接入 scope_tracker.py：范围基准/WBS/覆盖度/蔓延缩水检测/变更基线化）
+**文档版本**：v21.1.1
+**最后更新**：2026-08-25（审计整改：gate 快照留痕门禁结论/健康分阈值/fail-closed/蔓延补 MOD·TC 孤儿，见 scope_tracker.py v1.1.1；标准引用升 v1.1.1）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
