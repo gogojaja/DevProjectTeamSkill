@@ -307,7 +307,23 @@ def main():
         try:
             if os.path.islink(tmp_link) or os.path.exists(tmp_link):
                 os.remove(tmp_link)
-            os.symlink(f"v{version}", tmp_link)
+            try:
+                os.symlink(f"v{version}", tmp_link)
+            except OSError:
+                if sys.platform == "win32":
+                    abs_target = os.path.join(target_root, f"v{version}")
+                    subprocess.run(["cmd", "/c", "mklink", "/J", tmp_link, abs_target],
+                                   check=True, capture_output=True)
+                else:
+                    raise
+            if os.path.exists(current) or os.path.islink(current):
+                try:
+                    os.remove(current)
+                except OSError:
+                    try:
+                        os.rmdir(current)
+                    except OSError:
+                        shutil.rmtree(current)
             os.replace(tmp_link, current)
         except OSError as e:
             print(f"  ✗ 软链切换失败: {e}"); sys.exit(1)
@@ -317,7 +333,11 @@ def main():
         print(f"  (dry-run) 将部署到全局库 {GLOBAL_SKILLS}")
     else:
         if os.path.isdir(GLOBAL_SKILLS):
-            shutil.rmtree(GLOBAL_SKILLS)
+            if sys.platform == "win32":
+                subprocess.run(["cmd", "/c", "rmdir", "/s", "/q", GLOBAL_SKILLS],
+                               check=True, capture_output=True)
+            else:
+                shutil.rmtree(GLOBAL_SKILLS)
         copy_skills_to(GLOBAL_SKILLS)
         print(f"  ✓ 已发布到全局库 {GLOBAL_SKILLS}")
 

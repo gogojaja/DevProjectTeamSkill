@@ -1,3 +1,0 @@
-﻿文档ID,项目群编号,文档类别,文档名称,版本,状态(草稿/评审/基线/作废),密级(A/B/C),责任人,存放路径,基线日期,变更记录,留存期限,关联配置项
-DOC-001,PG-LOCAL-001,战略类,项目群章程与路线图,v1.0,基线,B,douglas,<项目根>/台账/28_program_registry.csv,2026-08-17,初始登记,项目结束后≥3年,章程/路线图
-DOC-002,PG-LOCAL-001,治理类,仓库结构说明书(REPO_STRUCTURE),v1.0,草稿,B,DevProjectTeamSkill,<项目根>/docs/REPO_STRUCTURE.md,2026-08-18,规整新增,3年,结构治理

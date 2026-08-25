@@ -1,3 +1,0 @@
-阶段,复盘对象,做得好,需改进,可固化到SKILL流程,可复用工具,降Token措施,行动项
-v21.3.x增强改造,模型选型/环境抽取/复盘收割/密钥隔离/铁律,完成R1-R5共5项需求+铁律防压缩遗忘,系统文件操作曾误删hosts(现铁律已加固),select_model/retrospect_harvest/record_env_config三action,check_version_consistency.py版本门禁+pre-commit密钥扫描,每轮回显铁律锚点+压缩后重读iron_rules,确认版本一致性工具覆盖所有SKILL.md; 定期巡检授权时效
-v21.3.x复盘,压缩致铁律遗忘,建立iron_rules.md铁律卡+压缩后重读锚点,压缩后重读铁律卡流程,铁律卡+锚点机制,压缩后仅重读1条铁律卡而非全量,-
