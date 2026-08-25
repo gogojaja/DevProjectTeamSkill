@@ -78,6 +78,10 @@ python tools/publish_production.py                # 跨平台/Windows 主推
 
 ```sh
 python tools/check_skill_links.py       # 技能库引用可达性门禁（拦截 .// 残留与 __resources 断链；已纳入 lint_repo ⑥）
+python tools/scope_tracker.py init      # 范围跟踪初始化：建扩展 RTM（含 PRIORITY/SCOPE_STATUS/BASELINE_VER 等）+ 06/07 范围台账（含表头与示例）
+python tools/scope_tracker.py metrics [--write]   # 范围覆盖度指标 + 健康分（--write 写 07_范围跟踪台账 快照）
+python tools/scope_tracker.py gate [--max-violations 0]  # 范围门禁：一致性+蔓延/缩水检测+健康分，写 07，结论 exit(驳回/警告/通过)
+python tools/scope_tracker.py change --req REQ-001 --title "..." --type 范围调整 --severity 主要 --approver 用户 --baseline-from v1.0.0 --baseline-to v1.0.1  # 登记变更请求→06_范围变更台账（CCB 五维影响）
 python tools/excel_to_csv.py            # 迁移存量 xlsx→csv
 python tools/github_push.py --dry-run   # GitHub 真实 IP 推送：dry-run 预览（仅探测，不推送）
 python tools/github_push.py             # GitHub 真实 IP 一键推送（固定动作：候选IP→可达+TLS证书合法探测→绑定真实IP push origin）
