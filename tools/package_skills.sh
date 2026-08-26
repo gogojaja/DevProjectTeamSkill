@@ -47,6 +47,7 @@ ALL_ROLES=(
   role-governance
   role-program-mgmt
   role-mgmt-consulting
+  role-project-mgmt
 )
 
 # 待处理角色

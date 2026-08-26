@@ -1,12 +1,13 @@
 # SKILL_INDEX — 角色包索引清单
 
-> 技能库根只读入口：**工具/编排器据此选择角色包**，每包一行。
+> 技能库根只读入口：**工具/编排器据此选择角色包**，每包一行（含编排器共 11 条）。
 > 子技能明细由各角色包根 SKILL.md 路由表承载，本索引不重复。
 > 规范详见 `references/token_standard.md` §1。
 > **弱模型适配**：能力弱模型下技能识别与执行规范见 `references/weak_model_compatibility.md`（description 单语言/触发词前置）。
 > **目录访问边界**：本项目可读写/删除范围=本项目目录（`台账/26_访问边界.csv`），本项目目录外访问须经 `register_auth` 授权（默认仅本次对话），见 `references/iron_rules.md` §1a。
 
 | # | 角色包 | 域 | 触发词 | 加载路径 |
+|---|--------|-----|--------|----------|
 |---|--------|-----|--------|----------|
 | 0 | dev-project-team-skill | 编排器 | 全生命周期 / 角色组合加载 / 切换角色 / 技能维护 | dev-project-team-skill/ |
 | 1 | role-project-init | 项目启动 | 启动项目 / 立项 / 章程 / 干系人 / 组织架构 / RACI / 问题升级 / 基线初始化 | role-project-init/ |
@@ -18,6 +19,7 @@
 | 7 | role-governance | 总控保障 | 台账读写 / 阶段评审 / 门禁 / 基线固化 / 变更审计 / 归档 / 交接 | role-governance/ |
 | 8 | role-program-mgmt | 项目群/项目集 | 项目群 / 项目集 / 多项目协同 / PMO / 依赖 / 里程碑对齐 / 收益 / IMS | role-program-mgmt/ |
 | 9 | role-mgmt-consulting | 项目管理咨询 | 项目管理咨询 / PMO 咨询 / 成熟度评估 / 差距分析 / 方法论定制 / 变革管理 / 咨询建议书 / PMO 蓝图 / 教练辅导 | role-mgmt-consulting/ |
+| 10 | role-project-mgmt | 项目经理执行层 | 项目管理 / 日常管控 / RAID / 进展报告 / 变更协调 / 经验教训 / 干系人沟通 / 阶段状态跟踪（不涉及具体工程交付） | role-project-mgmt/ |
 
 ## 使用规则
 

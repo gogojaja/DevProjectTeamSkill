@@ -1,6 +1,6 @@
 ---
 name: "dev-project-team-skill"
-description: "用户启用全生命周期、启用某角色、切换角色、多角色联合、项目管控、阶段评审、基线固化、交接文档时加载本软件研发多角色编排器：按阶段渐进加载角色包（启动/需求/架构/开发/测试/投产/总控/项目群/管理咨询），支持跨模型/跨会话切换、全生命周期管控、台账评审门禁、基线固化与优先级仲裁。用户说启动生命周期/启用角色时加载。"
+description: "用户启用全生命周期、启用某角色、切换角色、多角色联合、项目管理模式、项目管控、阶段评审、基线固化、交接文档时加载本软件研发多角色编排器：按阶段渐进加载角色包（启动/需求/架构/开发/测试/投产/总控/项目群/管理咨询/项目经理执行层），支持跨模型/跨会话切换、全生命周期管控、台账评审门禁、基线固化与优先级仲裁。用户说启动生命周期/启用角色/项目管理模式时加载。"
 ---
 
 # DevProjectTeamSkill 软件研发多角色编排器
@@ -16,9 +16,10 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.8.2
-- **版本发布日期**：2026-08-22
+- **技能版本**：v21.9.0
+- **版本发布日期**：2026-08-27
 - **版本变更记录**：
+  - v21.9.0：新增「项目管理模式」+ 项目经理执行层 `role-project-mgmt`（2026-08-27）——①编排器 §3 执行模式新增「项目管理模式」（对齐 PRINCE2 治理与日常管理分离 + PMBOK 十大知识领域），§4 路由表增 #10 `role-project-mgmt`；②§5 调度新增「工程角色协调只读」铁律（该模式下需求/架构/开发/测试/投产仅读状态/依赖/风险、禁触发交付 action，PM 与 `role-governance` 职责分离）；③新增 `role-project-mgmt` 角色包（日常管控循环/RAID/阶段计划/进展报告/变更协调/经验教训 + 与保障层边界声明 + 轻量→建角色升级阈值 `domain/upgrade-threshold.md`）；④SKILL_INDEX / AGENTS 同步 10 角色包计数。
   - v21.8.2：本体全面评审 v21.8.2 缺陷修复批次（2026-08-22）——①`role-architecture` description 扩充至 150+ 字符（补「架构评估/技术选型」触发词）使 descriptions 门禁全绿；②初始化《需求-架构-代码追溯矩阵.csv》并补录存量 11 REQ/5 AE/17 MOD/6 TC 条目（铁律 #10 落地，`check_traceability.py` 通过）；③以 `references/` 为基准重建 `shared/references/` 副本消除 4 文件漂移 + 补 `traceability_standard.md` 副本（铁律 #1 单源合规，部署三目录同步）；④仓库卫生 lint 白名单更新（`.codebuddy/` IDE 数据目录 + `projects_registry.csv` 依赖文件），评审报告归档 `docs/reviews/`，清理 `.DS_Store/.pytest_cache/.venv/扫描报告×5`，lint 门禁 23 error→0；⑤`lint_repo.py` 白名单维护。
   - v21.8.1：生产发布集补全缺陷修复（2026-08-20）——修复 `tools/`（github_push.py/_gh_ip_probe.py 等）与 `docs/`（github_ip_records.csv 等）未纳入发布/部署/固化复制集、全局库按文档调用工具路径不存在的缺陷；`publish_production`/`deploy_skills`/`solidify` 复制集统一纳入 tools+docs，脱敏门禁扫描范围扩展至 tools/docs 并豁免规则定义示例与占位符；版本目录、项目级三目录、全局库同步生效。
 - **版本变更记录**：
@@ -96,6 +97,7 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 | **技能维护** | 「手工编写/修改 SKILL.md」「skill-authoring」 | 维护技能库本身，非执行项目业务；按 role-governance 的 `skill-authoring`（`../shared/authoring.md`）六步流程（定义→建模→编写→校验→验证→打包发布），且所有维护产出必须具备 `闭环执行系统` 章节与终审门禁（任务入口/状态机/验收门禁/失败恢复/交接审计） |
 | **项目群协同** | 「项目群/项目集/多项目协同/PMO 决策层」 | 多项目协同层：`role-program-mgmt` 承载（对齐 PMI SPM 5th/MSP/IMS/EVM），7 环节定义/收益/依赖/IMS 进度/标准一致/Program Board 评审/收尾；治理三层模型，Program Board 在 tranche 边界决策（继续/转向/终止）；与项目级 check_ready/stage_review 叠加双层门禁，不替代单项目治理 |
 | **管理咨询** | 「项目管理咨询/PMO咨询/成熟度评估/方法论定制/变革管理」 | 咨询层：`role-mgmt-consulting` 承载（二级方法工程/诊断，独立于 SDLC 一级执行路由），5 环节商机/诊断/方案/变革/成效；自建 5 维成熟度模型（0~5 级，证据必填）+ Kotter/ADKAR 变革；咨询只提建议不代客户决策，落地执行交接本库执行角色；客户数据按 iron_rules §3 A/B 级脱敏 |
+| **项目管理模式** | 「项目管理/日常管控/RAID/进展报告/变更协调/经验教训（且不涉及具体工程交付）」 | 项目经理执行层：`role-project-mgmt` 承载（对齐 PRINCE2 治理与日常管理分离 + PMBOK 十大知识领域），覆盖日常管控循环/RAID/阶段计划/进展报告/变更协调/经验教训；与 `role-governance`（保障/审计层）职责分离（PM 做、治理审）；工程角色（需求/架构/开发/测试/投产）在该模式下置为「协调只读」（仅读状态/依赖/风险用于协调，禁触发交付 action）；管理深度浅时先以本模式复用 `role-project-init`+`role-governance`，达 `role-project-mgmt/domain/upgrade-threshold.md` 阈值再正式建角色 |
 
 ---
 
@@ -112,6 +114,7 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 | 7 | role-governance | 总控保障 | 台账/评审/门禁/基线固化/变更/归档/交接 | role-governance/ |
 | 8 | role-program-mgmt | 项目群/项目集 | 项目群/项目集/多项目协同/PMO/依赖/里程碑对齐/收益/IMS | role-program-mgmt/ |
 | 9 | role-mgmt-consulting | 项目管理咨询 | 项目管理咨询/PMO咨询/成熟度评估/差距分析/方法论定制/变革管理/咨询建议书/PMO蓝图/教练辅导 | role-mgmt-consulting/ |
+| 10 | role-project-mgmt | 项目经理执行层 | 项目管理/日常管控/RAID/进展报告/变更协调/经验教训/干系人沟通/阶段状态跟踪（不涉及具体工程交付） | role-project-mgmt/ |
 
 - **元技能自省**：`shared/evolution.md`（SkillEvolutionSkill）按需触发，执行完毕即卸载；
 - **角色隔离**：各角色任务必须在对应角色包内完成，禁止跨角色执行；§2 公共底座对全角色强制生效；
@@ -141,6 +144,7 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 9. **环境配置统一**：开发/测试/部署环境准备时 `record_env_config` 统一写 `20_环境配置.csv`（`../references/environment_standard.md`），门禁含环境核对，密钥只存别名。
 10. **环境适配优先**：阶段 / 角色启动前先核对本机既有基础设施（已安装工具、守护服务、全局配置、已注册环境资产 `20_环境配置.csv` / CMDB），复用既有能力，避免重复搭建或方向反转；若既有环境与新决策冲突，按「事实 > 文档」铁律（§2.2-2）以实际运行态为准并登记偏差。
 11. **可追溯性优先（三方一致）**：阶段流转前（尤其 需求→架构、架构→开发、开发→测试）必须先跑 `tools/check_traceability.py` 校验《需求-架构-代码追溯矩阵》，孤儿 / 断链超容忍度（默认 0）**不得流转**；追溯矩阵为单一事实来源，需求/架构/代码任一变更须同步更新，禁止漂移（§2.2-8）。
+12. **项目管理模式·工程角色协调只读**：在「项目管理模式」下，工程角色（role-requirements-analysis/role-architecture/role-development/role-testing/role-deployment）仅以「协调只读」加载——PM 经其 `SKILL.md`/`domain/*.md` 读取状态、依赖、风险用于协调，**禁止触发其交付执行类 action**（编码、用例执行、投产发布等）；具体工程交付仍由对应角色在「标准模式」下执行。PM 与 `role-governance` 职责分离：PM 做日常管理、保障层审门禁/评审/审计，PM 不自行裁定门禁放行。
 
 ---
 
@@ -148,7 +152,7 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 
 | 文档 | 路径 | 说明 |
 |------|------|------|
-| 角色包索引 | `../SKILL_INDEX.md` | 10 角色包选择入口 |
+| 角色包索引 | `../SKILL_INDEX.md` | 11 角色包选择入口（含编排器） |
 | Token 标准 | `../references/token_standard.md` | 角色包模型/description/CSV 规则/压缩铁律/交接优先 |
 | 知识产权 | `../references/COPYRIGHT.md` | 版权声明 |
 | 接口契约 | `../references/api_contracts.md` | action 接口清单 |
@@ -214,5 +218,5 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 
 ---
 
-**文档版本**：v21.8.2　**最后更新**：2026-08-22（本体全面评审 v21.8.2 缺陷修复：description 门禁全绿 + 追溯矩阵初始化 + shared 副本漂移归零 + 仓库卫生 lint 全绿）
+**文档版本**：v21.9.0　**最后更新**：2026-08-27（新增「项目管理模式」+ role-project-mgmt 项目经理执行层，对齐 PRINCE2 治理/日常管理分离与 PMBOK 十大知识领域）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

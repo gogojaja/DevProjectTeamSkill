@@ -80,6 +80,7 @@ ALL_ROLES=(
   role-governance
   role-program-mgmt
   role-mgmt-consulting
+  role-project-mgmt
 )
 
 if [[ ${#ROLES[@]} -eq 0 ]]; then

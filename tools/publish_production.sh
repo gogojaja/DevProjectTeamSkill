@@ -36,7 +36,7 @@ TARGET_ROOT="${TARGET_ROOT:-$HOME_DIR/dev-project-team-skill}"
 
 ALL_ROLES=(dev-project-team-skill role-project-init role-requirements-analysis
            role-architecture role-development role-testing role-deployment
-           role-governance role-program-mgmt role-mgmt-consulting)
+           role-governance role-program-mgmt role-mgmt-consulting role-project-mgmt)
 
 VERSION=""
 DRY_RUN=0
