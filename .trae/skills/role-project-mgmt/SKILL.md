@@ -40,7 +40,7 @@ description: "用户进行软件项目全生命周期日常管理、但不涉及
 ## 4. 输出规范与边界
 
 - 所有台账读写经 `../shared/governance.md`（主台账 CSV，禁止 .xlsx），仅作管理视图、不改写保障层门禁逻辑；
-- 输出表格按 `token_standard.md` §3 阈值（Markdown/CSV，UTF-8 with BOM）；
+- 输出表格按 `../shared/references/token_standard.md` §3 阈值（Markdown/CSV，UTF-8 with BOM）；
 - 边界：仅负责日常管理执行；阶段评审/门禁/基线固化/EVM/审计/归档路由 `role-governance`；多项目协同路由 `role-program-mgmt`；咨询诊断路由 `role-mgmt-consulting`。
 
 ---
