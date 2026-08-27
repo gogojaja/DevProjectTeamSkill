@@ -27,7 +27,7 @@
 | Cline | Cline 扩展 → MCP Servers 标签 | `~/.cline/mcp_settings.json` |
 | Roo Code | Roo 扩展 → MCP 标签 | `~/.roo/mcp.json` |
 | Continue.dev | 底部 Continue 图标 → 配置/MCP；或命令 `Continue: Open MCP Servers` | `~/.continue/config.yaml`（`mcpServers`） |
-| Zed | 设置 → MCP（安装并接入后） | `~/.config/zed/settings.json`（待装） |
+| Zed | 设置 → MCP（命令面板 `Zed: Open User Settings (JSON)` 查 `mcp` 段或底部状态栏） | `~/.config/zed/settings.json`（v1.17.2, type=stdio） |
 
 > VS Code 系工具（Trae / Qoder / Comate / CodeBuddy / CodeGeeX / CodeFlicker / Windsurf）均复用 VS Code 的 `mcpServers` 配置键，验证入口基本一致。
 
@@ -41,4 +41,4 @@
 ## 已实测
 
 - Server 握手：`initialize` → `DevProjectTeamSkill v1.29.1`；`tools/list` 返回 7 个工具；`resources/list` 2 个；`prompts/list` 2 个；`tools/call skill_list` 正常。
-- 配置校验：上述 11 个工具（含 opencode）配置文件均含 `dev-project-team-skill` 且指向正确 server（10/10 已校验 PASS；Continue.dev 本次新接入）。
+- 配置校验：上述 12 个工具（含 opencode）配置文件均含 `dev-project-team-skill` 且指向正确 server（10/10 stdio/type 一致 PASS；Continue.dev/Zed 本次新接入，Zed GUI 绿点待启动后确认）。
