@@ -1,10 +1,10 @@
 {
   "mcpServers": {
     "dev-project-team-skill": {
-      "command": "py",
+      "type": "stdio",
+      "command": "${workspaceFolder}/.venv/bin/python",
       "args": [
-        "-3.11",
-        "${workspaceFolder}/tools/mcp_server.py"
+        "${workspaceFolder}/tools/mcp_server/skills_mcp_server.py"
       ],
       "env": {
         "START_MCP_TIMEOUT_MS": "60000",
