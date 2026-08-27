@@ -53,3 +53,4 @@ AUD-20260827-04,修改仓库外配置文件(授权登记),/Users/gogo/Library/Ap
 AUD-20260827-05,修改仓库外配置文件(授权登记),/Users/gogo/Library/Application Support/CodeBuddy CN/User/settings.json 增加 mcpServers.dev-project-team-skill,低,<user>(本机),是,/Volumes/BR256G/DevProjectTeamSkill/.backup/CodeBuddyCN_User_settings.json.20260827_211709,20260827211709,已备份并写入MCP登记，使该IDE可调用技能库工具
 OP-AUDIT-048,系统软件安装(VS Code扩展),VS Code 扩展 aminer.codegeex v2.27.6,低,<user>(本机),否(扩展安装无覆盖库外配置),不适用,安装CodeGeeX扩展(用户指令-安装国产MCP工具并接入); 经 code CLI 安装成功
 AUD-20260827-05,修改仓库外配置文件(授权登记),~/Library/Application Support/Code/User/settings.json 增加 mcpServers.dev-project-team-skill,低,<user>(本机),是,.backup/VS_Code_User_settings.json.20260827_212036,20260827212135,已备份并写入MCP登记(CodeGeeX 宿主为 VS Code)
+AUD-20260827-06,修改仓库外配置文件(授权登记),~/Library/Application Support/CodeFlicker/User/settings.json 创建并增加 mcpServers.dev-project-team-skill,低,<user>(本机),否(新文件无既有内容覆盖),不适用,20260827212812,已创建并写入MCP登记(CodeFlicker 原生支持MCP)
