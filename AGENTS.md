@@ -22,7 +22,7 @@ opencode.json         opencode 技能注册
 ## 核心规则（违反即返工）
 
 1. **源码单源**：`.trae/skills/` 是唯一事实来源，`tools/deploy_skills.py`/`solidify.py` 均以它为源；共享内容只存 `shared/`，角色包用 `../shared/...` 相对引用；**禁止手工复制** shared/references 进角色包（打包时自动内嵌）。
-2. **源码不备覆盖**：deploy 目标是 `.github/skills/`、`.claude/skills/`、`.agents/skills/`（开发固化）与全局库（生产载体，Windows：`C:\Users\<user>\.config\opencode\skills`；macOS/Linux：`~/.config/opencode/skills`），**永不覆盖 `.trae/skills/`**；改技能只在 `.trae/skills/` 源操作，改完即跑 `solidify` 部署到项目级三目录，生产发布走 `publish_production`。
+2. **源码不备覆盖**：deploy 目标是 `.github/skills/`、`.claude/skills/`、`.agents/skills/`（开发固化）与全局库（生产载体，Windows：`C:\Users\<user>\.config\opencode\skills`；macOS/Linux：`~/.config/opencode/skills`），**永不覆盖 `.trae/skills/`**；改技能只在 `.trae/skills/` 源操作，改完即跑 `solidify` 部署到项目级三目录，生产发布走 `publish_production`（`publish_production` 现同时把发布集同步到 TRAE/WorkBuddy 等工具的全局技能目录，多工具全局生效，详见「生产发布」段）。
 3. **新增/修改技能**：必须同步 `SKILL_INDEX.md` + `references/api_contracts.md`；description 150~250 字符（`做什么。<触发词>。Load when...`）。
 4. **输出格式**：>4K token 或 >20 列 → CSV（UTF-8 with BOM）；仅回显首 5 行 + 行数。禁止 .xlsx。
 5. **改动后固化**：任务完成执行固化脚本并刷新 `交接文档.md` 断点区，然后 git commit。macOS/Linux 用 `bash tools/solidify.sh "<说明>"`，Windows 用 `python tools/solidify.py "<说明>"` 或 `.\tools\solidify.ps1 "<说明>"`。固化后 TRAE 项目级（`.trae/skills/` 源码单源）与项目级三目录同步生效；生产消费需另行 `publish_production`（全局库 `~/.config/opencode/skills/`）。
@@ -73,6 +73,8 @@ python tools/publish_production.py                # 跨平台/Windows 主推
 - 留档：`~/dev-project-team-skill/v<版本>/`（不可变）+ `~/dev-project-team-skill/current`（软链=最新稳定版）
 - **发布集（source of truth = 源码单源 + 配套工具/文档）**：角色包 ×10 + `references/` + `shared/` + `SKILL_INDEX.md` + **`tools/` + `docs/`**（SKILL_INDEX/SKILL.md 引用大量 `tools/*` 与 `docs/*`，必须随发布集输出，否则消费端按文档调用脚本路径不存在）。`publish_production`/`deploy_skills`/`solidify` 三套复制集统一（若改发布集必须三处同步）。
 - **脱敏门禁语义**：脱敏扫描覆盖**发布集全部源头**（`.trae/skills/` + `tools/` + `docs/`）；A 级**真实凭据**硬拦截（中止发布）；A 级**占位符**（`<...>`）与 `desensitize/desensitize.py` 规则定义示例输入、B 级**示例/公开信息**（GitHub 公网 IP、example 邮箱、示例路径）仅告警+清单，不阻断发布。
+- **多工具全局生效（2026-08-27 起）**：`publish_production` 除部署 opencode 全局库（`~/.config/opencode/skills`）外，自动把**同一发布集**同步到**已安装工具**（其父目录存在）的全局技能目录，使各工具同时全局生效。矩阵（依据 `references/cross_tool_standard.md`）：TRAE 国际版 `~/.trae/skills/`、TRAE 中国版 `~/.trae-cn/skills/`、WorkBuddy `~/.workbuddy/skills/`、Claude Code `~/.claude/skills/`、Copilot `~/.copilot/skills/`、Agents `~/.agents/skills/`。opencode 用整库重建；其余工具用**精确同步**（仅清理本仓库发布集子项 `ALL_ROLES+references+shared+tools+docs+SKILL_INDEX.md`，保留用户其他全局技能），并兼容 Windows 目录 junction/symlink（`os.rmdir` 仅删链接本身，不误删目标内容）。
+  - 控制参数：`--no-extra-globals`（仅 opencode，原行为）/ `--extra-globals trae,workbuddy`（显式指定）/ `--all-globals`（全部已知工具，即使未安装也创建）；默认自动发现已安装工具。
 - 其他项目 opencode 通过全局库自动发现生产技能；本项目开发用项目级三目录
 - 生产发布为外部目录操作，按铁律 #7/#7a `register_auth` 授权 + `.backup/` 备份 + 台账留痕
 

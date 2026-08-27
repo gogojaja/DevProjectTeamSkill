@@ -59,6 +59,9 @@ def parse_args(argv):
     version = None
     dry_run = False
     gate_only = False
+    extra_list = None
+    all_globals = False
+    no_extra = False
     i = 0
     while i < len(argv):
         a = argv[i]
@@ -70,13 +73,24 @@ def parse_args(argv):
             dry_run = True; i += 1
         elif a == "--gate-desensitize":
             gate_only = True; i += 1
+        elif a == "--no-extra-globals":
+            no_extra = True; i += 1
+        elif a == "--all-globals":
+            all_globals = True; i += 1
+        elif a == "--extra-globals":
+            extra_list = [x.strip() for x in argv[i + 1].split(",") if x.strip()]; i += 2
         elif a in ("-h", "--help"):
             print("用法: publish_production.py [--version <vX.Y.Z>] [--target-dir <dir>] "
-                  "[--dry-run] [--gate-desensitize]")
+                  "[--dry-run] [--gate-desensitize]\n"
+                  "      [--no-extra-globals | --extra-globals trae,workbuddy | --all-globals]")
+            print("  默认: 除 opencode 全局库外，自动同步到已安装工具(父目录存在)的全局技能目录")
+            print("  --no-extra-globals : 仅发布到 opencode 全局库(原行为)")
+            print("  --extra-globals    : 显式指定额外全局目标(trae/trae-cn/workbuddy/claude/copilot/agents)")
+            print("  --all-globals       : 全部已知工具全局目录(即使未安装也创建)")
             sys.exit(0)
         else:
             print(f"未知参数: {a}"); sys.exit(1)
-    return target_root, version, dry_run, gate_only
+    return target_root, version, dry_run, gate_only, extra_list, all_globals, no_extra
 
 
 def read_version():
@@ -130,6 +144,76 @@ def copy_skills_to(dest):
     ok = all(os.path.isfile(os.path.join(dest, r, "SKILL.md")) for r in ALL_ROLES)
     if not ok:
         print("  ✗ 版本目录复制校验失败"); sys.exit(1)
+
+
+def sync_into(dest):
+    """精确同步到某全局技能目录：先清理本仓库发布集子项，再整集复制。
+    用于非 opencode 工具全局目录，避免整目录重建误删用户其他技能。
+    兼容 Windows 目录 junction/symlink：优先 os.rmdir 仅删链接本身，
+    不误删链接目标内容；真实目录才 rmtree。"""
+    os.makedirs(dest, exist_ok=True)
+    purge = ALL_ROLES + ["references", "shared", "tools", "docs", "SKILL_INDEX.md"]
+    for name in purge:
+        p = os.path.join(dest, name)
+        if not os.path.lexists(p):
+            continue
+        try:
+            if os.path.islink(p) and not os.path.isdir(p):
+                os.unlink(p)
+            elif os.path.islink(p) or os.path.isdir(p):
+                # 目录 symlink / junction：先尝试 rmdir 仅删链接本身
+                try:
+                    os.rmdir(p)
+                except OSError:
+                    # 真实目录（rmdir 因非空失败）→ 递归删除
+                    shutil.rmtree(p)
+            else:
+                os.remove(p)
+        except OSError as e:
+            print(f"  ~ 清理 {p} 失败（跳过）: {e}")
+    copy_skills_to(dest)
+
+
+def global_target_matrix():
+    """各工具全局技能目录矩阵（依据 cross_tool_standard.md 与 WorkBuddy 审计记录）。"""
+    return {
+        "opencode": {"path": GLOBAL_SKILLS, "rebuild": True, "always": True},
+        "trae": {"path": os.path.join(HOME_DIR, ".trae", "skills"), "rebuild": False, "always": False},
+        "trae-cn": {"path": os.path.join(HOME_DIR, ".trae-cn", "skills"), "rebuild": False, "always": False},
+        "workbuddy": {"path": os.path.join(HOME_DIR, ".workbuddy", "skills"), "rebuild": False, "always": False},
+        "claude": {"path": os.path.join(HOME_DIR, ".claude", "skills"), "rebuild": False, "always": False},
+        "copilot": {"path": os.path.join(HOME_DIR, ".copilot", "skills"), "rebuild": False, "always": False},
+        "agents": {"path": os.path.join(HOME_DIR, ".agents", "skills"), "rebuild": False, "always": False},
+    }
+
+
+def resolve_global_targets(extra_list, all_globals, no_extra):
+    """解析本次要部署的全局目标。
+    - opencode 始终（always）
+    - 默认：仅对已安装工具（其父目录存在）自动部署
+    - --no-extra-globals：仅 opencode
+    - --extra-globals a,b：显式指定（覆盖默认与自动发现）
+    - --all-globals：全部已知工具（即使未安装也创建）
+    """
+    matrix = global_target_matrix()
+    result = {}
+    for name, cfg in matrix.items():
+        if cfg.get("always"):
+            result[name] = cfg
+            continue
+        if no_extra:
+            continue
+        if extra_list:
+            if name in extra_list:
+                result[name] = cfg
+            continue
+        if all_globals:
+            result[name] = cfg
+            continue
+        parent = os.path.dirname(cfg["path"])
+        if os.path.isdir(parent):
+            result[name] = cfg
+    return result
 
 
 def dir_hash(path):
@@ -256,7 +340,7 @@ def run_desensitize_gate(skills_dir=None, report_path=None):
 
 
 def main():
-    target_root, version, dry_run, gate_only = parse_args(sys.argv[1:])
+    target_root, version, dry_run, gate_only, extra_list, all_globals, no_extra = parse_args(sys.argv[1:])
     if version is None:
         version = read_version()
 
@@ -270,7 +354,12 @@ def main():
     print("=" * 60)
     print(f"源库: {SKILLS_DIR}")
     print(f"留档根: {target_root}")
-    print(f"生产消费载体: {GLOBAL_SKILLS}")
+
+    # 解析全局生效目标（opencode + 自动发现的 trae/workbuddy 等）
+    g_targets = resolve_global_targets(extra_list, all_globals, no_extra)
+    print(f"全局生效目标 ({len(g_targets)}):")
+    for n, c in g_targets.items():
+        print(f"  - {n}: {c['path']}  (rebuild={c['rebuild']})")
 
     # 1. 门禁
     gates = [
@@ -328,18 +417,25 @@ def main():
         except OSError as e:
             print(f"  ✗ 软链切换失败: {e}"); sys.exit(1)
 
-    # 5. 发布到全局库（生产消费载体）
-    if dry_run:
-        print(f"  (dry-run) 将部署到全局库 {GLOBAL_SKILLS}")
-    else:
-        if os.path.isdir(GLOBAL_SKILLS):
-            if sys.platform == "win32":
-                subprocess.run(["cmd", "/c", "rmdir", "/s", "/q", GLOBAL_SKILLS],
-                               check=True, capture_output=True)
-            else:
-                shutil.rmtree(GLOBAL_SKILLS)
-        copy_skills_to(GLOBAL_SKILLS)
-        print(f"  ✓ 已发布到全局库 {GLOBAL_SKILLS}")
+    # 5. 发布到全局库（多工具全局生效：opencode + trae/workbuddy 等）
+    for name, cfg in g_targets.items():
+        dest = cfg["path"]
+        if dry_run:
+            print(f"  (dry-run) 将部署到 {name} 全局库 {dest} (rebuild={cfg['rebuild']})")
+            continue
+        if cfg["rebuild"]:
+            # 整库重建（opencode 专属：假定全局库专用于本仓库）
+            if os.path.isdir(dest):
+                if sys.platform == "win32":
+                    subprocess.run(["cmd", "/c", "rmdir", "/s", "/q", dest],
+                                   check=True, capture_output=True)
+                else:
+                    shutil.rmtree(dest)
+            copy_skills_to(dest)
+        else:
+            # 精确同步（其他工具：仅清理本仓库发布集子项，保护用户其他全局技能）
+            sync_into(dest)
+        print(f"  ✓ 已发布到 {name} 全局库 {dest}")
 
     if not dry_run:
         # 6. 打印留档信息

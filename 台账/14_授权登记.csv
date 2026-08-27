@@ -7,3 +7,4 @@ AUTH-004,opencode全局配置(屏蔽不可用模型),文件,~/.config/opencode/o
 AUTH-005,生产技能库部署目录,目录,~/dev-project-team-skill,读/写/创建,<user>(本机),2026-08-20,2026-08-21,有效,用户指令-创建本技能生产目录供其他项目复用(仅最新版本v21.8.0)
 AUTH-006,三环境目录映射(Prod<HOME>/Dev<DEV_VOLUME>/Test<TEST_VOLUME>),目录,<脱敏占位>,读/登记,douglas\<user>,2026-08-21 23:09:31,2026-08-21 23:09:31,有效,用户指令:三环境真实映射脱敏登记(本会话有效)
 AUTH-PROD-2026-08-23210953,全局openocode技能库,目录,/Users/gogo/.config/opencode/skills,改/删(rmtree重建),gogo,2026-08-23 21:09:53,2027-12-31,有效,publish_production v21.8.2 生产发布，用户已授权
+AUTH-007,trae-cn全局技能目录,目录,C:\Users\gogoj\.trae-cn\skills,写/改,<user>(本机),2026-08-27 14:48:00,2026-08-27 14:48:00,有效(本次会话),用户指令-启用DevProjectTeamSkill全局最新版v21.10.0,补齐role-project-mgmt至trae-cn部署副本
