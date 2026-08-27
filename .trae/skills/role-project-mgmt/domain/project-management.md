@@ -58,4 +58,4 @@ description: "Project manager execution-layer skill: daily control loop across P
 - 复盘要点：何因、何果、可复用流程/工具/降 Token 措施；
 - 资产化交接保障层归档，供后续项目检索复用。
 
-> 全部台账读写经 `../shared/governance.md`，禁止 .xlsx；外部文件/系统文件操作须 `register_auth` 授权（铁律 #7/#7a）。
+> 全部台账读写经 `../../shared/governance.md`，禁止 .xlsx；外部文件/系统文件操作须 `register_auth` 授权（铁律 #7/#7a）。
