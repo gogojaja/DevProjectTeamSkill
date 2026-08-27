@@ -95,14 +95,34 @@
 - **架构 / 安全 / 跨库推理** → Opus / Sol / Gemini Pro / DeepSeek-R1 / 智谱 Plus（质量优先）；
 - **日常迭代** → Sonnet / Terra / 国产中端（本机已装 Trae CN / Comate 可直接承载）。
 
-## 5. 维护
+## 5. 本地网关对接（free-api-hub / 9Router / OmniRoute / LiteLLM）
+
+> 适用：存在本地 AI 网关时，技能库**只描述策略与配置约定，不携带网关业务代码**（对齐 `model_selection.md` §4.5）。网关本体属业务部署。
+
+- **本机现状（2026-08-27 实测）**：未发现 free-api-hub / 9Router / OmniRoute / LiteLLM / one-api 等网关进程或 CLI，**当前未启用本地网关**；本地仅 `ollama serve` 在跑（直连本地模型，不经网关）。
+- **接入价值**：统一多模型路由 + 缓存 + 重试/降级 + 预算强制 + 合规日志；规则路由（按任务类型）即可拿 80% 收益（EV-2）。
+- **配置约定（落 `20_环境配置.csv`）**，字段与 `model_selection.md` §4.5.3 一致：
+
+| 字段 | 语义 | 取值示例 |
+|------|------|----------|
+| `routing_strategy` | 路由策略 | `auto` / `weighted` / `fallback` |
+| `model_pool` | 候选模型池 | `qwen2.5-coder:7b,glm-4.7-flash,deepseek-v3,opus-4.8` |
+| `fallback_chain` | 降级链 | `strong→mid→budget` |
+| `cost_per_token` | 单 token 成本 | 由 catalog §2 价格快照推导 |
+
+- **档位映射**：S0/S1 → `weighted`（低成本高权重）或 `auto/cheap`；S2/S3 → `fallback`（强模型优先 + 降级）或 `auto/smart`/`auto/coding`；
+- **启用步骤**：①安装网关（归入业务项目，非技能库）；②`20_环境配置.csv` 填上述字段；③`select_model` 复核 + `register_change` 留痕；④本目录 §0/§2 同步可用端点与模型；
+- **成本可观测（EV-3）**：网关须输出每任务 token/费用日志，定期回写 `台账/40_大模型成本台账.csv`，设止损（cap 重试）防回退循环吞噬节省。
+
+## 6. 维护
 
 - 价格快照日随单价波动更新，更新须留痕 `13_安全审计台账.csv`（注明「价格复核」）；
 - **本机已装清单（§0）随安装/卸载实测更新**，不与「国产/国际清单」混淆；
 - 新增/下线平台或模型 → 同步 `model_selection.md` §7 候选模型池 + 本目录，走 `register_change` 留痕；
-- 阈值（文件数 / token 数）按 `台账/40_大模型成本台账.csv` 实际账单季度校准。
+- 阈值（文件数 / token 数）按 `台账/40_大模型成本台账.csv` 实际账单季度校准；
+- 本地网关启用/停用须同步本节与本机实测状态（§0）。
 
 ---
 
-**文档版本**：v1.1.0　**最后更新**：2026-08-27（扩充国产 AI 工具/模型清单 + 本机已装实测清单 §0）
+**文档版本**：v1.2.0　**最后更新**：2026-08-27（新增 §5 本地网关对接 + 成本估算器 tools/estimate_cost.py 接入）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
