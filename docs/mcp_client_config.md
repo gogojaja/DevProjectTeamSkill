@@ -1,7 +1,10 @@
 # 各工具接入 DevProjectTeamSkill MCP 服务 · 配置片段
 
 - **文档版本**：v1.0.0　**关联**：`tools/mcp_server/skills_mcp_server.py`（官方 `mcp[cli]` SDK）
-- **前置**：客户端环境需 `pip install "mcp[cli]"`（见 `tools/mcp_server/requirements.txt`）；server 以 **stdio** 拉起，工作目录须为**仓库根**。
+- **前置**：客户端环境需 `pip install "mcp[cli]<2"`（见 `tools/mcp_server/requirements.txt`）；server 以 **stdio** 拉起，工作目录须为**仓库根**。
+- ⚠️ **版本引脚**：当前 server 使用官方 SDK **v1.x（FastMCP 装饰器）**；`mcp 2.x` 已把 `FastMCP` 重命名为 `MCPServer` 并改 API，装到 2.x 会导入失败，务必 `<2`。
+- **本机可用解释器**：`/opt/homebrew/bin/python3.12`（brew 3.12.13）或 `uv` 自带 3.10/3.12；系统 `/usr/bin/python3` 因 PEP 668 受限，需建 venv。已验证 `.venv`（brew 3.12 + mcp 1.29.1）可正常 `list_tools`。
+- **Resources 说明**：`skill://index` 与 `skill://version` 为静态；`skill://role/{name}/SKILL`、`skill://references/{file}` 为 **URI 模板**（按具体 name/file 取值，不出现在 list 中）。
 
 > 单一事实来源：技能库版本由 server 运行时动态读取 `.trae/skills/dev-project-team-skill/SKILL.md`；
 > 每次 `publish_production` 还会生成 `tools/mcp_server/manifest.json` + `VERSION`。

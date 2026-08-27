@@ -1,1 +1,4 @@
-mcp[cli]>=1.0
+# 官方 MCP Python SDK v1.x（FastMCP 装饰器 API）。
+# 注意：mcp 2.x 已把 FastMCP 重命名为 MCPServer 并变更 API，会导致本 server 导入失败；
+# 故锁定 <2。部署前在目标 python 环境执行：pip install "mcp[cli]<2"
+mcp[cli]>=1.0,<2
