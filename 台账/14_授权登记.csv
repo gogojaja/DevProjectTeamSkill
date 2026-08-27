@@ -15,3 +15,6 @@ AUTH-011,接入DevProjectTeamSkill MCP到Comate,文件,/Users/gogo/Library/Appli
 AUTH-012,接入DevProjectTeamSkill MCP到CodeBuddyCN,文件,/Users/gogo/Library/Application Support/CodeBuddy CN/User/settings.json,改,<user>(本机),20260827211709,未指定(默认本次会话),用户指令-沿多工具MCP目标，将技能库MCP登记进本机已装国产IDE,已备份(CodeBuddyCN_User_settings.json.20260827_211709)后写入mcpServers
 AUTH-013,接入DevProjectTeamSkill MCP到VS Code(CodeGeeX宿主),文件,/Users/gogo/Library/Application Support/Code/User/settings.json,改,<user>(本机),未指定(默认本次会话),用户指令-安装 CodeGeeX 并接入MCP; 备份后写入 mcpServers
 AUTH-014,接入DevProjectTeamSkill MCP到CodeFlicker,文件,/Users/gogo/Library/Application Support/CodeFlicker/User/settings.json,改,<user>(本机),未指定(默认本次会话),用户指令-CodeFlicker已安装，要求接入MCP; 创建配置并写入 mcpServers
+AUTH-015,接入DevProjectTeamSkill MCP到Windsurf,文件,/Users/gogo/Library/Application Support/Windsurf/User/settings.json,改,<user>(本机),未指定(默认本次会话),用户指令-新装 MCP 客户端; 备份后写入 mcpServers
+AUTH-016,接入DevProjectTeamSkill MCP到Cline,文件,/Users/gogo/.cline/mcp_settings.json,改,<user>(本机),未指定(默认本次会话),用户指令-新装 MCP 客户端; 创建配置并写入 mcpServers
+AUTH-017,接入DevProjectTeamSkill MCP到Roo Code,文件,/Users/gogo/.roo/mcp.json,改,<user>(本机),未指定(默认本次会话),用户指令-新装 MCP 客户端; 创建配置并写入 mcpServers
