@@ -16,9 +16,10 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.9.0
+- **技能版本**：v21.10.0
 - **版本发布日期**：2026-08-27
 - **版本变更记录**：
+  - v21.10.0：新增「大批量任务成本预警」铁律与开发平台/模型知识库（2026-08-27）——①编排器 §2.2 新增 §2.2-9「大批量任务成本预警」：超阈值（文件>20/输出>50K tok/大文档>5K 行/多轮 agent 循环）须先提示估算成本并三选一（A 只定方案/B 分步执行/C 指定平台模型），落 `台账/40_大模型成本台账.csv` + 触发 `select_model`；②新增 `references/dev_platform_catalog.md`（开发平台 + 模型三层 + 公开定价快照 + 场景映射 + 大批量推荐组合，边界：不含凭据、不重复定义路由）；③新增 `台账/40_大模型成本台账.csv`（实际成本账本，与 `21_模型选型.csv` 决策台账分工）；对齐行业三层路由（EV-1 省 40–85% / EV-2 20·60·20 预算）。
   - v21.9.0：新增「项目管理模式」+ 项目经理执行层 `role-project-mgmt`（2026-08-27）——①编排器 §3 执行模式新增「项目管理模式」（对齐 PRINCE2 治理与日常管理分离 + PMBOK 十大知识领域），§4 路由表增 #10 `role-project-mgmt`；②§5 调度新增「工程角色协调只读」铁律（该模式下需求/架构/开发/测试/投产仅读状态/依赖/风险、禁触发交付 action，PM 与 `role-governance` 职责分离）；③新增 `role-project-mgmt` 角色包（日常管控循环/RAID/阶段计划/进展报告/变更协调/经验教训 + 与保障层边界声明 + 轻量→建角色升级阈值 `domain/upgrade-threshold.md`）；④SKILL_INDEX / AGENTS 同步 10 角色包计数。
   - v21.8.2：本体全面评审 v21.8.2 缺陷修复批次（2026-08-22）——①`role-architecture` description 扩充至 150+ 字符（补「架构评估/技术选型」触发词）使 descriptions 门禁全绿；②初始化《需求-架构-代码追溯矩阵.csv》并补录存量 11 REQ/5 AE/17 MOD/6 TC 条目（铁律 #10 落地，`check_traceability.py` 通过）；③以 `references/` 为基准重建 `shared/references/` 副本消除 4 文件漂移 + 补 `traceability_standard.md` 副本（铁律 #1 单源合规，部署三目录同步）；④仓库卫生 lint 白名单更新（`.codebuddy/` IDE 数据目录 + `projects_registry.csv` 依赖文件），评审报告归档 `docs/reviews/`，清理 `.DS_Store/.pytest_cache/.venv/扫描报告×5`，lint 门禁 23 error→0；⑤`lint_repo.py` 白名单维护。
   - v21.8.1：生产发布集补全缺陷修复（2026-08-20）——修复 `tools/`（github_push.py/_gh_ip_probe.py 等）与 `docs/`（github_ip_records.csv 等）未纳入发布/部署/固化复制集、全局库按文档调用工具路径不存在的缺陷；`publish_production`/`deploy_skills`/`solidify` 复制集统一纳入 tools+docs，脱敏门禁扫描范围扩展至 tools/docs 并豁免规则定义示例与占位符；版本目录、项目级三目录、全局库同步生效。
@@ -79,6 +80,7 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 6. **双平台兼容（强制）**：本技能库所有启用项目**必须同时支持 Windows 与 macOS 双平台**——①路径/脚本/配置禁止硬编码单一平台绝对路径（如 `C:\...`、`/Users/...`），统一用相对路径或平台自适应（`os.path`/`$HOME`/`%USERPROFILE%`）；②交付物（脚本/批处理/命令）须双平台可执行，禁止依赖 Windows 专属命令（`py -3.11` 等）或 macOS 专属假设；③文本文件行尾统一 LF（配 `.gitattributes` 防 CRLF 反复 diff）；④文档中涉及路径时同时标注双平台写法；细则见 `../references/token_standard.md` §6。
 7. **「废弃清理门禁」铁律**：当任意 ADR（`架构资产/*/ADR`）状态标记为「废弃」后——①**任何后续会话启动第一步必须先做「废弃资产完整性检查」**（全库 grep 该资产引用 + 端口/进程/LaunchAgent 三查），发现残留立即登记并清理；②**基线固化阶段（solidify）强制移除废弃资产**，存在引用 / 运行态残留（端口监听、进程运行、LaunchAgent 加载）则中止固化（未通过不得固化）；校验由 `tools/check_deprecation_cleanup.py` 作为第 4 硬门禁执行。
 8. **「需求-架构-代码 三方一致性」铁律**：防止需求↔架构、架构↔代码 漂移——①统一标识符（`REQ-/ADR-/AE-/MOD-/TC-`，不复用）；②**单一事实来源《需求-架构-代码追溯矩阵.csv》（`references/traceability_standard.md`）连续维护，禁止事后突击补表**；③阶段流转前（尤其 需求→架构、架构→开发、开发→测试）`stage_review`/`check_gate` **强制运行 `tools/check_traceability.py`**，出现孤儿（无父链接的需求/架构/代码/测试）或断链超容忍度则**驳回流转**；④代码评审含「孤儿代码」检查。详见 `references/traceability_standard.md`（依据 NASA SWE-059 / EN 62304 / ASPICE / ArchUnit）。
+9. **「大批量任务成本预警」铁律**：当任务预估达到以下任一阈值——①生成/修改文件 **>20 个**；②单次输出 **>50K token**；③生成大文档 **>5K 行**；④将触发多轮 agent 自循环（全库扫描 / 批量迁移 / 大批量代码生成）——执行前**必须先提示用户估算成本并给出三选一**：**A. 只制定方案与计划**（不执行生成）；**B. 分步骤执行**（分批、每步确认、可回滚，推荐本地/低价档）；**C. 指定平台/模型继续**（依 `references/dev_platform_catalog.md` 推最便宜可行档）。预警须写入 `台账/40_大模型成本台账.csv` 并触发 `select_model`（既有 action，路由归 `references/model_selection.md` 的 S0–S3）；**未获用户确认不得直接执行大批量生成**。阈值可按实际账单在 `dev_platform_catalog.md` 校准（初值见上）。
 
 ### 2.3 内置工具调度
 
@@ -218,5 +220,5 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 
 ---
 
-**文档版本**：v21.9.0　**最后更新**：2026-08-27（新增「项目管理模式」+ role-project-mgmt 项目经理执行层，对齐 PRINCE2 治理/日常管理分离与 PMBOK 十大知识领域）
+**文档版本**：v21.10.0　**最后更新**：2026-08-27（新增「大批量任务成本预警」铁律 + 开发平台/模型知识库 dev_platform_catalog.md + 大模型成本台账 40）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
