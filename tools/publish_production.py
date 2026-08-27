@@ -26,7 +26,8 @@
 #
 # 跨平台: macOS/Linux/python 均可；Windows 用 py -3.11
 # =============================================================================
-import os, sys, re, shutil, glob, subprocess, tempfile
+import os, sys, re, shutil, glob, subprocess, tempfile, json
+from datetime import datetime, timezone
 sys.stdout.reconfigure(encoding="utf-8")
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -103,6 +104,40 @@ def read_version():
             if m:
                 return m.group(1)
     raise SystemExit("  ✗ 未在 SKILL.md 发现版本号")
+
+
+def emit_mcp_manifest(version, dry_run):
+    """发布时自动生成 MCP 版本清单（manifest.json + VERSION），使各工具共享同一 MCP 版本，
+    无需各自同步（用户核心诉求）。server 运行时亦动态读取 SKILL.md 版本，此处为离线探测副本。"""
+    srv_dir = os.path.join(ROOT, "tools", "mcp_server")
+    os.makedirs(srv_dir, exist_ok=True)
+    entry = os.path.join("tools", "mcp_server", "skills_mcp_server.py")
+    snippet = {
+        "mcpServers": {
+            "dev-project-team-skill": {
+                "command": "python3",
+                "args": [entry],
+                "cwd": "<repo-root>",
+            }
+        }
+    }
+    manifest = {
+        "skill_name": "DevProjectTeamSkill",
+        "released_version": "v" + version,
+        "skill_source_version": "v" + version,
+        "released_at": datetime.now(timezone.utc).isoformat(),
+        "server_entry": entry,
+        "client_config_snippet": snippet,
+        "note": "MCP 版本随技能发布自动更新；运行时版本也可经 skill://version 动态获取（单源 .trae/skills）。",
+    }
+    if dry_run:
+        print(f"  (dry-run) 将写入 {srv_dir}/manifest.json + VERSION (v{version})")
+        return
+    with open(os.path.join(srv_dir, "manifest.json"), "w", encoding="utf-8") as f:
+        json.dump(manifest, f, ensure_ascii=False, indent=2)
+    with open(os.path.join(srv_dir, "VERSION"), "w", encoding="utf-8") as f:
+        f.write("v" + version + "\n")
+    print(f"  ✓ 已生成 MCP 版本清单: {srv_dir}/manifest.json (v{version})")
 
 
 def run_gate(name, script, extra=()):
@@ -436,6 +471,9 @@ def main():
             # 精确同步（其他工具：仅清理本仓库发布集子项，保护用户其他全局技能）
             sync_into(dest)
         print(f"  ✓ 已发布到 {name} 全局库 {dest}")
+
+    # 5.1 自动更新 MCP 版本清单（单源 + 发布即更新，避免多工具反复同步）
+    emit_mcp_manifest(version, dry_run)
 
     if not dry_run:
         # 6. 打印留档信息

@@ -1,0 +1,19 @@
+{
+  "skill_name": "DevProjectTeamSkill",
+  "released_version": "v21.10.3",
+  "skill_source_version": "v21.10.3",
+  "released_at": "2026-08-27T10:45:04.774549+00:00",
+  "server_entry": "tools/mcp_server/skills_mcp_server.py",
+  "client_config_snippet": {
+    "mcpServers": {
+      "dev-project-team-skill": {
+        "command": "python3",
+        "args": [
+          "tools/mcp_server/skills_mcp_server.py"
+        ],
+        "cwd": "<repo-root>"
+      }
+    }
+  },
+  "note": "MCP 版本随技能发布自动更新；运行时版本也可经 skill://version 动态获取（单源 .trae/skills）。"
+}
