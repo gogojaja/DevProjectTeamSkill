@@ -26,7 +26,43 @@ import csv
 import argparse
 import datetime
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# --- 项目根解析（修复部署副本场景 ROOT 错位）---
+# 部署副本（如 ~/.workbuddy/skills/tools/）下，dirname(dirname(__file__)) 会指向
+# 技能库目录而非真实项目，导致读写错误的 台账/。按以下优先级解析真实项目根：
+#   1) --root 显式指定  2) 环境变量 PROJECT_ROOT / DPB_ROOT
+#   3) 从当前工作目录向上寻找项目标记  4) 从脚本目录向上寻找
+#   5) 兜底旧语义 dirname(dirname(__file__))
+_PROJECT_MARKERS = ('台账', 'AGENTS.md', 'SKILL_INDEX.md', '交接文档.md', 'dev-project-team-skill')
+
+
+def _looks_like_project_root(d):
+    return any(os.path.exists(os.path.join(d, m)) for m in _PROJECT_MARKERS)
+
+
+def find_project_root(explicit=None):
+    cand = explicit or os.environ.get('PROJECT_ROOT') or os.environ.get('DPB_ROOT')
+    if cand and os.path.isdir(cand):
+        return os.path.abspath(cand)
+    d = os.path.abspath(os.getcwd())
+    while True:
+        if _looks_like_project_root(d):
+            return d
+        parent = os.path.dirname(d)
+        if parent == d:
+            break
+        d = parent
+    d = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
+    while True:
+        if _looks_like_project_root(d):
+            return d
+        parent = os.path.dirname(d)
+        if parent == d:
+            break
+        d = parent
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+ROOT = find_project_root()
 DEFAULT_MATRIX = os.path.join(ROOT, '台账', '需求-架构-代码追溯矩阵.csv')
 DEFAULT_CHANGE = os.path.join(ROOT, '台账', '06_范围变更台账.csv')
 DEFAULT_TRACK = os.path.join(ROOT, '台账', '07_范围跟踪台账.csv')
@@ -201,6 +237,29 @@ def ensure_header(path, cols):
         print('   ✓ 已初始化台账(表头): %s' % path)
 
 
+def reconcile_ledger_header(path, cols, force):
+    """若台账已存在且表头与预期 schema 不一致：无数据行时安全重写表头；含数据则仅告警，防丢失。"""
+    if not os.path.isfile(path):
+        return
+    with open(path, encoding='utf-8-sig', newline='') as f:
+        rows = list(csv.reader(f))
+    header = rows[0] if rows else []
+    if [c.strip() for c in header] == [c.strip() for c in cols]:
+        return  # 已一致
+    data_rows = [r for r in rows[1:] if any(str(c).strip() for c in r)]
+    if not data_rows:
+        # 仅表头（无数据）：安全重写
+        with open(path, 'w', encoding='utf-8-sig', newline='') as f:
+            csv.writer(f).writerow(cols)
+        print('   ✓ 已按 scope_tracker schema 重写表头(无数据,安全): %s' % path)
+    elif force:
+        print('   ⚠ 含 %d 行数据，拒绝强制重写以防丢失（请先备份）: %s' % (len(data_rows), path))
+    else:
+        print('   ⚠ 台账表头与 scope_tracker 预期 schema 不一致(含 %d 行数据,未改写): %s' % (len(data_rows), path))
+        print('     预期 %d 列: %s' % (len(cols), ','.join(cols)))
+        print('     实际 %d 列: %s' % (len(header), ','.join(h.strip() for h in header)))
+
+
 def cmd_init(args):
     ensure_header(DEFAULT_MATRIX, RTM_COLS)
     with open(DEFAULT_MATRIX, encoding='utf-8-sig', newline='') as f:
@@ -213,6 +272,10 @@ def cmd_init(args):
         print('   ✓ 已写入 RTM 示例行')
     ensure_header(DEFAULT_CHANGE, CHANGE_COLS)
     ensure_header(DEFAULT_TRACK, TRACK_COLS)
+    # schema 对齐自检：已存在但表头不符时安全重写（仅表头）或告警（含数据）
+    reconcile_ledger_header(DEFAULT_MATRIX, RTM_COLS, args.reset_ledgers)
+    reconcile_ledger_header(DEFAULT_CHANGE, CHANGE_COLS, args.reset_ledgers)
+    reconcile_ledger_header(DEFAULT_TRACK, TRACK_COLS, args.reset_ledgers)
     print('   ✓ 范围跟踪机制初始化完成（RTM + 06/07 台账）')
     return 0
 
@@ -322,9 +385,13 @@ def cmd_change(args):
 
 def main():
     ap = argparse.ArgumentParser(description='项目范围跟踪与范围基准工具')
+    ap.add_argument('--root', default=None,
+                    help='显式指定项目根目录（含 台账/ 的目录）；默认自动探测（CWD/脚本目录向上查找项目标记）')
     sub = ap.add_subparsers(dest='cmd')
 
     p_init = sub.add_parser('init', help='初始化 RTM 与 06/07 范围台账')
+    p_init.add_argument('--reset-ledgers', action='store_true',
+                        help='若 06/07/RTM 已存在但表头不一致且无数据行，安全重写表头')
     p_m = sub.add_parser('metrics', help='计算覆盖度指标与健康分')
     p_m.add_argument('--write', action='store_true', help='同时写 07 范围跟踪台账快照')
     p_g = sub.add_parser('gate', help='范围门禁（一致性+蔓延/缩水+健康分）')
@@ -347,6 +414,12 @@ def main():
     p_c.add_argument('--note', default='', help='备注')
 
     args = ap.parse_args()
+    if getattr(args, 'root', None):
+        global ROOT, DEFAULT_MATRIX, DEFAULT_CHANGE, DEFAULT_TRACK
+        ROOT = find_project_root(args.root)
+        DEFAULT_MATRIX = os.path.join(ROOT, '台账', '需求-架构-代码追溯矩阵.csv')
+        DEFAULT_CHANGE = os.path.join(ROOT, '台账', '06_范围变更台账.csv')
+        DEFAULT_TRACK = os.path.join(ROOT, '台账', '07_范围跟踪台账.csv')
     if args.cmd == 'init':
         return cmd_init(args)
     if args.cmd == 'metrics':

@@ -26,7 +26,38 @@ import sys
 import csv
 import argparse
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# --- 项目根解析（修复部署副本场景 ROOT 错位，与 scope_tracker.py 同源）---
+_PROJECT_MARKERS = ('台账', 'AGENTS.md', 'SKILL_INDEX.md', '交接文档.md', 'dev-project-team-skill')
+
+
+def _looks_like_project_root(d):
+    return any(os.path.exists(os.path.join(d, m)) for m in _PROJECT_MARKERS)
+
+
+def find_project_root(explicit=None):
+    cand = explicit or os.environ.get('PROJECT_ROOT') or os.environ.get('DPB_ROOT')
+    if cand and os.path.isdir(cand):
+        return os.path.abspath(cand)
+    d = os.path.abspath(os.getcwd())
+    while True:
+        if _looks_like_project_root(d):
+            return d
+        parent = os.path.dirname(d)
+        if parent == d:
+            break
+        d = parent
+    d = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
+    while True:
+        if _looks_like_project_root(d):
+            return d
+        parent = os.path.dirname(d)
+        if parent == d:
+            break
+        d = parent
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+ROOT = find_project_root()
 DEFAULT_MATRIX = os.path.join(ROOT, '台账', '需求-架构-代码追溯矩阵.csv')
 
 EXPECTED_COLS = ['REQ_ID', 'REQ_TITLE', 'AE_ID', 'MOD_ID', 'TC_ID']

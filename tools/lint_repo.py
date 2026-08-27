@@ -25,6 +25,7 @@ WHITELIST_DIRS = {
     '.git', '.trae', '.agents', '.claude', '.github', '.secrets', '.backup',
     '.githooks', '.vscode', 'docs', 'tools', 'scripts', 'security',
     'requirements', 'tests', '台账', '.trae-html-share-packages', '架构资产', 'env-architecture-plan',
+    '项目模板',  # PMO 阶段模板目录（立项/需求/设计开发/测试/上线验收等阶段模板，并行会话生成，合法根级产物）
     '.codebuddy',  # IDE 项目数据目录（含计划/会话状态），非临时缓存，禁止删除
     '.workbuddy',  # WorkBuddy 本地会话/记忆数据目录（已 gitignore，保留本地磁盘，不入库）
     '.idea',       # JetBrains IDE 本地配置（已 gitignore，保留本地磁盘，不入库）
