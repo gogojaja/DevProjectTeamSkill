@@ -26,6 +26,7 @@ WHITELIST_DIRS = {
     '.githooks', '.vscode', 'docs', 'tools', 'scripts', 'security',
     'requirements', 'tests', '台账', '.trae-html-share-packages', '架构资产', 'env-architecture-plan',
     '.codebuddy',  # IDE 项目数据目录（含计划/会话状态），非临时缓存，禁止删除
+    '.workbuddy',  # WorkBuddy 本地会话/记忆数据目录（已 gitignore，保留本地磁盘，不入库）
     '.idea',       # JetBrains IDE 本地配置（已 gitignore，保留本地磁盘，不入库）
 }
 # 根目录白名单（文件）
