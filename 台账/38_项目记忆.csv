@@ -1,0 +1,5 @@
+﻿时间,类型,内容,关联
+2026-08-18 10:18:36,decision,自主Agent运行时演进方案 v1.1.0 评审通过(条件签署)，启动 P1->P5 实施,PG-LOCAL-001-PLAN-001
+2026-08-18 10:18:36,todo,P2 记忆服务 memory_store.py 落地，供跨会话自动载入决策/待办,PG-LOCAL-001-PLAN-001
+2026-08-18 10:18:36,context,GitHub 访问 flapping，已建 Gitee 镜像(mirror)双推兜底；hosts 含 xxx.xxx.xxx.xxx github.com,github
+2026-08-18 10:18:36,risk,Gitee token 已在对话明文暴露，须尽快轮换(A级),security

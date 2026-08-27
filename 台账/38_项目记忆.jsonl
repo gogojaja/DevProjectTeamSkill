@@ -1,0 +1,4 @@
+{"ts": "2026-08-18 10:18:36", "type": "decision", "text": "自主Agent运行时演进方案 v1.1.0 评审通过(条件签署)，启动 P1->P5 实施", "meta": "PG-LOCAL-001-PLAN-001"}
+{"ts": "2026-08-18 10:18:36", "type": "todo", "text": "P2 记忆服务 memory_store.py 落地，供跨会话自动载入决策/待办", "meta": "PG-LOCAL-001-PLAN-001"}
+{"ts": "2026-08-18 10:18:36", "type": "context", "text": "GitHub 访问 flapping，已建 Gitee 镜像(mirror)双推兜底；hosts 含 140.82.114.4 github.com", "meta": "github"}
+{"ts": "2026-08-18 10:18:36", "type": "risk", "text": "Gitee token 已在对话明文暴露，须尽快轮换(A级)", "meta": "security"}
