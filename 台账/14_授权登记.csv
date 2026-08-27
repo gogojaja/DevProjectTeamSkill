@@ -18,3 +18,4 @@ AUTH-014,接入DevProjectTeamSkill MCP到CodeFlicker,文件,/Users/gogo/Library/
 AUTH-015,接入DevProjectTeamSkill MCP到Windsurf,文件,/Users/gogo/Library/Application Support/Windsurf/User/settings.json,改,<user>(本机),未指定(默认本次会话),用户指令-新装 MCP 客户端; 备份后写入 mcpServers
 AUTH-016,接入DevProjectTeamSkill MCP到Cline,文件,/Users/gogo/.cline/mcp_settings.json,改,<user>(本机),未指定(默认本次会话),用户指令-新装 MCP 客户端; 创建配置并写入 mcpServers
 AUTH-017,接入DevProjectTeamSkill MCP到Roo Code,文件,/Users/gogo/.roo/mcp.json,改,<user>(本机),未指定(默认本次会话),用户指令-新装 MCP 客户端; 创建配置并写入 mcpServers
+AUTH-018,系统外部文件改动授权,用户明确要求接入 Continue.dev MCP；授权修改 ~/.continue/config.yaml(外部系统文件),低,<user>(本机),本会话(用户显式授权),不适用,20260827233121,备份于 .backup/Continue_config_yaml.20260827233121
