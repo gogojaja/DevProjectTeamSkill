@@ -1,13 +1,4 @@
 ﻿ID,Hostname,ResourceType,ResourceIdentifier,OccupiedBy,Status,Priority,RegisteredAt
-1,gogojajadeMac-mini,model,qwen2.5-coder:7b,DevProjectTeamSkill,occupied,high,2026-08-14 11:42:24
-2,gogojajadeMac-mini,model,qwen2.5:7b,DevProjectTeamSkill,occupied,high,2026-08-14 11:42:24
-3,gogojajadeMac-mini,port,11434,DevProjectTeamSkill,occupied,high,2026-08-14 11:42:24
-4,gogojajadeMac-mini,port,8080,,free,high,2026-08-14 11:43:50
-5,gogojajadeMac-mini,port,5080,DevProjectTeamSkill,occupied,medium,2026-08-14 11:43:50
-6,gogojajadeMac-mini,port,5101,DevProjectTeamSkill,occupied,medium,2026-08-14 11:43:50
-7,gogojajadeMac-mini,port,4040,DevProjectTeamSkill,occupied,low,2026-08-14 11:43:50
-8,gogojajadeMac-mini,gpu,Apple-M2,DevProjectTeamSkill,occupied,high,2026-08-14 11:43:50
-9,gogojajadeMac-mini,container,docker-desktop,DevProjectTeamSkill,occupied,high,2026-08-14 14:45:37
 10,gogojajadeMac-mini,software,homebrew,DevProjectTeamSkill,occupied,high,2026-08-14 22:45:19
 11,gogojajadeMac-mini,software,git,DevProjectTeamSkill,occupied,high,2026-08-14 22:45:19
 12,gogojajadeMac-mini,software,node,DevProjectTeamSkill,occupied,high,2026-08-14 22:45:19
@@ -37,3 +28,5 @@
 36,gogojajadeMac-mini,software,evernote,DevProjectTeamSkill,occupied,low,2026-08-14 22:45:27
 37,gogojajadeMac-mini,software,whatsapp,DevProjectTeamSkill,occupied,low,2026-08-14 22:45:27
 38,gogojajadeMac-mini,software,awesun,DevProjectTeamSkill,occupied,low,2026-08-14 22:45:27
+45,gogojajadeMac-mini,software,comate,DevProjectTeamSkill,occupied,high,2026-08-27 13:02:08
+46,gogojajadeMac-mini,software,codebuddy-cn,DevProjectTeamSkill,occupied,high,2026-08-27 13:02:08
