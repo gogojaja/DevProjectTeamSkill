@@ -60,7 +60,7 @@ def skill_list() -> str:
         if os.path.isfile(skill):
             with open(skill, encoding="utf-8") as f:
                 for line in f:
-                    m = re.search(r"技能版本[”：:]\s*v(\d+\.\d+\.\d+)", line)
+                    m = re.search(r"技能版本\**\s*[:：]\s*v(\d+\.\d+\.\d+)", line)
                     if m:
                         ver = "v" + m.group(1)
                         break
