@@ -82,3 +82,7 @@ PRN
 
 # 控制环运行时自变留痕（agent-loop 每次运行重写，不入库防反复提交）
 台账/34_控制环执行记录.csv
+
+# 夜间自动补全运行时自变留痕（每次运行自动append，不入库防反复提交，铁律#12）
+台账/nightly_code_complete_audit.csv
+.secrets/nightly_code_complete_state.json

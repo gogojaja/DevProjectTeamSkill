@@ -1,0 +1,49 @@
+# .github/workflows/nightly-code-complete.yml
+# 夜间自动代码补全调度（cron）。默认每周一~五 03:17 跑（错峰，避免整点）。
+# 仅产出 draft PR，绝不自动合入（人在回路，EV-001/006）。
+#
+# 前置：
+#   - 仓库需配置 secret LLM_TOKEN（http provider）或 runner 已装 opencode CLI
+#   - 若用 gitee 镜像，需 GITEE_TOKEN secret；本工作流默认 GitHub origin
+# 安全：权限最小（contents: write 仅用于推分支+建 PR；pull-requests: write）
+name: nightly-code-complete
+
+on:
+  schedule:
+    - cron: "17 3 * * 1-5"   # 周一至周五 03:17 UTC
+  workflow_dispatch:         # 手动触发
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  autocomplete:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: 运行夜间补全（draft PR 模式）
+        env:
+          LLM_TOKEN: ${{ secrets.LLM_TOKEN }}
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+          ENABLE_AI_REVIEW: "false"
+        run: |
+          git config user.name "nightly-code-complete[bot]"
+          git config user.email "bot@noreply"
+          python3 tools/nightly_code_complete.py run \
+            --provider http --secret-name llm_token \
+            --max-candidates 5 --scope tools \
+            --lint-cmd "python3 -m py_compile tools/*.py" \
+            --test-cmd "python3 -m pytest tests -q"
+      - name: 脱敏审计台账（不入库，仅作为运行产物）
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-code-complete-audit
+          path: 台账/nightly_code_complete_audit.csv
+          if-no-files-found: ignore
