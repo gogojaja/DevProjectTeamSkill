@@ -1,11 +1,39 @@
 # 文档脱敏工具（desensitize）
 
-> 版本：v1.1.0  
+> 版本：v1.2.0  
 > 依据：`iron_rules.md` §3 敏感信息三级处理（A/B/C 级）＋ 脱敏字典文档
 
 通用文档脱敏小工具，可在各项目中独立调用。支持扫描检测、批量脱敏、自定义规则、**脱敏字典**、生成 CSV 报告。
 
-## 功能特性
+## v1.2.0 新增：Office 文档脱敏（`office_desensitize.py`）
+
+针对 **docx / xlsx / OLE2 旧格式 .doc / .xls / zip 归档内嵌文档** 的深度脱敏（纯文本正则方案无法处理二进制 Office 格式；能力源自 2026-08-25 项目模板脱敏实战，49 文件 0 残留验证）：
+
+- **docx 跨 run 替换**：`<w:p>` 段落级合并所有 `<w:t>` 后整词替换（解决 Word 把短语拆进多个 run 导致替换不命中的问题），覆盖正文/页眉/页脚/脚注/尾注
+- **xlsx sharedStrings 跨 `<t>` 替换**：同一思路处理共享字符串
+- **OLE2 等长替换**：`.doc/.xls` 旧格式按 UTF-16LE/GBK 双编码字节替换，短串空格填充保持字节长度不破坏结构
+- **zip 归档递归**：处理 `.zip` 内嵌的 docx/xlsx/OLE2/伪 docx（扩展名与真实格式不符自动按文件头识别）
+- **图片删除**（`--strip-images`）：清除 media 部件 + drawings 部件 + `.rels` image 关系 + 文档内 drawing 占位
+- **文件名/目录名脱敏**：`--filename-delete` 删指定子串；`--strip-leading-non-cjk` 去开头非中文字符（含 zip 内条目）
+- **闭环保障**：自动时间戳备份 → 执行记录 CSV（正文替换/文件名变更/图片删除）→ 校验（残余敏感词计数 + zip 完整性），校验失败返回码 1
+- **零第三方依赖**：仅 Python 标准库；回归测试见 `tools/tests/test_office_desensitize.py`
+
+```bash
+# 扫描 Office 文档敏感词位置 + 图片清单（只读）
+python tools/desensitize/office_desensitize.py --scan ./docs --keywords "机构A,机构B" --report-dir ./reports
+
+# 脱敏执行（先备份）：长短语优先，"旧=" 表示删除
+python tools/desensitize/office_desensitize.py ./docs \
+    --keywords-map "某某省农村信用社联合社=LHS,省联社=LHS,农信=NX" \
+    --strip-images --filename-delete "某某省农村信用社联合社" --report-dir ./reports
+
+# 复用脱敏字典（keyword→replacement 列参与替换，与 --keywords-map 合并）
+python tools/desensitize/office_desensitize.py ./docs --dictionary desensitize_dictionary.csv --strip-images
+```
+
+> 注意：替换映射按**长词优先**排序执行，避免短词先命中拆散长短语；`~$` 临时锁文件自动跳过。
+
+## 功能特性（文本类，`desensitize.py`）
 
 - **三级分级**：A 级（密钥/Token/密码，告警）、B 级（IP/路径/邮箱，脱敏入库）、可扩展 C 级
 - **脱敏字典**：`desensitize_dictionary.csv` 关键字集（子串匹配）+ `--dictionary` 参数自动并入，见 `DESENSITIZE_DICTIONARY.md`

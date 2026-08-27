@@ -1,4 +1,4 @@
----
+﻿---
 name: "dev-project-team-skill"
 description: "用户启用全生命周期、启用某角色、切换角色、多角色联合、项目管理模式、项目管控、阶段评审、基线固化、交接文档时加载本软件研发多角色编排器：按阶段渐进加载角色包（启动/需求/架构/开发/测试/投产/总控/项目群/管理咨询/项目经理执行层），支持跨模型/跨会话切换、全生命周期管控、台账评审门禁、基线固化与优先级仲裁。用户说启动生命周期/启用角色/项目管理模式时加载。"
 ---
@@ -16,9 +16,12 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.10.0
+- **技能版本**：v21.10.3
 - **版本发布日期**：2026-08-27
 - **版本变更记录**：
+  - v21.10.3：范围跟踪工具 ROOT 解析修复（2026-08-27）——`tools/scope_tracker.py` 与 `tools/check_traceability.py` 原 `ROOT = dirname(dirname(__file__))` 在部署副本（全局技能目录）误指技能库根，导致读写错 台账/；改为 `find_project_root()` 按 `--root` CLI / `PROJECT_ROOT` 环境变量 / CWD 与 `__file__` 向上找项目标记（台账/或 AGENTS.md）/ 兜底解析；`cmd_init` 加 `--reset-ledgers` 安全重写表头护栏（仅无数据行时）；三端全局副本已同步。v21.10.3 = v21.10.2 内容 + 范围跟踪工具 ROOT 修复，脱敏模块等其余零差异。
+  - v21.10.2：文档脱敏工具升级 v1.1.0→v1.2.0 新增 Office 文档深度脱敏（2026-08-27）——`tools/desensitize/office_desensitize.py`：docx 跨 `<w:t>` run 段落级合并替换、xlsx sharedStrings 跨 `<t>` 替换、OLE2 .doc/.xls UTF-16LE/GBK 等长字节替换（短串空格填充）、zip 归档内嵌文档递归处理（伪 docx 按文件头识别）、`--strip-images` 内嵌图片删除（media+drawings+rels+占位）、文件名/目录名脱敏（删子串+去前导非中文，含 zip 内条目）、备份先行+执行记录 CSV+残余校验闭环；零第三方依赖；回归测试 `tools/tests/test_office_desensitize.py` 3 例全过；能力源自 2026-08-25 项目模板脱敏实战（49 文件 0 残留）。v21.10.2 = v21.10.1 + Office 脱敏模块，其余零差异。
+  - v21.10.1：生产发布工具多目标全局同步能力增强（2026-08-27）——`publish_production.py` 新增 `--no-extra-globals`/`--all-globals`/`--extra-globals trae,workbuddy` 参数与 `sync_into()` 精确同步（仅清本仓库发布集子项、保护用户其他全局技能），支持一次性把发布集铺到 opencode/trae-cn/workbuddy 三端全局目录；v21.10.1 = v21.10.0 内容 + 增强版发布工具，角色包/references/shared/docs/SKILL_INDEX 与 v21.10.0 零差异。
   - v21.10.0：新增「大批量任务成本预警」铁律与开发平台/模型知识库（2026-08-27）——①编排器 §2.2 新增 §2.2-9「大批量任务成本预警」：超阈值（文件>20/输出>50K tok/大文档>5K 行/多轮 agent 循环）须先提示估算成本并三选一（A 只定方案/B 分步执行/C 指定平台模型），落 `台账/40_大模型成本台账.csv` + 触发 `select_model`；②新增 `references/dev_platform_catalog.md`（开发平台 + 模型三层 + 公开定价快照 + 场景映射 + 大批量推荐组合，边界：不含凭据、不重复定义路由）；③新增 `台账/40_大模型成本台账.csv`（实际成本账本，与 `21_模型选型.csv` 决策台账分工）；对齐行业三层路由（EV-1 省 40–85% / EV-2 20·60·20 预算）。
   - v21.9.0：新增「项目管理模式」+ 项目经理执行层 `role-project-mgmt`（2026-08-27）——①编排器 §3 执行模式新增「项目管理模式」（对齐 PRINCE2 治理与日常管理分离 + PMBOK 十大知识领域），§4 路由表增 #10 `role-project-mgmt`；②§5 调度新增「工程角色协调只读」铁律（该模式下需求/架构/开发/测试/投产仅读状态/依赖/风险、禁触发交付 action，PM 与 `role-governance` 职责分离）；③新增 `role-project-mgmt` 角色包（日常管控循环/RAID/阶段计划/进展报告/变更协调/经验教训 + 与保障层边界声明 + 轻量→建角色升级阈值 `domain/upgrade-threshold.md`）；④SKILL_INDEX / AGENTS 同步 10 角色包计数。
   - v21.8.2：本体全面评审 v21.8.2 缺陷修复批次（2026-08-22）——①`role-architecture` description 扩充至 150+ 字符（补「架构评估/技术选型」触发词）使 descriptions 门禁全绿；②初始化《需求-架构-代码追溯矩阵.csv》并补录存量 11 REQ/5 AE/17 MOD/6 TC 条目（铁律 #10 落地，`check_traceability.py` 通过）；③以 `references/` 为基准重建 `shared/references/` 副本消除 4 文件漂移 + 补 `traceability_standard.md` 副本（铁律 #1 单源合规，部署三目录同步）；④仓库卫生 lint 白名单更新（`.codebuddy/` IDE 数据目录 + `projects_registry.csv` 依赖文件），评审报告归档 `docs/reviews/`，清理 `.DS_Store/.pytest_cache/.venv/扫描报告×5`，lint 门禁 23 error→0；⑤`lint_repo.py` 白名单维护。
@@ -220,5 +223,5 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 
 ---
 
-**文档版本**：v21.10.0　**最后更新**：2026-08-27（新增「大批量任务成本预警」铁律 + 开发平台/模型知识库 dev_platform_catalog.md + 大模型成本台账 40）
+**文档版本**：v21.10.3　**最后更新**：2026-08-27（脱敏工具 v1.2.0 新增 Office 文档深度脱敏模块；此前：新增「大批量任务成本预警」铁律 + 开发平台/模型知识库 dev_platform_catalog.md + 大模型成本台账 40）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
