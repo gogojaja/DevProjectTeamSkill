@@ -2,3 +2,4 @@
 v21.3.x增强改造,模型选型/环境抽取/复盘收割/密钥隔离/铁律,完成R1-R5共5项需求+铁律防压缩遗忘,系统文件操作曾误删hosts(现铁律已加固),select_model/retrospect_harvest/record_env_config三action,check_version_consistency.py版本门禁+pre-commit密钥扫描,每轮回显铁律锚点+压缩后重读iron_rules,确认版本一致性工具覆盖所有SKILL.md; 定期巡检授权时效
 v21.3.x复盘,压缩致铁律遗忘,建立iron_rules.md铁律卡+压缩后重读锚点,压缩后重读铁律卡流程,铁律卡+锚点机制,压缩后仅重读1条铁律卡而非全量,-,
 v21.11.0,评审复盘能力独立化,判定方法完备缺执行化; 采用工具化封装不新建技能; 落ADR-2026-08-29-001,评审无CLI封装; 复盘行动项无回环; 早期工具曾用Python3.9不兼容语法,mpv_cli.py/retro_cli.py/check_retro_closure.py/improve_cli.py 四工具分阶段落地,tools/mpv_cli.py + tools/retro_cli.py + tools/check_review_artifacts.py,工具化落盘/脱敏/门禁复用现有链路,落地四工具+接入fixed文门禁;owner:gogo;deadline:2026-08-31[已关闭]
+v21.11.0-反信号观察,工具落地使用推进,四工具启动真实调用; mpv_cli validate/dry-run 通过,工具化后需主动推动调用才避免反信号收缩,观察期阶段强制真实调用四工具至少1次,mpv_cli/retro_cli/check_retro_closure/improve_cli,工具落盘复用现有链路减少重复劳动,完成四工具真实调用序列并留痕;owner:gogo;deadline:2026-08-29（owner+deadline 已齐，符合 Atlassian 复盘闭环标准）[已关闭]
