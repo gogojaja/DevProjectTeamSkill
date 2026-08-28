@@ -1,0 +1,12 @@
+perspective,check_id,check_name,status,severity,evidence,confidence
+architect,ARCH-001,三层交接文档结构合理性,PASS,"",EV-001[high]/EV-003[medium]/EV-007[high],high
+architect,ARCH-002,显式Token预算分配(10%/75%/15%),PASS,"",EV-006[high]/EV-001[high],high
+architect,ARCH-003,三模式策略可配置性,PASS,"",EV-003[medium],medium
+architect,ARCH-004,ADR模板预置位置,PASS,"CR-001闭环",架构资产/01_架构策略/ADR-2026-08-28-001.md,high
+security,SEC-001,语义去重前强制脱敏,PASS,"CR-002闭环",desensitize.py --dictionary,A级/B级全覆盖,high
+security,SEC-002,向量不落盘仅内存计算,PASS,"",EV-002[medium],high
+security,SEC-003,敏感信息分级处理对齐,PASS,"",iron_rules.md §3 A/B/C三级,high
+performance,PERF-001,摘要生成延迟<500ms,PASS,"CR-003闭环",EV-001[high]阈值经验值,medium
+performance,PERF-002,语义去重延迟<200ms/32条,PASS,"CR-004闭环",qwen2.5-coder:7b mean-pooling 3584维,medium
+performance,PERF-003,内存峰值≤1.5GB,PASS,"",EV-002[medium] Hermes资源监控,medium
+performance,PERF-004,回归阈值10%配置化,PASS,"",.performance.yml handoff段,high

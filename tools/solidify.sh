@@ -103,6 +103,16 @@ else
   echo "   ⚠ L1 摘要生成失败（fallback 规则摘要已尝试），继续固化..." >&2
 fi
 
+# ---- 1f. 硬门禁：评审产物落盘校验（评审报告CSV/证据卡入库/评审模式申明/无 /tmp 挂链） ----
+echo ""
+echo "[1f/6] 评审产物落盘校验（硬门禁）"
+if python3 "$ROOT/tools/check_review_artifacts.py" 2>&1; then
+  echo "   ✓ 评审产物门禁通过"
+else
+  echo "   ✗ 评审产物门禁未通过，中止固化。请先补齐评审报告 CSV（docs/reviews/）、证据卡入库（docs/evidence_cards_*.json，禁 /tmp）与评审模式申明。" >&2
+  exit 1
+fi
+
 # ---- 2. 交接文档断点区强制刷新（缺失则模板创建） ----
 echo ""
 echo "[2/6] 强制刷新交接文档断点区"

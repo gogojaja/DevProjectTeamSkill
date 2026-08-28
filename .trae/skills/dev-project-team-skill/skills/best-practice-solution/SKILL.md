@@ -5,7 +5,7 @@ description: "用户要求给出解决方案、技术选型、方案建议且需
 
 # Best-Practice Solution 最佳实践方案
 
-- **技能版本**：v1.2.0　**发布日期**：2026-08-19
+- **技能版本**：v1.2.1　**发布日期**：2026-08-29
 
 > 版权声明：`../../../references/COPYRIGHT.md`　Token 标准：`../../../references/token_standard.md`　编排器：`../../SKILL.md`　多视角验证：`../multi-perspective-validation/SKILL.md`　敏感信息分级：`../../../references/iron_rules.md`　closure 模板：`../../../shared/closure_execution_template.md`
 
@@ -265,6 +265,6 @@ graph LR
 
 ---
 
-**文档版本**：v1.2.0　**最后更新**：2026-08-19（v1.2.0：基于第二轮五视角评审的 49 条意见落地——新增 LIGHT-P0 纯本地档（知识优先、web 条件化）、统一 token 预算口径与超限规则（FULL＝调研 6000＋评审 6000＋外部核验 4000＋收敛 4000，含工具 context）、评审决策统一 SIGNED_OFF/CHANGES_REQUESTED/BLOCKED 三态并引用 MPV 决策矩阵、新增第 4 问选型锁定判据与黑名单量化（金额 ≥5 万/许可证/契约破坏、生产核心链路限定）、routes 路由仲裁（技术选型→BPS / ADR→role-architecture / 代码评审→MPV）、SSRF 约束统一清单（含 IPv6/link-local/编码混淆/重定向复检）、涉密只出不进、confidence 映射表与 INSUFFICIENT 计数口径、T3 降级为反向信号、证据卡 timeliness 字段、closure 模板引用与「审检中」笔误修复）
+**文档版本**：v1.2.1　**最后更新**：2026-08-29（v1.2.1：评审产物落盘门禁落地——评审报告必须落盘 docs/reviews/、证据卡必须入库 docs/evidence_cards_*.json 禁止 /tmp、评审模式/真实外部信号升为必填字段、新增 check_review_artifacts.py 固化硬门禁；基于 2026-08-29 评审过程自省 DEP-001~004。此前 v1.2.0：基于第二轮五视角评审的 49 条意见落地——新增 LIGHT-P0 纯本地档、统一 token 预算口径、评审决策统一 SIGned_OFF/CHANGES_REQUESTED/BLOCKED 三态、新增第 4 问选型锁定判据与黑名单量化、routes 路由仲裁、SSRF 约束统一清单、涉密只出不进、confidence 映射与 INSUFFICIENT 计数、T3 降级为反向信号、证据卡 timeliness 字段、closure 模板引用）
 
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

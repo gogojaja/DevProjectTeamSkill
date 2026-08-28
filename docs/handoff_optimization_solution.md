@@ -2,7 +2,9 @@
 
 > **决策对象**：DevProjectTeamSkill 技能库的交接机制重构  
 > **档位**：FULL（系统级/不可逆/核心基础设施/架构选型锁定）  
-> **证据卡**：见 `/tmp/evidence_cards.json` (EV-001~EV-008)  
+> **证据卡**：见 `docs/evidence_cards_handoff_optimization_20260828.json` (EV-001~EV-008)  
+> **评审报告**：`docs/reviews/评审报告_交接优化方案_v21.11.0_多视角评审.csv`（评审产物落盘门禁补齐）  
+> **评审模式**：多视角自评（非真实第三方）＋真实外部信号（EV-001/002/003 均 webfetch 官方文档/RFC 核验；本库实测已验证 Ollama 部署）  
 > **产出**：双栏方案 v1 + 决策记录（SIGNED_OFF）+ ADR 模板预置
 > **评审结论**：三视角（Architect/Security/Performance）均 **SIGNED_OFF**，CR-001~004 全部闭环
 

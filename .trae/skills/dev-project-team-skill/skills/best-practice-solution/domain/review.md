@@ -1,6 +1,6 @@
 # Review 第三方多视角评审（FULL）
 
-> 归属：`../SKILL.md` §2.2.4b　版本：v1.2.0
+> 归属：`../SKILL.md` §2.2.4b　版本：v1.2.1
 
 ## 1. 目的
 对高风险决策方案做多视角评审，收敛形成最优；本库语境下为「多视角自评（非真实第三方）」，必须显式申明并补充真实外部信号。
@@ -32,17 +32,33 @@
 6. **防 conformity**：仅真并行（多 Worker / 多模型）时启用匿名化+防翻转显式提示；串行执行时不做仪式化防翻转，只保留对照证据与反向信号检查
 
 ## 4. 产物
+
+### 4.1 报告格式（必填字段，缺一不可）
 ```markdown
 # 多视角评审报告（FULL）
-- 模式：多视角自评（声明确认）＋外部信号清单
+- 模式：多视角自评（声明确认）＋外部信号清单   // 必填：自评 / 真实第三方，缺则评审无效
+- 真实外部信号：≥1 条（webfetch 官方文档 / 实测跑脚本 / 工具核验），缺则标记「未完成」
 - 决策：SIGNED_OFF / CHANGES_REQUESTED / BLOCKED
 - 意见清单：CR-001..（观点 | 严重度 | 证据引用 | status: new|ack|closed|deferred）
+- 证据卡：入库路径（docs/evidence_cards_<对象>_<日期>.json，禁止 /tmp）
 ```
 - **决策聚合（引 MPV 决策矩阵）**：全视角 SIGNED_OFF→SIGNED_OFF；1 视角 FAIL→CHANGES_REQUESTED；≥2 视角 FAIL 或任意 ERROR→BLOCKED；BLOCKED 未经人工确认禁止交付
-- 报告 CSV 按 MPV `token_standard` §3 规范（UTF-8 BOM）命名 `评审报告_<对象>_<版本>_<…>.csv` 存项目根，仅回显首 5 行
+- 报告 CSV 按 MPV `token_standard` §3 规范（UTF-8 BOM）命名 `评审报告_<对象>_<版本>_<…>.csv` 存项目根 `docs/reviews/`，仅回显首 5 行
+
+### 4.2 证据卡入库（产物落盘铁律 #14 对齐）
+- 证据卡生成即以 **`docs/evidence_cards_<对象>_<YYYYMMDD>.json`** 入库，**禁止引用 /tmp/ 临时路径**（跨会话即失效，证据链断裂）
+- 方案文档、ADR 引用证据时指向 `docs/evidence_cards_*.json` 路径，并校验文件存在
+- 固化门禁：`tools/check_review_artifacts.py`（solidify Step 1f）校验证据卡入库 / 评审报告落盘 / 评审模式申明 / 无 /tmp 挂链；硬性问题阻断固化
 
 ## 5. 门禁
 - 缺失真实外部信号 → 评审记为「未完成」，不可作为 SIGNED_OFF 依据
+- **评审模式申明缺失（未标注自评/真实第三方）→ 评审无效，不得 SIGNED_OFF**
+- **证据卡未入库 docs/ 或存在 /tmp 引用 → 固化门禁阻断（check_review_artifacts.py 硬门禁）**
 - 报告落盘前跑 `desensitize.py` A/B 级扫描（内网 URL/IP/密钥三查）
 - CHANGES_REQUESTED 与 BLOCKED 均计入 ≤2 轮收敛；第 2 次 BLOCKED 强制人工确认
 - 未经人工确认不得交付 BLOCKED 原方案
+
+---
+
+## 6. 变更记录（v1.2.1）
+- 2026-08-29：评审产物落盘门禁落地（DEP-001~004 闭环）：①评审报告必须落盘 docs/reviews/（不再仅内嵌方案文档）；②证据卡必须入库 `docs/evidence_cards_*.json` 禁止 /tmp（产物落盘铁律 #14）；③报告模板「评审模式/真实外部信号」升为必填字段；④新增 `tools/check_review_artifacts.py` 固化硬门禁（solidify Step 1f）。版本 v1.2.0 → v1.2.1。

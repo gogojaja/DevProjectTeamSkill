@@ -1,0 +1,82 @@
+[
+  {
+    "id": "EV-001",
+    "claim": "ACON框架：针对长时程Agent的上下文压缩，适度压缩阈值（历史4096、观测1024）在token节省与任务成功率间取得最佳平衡；小模型（Qwen3-14B）经压缩后性能可接近大模型",
+    "source": "https://arxiv.org/pdf/2510.00615",
+    "tier": "T1",
+    "cross_check": 1,
+    "access_date": "2026-08-28",
+    "timeliness": "volatile",
+    "confidence": "high"
+  },
+  {
+    "id": "EV-002",
+    "claim": "Hermes Agent双层压缩：网关层85%触发+Agent层50%触发，token预算型尾部保护（protect_last_n=20, min_tail_user_messages=1），结构化摘要需辅助模型，边界对齐保护tool_call/tool_result组完整性",
+    "source": "https://hermes-agent.nousresearch.com/docs/developer-guide/context-compression-and-caching",
+    "tier": "T2",
+    "cross_check": 1,
+    "access_date": "2026-08-28",
+    "timeliness": "stable",
+    "confidence": "medium"
+  },
+  {
+    "id": "EV-003",
+    "claim": "Oh-My-Phi三策略：context-full(LLM摘要)、handoff(独立交接任务)、snapcompact(位图归档无API调用)。阈值80%可配置，支持中转压缩、工具输出剪枝、模型感知帧形状",
+    "source": "https://gist.github.com/tmaiaroto/0c7fc0ea30cdb877de2fc327444f4d4b",
+    "tier": "T2",
+    "cross_check": 1,
+    "access_date": "2026-08-28",
+    "timeliness": "stable",
+    "confidence": "medium"
+  },
+  {
+    "id": "EV-004",
+    "claim": "OpenCode请求预算压缩：基于keep.tokens/buffer配置，请求前预估完整可见请求对比模型上下文窗口，预算不足触发压缩",
+    "source": "https://gist.github.com/tmaiaroto/0c7fc0ea30cdb877de2fc327444f4d4b",
+    "tier": "T2",
+    "cross_check": 1,
+    "access_date": "2026-08-28",
+    "timeliness": "stable",
+    "confidence": "medium"
+  },
+  {
+    "id": "EV-005",
+    "claim": "五大压缩模式实战：分层摘要(文档)、语义去重(对话)、结构化提取(工具结果)、工具输出剪枝、滚动窗口掩码。工具输出剪枝可内嵌现有工作流无需额外LLM调用",
+    "source": "https://www.buildmvpfast.com/blog/context-compression-techniques-fewer-tokens-llm-optimization-2026",
+    "tier": "T3",
+    "cross_check": 0,
+    "access_date": "2026-08-28",
+    "timeliness": "volatile",
+    "confidence": "low"
+  },
+  {
+    "id": "EV-006",
+    "claim": "本库token_standard §1.3：阶段门禁/迭代切换强制压缩，峰值=阶段内累计未压缩包量级，压缩后必须重读iron_rules.md做锚点。缺：无显式交接预算、无结构化摘要保留、无辅助压缩模型",
+    "source": ".trae/skills/references/token_standard.md",
+    "tier": "T1",
+    "cross_check": 0,
+    "access_date": "2026-08-28",
+    "timeliness": "stable",
+    "confidence": "high"
+  },
+  {
+    "id": "EV-007",
+    "claim": "本库交接文档.md：单一事实来源，含工作断点区(固化自动刷新)、关键文件索引、台账指针、约定铁律。固化时自动刷新断点区。缺：结构扁平、无分层/分级、无关键实体索引、大模型友好但小模型难以在有限上下文提取关键信息",
+    "source": "交接文档.md",
+    "tier": "T1",
+    "cross_check": 0,
+    "access_date": "2026-08-28",
+    "timeliness": "stable",
+    "confidence": "high"
+  },
+  {
+    "id": "EV-008",
+    "claim": "编排器§2.1-5/6：阶段切换/迭代切换强制压缩，压缩后必须重读iron_rules.md。§2.1-4上下文健康监控三档(60%/75%/85%)红区强制压缩。缺：交接专用预算、结构化摘要保留、handoff策略",
+    "source": ".trae/skills/dev-project-team-skill/SKILL.md §2.1",
+    "tier": "T1",
+    "cross_check": 0,
+    "access_date": "2026-08-28",
+    "timeliness": "stable",
+    "confidence": "high"
+  }
+]
