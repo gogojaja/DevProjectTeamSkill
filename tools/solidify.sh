@@ -94,6 +94,15 @@ else
   exit 1
 fi
 
+# ---- 1e. 生成 L1 交接核心摘要（token_standard §7 / handoff-struct） ----
+echo ""
+echo "[1e/6] 生成 L1 交接核心摘要 (handoff_summarizer.py)"
+if python3 "$ROOT/tools/handoff_summarizer.py" --fallback-only 2>&1; then
+  echo "   ✓ L1 核心摘要已生成/更新"
+else
+  echo "   ⚠ L1 摘要生成失败（fallback 规则摘要已尝试），继续固化..." >&2
+fi
+
 # ---- 2. 交接文档断点区强制刷新（缺失则模板创建） ----
 echo ""
 echo "[2/6] 强制刷新交接文档断点区"
