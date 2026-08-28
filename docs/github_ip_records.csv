@@ -72,3 +72,4 @@ fastly.net,A,100.100.100.100,system-resolver,2026-08-23,动态补充(ipaddress.c
 github.io,A,100.100.100.100,system-resolver,2026-08-23,动态补充(ipaddress.com/DoH/系统解析)
 gist.github.com,A,20.205.243.166,system-resolver,2026-08-28,动态补充(ipaddress.com/DoH/系统解析)
 github.global.ssl.fastly.net,A,162.125.80.3,system-resolver,2026-08-28,动态补充(ipaddress.com/DoH/系统解析)
+github.global.ssl.fastly.net,A,157.240.12.35,system-resolver,2026-08-28,动态补充(ipaddress.com/DoH/系统解析)
