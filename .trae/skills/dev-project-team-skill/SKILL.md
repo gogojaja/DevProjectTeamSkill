@@ -16,9 +16,10 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.10.3
-- **版本发布日期**：2026-08-27
+- **技能版本**：v21.11.0
+- **版本发布日期**：2026-08-29
 - **版本变更记录**：
+  - v21.11.0：新增「任务级按需加载」模式（2026-08-29）——P3 交接优化：①§3 执行模式新增「任务级按需加载」；②新增 §2.4 任务级加载逻辑（路由决策/映射表/加载算法伪代码/兼容回退）；③新增 `domain/skill-loader.md`（任务类型→角色包映射表 + 关键词推断 + 加载算法 + L1 摘要字段规格）；④交接文档 L1 新增「当前任务类型」字段；回退无任务类型时自动回退阶段渐进加载，完全向后兼容；对齐 `handoff_optimization_solution.md` P3 章节。v21.11.0 = v21.10.3 内容 + 任务级按需加载，脱敏模块等其余零差异。
   - v21.10.3：范围跟踪工具 ROOT 解析修复（2026-08-27）——`tools/scope_tracker.py` 与 `tools/check_traceability.py` 原 `ROOT = dirname(dirname(__file__))` 在部署副本（全局技能目录）误指技能库根，导致读写错 台账/；改为 `find_project_root()` 按 `--root` CLI / `PROJECT_ROOT` 环境变量 / CWD 与 `__file__` 向上找项目标记（台账/或 AGENTS.md）/ 兜底解析；`cmd_init` 加 `--reset-ledgers` 安全重写表头护栏（仅无数据行时）；三端全局副本已同步。v21.10.3 = v21.10.2 内容 + 范围跟踪工具 ROOT 修复，脱敏模块等其余零差异。
   - v21.10.2：文档脱敏工具升级 v1.1.0→v1.2.0 新增 Office 文档深度脱敏（2026-08-27）——`tools/desensitize/office_desensitize.py`：docx 跨 `<w:t>` run 段落级合并替换、xlsx sharedStrings 跨 `<t>` 替换、OLE2 .doc/.xls UTF-16LE/GBK 等长字节替换（短串空格填充）、zip 归档内嵌文档递归处理（伪 docx 按文件头识别）、`--strip-images` 内嵌图片删除（media+drawings+rels+占位）、文件名/目录名脱敏（删子串+去前导非中文，含 zip 内条目）、备份先行+执行记录 CSV+残余校验闭环；零第三方依赖；回归测试 `tools/tests/test_office_desensitize.py` 3 例全过；能力源自 2026-08-25 项目模板脱敏实战（49 文件 0 残留）。v21.10.2 = v21.10.1 + Office 脱敏模块，其余零差异。
   - v21.10.1：生产发布工具多目标全局同步能力增强（2026-08-27）——`publish_production.py` 新增 `--no-extra-globals`/`--all-globals`/`--extra-globals trae,workbuddy` 参数与 `sync_into()` 精确同步（仅清本仓库发布集子项、保护用户其他全局技能），支持一次性把发布集铺到 opencode/trae-cn/workbuddy 三端全局目录；v21.10.1 = v21.10.0 内容 + 增强版发布工具，角色包/references/shared/docs/SKILL_INDEX 与 v21.10.0 零差异。
@@ -91,6 +92,66 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 
 所有阶段评审、范围变更、门禁校验、基线固化、归档交接统一调用 `role-governance` 总控包读写台账、生成评审、记录审计；具体接口见 `../references/api_contracts.md`。
 
+### 2.4 任务级按需加载逻辑（P3 可选增强）
+
+> 依据 `domain/skill-loader.md` 与 `token_standard.md §7` 交接文档 L1 核心摘要
+
+#### 2.4.1 路由决策流程
+
+1. **读取 L1 核心摘要**：启动时读取 `交接文档.md` 头部 `## 🔴 L1 必读核心` 中的 `当前任务类型` 字段
+2. **任务类型映射**：按 `domain/skill-loader.md §2` 映射表解析需加载角色包
+3. **用户显式覆盖**：若用户显式指定"启用需求分析师+测试工程师"，优先于自动路由
+4. **总控包注入**：`role-governance` 作为横向支撑始终可选加载（只读模式可选）
+5. **回退机制**：L1 无任务类型字段时，自动回退到 §3 标准模式（阶段渐进加载）
+
+#### 2.4.2 任务类型→角色包映射表（精简版）
+
+| 任务类型 | 核心包 | 可选包 | 触发词示例 |
+|----------|--------|--------|------------|
+| 启动/立项 | `role-project-init` | `role-governance` | 启动项目/立项/章程/干系人 |
+| 需求分析 | `role-requirements-analysis` | `role-project-init` | 收集/分析/编写 SRS/需求变更 |
+| 架构设计 | `role-architecture` | `role-requirements-analysis` | 架构策略/设计/数据安全/ADR/评审 |
+| 编码开发 | `role-development` | `role-architecture`、`role-testing` | 开发策略/编码/走查/单测/联调/质量 |
+| 测试执行 | `role-testing` | `role-development` | 测试策略/计划/用例/执行/缺陷/总结 |
+| 投产发布 | `role-deployment` | `role-testing`、`role-governance` | 投产策略/计划/Go-Live/发布/回滚/交接 |
+| 总控评审 | `role-governance` | 全包(只读) | 台账/评审/门禁/基线固化/变更/归档/交接 |
+| 项目群协同 | `role-program-mgmt` | `role-governance`、`role-project-mgmt` | 项目群/项目集/多项目协同/PMO/依赖/里程碑 |
+| 管理咨询 | `role-mgmt-consulting` | `role-program-mgmt` | 项目管理咨询/PMO咨询/成熟度评估/差距分析 |
+| 项目日常管控 | `role-project-mgmt` | `role-governance`、相关执行包(只读) | 项目管理/日常管控/RAID/进展报告/变更协调 |
+
+#### 2.4.3 加载算法伪代码
+
+```python
+def resolve_packages(handoff_l1: dict, user_instruction: str = "") -> list[str]:
+    # 1. 从 L1 获取任务类型
+    task_type = handoff_l1.get("当前任务类型", "")
+    
+    # 2. 用户指令显式指定优先
+    explicit = parse_explicit_roles(user_instruction)
+    if explicit:
+        return explicit + ["role-governance"]
+    
+    # 3. 映射表解析
+    if task_type and task_type in TASK_TYPE_MAP:
+        packages = TASK_TYPE_MAP[task_type]["core"] + TASK_TYPE_MAP[task_type].get("optional", [])
+    else:
+        # 回退：阶段渐进加载
+        return resolve_by_phase()
+    
+    # 4. 总控包注入
+    if "role-governance" not in packages:
+        packages.append("role-governance")
+    
+    return packages
+```
+
+#### 2.4.4 兼容性与回退
+
+- **完全向后兼容**：无 L1 任务类型字段时，自动回退到 §3 标准模式（阶段渐进加载）
+- **显式优先**：用户显式指定角色包优先于自动路由
+- **总控包始终可用**：`role-governance` 作为横向支撑始终可选加载
+- **L1 摘要生成器**：`tools/handoff_summarizer.py` 在固化时自动提取/生成 `当前任务类型` 字段
+
 ---
 
 ## 3. 执行模式（依据 token_standard §1.2）
@@ -105,6 +166,7 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 | **项目群协同** | 「项目群/项目集/多项目协同/PMO 决策层」 | 多项目协同层：`role-program-mgmt` 承载（对齐 PMI SPM 5th/MSP/IMS/EVM），7 环节定义/收益/依赖/IMS 进度/标准一致/Program Board 评审/收尾；治理三层模型，Program Board 在 tranche 边界决策（继续/转向/终止）；与项目级 check_ready/stage_review 叠加双层门禁，不替代单项目治理 |
 | **管理咨询** | 「项目管理咨询/PMO咨询/成熟度评估/方法论定制/变革管理」 | 咨询层：`role-mgmt-consulting` 承载（二级方法工程/诊断，独立于 SDLC 一级执行路由），5 环节商机/诊断/方案/变革/成效；自建 5 维成熟度模型（0~5 级，证据必填）+ Kotter/ADKAR 变革；咨询只提建议不代客户决策，落地执行交接本库执行角色；客户数据按 iron_rules §3 A/B 级脱敏 |
 | **项目管理模式** | 「项目管理/日常管控/RAID/进展报告/变更协调/经验教训（且不涉及具体工程交付）」 | 项目经理执行层：`role-project-mgmt` 承载（对齐 PRINCE2 治理与日常管理分离 + PMBOK 十大知识领域），覆盖日常管控循环/RAID/阶段计划/进展报告/变更协调/经验教训；与 `role-governance`（保障/审计层）职责分离（PM 做、治理审）；工程角色（需求/架构/开发/测试/投产）在该模式下置为「协调只读」（仅读状态/依赖/风险用于协调，禁触发交付 action）；管理深度浅时先以本模式复用 `role-project-init`+`role-governance`，达 `role-project-mgmt/domain/upgrade-threshold.md` 阈值再正式建角色 |
+| **任务级按需加载**（新增） | 交接文档 L1 有任务类型 / 用户指定任务 | 仅加载映射表对应的角色包（1-3个），复用 `token_standard §1.2 角色组合加载` 机制扩展为任务级；无任务类型时回退阶段渐进加载 |
 
 ---
 
@@ -225,5 +287,5 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 
 ---
 
-**文档版本**：v21.10.3　**最后更新**：2026-08-27（脱敏工具 v1.2.0 新增 Office 文档深度脱敏模块；此前：新增「大批量任务成本预警」铁律 + 开发平台/模型知识库 dev_platform_catalog.md + 大模型成本台账 40）
+**文档版本**：v21.11.0　**最后更新**：2026-08-29（新增「任务级按需加载」模式 + domain/skill-loader.md；此前：v21.10.3 范围跟踪工具 ROOT 修复、脱敏工具 v1.2.0 新增 Office 文档深度脱敏模块）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
