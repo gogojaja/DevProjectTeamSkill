@@ -1,0 +1,10 @@
+perspective,check_id,check_name,status,severity,evidence,confidence
+architect,ARCH-101,评审能力工具化判定（MPV/BPS方法论完备但无CLI）,PASS,medium,EV-101/EV-102 方法论完备但无脚本封装,high
+architect,ARCH-102,复盘能力闭环判定（OODA完备但行动项回环缺失）,CHANGES_REQUESTED,medium,EV-103/EV-104 复盘缺自动验证闭环,high
+architect,ARCH-103,独立技能 vs 工具取向（新建顶层技能与10角色包结构冲突）,PASS,high,EV-107 复用率高的流程提升为能力域但须工具化而非重复建技能,high
+architect,ARCH-104,评审独立性边界（与best-practice-solution/MPV分工）,PASS,medium,评审工具化不新建技能,保留子技能编排语义,medium
+security,SEC-101,工具化脱敏合规（评审报告/复盘数据含敏感信息须脱敏）,PASS,high,复用check_review_artifacts.py + desensitize.py 现有链路,high
+security,SEC-102,复盘数据分级（22/23台账含内部信息须分级处理）,CHANGES_REQUESTED,medium,EV-104 复盘数据入库前须A/B级脱敏,medium
+cost-evolution,COST-101,工具化成本收益（CLI封装低投入复用现有流程）,PASS,high,EV-101~104 方法论已存在仅需封装脚本,high
+cost-evolution,COST-102,过度工具化风险（形式化/刷分/无人调用）,WARNING,medium,EV-108 DORA反信号,medium
+cost-evolution,COST-103,阶段化实施（A工具化→B复盘闭环→C独立形态可演进）,PASS,medium,按投入从小到大分P阶段推进,medium

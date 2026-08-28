@@ -84,6 +84,10 @@ python tools/publish_production.py                # 跨平台/Windows 主推
 
 ```sh
 python tools/check_skill_links.py       # 技能库引用可达性门禁（拦截 .// 残留与 __resources 断链；已纳入 lint_repo ⑥）
+python tools/mpv_cli.py --target <对象> --perspectives architect,security --report <CSV>  # 评审能力工具化（ADR-2026-08-29-001 A）：MPV 五视角评审落盘 CSV + 脱敏扫描 + 对接 check_review_artifacts 门禁；--dry-run 预览 / --validate 校验已有报告
+python tools/retro_cli.py --stage <阶段> --object <对象> --good "" --improve "" --action "<行动项>;owner:x;deadline:yyyy-mm-dd"  # 复盘收割工具化（ADR-2026-08-29-001 B）：写 22_阶段复盘 + 提取行动项(owner/deadline) + --write-lessons 登记经验库；写库前强制脱敏扫描
+python tools/check_retro_closure.py     # 复盘行动项回环（ADR-2026-08-29-001 B companion）：列出未关闭行动项；--mark-closed "<关键词>" 标记已关闭；Atlassian 复盘闭环标准
+python tools/improve_cli.py --diagnose <目标>  # self-improve 独立工具形态（ADR-2026-08-29-001 D）：偏差侦测清单 / --propose 登记提案台账 33 / --experiment 回填验证状态
 python tools/scope_tracker.py init      # 范围跟踪初始化：建扩展 RTM（含 PRIORITY/SCOPE_STATUS/BASELINE_VER 等）+ 06/07 范围台账（含表头与示例）
 python tools/scope_tracker.py metrics [--write]   # 范围覆盖度指标 + 健康分（--write 写 07_范围跟踪台账 快照）
 python tools/scope_tracker.py gate [--max-violations 0]  # 范围门禁：一致性+蔓延/缩水检测+健康分，写 07，结论 exit(驳回/警告/通过)

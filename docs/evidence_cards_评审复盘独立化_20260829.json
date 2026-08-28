@@ -1,0 +1,82 @@
+[
+  {
+    "id": "EV-101",
+    "claim": "本项目 multi-perspective-validation 子技能已具备五视角并行评审（Architect/CodeReviewer/Security/Test/Performance）+ 聚合决策矩阵（SIGNED_OFF/CHANGES_REQUESTED/BLOCKED）+ CSV 报告规范，方法论完备但无独立 CLI 工具封装",
+    "source": ".trae/skills/dev-project-team-skill/skills/multi-perspective-validation/SKILL.md",
+    "tier": "T1",
+    "cross_check": 1,
+    "access_date": "2026-08-29",
+    "timeliness": "stable",
+    "confidence": "high"
+  },
+  {
+    "id": "EV-102",
+    "claim": "本项目 best-practice-solution 子技能具备四段工程决策水线（Triage→Research→Draft→Review→Converge），FULL 档多视角评审缺省 3 视角 + 评审产物落盘门禁 check_review_artifacts.py（固化 Step 1f）",
+    "source": ".trae/skills/dev-project-team-skill/skills/best-practice-solution/SKILL.md",
+    "tier": "T1",
+    "cross_check": 1,
+    "access_date": "2026-08-29",
+    "timeliness": "stable",
+    "confidence": "high"
+  },
+  {
+    "id": "EV-103",
+    "claim": "本项目 self-improve 子技能具备完整复盘闭环（OODA：Observe→Orient→Decide→Act）+ 偏差侦测/5-Why 根因/提案/实验评估/版本化发布/经验沉淀（lesson-harvesting），方法论完备但 retrospect_harvest 为手工 action 无脚本封装",
+    "source": ".trae/skills/dev-project-team-skill/skills/self-improve/SKILL.md",
+    "tier": "T1",
+    "cross_check": 1,
+    "access_date": "2026-08-29",
+    "timeliness": "stable",
+    "confidence": "high"
+  },
+  {
+    "id": "EV-104",
+    "claim": "本库复盘沉淀层已有 22_阶段复盘.csv（做得好/需改进/可固化到SKILL流程/可复用工具/降Token措施/行动项 + 引用/验证状态列）+ shared/evolution/skill-lessons-learned 6 层经验 CSV，但缺「行动项→验证→关闭」自动回环与「复用命中统计」",
+    "source": "台账/22_阶段复盘.csv + .trae/skills/shared/evolution/skill-lessons-learned/",
+    "tier": "T1",
+    "cross_check": 1,
+    "access_date": "2026-08-29",
+    "timeliness": "stable",
+    "confidence": "high"
+  },
+  {
+    "id": "EV-105",
+    "claim": "DORA 官方：软件交付绩效用领先/滞后指标衡量，复盘（retrospective）是验证改进进度的关键步骤，建议用自动化工具（如 Quick Check）代替纯对话复盘；重复的团队复盘形成持续改进循环",
+    "source": "https://dora.dev/guides/dora-metrics-four-keys/",
+    "tier": "T1",
+    "cross_check": 1,
+    "access_date": "2026-08-29",
+    "timeliness": "volatile",
+    "confidence": "high"
+  },
+  {
+    "id": "EV-106",
+    "claim": "Atlassian Team Playbook：复盘 5 步（设基调/收集反馈/洞察/行动项/总结）；行动项必须有 owner+deadline；匿名反馈与心理安全提升复盘质量；复盘需与任务系统集成产生行动跟进闭环；AI 用于总结洞察与生成行动项",
+    "source": "https://www.atlassian.com/team-playbook/plays/retrospective",
+    "tier": "T2",
+    "cross_check": 1,
+    "access_date": "2026-08-29",
+    "timeliness": "stable",
+    "confidence": "medium"
+  },
+  {
+    "id": "EV-107",
+    "claim": "CMMI/SPICE 能力域判定：复用率高的流程提升为独立能力域；本库评审（MPV/BPS）与复盘（self-improve）方法论完备，但「工具化封装」使它们仍为内嵌子技能，无法被 CI/门禁/其他工具自动调用",
+    "source": "CMMI V3 过程域模型（行业标准）",
+    "tier": "T2",
+    "cross_check": 0,
+    "access_date": "2026-08-29",
+    "timeliness": "stable",
+    "confidence": "medium"
+  },
+  {
+    "id": "EV-108",
+    "claim": "反信号（过度工具化风险）：DORA 警告『不要为度量而度量』『关注改进而非竞争』；若工具化后无人调用、仅门禁刷分或复盘退化为填表，则工具化无增值；人类判断不可替代（Atlassian 强调人为洞察，AI 仅辅助总结）",
+    "source": "https://dora.dev/guides/dora-metrics-four-keys/",
+    "tier": "T1",
+    "cross_check": 1,
+    "access_date": "2026-08-29",
+    "timeliness": "stable",
+    "confidence": "medium"
+  }
+]
