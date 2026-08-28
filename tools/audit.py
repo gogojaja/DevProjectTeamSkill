@@ -9,11 +9,12 @@
   - 模型名称   : 未传时读 opencode.json 的 model 字段，再降级 "未知"
 
 用法：
-  # 关键操作审计
+  # 关键操作审计（铁律#15 执行合同闸门：须带 --confirm-word 确认词）
   python3 tools/audit.py op \
       --type "修改项目外文件" --target "~/.config/opencode/opencode.jsonc" \
       --risk 中 --auth AUTH-020 --backup 是 --backup-path ".backup/xxx" \
-      --result "成功" [--tool Trae] [--model ark-coding/deepseek-v4-flash] \
+      --result "成功" --confirm-word "执行" [--param-hash <sha前10>] \
+      [--tool Trae] [--model ark-coding/deepseek-v4-flash] \
       [--session-id <uuid>] [--note "..."]
 
   # 授权登记
@@ -27,6 +28,7 @@
 import argparse
 import csv
 import datetime
+import hashlib
 import json
 import os
 import re
@@ -104,7 +106,7 @@ def write_row(path, header, row):
 def cmd_op(args):
     header = ["操作ID", "会话ID", "主机标识", "客户端工具", "模型名称", "操作时间",
               "操作类型", "对象", "风险等级", "授权人", "授权ID", "是否备份",
-              "备份路径", "留痕时间", "结果"]
+              "备份路径", "留痕时间", "结果", "确认词", "参数哈希"]
     op_id = args.op_id or next_op_id()
     session = args.session_id or str(uuid.uuid4())
     host = normalize_host()
@@ -113,24 +115,31 @@ def cmd_op(args):
     op_time = now_iso()
     note = args.note or ""
     result = args.result + (f"；{note}" if note else "")
+    # 参数哈希：审批绑定（操作名+目标路径+改动内容）SHA-256 前 10 位（铁律#15）
+    if args.param_hash:
+        phash = args.param_hash
+    else:
+        raw = f"{args.type}|{args.target}|{result}"
+        phash = hashlib.sha256(raw.encode("utf-8")).hexdigest()[:10]
     row = [op_id, session, host, tool, model, op_time, args.type, args.target,
            args.risk, args.actor, args.auth, args.backup, args.backup_path,
-           op_time, result]
+           op_time, result, args.confirm_word, phash]
     write_row(P13, header, row)
-    print(f"[audit] 已写 13 台账: {op_id} host={host} tool={tool} model={model} time={op_time}")
+    print(f"[audit] 已写 13 台账: {op_id} host={host} tool={tool} model={model} time={op_time} 确认词={args.confirm_word} 参数哈希={phash}")
 
 
 def cmd_auth(args):
     header = ["授权ID", "主机标识", "授权对象", "对象类型(目录/文件/系统)", "路径",
               "权限(读/写/改/删)", "授权人", "授权时间", "有效期至",
-              "状态(有效/过期/已撤销)", "备注"]
+              "状态(有效/过期/已撤销)", "备注", "确认词"]
     auth_id = args.auth_id or next_auth_id()
     host = args.host or normalize_host()
     note = args.note or ""
     row = [auth_id, host, args.object, args.otype, args.path, args.perm,
-           args.actor, args.auth_time, args.valid_until, args.status, note]
+           args.actor, args.auth_time, args.valid_until, args.status, note,
+           args.confirm_word]
     write_row(P14, header, row)
-    print(f"[audit] 已写 14 台账: {auth_id} host={host} object={args.object}")
+    print(f"[audit] 已写 14 台账: {auth_id} host={host} object={args.object} 确认词={args.confirm_word}")
 
 
 def main():
@@ -151,6 +160,8 @@ def main():
     op.add_argument("--tool", default=None)
     op.add_argument("--model", default=None)
     op.add_argument("--note", default=None)
+    op.add_argument("--confirm-word", default="—", help="执行合同确认词(执行/OK/确认/改吧/方案X)，铁律#15")
+    op.add_argument("--param-hash", default=None, help="审批参数哈希(操作名+路径+内容 SHA256 前10位)；缺省自动算")
     op.set_defaults(func=cmd_op)
 
     au = sub.add_parser("auth", help="授权登记")
@@ -165,6 +176,7 @@ def main():
     au.add_argument("--valid-until", default="本会话")
     au.add_argument("--status", default="有效")
     au.add_argument("--note", default=None)
+    au.add_argument("--confirm-word", default="—", help="授权确认词(执行合同白名单)，铁律#15")
     au.set_defaults(func=cmd_auth)
 
     args = ap.parse_args()

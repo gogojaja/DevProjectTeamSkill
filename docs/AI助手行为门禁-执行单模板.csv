@@ -1,0 +1,2 @@
+﻿操作编号,操作名,目标路径,完整改动内容,风险等级,授权+备份情况
+OP-EX01,恢复模型 limit,opencode.json,将 models[].limit 由 8 恢复为官方值 32(context)/16(output)，仅 context/output 两项，不动 thinking,Tier2,AUTH-020 覆盖路径；已 git stash 即时备份 /.backup/

@@ -95,6 +95,15 @@ else
   echo "⚠ 未定位到 python.exe，跳过结构门禁（手动运行: py -3.11 tools/lint_repo.py）" >&2
 fi
 
+# ---- 6. 执行合同闸门软提示（铁律 #15，非阻断） ----
+# 若本次提交涉及门禁相关文件（AGENTS.md / 台账13 / tools/audit.py / 技能源），
+# 提醒 AI 操作须已走「六段执行合同」并在 13 台账留痕确认词（不阻断提交）。
+gate_hit=""
+gate_hit=$(printf '%s\n' "$files" | grep -E '^(AGENTS\.md|台账/13_安全审计台账\.csv|tools/audit\.py|\.trae/skills/)' | head -1) || true
+if [ -n "${gate_hit:-}" ]; then
+  echo "ℹ 铁律 #15 提示：本次涉及门禁相关文件（${gate_hit:-}），请确认已走「六段执行合同」并在 13 台账留痕确认词（--confirm-word）。此提示不阻断提交。"
+fi
+
 if [ "$fail" -ne 0 ]; then
   echo "⛔ 提交门禁未通过，提交已阻断。修正后重新 git add + commit。" >&2
   exit 1

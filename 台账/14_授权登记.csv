@@ -1,24 +1,24 @@
-授权ID,主机标识,授权对象,对象类型(目录/文件/系统),路径,权限(读/写/改/删),授权人,授权时间,有效期至,状态(有效/过期/已撤销),备注
-AUTH-001,douglas,%SYSTEMDRIVE%\...\System32\drivers\etc\hosts,系统文件,写(恢复),douglas\<user>,2026-08-07,2026-08-08,有效,一次性恢复操作已执行并备份,
-AUTH-002,douglas,本机项目集PMO与项目根目录,目录,<repo>,读/写,douglas\<user>,2026-08-17,2026-08-17,有效,用户指令-项目集台账落<repo>并纳入本机全部项目(本次会话)
-AUTH-003,douglas,%SYSTEMDRIVE%\...\<user>\.workbuddy\skills (WorkBuddy全局技能目录),目录,%SYSTEMDRIVE%\...\<user>\.workbuddy\skills,写/改/删,douglas\<user>,2026-08-25,长期,有效,用户授权-DevProjectTeamSkill全局生效(同步仓库源码覆盖旧桩版并移除)
-AUTH-003,douglas,临时hosts覆盖以推送GitHub,系统文件,%SYSTEMDRIVE%\...\System32\drivers\etc\hosts,写(github.com→可达IP),douglas\<user>,2026-08-17,2026-08-17,有效(本次会话),方案2——临时hosts覆盖github.com至可达IP并推送后还原；实际因权限不足未改写，沿用既有覆盖(xxx.xxx.xxx.xxx)+flushdns推送成功
-AUTH-004,gogojajadeMac-mini,opencode全局配置(屏蔽不可用模型),文件,~/.config/opencode/opencode.jsonc,读/写,<user>(本机),2026-08-20,2026-08-20,有效(本次会话),用户指令-全provider白名单化并禁用deepseek；备份.onbackup/opencode.jsonc.bak.20260820_221223
-AUTH-005,gogojajadeMac-mini,生产技能库部署目录,目录,~/dev-project-team-skill,读/写/创建,<user>(本机),2026-08-20,2026-08-21,有效,用户指令-创建本技能生产目录供其他项目复用(仅最新版本v21.8.0)
-AUTH-006,douglas,三环境目录映射(Prod<HOME>/Dev<DEV_VOLUME>/Test<TEST_VOLUME>),目录,<脱敏占位>,读/登记,douglas\<user>,2026-08-21 23:09:31,2026-08-21 23:09:31,有效,用户指令:三环境真实映射脱敏登记(本会话有效)
-AUTH-PROD-2026-08-23210953,gogojajadeMac-mini,全局openocode技能库,目录,~/.config/opencode/skills,改/删(rmtree重建),gogo,2026-08-23 21:09:53,2027-12-31,有效,publish_production v21.8.2 生产发布，用户已授权
-AUTH-007,gogojajadeMac-mini,trae-cn全局技能目录,目录,%USERPROFILE%\.trae-cn\skills,写/改,<user>(本机),2026-08-27 14:48:00,2026-08-27 14:48:00,有效(本次会话),用户指令-启用DevProjectTeamSkill全局最新版v21.10.0
-AUTH-008,gogojajadeMac-mini,v21.10.1生产发布与三端同步,目录,~/dev-project-team-skill/v21.10.1 + opencode/trae-cn/workbuddy全局技能目录,写/创建,<user>(本机),2026-08-27 15:05:00,2026-08-27 15:05:00,有效(本次会话),用户指令-重新打包并启用v21.10.1(含增强版publish_production.py多目标同步)
-AUTH-009,gogojajadeMac-mini,接入DevProjectTeamSkill MCP到Trae CN,文件,/Users/gogo/Library/Application Support/Trae CN/User/settings.json,改,<user>(本机),2026-08-27 20:57:00,未指定(默认本次会话),用户指令-本机安装了Trae，要求将技能库MCP服务登记进Trae；已备份(.backup/Trae_CN_User_settings.json.20260827_205753)后写入mcpServers,
-AUTH-010,gogojajadeMac-mini,接入DevProjectTeamSkill MCP到QoderCN,文件,/Users/gogo/Library/Application Support/QoderCN/User/settings.json,改,<user>(本机),20260827211709,未指定(默认本次会话),用户指令-沿多工具MCP目标，将技能库MCP登记进本机已装国产IDE,已备份(QoderCN_User_settings.json.20260827_211709)后写入mcpServers
-AUTH-011,gogojajadeMac-mini,接入DevProjectTeamSkill MCP到Comate,文件,/Users/gogo/Library/Application Support/Comate/User/settings.json,改,<user>(本机),20260827211709,未指定(默认本次会话),用户指令-沿多工具MCP目标，将技能库MCP登记进本机已装国产IDE,已备份(Comate_User_settings.json.20260827_211709)后写入mcpServers
-AUTH-012,gogojajadeMac-mini,接入DevProjectTeamSkill MCP到CodeBuddyCN,文件,/Users/gogo/Library/Application Support/CodeBuddy CN/User/settings.json,改,<user>(本机),20260827211709,未指定(默认本次会话),用户指令-沿多工具MCP目标，将技能库MCP登记进本机已装国产IDE,已备份(CodeBuddyCN_User_settings.json.20260827_211709)后写入mcpServers
-AUTH-013,gogojajadeMac-mini,接入DevProjectTeamSkill MCP到VS Code(CodeGeeX宿主),文件,/Users/gogo/Library/Application Support/Code/User/settings.json,改,<user>(本机),未指定(默认本次会话),用户指令-安装 CodeGeeX 并接入MCP; 备份后写入 mcpServers,,
-AUTH-014,gogojajadeMac-mini,接入DevProjectTeamSkill MCP到CodeFlicker,文件,/Users/gogo/Library/Application Support/CodeFlicker/User/settings.json,改,<user>(本机),未指定(默认本次会话),用户指令-CodeFlicker已安装，要求接入MCP; 创建配置并写入 mcpServers,,
-AUTH-015,gogojajadeMac-mini,接入DevProjectTeamSkill MCP到Windsurf,文件,/Users/gogo/Library/Application Support/Windsurf/User/settings.json,改,<user>(本机),未指定(默认本次会话),用户指令-新装 MCP 客户端; 备份后写入 mcpServers,,
-AUTH-016,gogojajadeMac-mini,接入DevProjectTeamSkill MCP到Cline,文件,/Users/gogo/.cline/mcp_settings.json,改,<user>(本机),未指定(默认本次会话),用户指令-新装 MCP 客户端; 创建配置并写入 mcpServers,,
-AUTH-017,gogojajadeMac-mini,接入DevProjectTeamSkill MCP到Roo Code,文件,/Users/gogo/.roo/mcp.json,改,<user>(本机),未指定(默认本次会话),用户指令-新装 MCP 客户端; 创建配置并写入 mcpServers,,
-AUTH-018,gogojajadeMac-mini,系统外部文件改动授权,用户明确要求接入 Continue.dev MCP；授权修改 ~/.continue/config.yaml(外部系统文件),低,<user>(本机),本会话(用户显式授权),不适用,20260827233121,备份于 .backup/Continue_config_yaml.20260827233121,
-AUTH-019,gogojajadeMac-mini,系统软件安装+MCP接入,"用户要求安装Zed并接入本技能MCP; 授权创建~/.config/zed/settings.json(Zed全局配置), ~/Applications/Zed.app, ~/.local/bin/zed CLI launcher",低,<user>(本机),本会话,不适用,20260828064318,新建文件; 无覆盖,
-AUTH-020,gogojajadeMac-mini,修 opencode 全局 MCP 注册：旧坏 server→新 server,文件,~/.config/opencode/opencode.jsonc,改（仅 dev-project-team-skill MCP command 字段）,gogo(本机),2026-08-28,未指定(默认本次会话),,"用户指令""继续""——确认修正全局 MCP 注册（此前 OP-AUDIT-025 登记的配置已过期）；改前必须备份"
-AUTH-021,gogojajadeMac-mini,审计/授权台账主机名明文保留,系统/台账,台账/13_安全审计台账.csv;台账/14_授权登记.csv,读/写,用户(本机),2026-08-28,长期,有效,"用户明确授权-为跨机异常定位需在审计台账明文保留主机名(铁律#8 B级脱敏例外, 范围限定本仓库)"
+授权ID,主机标识,授权对象,对象类型(目录/文件/系统),路径,权限(读/写/改/删),授权人,授权时间,有效期至,状态(有效/过期/已撤销),备注,确认词
+AUTH-001,douglas,%SYSTEMDRIVE%\...\System32\drivers\etc\hosts,系统文件,写(恢复),douglas\<user>,2026-08-07,2026-08-08,有效,一次性恢复操作已执行并备份,,—
+AUTH-002,douglas,本机项目集PMO与项目根目录,目录,<repo>,读/写,douglas\<user>,2026-08-17,2026-08-17,有效,用户指令-项目集台账落<repo>并纳入本机全部项目(本次会话),—
+AUTH-003,douglas,%SYSTEMDRIVE%\...\<user>\.workbuddy\skills (WorkBuddy全局技能目录),目录,%SYSTEMDRIVE%\...\<user>\.workbuddy\skills,写/改/删,douglas\<user>,2026-08-25,长期,有效,用户授权-DevProjectTeamSkill全局生效(同步仓库源码覆盖旧桩版并移除),—
+AUTH-003,douglas,临时hosts覆盖以推送GitHub,系统文件,%SYSTEMDRIVE%\...\System32\drivers\etc\hosts,写(github.com→可达IP),douglas\<user>,2026-08-17,2026-08-17,有效(本次会话),方案2——临时hosts覆盖github.com至可达IP并推送后还原；实际因权限不足未改写，沿用既有覆盖(xxx.xxx.xxx.xxx)+flushdns推送成功,—
+AUTH-004,gogojajadeMac-mini,opencode全局配置(屏蔽不可用模型),文件,~/.config/opencode/opencode.jsonc,读/写,<user>(本机),2026-08-20,2026-08-20,有效(本次会话),用户指令-全provider白名单化并禁用deepseek；备份.onbackup/opencode.jsonc.bak.20260820_221223,—
+AUTH-005,gogojajadeMac-mini,生产技能库部署目录,目录,~/dev-project-team-skill,读/写/创建,<user>(本机),2026-08-20,2026-08-21,有效,用户指令-创建本技能生产目录供其他项目复用(仅最新版本v21.8.0),—
+AUTH-006,douglas,三环境目录映射(Prod<HOME>/Dev<DEV_VOLUME>/Test<TEST_VOLUME>),目录,<脱敏占位>,读/登记,douglas\<user>,2026-08-21 23:09:31,2026-08-21 23:09:31,有效,用户指令:三环境真实映射脱敏登记(本会话有效),—
+AUTH-PROD-2026-08-23210953,gogojajadeMac-mini,全局openocode技能库,目录,~/.config/opencode/skills,改/删(rmtree重建),gogo,2026-08-23 21:09:53,2027-12-31,有效,publish_production v21.8.2 生产发布，用户已授权,—
+AUTH-007,gogojajadeMac-mini,trae-cn全局技能目录,目录,%USERPROFILE%\.trae-cn\skills,写/改,<user>(本机),2026-08-27 14:48:00,2026-08-27 14:48:00,有效(本次会话),用户指令-启用DevProjectTeamSkill全局最新版v21.10.0,—
+AUTH-008,gogojajadeMac-mini,v21.10.1生产发布与三端同步,目录,~/dev-project-team-skill/v21.10.1 + opencode/trae-cn/workbuddy全局技能目录,写/创建,<user>(本机),2026-08-27 15:05:00,2026-08-27 15:05:00,有效(本次会话),用户指令-重新打包并启用v21.10.1(含增强版publish_production.py多目标同步),—
+AUTH-009,gogojajadeMac-mini,接入DevProjectTeamSkill MCP到Trae CN,文件,/Users/gogo/Library/Application Support/Trae CN/User/settings.json,改,<user>(本机),2026-08-27 20:57:00,未指定(默认本次会话),用户指令-本机安装了Trae，要求将技能库MCP服务登记进Trae；已备份(.backup/Trae_CN_User_settings.json.20260827_205753)后写入mcpServers,,—
+AUTH-010,gogojajadeMac-mini,接入DevProjectTeamSkill MCP到QoderCN,文件,/Users/gogo/Library/Application Support/QoderCN/User/settings.json,改,<user>(本机),20260827211709,未指定(默认本次会话),用户指令-沿多工具MCP目标，将技能库MCP登记进本机已装国产IDE,已备份(QoderCN_User_settings.json.20260827_211709)后写入mcpServers,—
+AUTH-011,gogojajadeMac-mini,接入DevProjectTeamSkill MCP到Comate,文件,/Users/gogo/Library/Application Support/Comate/User/settings.json,改,<user>(本机),20260827211709,未指定(默认本次会话),用户指令-沿多工具MCP目标，将技能库MCP登记进本机已装国产IDE,已备份(Comate_User_settings.json.20260827_211709)后写入mcpServers,—
+AUTH-012,gogojajadeMac-mini,接入DevProjectTeamSkill MCP到CodeBuddyCN,文件,/Users/gogo/Library/Application Support/CodeBuddy CN/User/settings.json,改,<user>(本机),20260827211709,未指定(默认本次会话),用户指令-沿多工具MCP目标，将技能库MCP登记进本机已装国产IDE,已备份(CodeBuddyCN_User_settings.json.20260827_211709)后写入mcpServers,—
+AUTH-013,gogojajadeMac-mini,接入DevProjectTeamSkill MCP到VS Code(CodeGeeX宿主),文件,/Users/gogo/Library/Application Support/Code/User/settings.json,改,<user>(本机),未指定(默认本次会话),用户指令-安装 CodeGeeX 并接入MCP; 备份后写入 mcpServers,,,—
+AUTH-014,gogojajadeMac-mini,接入DevProjectTeamSkill MCP到CodeFlicker,文件,/Users/gogo/Library/Application Support/CodeFlicker/User/settings.json,改,<user>(本机),未指定(默认本次会话),用户指令-CodeFlicker已安装，要求接入MCP; 创建配置并写入 mcpServers,,,—
+AUTH-015,gogojajadeMac-mini,接入DevProjectTeamSkill MCP到Windsurf,文件,/Users/gogo/Library/Application Support/Windsurf/User/settings.json,改,<user>(本机),未指定(默认本次会话),用户指令-新装 MCP 客户端; 备份后写入 mcpServers,,,—
+AUTH-016,gogojajadeMac-mini,接入DevProjectTeamSkill MCP到Cline,文件,/Users/gogo/.cline/mcp_settings.json,改,<user>(本机),未指定(默认本次会话),用户指令-新装 MCP 客户端; 创建配置并写入 mcpServers,,,—
+AUTH-017,gogojajadeMac-mini,接入DevProjectTeamSkill MCP到Roo Code,文件,/Users/gogo/.roo/mcp.json,改,<user>(本机),未指定(默认本次会话),用户指令-新装 MCP 客户端; 创建配置并写入 mcpServers,,,—
+AUTH-018,gogojajadeMac-mini,系统外部文件改动授权,用户明确要求接入 Continue.dev MCP；授权修改 ~/.continue/config.yaml(外部系统文件),低,<user>(本机),本会话(用户显式授权),不适用,20260827233121,备份于 .backup/Continue_config_yaml.20260827233121,,—
+AUTH-019,gogojajadeMac-mini,系统软件安装+MCP接入,"用户要求安装Zed并接入本技能MCP; 授权创建~/.config/zed/settings.json(Zed全局配置), ~/Applications/Zed.app, ~/.local/bin/zed CLI launcher",低,<user>(本机),本会话,不适用,20260828064318,新建文件; 无覆盖,,—
+AUTH-020,gogojajadeMac-mini,修 opencode 全局 MCP 注册：旧坏 server→新 server,文件,~/.config/opencode/opencode.jsonc,改（仅 dev-project-team-skill MCP command 字段）,gogo(本机),2026-08-28,未指定(默认本次会话),,"用户指令""继续""——确认修正全局 MCP 注册（此前 OP-AUDIT-025 登记的配置已过期）；改前必须备份",—
+AUTH-021,gogojajadeMac-mini,审计/授权台账主机名明文保留,系统/台账,台账/13_安全审计台账.csv;台账/14_授权登记.csv,读/写,用户(本机),2026-08-28,长期,有效,"用户明确授权-为跨机异常定位需在审计台账明文保留主机名(铁律#8 B级脱敏例外, 范围限定本仓库)",—
