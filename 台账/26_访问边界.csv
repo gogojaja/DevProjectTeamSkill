@@ -7,3 +7,7 @@ AB-004,<DEV_VOLUME>BR256G卷(Dev环境),外部卷,AUTH-003,2026-08-21 23:09:31,�
 AB-005,<TEST_VOLUME>KINGSTON卷(Test环境),外部卷,AUTH-003,2026-08-21 23:09:31,有效,三环境之测试环境(用户提供映射,脱敏登记)
 BND-PROD-2026-08-232109,生产技能载体,~/.config/opencode/skills,AUTH-PROD-2026-08-23210953,2026-08-23 21:09:53,有效,"本次发布授权(外部目录,已备份+留痕)"
 AB-006,%USERPROFILE%\.trae-cn\skills,授权外,AUTH-007,2026-08-27 14:48:00,有效,用户授权-启用DevProjectTeamSkill全局最新版v21.10.0,同步trae-cn部署副本(本次会话)
+CMDB-ASSET-001,<repo>\DevProjectTeamSkill\docs\AI助手行为门禁与授权合同.md,项目内文档资产,-,2026-08-29 19:46:58,有效,CMDB:AI助手门禁合同v1.0方案文档(评审通过 R2 pass)
+CMDB-ASSET-002,<repo>\DevProjectTeamSkill\docs\AI助手行为门禁-执行单模板.csv,项目内文档资产,-,2026-08-29 19:46:58,有效,CMDB:AI助手门禁审批六要素执行单CSV模板(UTF-8 BOM)
+CMDB-ASSET-003,<repo>\DevProjectTeamSkill\.trae\specs\ai-self-control-20260828,项目内规格资产,-,2026-08-29 19:46:58,有效,CMDB:AI助手门禁方案spec mode产物(spec/tasks/review.md)
+CMDB-ASSET-004,<repo>\DevProjectTeamSkill,项目内资产扩展,-,2026-08-29 19:46:58,有效,CMDB:本次会话新增AI门禁方案资产集合(含以上3项整体登记)
