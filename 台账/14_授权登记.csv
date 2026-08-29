@@ -23,3 +23,4 @@ AUTH-019,gogojajadeMac-mini,系统软件安装+MCP接入,"用户要求安装Zed�
 AUTH-020,gogojajadeMac-mini,修 opencode 全局 MCP 注册：旧坏 server→新 server,文件,~/.config/opencode/opencode.jsonc,改（仅 dev-project-team-skill MCP command 字段）,gogo(本机),2026-08-28,未指定(默认本次会话),,"用户指令""继续""——确认修正全局 MCP 注册（此前 OP-AUDIT-025 登记的配置已过期）；改前必须备份",—
 AUTH-021,gogojajadeMac-mini,审计/授权台账主机名明文保留,系统/台账,台账/13_安全审计台账.csv;台账/14_授权登记.csv,读/写,用户(本机),2026-08-28,长期,有效,"用户明确授权-为跨机异常定位需在审计台账明文保留主机名(铁律#8 B级脱敏例外, 范围限定本仓库)",—
 AUTH-PROD-2026-08-29-v21110,gogojajadeMac-mini-6.local,v21.11.0生产发布多工具全局同步,目录,~/.config/opencode/skills + ~/.trae-cn/skills + ~/.workbuddy/skills + ~/.copilot/skills + ~/dev-project-team-skill/v21.11.0+current,写/重建/精确同步,gogo(本机),2026-08-29,2026-08-29(本次会话),有效,publish_production v21.11.0 生产发布，用户经执行合同闸门确认词「执行」，多工具全局同步授权,执行
+AUTH-014,gogojajadeMac-mini,dev-git-hub 独立 git 基建项目,目录,/Volumes/BR256G/dev-git-hub,创建/读写,gogo(本机),2026-08-30,2027-12-31,有效,用户采纳方案A：独立项目承载 git 基建（LAN中枢+Windows副本+WAN灾备），与本项目解耦；长期有效,采纳方案A

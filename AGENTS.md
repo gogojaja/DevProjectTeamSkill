@@ -5,6 +5,8 @@
 
 DevProjectTeamSkill：软件研发全生命周期多角色编排技能库（10 个角色包 + 1 个编排器）。本体即技能源码，不是业务应用。AI Agent 在本仓库的职责是**维护技能库本身**（skill 编写/结构/打包/部署），不是执行软件项目业务。
 
+> **独立关联项目（仅登记不内嵌）**：局域网 Git 基建由独立项目 `dev-git-hub`（`/Volumes/BR256G/dev-git-hub`，授权 AUTH-014）承载——Mac 局域网 bare 中枢 + Windows 全量副本 + WAN 灾备，日常 push 走 LAN 减少频繁远端推送；本仓库只登记引用（README/install_mac.sh/install_windows.ps1/sync_policy.md），不内嵌其代码，避免技能库膨胀与硬件配置耦合。详见 `/Volumes/BR256G/dev-git-hub/README.md` 与本仓库 `docs/局域网git服务器方案.md`。
+
 ## 仓库结构
 
 ```
