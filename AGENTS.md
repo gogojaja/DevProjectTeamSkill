@@ -38,6 +38,7 @@ opencode.json         opencode 技能注册
 13. **语言铁律（全程中文）**：所有项目（含本技能库维护）的对话、产出文档、台账、报告、提交说明、面向用户的回复一律使用中文；代码标识符可保留英文，但注释/提交信息/文档/说明文字必须用中文。不主动切换其他语言，除非用户明确要求。细则见 `.trae/skills/references/iron_rules.md` §8。
 14. **产物落盘铁律（禁入系统盘/C 盘）**：所有任务生成的产物（文档/报告/台账/脚本/导出文件/快照/构建物等）必须写入**本项目目录内**，严禁写入系统盘或 C 盘等非项目路径；确需新建目录只能建在项目目录内且经用户确认。与目录访问边界铁律（#7a）同源，项目外路径一律经 `register_auth` 授权。细则见 `.trae/skills/references/iron_rules.md` §9；项目初始化时由 `role-project-init` 的 `write_project_iron_rules` 落地为项目根 `项目铁律.md`。
 15. **执行合同闸门铁律（防擅作主张）**：AI 执行**任何带副作用操作**（不含 Tier1 纯读）前，必须走「六段执行合同」——①理解（复述本轮指令明确操作项）②拆解（目标文件/改什么/不改什么/量级）③清单（输出审批五要素表：操作编号+操作名/目标路径/完整改动内容/风险级/授权+备份）④确认（等用户确认词白名单 `执行/OK/确认/改吧/方案X`，**不接受模糊措辞**，未确认前什么都不做）⑤执行（严格按清单，参数变更须回确认段）⑥复验（给客观证据链，禁"我认为成功"）。工具风险分级：Tier1 只读自由 / Tier2 范围写（项目内+本轮指令提及文件，清单+确认）/ Tier3 高辐射（外部文件写、`~/.config/*`、删除、推送、`solidify`/`publish_production`/`mirror_push` 等，须 清单+参数哈希+备份+授权+确认词+审计台账 6 件套）。审批绑定**参数哈希**（操作名+目标路径+改动内容 SHA 前10位，由 `tools/audit.py --param-hash` 算），参数变更旧哈希作废须重确认。越界识别：红灯（未确认即执行/顺带范围外/参数变不重申请/路径越界）、黄灯（清单要素不全/风险级标低/接受模糊确认词）；**连续 2 次红灯 → 全闸模式**（下一轮所有 Tier2/Tier3 走完整 6 段 + 额外一轮确认，1 次合规后解除）。本合同为铁律 #7（授权→备份→留痕）的**执行前前置强化**，不替代 #7。台账 13 扩展 `确认词`+`参数哈希` 列、14 扩展 `确认词` 列，由 `tools/audit.py` 写入。单一事实来源：`docs/AI助手行为门禁与授权合同.md`。
+16. **同质操作熔断与不胜任检测铁律（防碎片提交循环）**：当某工具/客户端（如 TRAE）反复执行**同质化无实质新进展操作**（固化/提交/审计留痕/交接断点刷新/推送重试等 1~2 文件的小改动完整闭环）时——①**L1 提交批量化**：同质小改动（审计/断点/台账/文档 1~2 文件）应合并到相关功能提交，禁止碎片化单独立提交（`tools/commit_batch_check.py` 检查，`--gate` 强制硬阻断）。②**L2 固化频次提示**：1 小时内固化/审计操作 >3 次且均为同质 → 提示攒批（`commit_batch_check.py --freq-scan`）。③**L3 不胜任判定**：同质操作密度 ≥阈值（缺省 5 次/会话，`tools/incompetence_detector.py --threshold N` 可调）**且无实质新进展**时——判定当前工具/模型**不胜任**；有实质新进展（评审/方案/落地/复盘等）则视为胜任不误伤。④**L4 交接熔断**：触发 L3 且确认多次重复 → **立即明确停止当前工作**（不再固化/提交/重试）→ **开始交接**（写 `交接文档.md` 断点 + 13 审计留痕）→ **推荐替代工具/模型**（按 `references/dev_platform_catalog.md` 平台矩阵给候选：本地 CLI 换 opencode/claude-code、同平台换 WorkBuddy/Cursor、机械操作用低价档/复杂任务用强档）。判定依据对齐 DORA VSM（等待时间/瓶颈为隐藏低效指标）+ GitHub PR（相关变更聚合提交标准）+ 反信号（区分「高频有效」vs「同质无进展」）。违规表现：碎片提交循环反复发生、固化连刷断点、推送失败不停重试。细则见 `docs/工具不胜任熔断方案.md`。
 
 ## 命令
 
@@ -88,6 +89,8 @@ python tools/mpv_cli.py --target <对象> --perspectives architect,security --re
 python tools/retro_cli.py --stage <阶段> --object <对象> --good "" --improve "" --action "<行动项>;owner:x;deadline:yyyy-mm-dd"  # 复盘收割工具化（ADR-2026-08-29-001 B）：写 22_阶段复盘 + 提取行动项(owner/deadline) + --write-lessons 登记经验库；写库前强制脱敏扫描
 python tools/check_retro_closure.py     # 复盘行动项回环（ADR-2026-08-29-001 B companion）：列出未关闭行动项；--mark-closed "<关键词>" 标记已关闭；Atlassian 复盘闭环标准
 python tools/improve_cli.py --diagnose <目标>  # self-improve 独立工具形态（ADR-2026-08-29-001 D）：偏差侦测清单 / --propose 登记提案台账 33 / --experiment 回填验证状态
+python tools/commit_batch_check.py       # 同质操作熔断 L1/L2（铁律#16）：提交批量化检查（--gate 硬阻断）+ 1 小时固化频次提示（--freq-scan）；防碎片提交循环
+python tools/incompetence_detector.py --threshold N   # 同质操作熔断 L3/L4（铁律#16）：同质操作密度 ≥阈值(缺省5)且无实质新进展 → 判定不胜任 → 立即停止+交接+推荐替代工具/模型；--json 结构化输出 / --recommend 推荐替代；对齐 DORA VSM + GitHub PR 聚合提交标准
 python tools/scope_tracker.py init      # 范围跟踪初始化：建扩展 RTM（含 PRIORITY/SCOPE_STATUS/BASELINE_VER 等）+ 06/07 范围台账（含表头与示例）
 python tools/scope_tracker.py metrics [--write]   # 范围覆盖度指标 + 健康分（--write 写 07_范围跟踪台账 快照）
 python tools/scope_tracker.py gate [--max-violations 0]  # 范围门禁：一致性+蔓延/缩水检测+健康分，写 07，结论 exit(驳回/警告/通过)

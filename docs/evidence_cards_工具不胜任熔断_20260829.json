@@ -1,0 +1,82 @@
+[
+  {
+    "id": "EV-109",
+    "claim": "2026-08-29 当天 17 次提交中 10 条为同质化操作（固化/审计/交接断点刷新），多条仅提交 1~2 个小文件（如审计留痕各 1 文件、交接状态刷新 1 文件）；同质操作反复经历「固化→提交→双推→网络重试」，形成高频率低价值提交循环",
+    "source": "git log --since=2026-08-29 + 台账/32_镜像同步记录.csv",
+    "tier": "T1",
+    "cross_check": 1,
+    "access_date": "2026-08-29",
+    "timeliness": "stable",
+    "confidence": "high"
+  },
+  {
+    "id": "EV-110",
+    "claim": "根因链：①每次少量改动即触发固化+提交+双推完整闭环（AGENTS.md #5 无批量阈值）②solidify 每次固化刷新交接断点又产生提交（递归）③双推失败重试占用大量往返（今日 32 台账多次失败重试）④TRAE 客户端机械执行任务完成即固化提交，未合并小改动批次",
+    "source": "复盘 5-Why 分析（本会话 Observe/Orient）",
+    "tier": "T1",
+    "cross_check": 1,
+    "access_date": "2026-08-29",
+    "timeliness": "stable",
+    "confidence": "high"
+  },
+  {
+    "id": "EV-111",
+    "claim": "本项目已具备防不胜任基础设施：镜像同步熔断（凭据失败置阻断/网络失败置冷却）、审计四维定位（13 台账）、执行合同闸门（铁律#15）、反信号机制（ADR 反信号）。但缺少「同质操作频率熔断」——即小改动碎片提交检测与工具不胜任判定",
+    "source": "AGENTS.md 熔断器 + tools/mirror_push.py + 铁律#15",
+    "tier": "T1",
+    "cross_check": 1,
+    "access_date": "2026-08-29",
+    "timeliness": "stable",
+    "confidence": "high"
+  },
+  {
+    "id": "EV-112",
+    "claim": "DORA Value Stream Mapping：量化瓶颈/wait time、识别 friction point、先定义 outcome 再行动、避免『endless effort with minimal results』（无休止低效迭代）与分析瘫痪；强调端到端流程看整体而非碎片局部优化；等待时间（wait time）是隐藏低效的指标",
+    "source": "https://dora.dev/guides/value-stream-management/",
+    "tier": "T1",
+    "cross_check": 1,
+    "access_date": "2026-08-29",
+    "timeliness": "stable",
+    "confidence": "high"
+  },
+  {
+    "id": "EV-113",
+    "claim": "GitHub PR（官方）：PR 将相关变更聚合为单一可评审单元——相关变更合并提交是协作标准；碎片提交（1 文件/次）与『ready for review』时机由提交聚合决定；避免为每个微变更单独提交",
+    "source": "https://docs.github.com/en/pull-requests/.../about-pull-requests",
+    "tier": "T1",
+    "cross_check": 1,
+    "access_date": "2026-08-29",
+    "timeliness": "stable",
+    "confidence": "high"
+  },
+  {
+    "id": "EV-114",
+    "claim": "工具/客户端不胜任检测的行业共识：当代理反复执行同一低效操作（提交碎片/固化循环/推送重试）时，应识别『卡循环』信号并停止——用延迟/等待时间（wait time）与操作频率（同质操作密度）作为领先指标，超出阈值即触发熔断/交接，而非继续无休止重试",
+    "source": "DORA VSM wait time 指标（EV-112 延伸）+ 熔断器模式（mirror_push 已有先例）",
+    "tier": "T2",
+    "cross_check": 1,
+    "access_date": "2026-08-29",
+    "timeliness": "stable",
+    "confidence": "medium"
+  },
+  {
+    "id": "EV-115",
+    "claim": "反信号（防形式化）：DORA『不为度量而度量』——熔断阈值若设置过严会误伤正常高频发布；项目已有自动发布/自动化场景（post-commit 自动部署），频率熔断应对『同质化无进展操作』而非『高频有效操作』区分对待",
+    "source": "https://dora.dev/guides/dora-metrics-four-keys/（EV-108 同源）",
+    "tier": "T1",
+    "cross_check": 1,
+    "access_date": "2026-08-29",
+    "timeliness": "stable",
+    "confidence": "medium"
+  },
+  {
+    "id": "EV-116",
+    "claim": "交接即知识保留（KTE）：检测到不胜任/卡循环时，应立即停止当前工作、开始交接（写入 交接文档.md 断点 + 13 台账 + 推荐替代工具/模型），而非继续低效重试；本项目已具备交接文档三层结构（L1/L2/L3）可作为交叉会话交接载体",
+    "source": "交接文档.md（L1/L2/L3 结构）+ 铁律（固化/交接体系）",
+    "tier": "T1",
+    "cross_check": 1,
+    "access_date": "2026-08-29",
+    "timeliness": "stable",
+    "confidence": "high"
+  }
+]

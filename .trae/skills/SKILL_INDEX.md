@@ -45,6 +45,7 @@
 13. **CMDB 工具**：多项目共享服务器资源管理工具，参考 `tools/cmdb/README.md`（注册/查询/释放/冲突检测；SQLite 数据库；审计日志；CSV 导出）。
 
 13a. **评审/复盘工具族（2026-08-29，ADR-2026-08-29-001）**：评审与复盘能力工具化封装（方法论单源在子技能，工具负责执行/落盘/校验）：`tools/mpv_cli.py`（评审落盘 CSV + 脱敏 + 对接 check_review_artifacts 门禁，--dry-run/--validate）、`tools/retro_cli.py`（复盘收割写 22_阶段复盘 + 行动项 owner/deadline + --write-lessons 登记经验库，写库前强制脱敏）、`tools/check_retro_closure.py`（复盘行动项回环：未关闭列出 + --mark-closed 关闭，对齐 Atlassian 复盘闭环）、`tools/improve_cli.py`（self-improve 独立形态：--diagnose 偏差清单 / --propose 提案台账 33 / --experiment 回填验证状态）。
+13b. **同质操作熔断工具族（2026-08-29，ADR-2026-08-29-002 / 铁律#16）**：防 TRAE 等客户端反复提交同质化文件（碎片提交/固化循环/推送重试）——`tools/commit_batch_check.py`（L1 提交批量化：--gate 硬阻断碎片提交；L2 固化频次：--freq-scan 提示攒批）、`tools/incompetence_detector.py`（L3 不胜任检测：同质操作密度 ≥阈值且无实质进展 → 判定不胜任；L4 交接熔断：立即停止 + 交接文档断点 + 13 审计 + 推荐替代工具/模型，--json/--recommend/--threshold 可调；对齐 DORA VSM 等待时间 + GitHub PR 聚合提交 + 反信号防误伤）。
 14. **文档脱敏工具（v1.2.0）**：通用文档脱敏小工具，参考 `tools/desensitize/README.md` 与 `tools/desensitize/DESENSITIZE_DICTIONARY.md`（A/B/C 三级敏感信息扫描与替换；扫描模式/脱敏模式；自定义规则 JSON；**脱敏字典 CSV `--dictionary` 关键字集**；CSV 报告；跨平台 Python 实现）。**v1.2.0 新增 Office 文档深度脱敏 `tools/desensitize/office_desensitize.py`**：docx 跨 run 段落级替换 / xlsx sharedStrings 替换 / OLE2 .doc·xls 等长字节替换 / zip 归档内嵌文档递归（伪 docx 按文件头识别）/ `--strip-images` 图片删除 / 文件名目录名脱敏（删子串+去前导非中文）/ 备份+执行记录+残余校验闭环；零第三方依赖；回归测试 `tools/tests/test_office_desensitize.py`。
 
 15. **启动治理（v21.5.9）**：启动阶段须完成组织架构与责任分配（`define_org_structure`，`27_组织架构.csv` RACI 矩阵）与问题解决与升级机制（`define_issue_escalation`，`12_风险问题台账.csv` 升级字段 P1~P4 分级 + 四级升级阶梯 + 单一 Owner）；`check_ready` 硬门禁（未明确不得 Go），详见 `role-project-init/SKILL.md`。
@@ -58,5 +59,5 @@
 ---
 
 **文档版本**：v21.10.2
-**最后更新**：2026-08-29（条目13a 评审/复盘工具族：mpv_cli/retro_cli/check_retro_closure/improve_cli 四工具，ADR-2026-08-29-001；条目12a 最佳实践方案 v1.2.1 评审产物落盘门禁；此前：条目14 文档脱敏工具 v1.2.0 Office 深度脱敏）
+**最后更新**：2026-08-29（条目13b 同质操作熔断工具族：commit_batch_check + incompetence_detector，铁律#16 / ADR-2026-08-29-002；条目13a 评审/复盘工具族：mpv_cli/retro_cli/check_retro_closure/improve_cli 四工具，ADR-2026-08-29-001；条目12a 最佳实践方案 v1.2.1 评审产物落盘门禁；此前：条目14 文档脱敏工具 v1.2.0 Office 深度脱敏）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

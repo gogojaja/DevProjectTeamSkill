@@ -1,0 +1,9 @@
+perspective,check_id,check_name,status,severity,evidence,confidence
+architect,ARCH-201,同质操作频率熔断机制合理性,CHANGES_REQUESTED,medium,EV-112 DORA VSM瓶颈/等待时间指标; 碎片提交需聚合,high
+architect,ARCH-202,不胜任检测与卡循环停止判定,CHANGES_REQUESTED,medium,EV-114 卡循环信号; wait time领先指标,high
+architect,ARCH-203,熔断与现有机制衔接（镜像熔断/审计四维/执行合同）,PASS,medium,EV-111 已有基础设施衔接,high
+security,SEC-201,熔断触发后的交接数据保护,CHANGES_REQUESTED,medium,EV-116 交接含敏感数据须分级脱敏,high
+security,SEC-202,防误熔断（高频有效操作 vs 同质无进展区分）,CHANGES_REQUESTED,medium,EV-115 不为度量而度量反信号,medium
+cost-evolution,COST-201,方案投入成本（脚本+技能+铁律修订）,PASS,high,复用现有工具族（retro_cli等）低成本,high
+cost-evolution,COST-202,熔断阈值参数化与可调性,CHANGES_REQUESTED,medium,EV-115 阈值需可调避免误伤,medium
+cost-evolution,COST-203,推荐替代工具/模型的可行性,CHANGES_REQUESTED,medium,EV-116 交接推荐需有依据,medium
