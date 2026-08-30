@@ -29,6 +29,9 @@ WHITELIST_DIRS = {
     '.codebuddy',  # IDE 项目数据目录（含计划/会话状态），非临时缓存，禁止删除
     '.workbuddy',  # WorkBuddy 本地会话/记忆数据目录（已 gitignore，保留本地磁盘，不入库）
     '.idea',       # JetBrains IDE 本地配置（已 gitignore，保留本地磁盘，不入库）
+    '.venv',       # Python 虚拟环境（已 gitignore，保留本地磁盘，不入库）
+    '.qoder',      # 工具本地配置目录（已 gitignore，保留本地磁盘，不入库）
+    'references',  # 项目级引用文档（project-registry 等，非技能库 references）
 }
 # 根目录白名单（文件）
 WHITELIST_FILES = {
