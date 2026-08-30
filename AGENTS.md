@@ -46,6 +46,19 @@ opencode.json         opencode 技能注册
 
 > **跨平台约定**：所有脚本均提供 `.sh`（macOS/Linux）+ `.py`（跨平台通用，Windows 主推）双实现，功能一致；Windows 额外提供 `.ps1` 原生封装。优先使用对应平台的脚本。
 
+### 迁移初始化（新机器首次执行）
+
+> 新机器 clone 本仓库后，运行以下脚本完成一键初始化（钩子安装 + dev-git-hub 定位 + remotes 配置 + 凭据引导 + 代理链路验证）：
+
+```sh
+bash scripts/bootstrap_remotes.sh       # macOS/Linux
+python scripts/bootstrap_remotes.py     # 跨平台/Windows 主推
+```
+
+- **dev-git-hub 定位优先级**：`DEV_GIT_HUB_ROOT` 环境变量 > 同级目录 `<repo>/../dev-git-hub` > `.hub_root` 配置文件
+- 本仓库**不内嵌推送工具实现**（单一信源在 dev-git-hub），经 `tools/_hub_proxy.py` 动态解析路径 + `tools/*.py` 薄封装代理转发
+- **本地提交完全独立**（不依赖 dev-git-hub），仅远端推送需 dev-git-hub 工具；脱离 dev-git-hub 时用原生 `git push` 兜底
+
 ### 固化与部署
 
 **macOS / Linux（bash）：**

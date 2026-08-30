@@ -30,6 +30,7 @@ SkillEvolutionSkill/
 
 # ===== è´¦å·/å¯†é’¥å®‰å…¨éš”ç¦»ï¼ˆR5ï¼šä¸å…¥åº“ï¼Œé˜²è¯¯æäº¤ï¼‰=====
 .secrets/
+.hub_root
 secrets/
 secrets-example/
 !security/secrets-example/
