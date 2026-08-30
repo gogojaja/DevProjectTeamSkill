@@ -204,6 +204,22 @@ else
   done
   [[ -f "$SKILLS_DIR/SKILL_INDEX.md" ]] && cp "$SKILLS_DIR/SKILL_INDEX.md" "$SNAP_DIR/SKILL_INDEX.md"
   echo "   ✓ ${SKILL_COUNT} 角色包 + references + SKILL_INDEX 快照已生成"
+
+# ---- 3a. 生成 MCP 版本清单（publish_production --dry-run）----
+echo ""
+echo "[3a/6] 生成 MCP 版本清单 → ${SNAP_DIR}/mcp_version_manifest.json"
+if python3 "$ROOT/tools/publish_production.py" --dry-run 2>/dev/null; then
+  # publish_production.py --dry-run 会在当前目录生成 v<版本>/mcp_version_manifest.json
+  MCP_DIR="v${MAIN_VER}"
+  if [[ -f "$MCP_DIR/mcp_version_manifest.json" ]]; then
+    cp "$MCP_DIR/mcp_version_manifest.json" "$SNAP_DIR/mcp_version_manifest.json"
+    echo "   ✓ MCP 版本清单已写入快照目录"
+  else
+    echo "   ⚠ MCP 版本清单未生成（publish_production.py --dry-run 未输出），跳过"
+  fi
+else
+  echo "   ⚠ publish_production.py --dry-run 执行失败，跳过 MCP 清单生成"
+fi
 fi
 
 # ---- 4. 打包 ----
