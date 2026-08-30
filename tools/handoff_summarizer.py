@@ -25,7 +25,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-ROOT = Path(__file__).parent.parent
+ROOT = Path(os.environ.get("PROJECT_ROOT", str(Path(__file__).parent.parent)))
 HANDOFF_DOC = ROOT / "交接文档.md"
 SOLIDIFY_STATE = ROOT / ".solidify_state.json"  # 固化时的临时上下文
 

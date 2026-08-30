@@ -16,7 +16,7 @@ import os
 from pathlib import Path
 
 # 本仓库根目录（动态计算，不硬编码）
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path(os.environ.get("PROJECT_ROOT", str(Path(__file__).resolve().parent.parent)))
 
 
 def find_hub_root():

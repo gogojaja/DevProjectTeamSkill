@@ -35,7 +35,7 @@ import re
 import socket
 import uuid
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.environ.get("PROJECT_ROOT", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 P13 = os.path.join(ROOT, "台账", "13_安全审计台账.csv")
 P14 = os.path.join(ROOT, "台账", "14_授权登记.csv")
 TZ = datetime.timezone(datetime.timedelta(hours=8))

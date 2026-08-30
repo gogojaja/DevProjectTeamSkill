@@ -2,7 +2,7 @@
 import os, sys, re, zipfile, shutil, glob
 sys.stdout.reconfigure(encoding='utf-8')
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.environ.get("PROJECT_ROOT", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SKILLS_DIR = os.environ.get('SKILLS_DIR', os.path.join(ROOT, '.trae', 'skills'))
 DIST = os.path.join(ROOT, 'dist')
 HANDOFF = os.path.join(ROOT, '交接文档.md')

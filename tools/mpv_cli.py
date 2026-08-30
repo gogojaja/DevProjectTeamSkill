@@ -41,7 +41,7 @@ try:
 except Exception:
     pass
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(os.environ.get("PROJECT_ROOT", str(Path(__file__).resolve().parent.parent)))
 DESENSITIZE = ROOT / "tools" / "desensitize" / "desensitize.py"
 GATE = ROOT / "tools" / "check_review_artifacts.py"
 

@@ -22,7 +22,7 @@ import re
 import datetime
 import argparse
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.environ.get("PROJECT_ROOT", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 BUS = os.path.join(ROOT, "台账", "35_任务消息总线.csv")
 ROLES = {"architect", "developer", "tester", "security", "governance", "pm"}
 SEQ = 0

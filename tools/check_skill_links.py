@@ -30,7 +30,9 @@ import os
 import re
 import sys
 
-ROOT = os.path.join('.trae', 'skills')
+_THIS = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+REPO_ROOT = os.environ.get("PROJECT_ROOT", _THIS)
+ROOT = os.path.join(REPO_ROOT, '.trae', 'skills')
 
 
 def norm(path):

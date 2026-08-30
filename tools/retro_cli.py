@@ -37,7 +37,7 @@ try:
 except Exception:
     pass
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(os.environ.get("PROJECT_ROOT", str(Path(__file__).resolve().parent.parent)))
 LEDGER22 = ROOT / "台账" / "22_阶段复盘.csv"
 LESSON01 = ROOT / ".trae" / "skills" / "shared" / "evolution" / "skill-lessons-learned" / "01_角色层经验.csv"
 DESENSITIZE = ROOT / "tools" / "desensitize" / "desensitize.py"

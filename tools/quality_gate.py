@@ -17,7 +17,7 @@ import datetime
 import argparse
 import subprocess
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.environ.get("PROJECT_ROOT", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 TOOLS = os.path.join(ROOT, "tools")
 GATE = os.path.join(ROOT, "台账", "36_质量门记录.csv")
 BOM = b"\xef\xbb\xbf"

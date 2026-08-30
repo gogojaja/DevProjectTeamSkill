@@ -20,7 +20,7 @@ import csv
 import datetime
 import argparse
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.environ.get("PROJECT_ROOT", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 STORE = os.path.join(ROOT, "台账", "38_项目记忆.jsonl")
 CSV_OUT = os.path.join(ROOT, "台账", "38_项目记忆.csv")
 VALID = {"decision", "todo", "context", "risk", "note"}

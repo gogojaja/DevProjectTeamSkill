@@ -35,7 +35,7 @@ try:
 except Exception:
     pass
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(os.environ.get("PROJECT_ROOT", str(Path(__file__).resolve().parent.parent)))
 
 # 提案台账自动定位：shared/evolution 或 台账
 PROPOSAL_TARGETS = [

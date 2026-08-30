@@ -16,7 +16,7 @@ DevProjectTeamSkill：软件研发全生命周期多角色编排技能库（10 �
   shared/             单源共享库：governance/evolution/authoring + references 副本
   dev-project-team-skill/   编排器（薄壳）
   role-*/             SKILL.md(根) + domain/ 流程 + *__resources/ 明细
-tools/                打包/部署/固化脚本（.sh + .py 双实现）
+tools/                打包/部署/固化脚本（.sh + .py 双实现）；全部工具支持 PROJECT_ROOT 环境变量注入，可被其他项目直接调用（见 references/tool_calling_standard.md）
 交接文档.md            跨会话断点，改动后必须刷新
 opencode.json         opencode 技能注册
 ```
@@ -58,6 +58,14 @@ python scripts/bootstrap_remotes.py     # 跨平台/Windows 主推
 - **dev-git-hub 定位优先级**：`DEV_GIT_HUB_ROOT` 环境变量 > 同级目录 `<repo>/../dev-git-hub` > `.hub_root` 配置文件
 - 本仓库**不内嵌推送工具实现**（单一信源在 dev-git-hub），经 `tools/_hub_proxy.py` 动态解析路径 + `tools/*.py` 薄封装代理转发
 - **本地提交完全独立**（不依赖 dev-git-hub），仅远端推送需 dev-git-hub 工具；脱离 dev-git-hub 时用原生 `git push` 兜底
+
+### 工具外部调用规范（2026-08-31 起）
+
+> 全部 `tools/*.py` 工具均支持 `PROJECT_ROOT` 环境变量注入，可被其他项目直接调用。规范见 `references/tool_calling_standard.md`。
+
+- **ROOT 解析铁律**：`os.environ.get("PROJECT_ROOT", __file__兜底)` — 禁止硬编码绝对路径、禁止 CWD 独占
+- **外部调用方式**：`PROJECT_ROOT=/path/to/target python3 /path/to/DevProjectTeamSkill/tools/<name>.py`
+- **今后新工具**：开发时必须遵循 `tool_calling_standard.md`（CLI 入口 + `--help` + PROJECT_ROOT 注入 + 无副作用模式）
 
 ### 固化与部署
 

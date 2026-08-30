@@ -23,7 +23,7 @@ import csv
 import datetime
 import subprocess
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.environ.get("PROJECT_ROOT", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 TOOLS = os.path.join(ROOT, "tools")
 LEDGER = os.path.join(ROOT, "台账", "34_控制环执行记录.csv")
 SYNC_LEDGER = os.path.join(ROOT, "台账", "32_镜像同步记录.csv")

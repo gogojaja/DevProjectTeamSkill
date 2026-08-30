@@ -25,7 +25,7 @@ try:
 except Exception:
     pass
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.environ.get("PROJECT_ROOT", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 EXCLUDE_DIRS = {'.git', 'dist', 'skills_backup', 'node_modules', '__pycache__',
                '.github', '.claude', '.agents', 'build', '.venv', 'venv', 'skills_backup_v21.6.0'}

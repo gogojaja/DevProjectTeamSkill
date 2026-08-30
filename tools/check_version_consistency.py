@@ -12,7 +12,7 @@ import os, sys, re
 
 sys.stdout.reconfigure(encoding='utf-8')
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.environ.get("PROJECT_ROOT", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SKILLS_DIR = os.environ.get('SKILLS_DIR', os.path.join(ROOT, '.trae', 'skills'))
 ALL_ROLES = ['dev-project-team-skill','role-project-init','role-requirements-analysis',
               'role-architecture','role-development','role-testing','role-deployment','role-governance',

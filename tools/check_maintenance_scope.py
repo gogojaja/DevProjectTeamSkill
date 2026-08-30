@@ -14,7 +14,7 @@ import os
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(os.environ.get("PROJECT_ROOT", str(Path(__file__).resolve().parent.parent)))
 SKILLS_DIR = ROOT / ".trae" / "skills"
 
 ALLOWED_SCOPE_PREFIXES = {

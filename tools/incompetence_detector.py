@@ -44,7 +44,7 @@ try:
 except Exception:
     pass
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.environ.get("PROJECT_ROOT", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 LEDGER13 = os.path.join(ROOT, "台账", "13_安全审计台账.csv")
 LEDGER32 = os.path.join(ROOT, "台账", "32_镜像同步记录.csv")
 CATALOG = os.path.join(ROOT, ".trae", "skills", "references", "dev_platform_catalog.md")

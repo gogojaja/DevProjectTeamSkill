@@ -32,7 +32,7 @@ try:
 except Exception:
     pass
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(os.environ.get("PROJECT_ROOT", str(Path(__file__).resolve().parent.parent)))
 LEDGER22 = ROOT / "台账" / "22_阶段复盘.csv"
 CLOSED_MARK = "[已关闭]"
 

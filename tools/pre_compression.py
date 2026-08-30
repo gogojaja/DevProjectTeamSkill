@@ -17,7 +17,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-ROOT = Path(__file__).parent.parent
+ROOT = Path(os.environ.get("PROJECT_ROOT", str(Path(__file__).parent.parent)))
 DESENSITIZE_SCRIPT = ROOT / "tools" / "desensitize" / "desensitize.py"
 DESENSITIZE_DICT = ROOT / "tools" / "desensitize" / "desensitize_dictionary.csv"
 OLLAMA_MODEL = "qwen2.5-coder:7b"  # 复用本地模型做 mean-pooling embedding

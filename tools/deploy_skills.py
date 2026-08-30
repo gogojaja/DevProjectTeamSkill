@@ -2,7 +2,7 @@
 import os, sys, shutil, glob
 sys.stdout.reconfigure(encoding='utf-8')
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.environ.get("PROJECT_ROOT", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SKILLS_DIR = os.environ.get('SKILLS_DIR', os.path.join(ROOT, '.trae', 'skills'))
 # 全局 opencode 技能库：平台自适应（Windows -> %USERPROFILE%/.config/...；macOS/Linux -> ~/.config/...）
 if sys.platform.startswith('win'):

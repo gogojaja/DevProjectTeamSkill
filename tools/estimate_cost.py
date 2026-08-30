@@ -18,7 +18,7 @@ import sys
 import argparse
 from datetime import datetime
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.environ.get("PROJECT_ROOT", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 CATALOG = os.path.join(ROOT, ".trae", "skills", "references", "dev_platform_catalog.md")
 LEDGER = os.path.join(ROOT, "台账", "40_大模型成本台账.csv")
 

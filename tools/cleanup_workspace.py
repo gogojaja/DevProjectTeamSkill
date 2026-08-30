@@ -40,7 +40,10 @@ log = logging.getLogger('cleanup_workspace')
 
 
 def find_repo_root():
-    """解析仓库根目录：优先 git rev-parse，回退向上查找 .git。"""
+    """解析仓库根目录：PROJECT_ROOT 环境变量优先 → git rev-parse → __file__ 回退。"""
+    env_root = os.environ.get("PROJECT_ROOT")
+    if env_root and os.path.isdir(env_root):
+        return os.path.abspath(env_root)
     try:
         out = subprocess.run(['git', 'rev-parse', '--show-toplevel'],
                              capture_output=True, text=True)

@@ -21,7 +21,7 @@ from mcp.server import MCPServer
 
 mcp = MCPServer("dev-project-team-skill")
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path(os.environ.get("PROJECT_ROOT", str(Path(__file__).resolve().parent.parent)))
 TOOLS_DIR = PROJECT_ROOT / "tools"
 SKILLS_DIR = PROJECT_ROOT / ".trae" / "skills"
 

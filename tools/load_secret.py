@@ -20,7 +20,7 @@ import io
 import platform
 import subprocess
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.environ.get("PROJECT_ROOT", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SECRET_DIR = os.path.join(ROOT, ".secrets")
 
 

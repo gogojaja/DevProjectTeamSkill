@@ -40,7 +40,7 @@ try:
 except Exception:
     pass
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.environ.get("PROJECT_ROOT", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # 同质小改动特征：审计留痕/断点刷新/README/台账微调/配置微调
 HOMOGENEOUS_RE = re.compile(r"(^|/)(13_|14_|26_|32_|文档|.*\.csv|.*\.json|.*\.yaml)")

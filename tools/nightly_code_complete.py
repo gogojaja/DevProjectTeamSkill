@@ -41,7 +41,7 @@ import datetime
 import subprocess
 import tempfile
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.environ.get("PROJECT_ROOT", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 TOOLS = os.path.join(ROOT, "tools")
 DEFAULT_SCOPES = [os.path.join(ROOT, "tools")]          # 铁律#1：默认只扫 tools/
 AUDIT = os.path.join(ROOT, "台账", "nightly_code_complete_audit.csv")

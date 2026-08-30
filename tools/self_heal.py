@@ -21,7 +21,7 @@ import shutil
 import datetime
 import subprocess
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.environ.get("PROJECT_ROOT", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 BACKUP = os.path.join(ROOT, ".backup")
 REMOTES = ["origin", "mirror"]
 

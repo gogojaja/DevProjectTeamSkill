@@ -30,7 +30,7 @@ import os, sys, re, shutil, glob, subprocess, tempfile, json
 from datetime import datetime, timezone
 sys.stdout.reconfigure(encoding="utf-8")
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.environ.get("PROJECT_ROOT", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SKILLS_DIR = os.environ.get("SKILLS_DIR", os.path.join(ROOT, ".trae", "skills"))
 
 if sys.platform.startswith("win"):

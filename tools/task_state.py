@@ -8,7 +8,7 @@ import json
 import os
 import datetime
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.environ.get("PROJECT_ROOT", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 STATE_FILE = os.path.join(ROOT, 'tools', 'task_state.json')
 
 DEFAULT_STATE = {
