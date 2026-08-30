@@ -5,7 +5,7 @@
 
 DevProjectTeamSkill：软件研发全生命周期多角色编排技能库（10 个角色包 + 1 个编排器）。本体即技能源码，不是业务应用。AI Agent 在本仓库的职责是**维护技能库本身**（skill 编写/结构/打包/部署），不是执行软件项目业务。
 
-> **独立关联项目（仅登记不内嵌）**：局域网 Git 基建由独立项目 `dev-git-hub`（`/Volumes/BR256G/dev-git-hub`，授权 AUTH-014）承载——Mac 局域网 bare 中枢 + Windows 全量副本 + WAN 灾备，日常 push 走 LAN 减少频繁远端推送；本仓库只登记引用（README/install_mac.sh/install_windows.ps1/sync_policy.md），不内嵌其代码，避免技能库膨胀与硬件配置耦合。详见 `/Volumes/BR256G/dev-git-hub/README.md` 与本仓库 `docs/局域网git服务器方案.md`。
+> **独立关联项目（仅登记不内嵌，单一信源）**：局域网 Git 基建由**独立项目 `dev-git-hub` 为单一信源**（`/Volumes/BR256G/dev-git-hub`，授权 AUTH-014）承载——Mac 局域网 bare 中枢 + Windows 全量副本 + WAN 灾备 + git 复杂远端操作工具（mirror_push/github_push/github_ip_refresh/restore_github_push/_gh_ip_probe/github_access 标准）。**所有 git 基建方案/工具/标准以 dev-git-hub 为唯一权威（见其 交接文档.md）**；本仓库**不保留实现**，仅经 **薄封装代理调用**（tools/ 下同名代理注入 PROJECT_ROOT 指向目标仓库）+ 引用登记。接口共享：dev-git-hub 脚本以 `PROJECT_ROOT`/`DPB_ROOT` 环境变量为目标仓库工作根（读其远端/台账），本仓库代理转发时注入。避免技能库膨胀与硬件配置耦合。详见 `/Volumes/BR256G/dev-git-hub/交接文档.md` 与 `/Volumes/BR256G/dev-git-hub/README.md`。
 
 ## 仓库结构
 

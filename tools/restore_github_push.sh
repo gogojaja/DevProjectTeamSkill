@@ -5,4 +5,5 @@ if [ ! -f "$HUB_SCRIPT" ]; then
   echo "[error] dev-git-hub 工具缺失: $HUB_SCRIPT（请先初始化 dev-git-hub 项目）" >&2
   exit 1
 fi
+export PROJECT_ROOT="/Volumes/BR256G/DevProjectTeamSkill"
 exec bash "$HUB_SCRIPT" "$@"
