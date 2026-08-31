@@ -1,0 +1,62 @@
+[
+  {
+    "id": "EV-901",
+    "claim": "APScheduler 是 Python 生态最成熟调度库，支持 cron/interval/date 三种触发器，支持持久化（SQLAlchemy/Redis/MongoDB），支持 async API",
+    "source": "https://pypi.org/project/APScheduler/",
+    "tier": "T1",
+    "cross_check": 2,
+    "access_date": "2026-08-31",
+    "timeliness": "stable",
+    "url_norm": "true",
+    "confidence": "high",
+    "status": "verified"
+  },
+  {
+    "id": "EV-902",
+    "claim": "跨项目任务调度应独立部署——当工具被跨项目复用 + 与本仓库无强耦合 + 独立维护成本低于内嵌 → 独立化",
+    "source": "docs/孵化器模式与git剥离方案.md + dev-git-hub 先例 AUTH-014",
+    "tier": "T2",
+    "cross_check": 1,
+    "access_date": "2026-08-30",
+    "timeliness": "stable",
+    "url_norm": "true",
+    "confidence": "medium",
+    "status": "recalled_only"
+  },
+  {
+    "id": "EV-903",
+    "claim": "本仓库已有 3,477 行完整调度引擎（tools/scheduler/），基于 APScheduler，含任务注册/执行/幂等/重试/告警/状态持久化全套能力，已有 scheduler.db 运行态数据",
+    "source": "本仓库 tools/scheduler/ 目录实测",
+    "tier": "T1",
+    "cross_check": 1,
+    "access_date": "2026-08-31",
+    "timeliness": "stable",
+    "url_norm": "true",
+    "confidence": "high",
+    "status": "verified"
+  },
+  {
+    "id": "EV-904",
+    "claim": "三判据评估（复用率/独立性/维护成本）全命中 → 倾向独立化；dev-git-hub 先例验证可行（剥离成本 1 天）",
+    "source": "docs/孵化器模式与git剥离方案.md 三判据 + dev-git-hub 先例",
+    "tier": "T2",
+    "cross_check": 1,
+    "access_date": "2026-08-30",
+    "timeliness": "stable",
+    "url_norm": "true",
+    "confidence": "medium",
+    "status": "recalled_only"
+  },
+  {
+    "id": "EV-905",
+    "claim": "APScheduler 3.11.3（最新稳定版）支持 async API + SQLite 持久化（本仓库已验证）；4.0.0a6 预览版支持更现代的 API",
+    "source": "https://pypi.org/project/APScheduler/ + 本仓库 scheduler.db 实测",
+    "tier": "T1",
+    "cross_check": 2,
+    "access_date": "2026-08-31",
+    "timeliness": "volatile",
+    "url_norm": "true",
+    "confidence": "high",
+    "status": "verified"
+  }
+]
