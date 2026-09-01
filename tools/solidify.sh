@@ -113,6 +113,15 @@ else
   exit 1
 fi
 
+# ---- 1g. 复盘闭环检查（未关闭行动项提示） ----
+echo ""
+echo "[1g/6] 复盘闭环检查（未关闭行动项提示）"
+if python3 "$ROOT/tools/check_retro_closure.py" 2>&1; then
+  echo "   ✓ 复盘行动项闭环检查通过"
+else
+  echo "   ⚠ 存在未关闭复盘行动项，建议处理后固化（非阻断）"
+fi
+
 # ---- 2. 交接文档断点区强制刷新（缺失则模板创建） ----
 echo ""
 echo "[2/6] 强制刷新交接文档断点区"

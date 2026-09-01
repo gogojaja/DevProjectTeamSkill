@@ -1,3 +1,3 @@
 ﻿提案编号,记录时间,问题标题,根因分析,改进方案,优先级,预期收益,验证状态,操作人员,备注
 P-20260829-01,2026-08-29 07:07:34,评审工具化缺乏CLI封装,方法论完备但执行化靠会话指令,落地mpv_cli.py封装评审落盘链路,P1,评审可被门禁自动调用,pass,gogo,mpv_cli dry-run/落盘/validate 三场景全通过
-P-20260829-02,2026-08-29 07:49:54,复盘行动项回环需人工mark-closed，缺自动校验提示,check_retro_closure仅在固化时可选调用，无pre-commit/固化强提示；22台账历史行动项缺owner/deadline格式,固化Step 1f后追加check_retro_closure提示；无owner/deadline的行动项标不可跟进并提示补,P2,复盘闭环符合Atlassian标准，避免行动项遗漏,待验证,gogo,
+P-20260829-02,2026-08-29 07:49:54,复盘行动项回环需人工mark-closed，缺自动校验提示,check_retro_closure仅在固化时可选调用，无pre-commit/固化强提示；22台账历史行动项缺owner/deadline格式,固化Step 1f后追加check_retro_closure提示；无owner/deadline的行动项标不可跟进并提示补,P2,复盘闭环符合Atlassian标准，避免行动项遗漏,pass,gogo,solidify.sh 1g 步已追加 check_retro_closure 提示（非阻断）

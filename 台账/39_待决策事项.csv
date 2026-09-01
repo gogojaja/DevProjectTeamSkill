@@ -1,5 +1,5 @@
 ﻿decision_id,time,project_alias,category,payload,rationale,status,expires_at,daytime_decision,approver,rollback
-DB-001,2026-08-21 21:44:54,dev-project-team-skill,unit_test_fail,"单测失败(存量 fixture 缺陷 test_dry_run_no_push,非本次改动)",跨模块回归,日间研判 flaky 与否,pending,2026-08-22 09:44,,,
-DB-002,2026-08-21 21:44:54,dev-project-team-skill,desensitize_hit,"脱敏扫描命中(B 级存量,报告已归档)",脱敏疑似项,日间研判,pending,2026-08-22 09:44,,,
-DB-003,2026-08-21 21:48:36,dev-project-team-skill,unit_test_fail,"单测失败(存量 fixture 缺陷,同 DB-001)",跨模块回归,日间研判 flaky 与否,pending,2026-08-22 09:48,,,
-DB-004,2026-08-21 21:48:36,dev-project-team-skill,desensitize_hit,"脱敏扫描命中(仅新增产物,报告 scan_repo_nightly.csv)",脱敏疑似项,日间研判,pending,2026-08-22 09:48,,,
+DB-001,2026-08-21 21:44:54,dev-project-team-skill,unit_test_fail,"单测失败(存量 fixture 缺陷 test_dry_run_no_push,非本次改动)",跨模块回归,日间研判 flaky 与否,closed,2026-08-22 09:44,存量问题已确认非回归,douglas,无
+DB-002,2026-08-21 21:44:54,dev-project-team-skill,desensitize_hit,"脱敏扫描命中(B 级存量,报告已归档)",脱敏疑似项,日间研判,closed,2026-08-22 09:44,B 级存量已确认,douglas,无
+DB-003,2026-08-21 21:48:36,dev-project-team-skill,unit_test_fail,"单测失败(存量 fixture 缺陷,同 DB-001)",跨模块回归,日间研判 flaky 与否,closed,2026-08-22 09:48,存量问题已确认非回归,douglas,无
+DB-004,2026-08-21 21:48:36,dev-project-team-skill,desensitize_hit,"脱敏扫描命中(仅新增产物,报告 scan_repo_nightly.csv)",脱敏疑似项,日间研判,closed,2026-08-22 09:48,新增产物已确认合规,douglas,无
