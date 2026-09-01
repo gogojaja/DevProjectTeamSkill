@@ -12,5 +12,5 @@ DevProjectTeamSkill,Phase3-2 worktree-isolation 环境管理扩展,2026-09-01,20
 DevProjectTeamSkill,Phase3-3 role-deployment 部署工具集扩展,2026-09-01,2026-09-01,0,1.0,否,已完成,douglas,deploy-toolkit.md + v21.1.0,2026-09-01
 DevProjectTeamSkill,Phase3-4 project-memory 知识库扩展,2026-09-01,2026-09-01,0,1.0,否,已完成,douglas,knowledge-base.md + v1.2.0,2026-09-01
 DevProjectTeamSkill,Phase4-1 dev-deploy-tools 独立化评估,2026-12-01,,,0,1.0,否,待启动,douglas,先技能后评估：3 个月后按三判据评估,2026-09-01
-DevProjectTeamSkill,Phase4-2 成本监控和告警,2026-09-15,,,0,1.0,否,待启动,douglas,消费统计+告警阈值,2026-09-01
-DevProjectTeamSkill,Phase4-3 最佳实践文档,2026-09-15,,,0,1.0,否,待启动,douglas,使用指南+案例,2026-09-01
+DevProjectTeamSkill,Phase4-2 成本监控和告警,2026-09-15,2026-09-01,0,1.0,否,已完成,douglas,成本监控脚本 cost_monitor.py + 告警阈值,2026-09-01
+DevProjectTeamSkill,Phase4-3 最佳实践文档,2026-09-15,2026-09-01,0,1.0,否,已完成,douglas,最佳实践 v3.0 使用指南+案例+经验教训,2026-09-01
