@@ -8,6 +8,7 @@ DevProjectTeamSkill：软件研发全生命周期多角色编排技能库（10 �
 > **独立关联项目（仅登记不内嵌，单一信源）**：
 > - 局域网 Git 基建由**独立项目 `dev-git-hub` 为单一信源**（`/Volumes/BR256G/dev-git-hub`，授权 AUTH-014）承载——Mac 局域网 bare 中枢 + Windows 全量副本 + WAN 灾备 + git 复杂远端操作工具（mirror_push/github_push/github_ip_refresh/restore_github_push/_gh_ip_probe/github_access 标准）。**所有 git 基建方案/工具/标准以 dev-git-hub 为唯一权威（见其 交接文档.md）**；本仓库**不保留实现**，仅经 **薄封装代理调用**（tools/ 下同名代理注入 PROJECT_ROOT 指向目标仓库）+ 引用登记。接口共享：dev-git-hub 脚本以 `PROJECT_ROOT`/`DPB_ROOT` 环境变量为目标仓库工作根（读其远端/台账），本仓库代理转发时注入。避免技能库膨胀与硬件配置耦合。详见 `/Volumes/BR256G/dev-git-hub/交接文档.md` 与 `/Volumes/BR256G/dev-git-hub/README.md`。
 > - 定时任务管理由**独立项目 `dev-task-scheduler` 为单一信源**（`/Volumes/BR256G/dev-task-scheduler`，授权 AUTH-015）承载——基于 APScheduler 3.11.3 的跨项目调度引擎（幂等/重试/告警/状态持久化）。**所有调度器方案/工具/标准以 dev-task-scheduler 为唯一权威（见其 README.md）**；本仓库**不保留实现**，仅经 **薄封装代理调用**（tools/scheduler_proxy.py 注入 PROJECT_ROOT 指向目标仓库）+ 引用登记。避免技能库膨胀。详见 `/Volumes/BR256G/dev-task-scheduler/README.md`。
+> - 多模型分层编排由**独立项目 `dev-model-router` 为单一信源**（`/Volumes/BR256G/dev-model-router`，授权 AUTH-016）承载——Router + DAG + Executor 三层架构（复杂度评估/模型选择/DAG 分解/分阶段执行/结果组装）。**所有编排器方案/工具/标准以 dev-model-router 为唯一权威（见其 README.md）**；本仓库**不保留实现**，仅经 **薄封装代理调用**（tools/model_router_proxy.py 注入 PROJECT_ROOT 指向目标仓库）+ 引用登记。避免技能库膨胀。详见 `/Volumes/BR256G/dev-model-router/README.md`。
 
 ## 仓库结构
 
@@ -128,6 +129,11 @@ python tools/mirror_push.py             # 双推：origin(GitHub) 直走真实 I
 python tools/scheduler_proxy.py status  # 调度器状态（经薄封装代理调用 dev-task-scheduler）
 python tools/scheduler_proxy.py list    # 列出任务
 python tools/scheduler_proxy.py run <任务名>  # 手动执行任务
+python tools/model_router_proxy.py assess "任务描述"  # 评估任务复杂度（经薄封装代理调用 dev-model-router）
+python tools/model_router_proxy.py select "任务描述"  # 选择模型
+python tools/model_router_proxy.py decompose "任务描述" --output tasks.json  # 分解任务为 DAG
+python tools/model_router_proxy.py execute tasks.json  # 执行 DAG
+python tools/model_router_proxy.py assemble tasks.json  # 组装结果
 python tools/desensitize/desensitize.py --scan <目标>  # 文档脱敏：扫描模式
 python tools/desensitize/desensitize.py <目标> -o <输出>  # 文档脱敏：按内置规则批量替换
 python tools/desensitize/desensitize.py --dictionary tools/desensitize/desensitize_dictionary.csv <目标> -o <输出>  # 文档脱敏：规则 + 脱敏字典关键字联合脱敏（字典维护见 tools/desensitize/DESENSITIZE_DICTIONARY.md）

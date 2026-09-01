@@ -32,6 +32,7 @@ SkillEvolutionSkill/
 .secrets/
 .hub_root
 .scheduler_root
+.model_router_root
 secrets/
 secrets-example/
 !security/secrets-example/
