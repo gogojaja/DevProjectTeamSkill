@@ -10,7 +10,8 @@
 | 项目名 | 路径 | 授权编号 | 用途 | 维护边界 | 状态 |
 |--------|------|----------|------|----------|------|
 | **dev-git-hub** | `/Volumes/BR256G/dev-git-hub` | `AUTH-014` | 局域网 Git 基建（LAN 中枢 + Windows 副本 + WAN 灾备 + git 复杂远端操作工具） | 仅经薄封装代理调用；本项目不维护其实现；改动只落其仓库 | ✅ 已移交 |
-| **dev-task-scheduler** | `/Volumes/BR256G/dev-task-scheduler`（待创建） | `AUTH-015`（待登记） | 定时任务管理（跨项目调度引擎，基于 APScheduler） | 仅经薄封装代理调用；本项目不维护其实现；改动只落其仓库 | ⚠️ 待移交 |
+| **dev-task-scheduler** | `/Volumes/BR256G/dev-task-scheduler` | `AUTH-015` | 定时任务管理（跨项目调度引擎，基于 APScheduler） | 仅经薄封装代理调用；本项目不维护其实现；改动只落其仓库 | ✅ 已移交 |
+| **dev-model-router** | `/Volumes/BR256G/dev-model-router`（待创建） | `AUTH-016`（待登记） | 多模型分层编排（Router + DAG + Executor，高阶拆解→低阶执行→高阶组装） | 仅经薄封装代理调用；本项目不维护其实现；改动只落其仓库 | ⚠️ 待移交 |
 
 ---
 
@@ -24,4 +25,4 @@
 
 ---
 
-**最后更新**：2026-08-31（新增 dev-task-scheduler 待移交登记）
+**最后更新**：2026-08-31（新增 dev-model-router 待移交登记 + dev-task-scheduler 已移交）

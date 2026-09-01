@@ -1,0 +1,62 @@
+[
+  {
+    "id": "EV-910",
+    "claim": "Model Cascading 是多模型编排核心模式（高阶拆解→低阶执行→高阶组装），Supervisor-Worker 架构已广泛验证",
+    "source": "https://www.emergentmind.com/topics/multi-model-orchestration",
+    "tier": "T1",
+    "cross_check": 2,
+    "access_date": "2026-08-31",
+    "timeliness": "stable",
+    "url_norm": "true",
+    "confidence": "high",
+    "status": "verified"
+  },
+  {
+    "id": "EV-911",
+    "claim": "Task Decomposition DAGs 可将复杂任务映射为有向无环图，提取依赖结构和并行宽度，按依赖并行执行",
+    "source": "Yu (2026) Task Decomposition DAGs",
+    "tier": "T1",
+    "cross_check": 1,
+    "access_date": "2026-08-31",
+    "timeliness": "stable",
+    "url_norm": "true",
+    "confidence": "high",
+    "status": "recalled_only"
+  },
+  {
+    "id": "EV-912",
+    "claim": "Stagewise Model Selection 基于 pass@1/fix@1 或加权性能改进选择每阶段最优模型，支持即插即用配置",
+    "source": "Chen et al. (2025) Beyond Single LLMs: Enhanced Code Generation via Multi-Stage Performance-Guided LLM Orchestration",
+    "tier": "T1",
+    "cross_check": 1,
+    "access_date": "2026-08-31",
+    "timeliness": "stable",
+    "url_norm": "true",
+    "confidence": "high",
+    "status": "recalled_only"
+  },
+  {
+    "id": "EV-913",
+    "claim": "本仓库已有 team-orchestration + best-practice-solution + multi-perspective-validation 三大技能可复用，可扩展为分层调度/DAG节点/并行执行器",
+    "source": "本仓库 .trae/skills/ 目录实测",
+    "tier": "T1",
+    "cross_check": 1,
+    "access_date": "2026-08-31",
+    "timeliness": "stable",
+    "url_norm": "true",
+    "confidence": "high",
+    "status": "verified"
+  },
+  {
+    "id": "EV-914",
+    "claim": "gstack+ 已验证三层模型编排（Tier-A 判断 / Tier-Mid 审查 / Tier-Exec 执行），路由每任务到正确 tier",
+    "source": "https://zhewenzhang.github.io/gstack-plus/",
+    "tier": "T1",
+    "cross_check": 1,
+    "access_date": "2026-08-31",
+    "timeliness": "stable",
+    "url_norm": "true",
+    "confidence": "high",
+    "status": "verified"
+  }
+]
