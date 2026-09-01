@@ -24,6 +24,7 @@ improve_cli.py — self-improve 独立工具形态（ADR-2026-08-29-001 建议 D
 import argparse
 import csv
 import json
+import os
 import re
 import sys
 from datetime import datetime

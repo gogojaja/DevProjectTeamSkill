@@ -678,6 +678,22 @@ DevProjectTeamSkill（总控）
 
 ---
 
+## 12. model-selection（模型选择子技能）
+
+**调用方**：DevProjectTeamSkill §4.1 嵌套能力 / 用户要求模型选择/推荐/定价查询/能力矩阵
+**核心 action**：管理大模型提供商清单与定价，根据任务复杂度推荐最优模型（详见 `dev-project-team-skill/skills/model-selection/SKILL.md`）
+**职责边界**：只负责清单管理与选型建议，不处理路由/聚合/转发（由 free-api-hub 独立项目承载）
+
+| action | 用途 | 典型调用时机 |
+|--------|------|-------------|
+| `list_providers` | 查询大模型提供商清单与定价 | 用户问模型清单/定价 |
+| `recommend_model` | 根据任务类型（S0~S3）推荐最优模型 | 用户问选哪个模型 |
+| `query_capability_matrix` | 查询能力矩阵（模型×场景适配） | 用户问模型对比/能力矩阵 |
+
+**协作**：与 `references/model_selection.md`（定价规则/档位标准）互补——本技能管清单与推荐，标准文档管规则；选型结果可交接 `role-architecture` 正式化 ADR。
+
+---
+
 **文档版本**：v21.1.1
 **最后更新**：2026-08-19（§11 best-practice-solution 升级 v1.2.0：4 问分级 + 路由仲裁 + 三态聚合矩阵 + 预算口径统一（评审6000/外部核验4000）+ 知识优先 web 条件化 + SSRF 统一清单 + confidence 映射表）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
