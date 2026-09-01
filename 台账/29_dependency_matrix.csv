@@ -2,10 +2,10 @@
 DEP-001,DevProjectTeamSkill,dev-git-hub,FS,硬,git 基建（mirror_push/github_push 等工具）,CMDB-014,单向,否,已建立,douglas,中,薄封装代理隔离
 DEP-002,DevProjectTeamSkill,dev-task-scheduler,FS,硬,定时任务调度（nightly_quality_gate 等）,CMDB-015,单向,否,已建立,douglas,中,薄封装代理隔离
 DEP-003,DevProjectTeamSkill,dev-model-router,FS,硬,多模型分层编排（Router/DAG/Executor）,CMDB-016,单向,否,已建立,douglas,中,薄封装代理隔离
-DEP-004,DevProjectTeamSkill,dev-project-mgmt,FS,软,项目管理工具集（RAID/进展报告/EVM）,CMDB-022,单向,否,待建立,douglas,低,方法论在 role-project-mgmt
-DEP-005,DevProjectTeamSkill,dev-security-tools,FS,软,安全审计工具集（脱敏扫描/边界检查）,CMDB-023,单向,否,待建立,douglas,低,现有 audit.py/desensitize 保留本库
-DEP-006,DevProjectTeamSkill,dev-test-tools,FS,软,测试工具集（覆盖率聚合/缺陷台账）,CMDB-024,单向,否,待建立,douglas,低,方法论在 role-testing
-DEP-007,dev-project-mgmt,dev-task-scheduler,FS,软,定时任务调度能力,CMDB-015,单向,否,待建立,douglas,低,经薄封装代理调用
-DEP-008,dev-security-tools,dev-task-scheduler,FS,软,定时审计任务调度,CMDB-015,单向,否,待建立,douglas,低,经薄封装代理调用
-DEP-009,dev-test-tools,dev-task-scheduler,FS,软,定时测试执行调度,CMDB-015,单向,否,待建立,douglas,低,经薄封装代理调用
+DEP-004,DevProjectTeamSkill,dev-project-mgmt,FS,软,项目管理工具集（RAID/进展报告/EVM）,CMDB-022,单向,否,已建立,douglas,低,各项目独立维护
+DEP-005,DevProjectTeamSkill,dev-security-tools,FS,软,安全审计工具集（脱敏扫描/边界检查）,CMDB-023,单向,否,已建立,douglas,低,各项目独立维护
+DEP-006,DevProjectTeamSkill,dev-test-tools,FS,软,测试工具集（覆盖率聚合/缺陷台账）,CMDB-024,单向,否,已建立,douglas,低,各项目独立维护
+DEP-007,dev-project-mgmt,dev-task-scheduler,FS,软,定时任务调度能力,CMDB-015,单向,否,已建立,douglas,低,各项目独立维护
+DEP-008,dev-security-tools,dev-task-scheduler,FS,软,定时审计任务调度,CMDB-015,单向,否,已建立,douglas,低,各项目独立维护
+DEP-009,dev-test-tools,dev-task-scheduler,FS,软,定时测试执行调度,CMDB-015,单向,否,已建立,douglas,低,各项目独立维护
 DEP-010,free-api-hub,DevProjectTeamSkill,FS,软,model-selection 技能（选型建议能力已转）,—,单向,否,已建立,douglas,低,技能化替代

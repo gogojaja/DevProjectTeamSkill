@@ -6,7 +6,7 @@ DevProjectTeamSkill,Phase1-4 验证本地模型调用,2026-09-01,2026-09-01,0,1.
 DevProjectTeamSkill,Phase2-1 dev-project-mgmt 独立,2026-09-01,2026-09-01,0,1.0,否,已完成,douglas,本地骨架已建+立项+授权 AUTH-022,2026-09-01
 DevProjectTeamSkill,Phase2-2 dev-security-tools 独立,2026-09-01,2026-09-01,0,1.0,否,已完成,douglas,本地骨架已建+立项+授权 AUTH-023,2026-09-01
 DevProjectTeamSkill,Phase2-3 dev-test-tools 独立,2026-09-01,2026-09-01,0,1.0,否,已完成,douglas,本地骨架已建+立项+授权 AUTH-024,2026-09-01
-DevProjectTeamSkill,Phase2-4 三项目远端仓库,2026-09-01,,,-1,0.0,否,阻塞,douglas,需用户网页创建或授权 gh repo create,2026-09-01
+DevProjectTeamSkill,Phase2-4 三项目远端仓库,2026-09-01,2026-09-01,0,1.0,否,已完成,douglas,远端仓库已建好，各项目独立维护,2026-09-01
 DevProjectTeamSkill,Phase3-1 role-governance 文档管理扩展,2026-09-01,2026-09-01,0,1.0,否,已完成,douglas,doc-management.md + v21.4.0,2026-09-01
 DevProjectTeamSkill,Phase3-2 worktree-isolation 环境管理扩展,2026-09-01,2026-09-01,0,1.0,否,已完成,douglas,env-management.md + v1.2.0,2026-09-01
 DevProjectTeamSkill,Phase3-3 role-deployment 部署工具集扩展,2026-09-01,2026-09-01,0,1.0,否,已完成,douglas,deploy-toolkit.md + v21.1.0,2026-09-01
