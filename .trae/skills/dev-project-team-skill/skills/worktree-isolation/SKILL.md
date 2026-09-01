@@ -1,11 +1,11 @@
 ---
 name: "worktree-isolation"
-description: "用户提到 worktree 隔离、并行开发环境、多任务隔离、git worktree、PSM、Teleport时加载本 worktree 隔离层技能：基于 git worktree 的并行开发环境管理，支持 issue/PR/feature 多任务隔离，内置会话注册表、tmux 整合、项目别名、GitHub/Jira 提供商。用户说 worktree/并行环境隔离时加载。"
+description: "用户提到 worktree 隔离、并行开发环境、多任务隔离、git worktree、PSM、Teleport、环境管理、端口分配时加载本 worktree 隔离层技能：基于 git worktree 的并行开发环境管理，支持 issue/PR/feature 多任务隔离，内置会话注册表、tmux 整合、项目别名、GitHub/Jira 提供商、环境资源分配与回收。用户说 worktree/并行环境隔离时加载。"
 ---
 
 # Worktree Isolation 工作树隔离层
 
-- **技能版本**：v1.1.0　**发布日期**：2026-08-18
+- **技能版本**：v1.2.0　**发布日期**：2026-09-01
 
 > 版权声明：`../../../references/COPYRIGHT.md`　Token 标准：`../../../references/token_standard.md`　编排器：`../../SKILL.md`
 
@@ -203,6 +203,7 @@ Tmux: psm:omc:pr-123
 | `domain/providers.md` | GitHub/Jira 提供商实现：CLI 调用、引用解析、认证配置 |
 | `domain/session-registry.md` | 会话注册表结构、CRUD、状态机、并发安全 |
 | `domain/worktree-ops.md` | git worktree 底层操作：创建/切换/移除/迁移/清理、错误处理 |
+| `domain/env-management.md` | 环境管理能力（dev-env-manager 技能化）：双套拓扑/端口区间分配/CMDB 独占资产注册/数据隔离/环境生命周期回收 |
 
 ---
 
@@ -261,6 +262,6 @@ Tmux: psm:omc:pr-123
 
 ---
 
-**文档版本**：v1.1.0　**最后更新**：2026-08-18（繁体转简体 + 新增闭环执行系统章节，技能库本体评审修复）
+**文档版本**：v1.2.0　**最后更新**：2026-09-01（新增 `domain/env-management.md` 环境管理能力，dev-env-manager 项目技能化，项目群规划 v3.0 评分 76/100；此前：v1.1.0 繁体转简体 + 新增闭环执行系统章节）
 
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

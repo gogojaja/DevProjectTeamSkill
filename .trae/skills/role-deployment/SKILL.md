@@ -1,6 +1,6 @@
 ---
 name: "role-deployment"
-description: "用户提到投产策略、发布计划、发布准备、部署执行、发布监控、回滚、Go-Live、运维交接时加载本投产发布角色包：负责部署策略与风险分析、发布计划、准备与演练、分阶段发布执行与监控、回滚、Go-Live 评审与运维交接，输出投产方案、部署清单、执行记录与回滚预案。用户说投产/发布/部署/回滚/运维时加载。"
+description: "用户提到投产策略、发布计划、发布准备、部署执行、发布监控、回滚、回滚演练、部署脚本、Go-Live、运维交接时加载本投产发布角色包：负责部署策略与风险分析、发布计划、准备与演练、分阶段发布执行与监控、回滚、Go-Live 评审与运维交接，输出投产方案、部署清单、执行记录与回滚预案。用户说投产/发布/部署/回滚/运维时加载。"
 ---
 
 # role-deployment 投产发布角色包
@@ -9,8 +9,8 @@ description: "用户提到投产策略、发布计划、发布准备、部署执
 
 ## 1. 元数据
 
-- **技能版本**：v21.0.0　**发布日期**：2026-08-04
-- **变更记录**：v21.0.0 由 deployment-management-skill + 4 子技能重组为角色包
+- **技能版本**：v21.1.0　**发布日期**：2026-09-01
+- **变更记录**：v21.1.0 新增部署工具集能力（2026-09-01）——`domain/deploy-toolkit.md` 部署脚本规范/发布前环境检查清单/回滚演练工具化/工具链清单（dev-deploy-tools 项目技能化，项目群规划 v3.0 评分 86/100，先技能后评估：3 个月后按 §5 触发条件评估是否独立）；v21.0.0 由 deployment-management-skill + 4 子技能重组为角色包
 - **参考标准**：ITIL v4 发布管理 · DORA · SRE 三支柱
 
 ## 2. 触发规则
@@ -28,6 +28,7 @@ description: "用户提到投产策略、发布计划、发布准备、部署执
 | 监控回滚 | monitor / rollback | `domain/release.md`（自动/手动回滚 + 数据还原） |
 | Go-Live | go_live_review | `domain/handover.md`（六维门禁） |
 | 交接 | handover_ops | `domain/handover.md`（Runbook/监控/on-call/SLA/发布总结） |
+| 部署工具集 | check_deploy_toolkit / rollback_drill | `domain/deploy-toolkit.md`（部署脚本规范/发布前检查清单/回滚演练工具化；dev-deploy-tools 技能化，先技能后评估） |
 
 ## 4. 发布铁律
 
@@ -94,5 +95,5 @@ description: "用户提到投产策略、发布计划、发布准备、部署执
 
 ---
 
-**文档版本**：v21.0.0　**最后更新**：2026-08-04
+**文档版本**：v21.1.0　**最后更新**：2026-09-01（新增部署工具集能力，dev-deploy-tools 技能化）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

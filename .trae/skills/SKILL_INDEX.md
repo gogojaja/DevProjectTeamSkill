@@ -15,8 +15,8 @@
 | 3 | role-architecture | 架构 | 架构策略 / 架构设计 / 数据安全 / ADR / 架构评审 | role-architecture/ |
 | 4 | role-development | 开发 | 开发策略 / 编码 / 代码走查 / 单元测试 / 联调 / 质量收口 | role-development/ |
 | 5 | role-testing | 测试 | 测试策略 / 测试计划 / 用例设计 / 测试执行 / 缺陷管理 / 测试总结 | role-testing/ |
-| 6 | role-deployment | 投产 | 投产策略 / 投产计划 / Go-Live / 发布执行 / 回滚 / 运维交接 | role-deployment/ |
-| 7 | role-governance | 总控保障 | 台账读写 / 阶段评审 / 门禁 / 基线固化 / 变更审计 / 归档 / 交接 | role-governance/ |
+| 6 | role-deployment | 投产 | 投产策略 / 投产计划 / Go-Live / 发布执行 / 回滚 / 回滚演练 / 部署脚本 / 运维交接 | role-deployment/ |
+| 7 | role-governance | 总控保障 | 台账读写 / 阶段评审 / 门禁 / 基线固化 / 变更审计 / 归档 / 交接 / 文档管理 | role-governance/ |
 | 8 | role-program-mgmt | 项目群/项目集 | 项目群 / 项目集 / 多项目协同 / PMO / 依赖 / 里程碑对齐 / 收益 / IMS | role-program-mgmt/ |
 | 9 | role-mgmt-consulting | 项目管理咨询 | 项目管理咨询 / PMO 咨询 / 成熟度评估 / 差距分析 / 方法论定制 / 变革管理 / 咨询建议书 / PMO 蓝图 / 教练辅导 | role-mgmt-consulting/ |
 | 10 | role-project-mgmt | 项目经理执行层 | 项目管理 / 日常管控 / RAID / 进展报告 / 变更协调 / 经验教训 / 干系人沟通 / 阶段状态跟踪（不涉及具体工程交付） | role-project-mgmt/ |
@@ -58,7 +58,7 @@
 
 ---
 
-**文档版本**：v21.11.0
+**文档版本**：v21.12.0
 **最后更新**：2026-09-01（条目20 模型选择技能 v1.0.0：从 free-api-hub 模型清单管理功能转化，支持 42+ 模型选型建议）
 
 19. **孵化器立项阶段技能（v1.0.0）**：内嵌子技能 `incubator-initiation`——支撑新独立项目/技能/工具的立项评估（方案调研 + 五维可行性分析 + 风险初判），输出立项建议书（可行性矩阵/风险雷达图/ROI 估算）；**只评估不落地**，落地交对应独立项目运营者独立执行；方案来源 `docs/孵化器模式与git剥离方案.md`，协同机制见 `docs/多项目协同与隔离维护机制方案.md`，独立项目登记见 `references/project-registry.md`；触发词 `立项评估`/`方案调研`/`可行性分析`/`孵化器启动`，详见 `dev-project-team-skill/skills/incubator-initiation/SKILL.md`。
