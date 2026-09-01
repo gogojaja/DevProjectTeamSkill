@@ -58,10 +58,12 @@
 
 ---
 
-**文档版本**：v21.10.3
-**最后更新**：2026-08-29（条目13b 同质操作熔断工具族：commit_batch_check + incompetence_detector，铁律#16 / ADR-2026-08-29-002；条目13a 评审/复盘工具族：mpv_cli/retro_cli/check_retro_closure/improve_cli 四工具，ADR-2026-08-29-001；条目12a 最佳实践方案 v1.2.1 评审产物落盘门禁；此前：条目14 文档脱敏工具 v1.2.0 Office 深度脱敏）
+**文档版本**：v21.11.0
+**最后更新**：2026-09-01（条目20 模型选择技能 v1.0.0：从 free-api-hub 模型清单管理功能转化，支持 42+ 模型选型建议）
 
 19. **孵化器立项阶段技能（v1.0.0）**：内嵌子技能 `incubator-initiation`——支撑新独立项目/技能/工具的立项评估（方案调研 + 五维可行性分析 + 风险初判），输出立项建议书（可行性矩阵/风险雷达图/ROI 估算）；**只评估不落地**，落地交对应独立项目运营者独立执行；方案来源 `docs/孵化器模式与git剥离方案.md`，协同机制见 `docs/多项目协同与隔离维护机制方案.md`，独立项目登记见 `references/project-registry.md`；触发词 `立项评估`/`方案调研`/`可行性分析`/`孵化器启动`，详见 `dev-project-team-skill/skills/incubator-initiation/SKILL.md`。
+
+20. **模型选择技能（v1.0.0）**：内嵌子技能 `model-selection`——管理大模型提供商清单（42+模型）、定价、能力矩阵，根据任务类型（S0~S3）推荐最优模型；**只负责清单管理与选型建议**，不处理路由/聚合/转发（由 free-api-hub 独立项目承载）；触发词 `模型选择`/`模型推荐`/`模型清单`/`模型定价`/`模型场景匹配`，详见 `dev-project-team-skill/skills/model-selection/SKILL.md`。
 
 ---
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
