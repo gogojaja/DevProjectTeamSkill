@@ -26,3 +26,6 @@ AUTH-PROD-2026-08-29-v21110,gogojajadeMac-mini-6.local,v21.11.0生产发布多�
 AUTH-014,gogojajadeMac-mini,dev-git-hub 独立 git 基建项目,目录,/Volumes/BR256G/dev-git-hub,创建/读写,gogo(本机),2026-08-30,2027-12-31,有效,用户采纳方案A：独立项目承载 git 基建（LAN中枢+Windows副本+WAN灾备），与本项目解耦；长期有效,采纳方案A
 AUTH-015,gogojajadeMac-mini,dev-task-scheduler 定时任务管理工具,目录,/Volumes/BR256G/dev-task-scheduler,创建/读写,gogo(本机),2026-08-31,2027-12-31,有效,用户采纳方案A：独立项目承载定时任务管理（基于APScheduler），与本项目解耦；孵化器INC-2026-08-31-001立项通过,采纳方案A
 AUTH-016,gogojajadeMac-mini,dev-model-router 多模型分层编排工具,目录,/Volumes/BR256G/dev-model-router,创建/读写,gogo(本机),2026-08-31,2027-12-31,有效,用户采纳方案A：独立项目承载多模型分层编排（Router+DAG+Executor），与本项目解耦；孵化器INC-2026-08-31-002立项通过,采纳方案A
+AUTH-022,gogojajadeMac-mini,dev-project-mgmt 项目管理工具集,目录,/Volumes/BR256G/dev-project-mgmt,创建/读写,gogo(本机),2026-09-01,2027-12-31,有效,Phase 2 项目独立：项目管理工具集（评分94/100），与本项目解耦；孵化器INC-2026-09-01-001立项通过,执行
+AUTH-023,gogojajadeMac-mini,dev-security-tools 安全审计工具集,目录,/Volumes/BR256G/dev-security-tools,创建/读写,gogo(本机),2026-09-01,2027-12-31,有效,Phase 2 项目独立：安全审计工具集（评分96/100），与本项目解耦；孵化器INC-2026-09-01-002立项通过,执行
+AUTH-024,gogojajadeMac-mini,dev-test-tools 测试工具集,目录,/Volumes/BR256G/dev-test-tools,创建/读写,gogo(本机),2026-09-01,2027-12-31,有效,Phase 2 项目独立：测试工具集（评分95/100），与本项目解耦；孵化器INC-2026-09-01-003立项通过,执行
