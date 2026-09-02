@@ -5,6 +5,8 @@
 
 DevProjectTeamSkill：软件研发全生命周期多角色编排技能库（10 个角色包 + 1 个编排器）。本体即技能源码，不是业务应用。AI Agent 在本仓库的职责是**维护技能库本身**（skill 编写/结构/打包/部署），不是执行软件项目业务。
 
+> **孵化器定位（M2，ADR-2026-08-30-001 方向，详见 `docs/孵化器模式与git剥离方案.md`）**：本库同时承担**项目孵化器**职能——产出初始方案/架构决策（ADR 草案）/可行性分析/技能工具定义，**只出方案不代落地**（落地交被孵化项目自身运营者）。孵化生命周期：方案调研→可行性五维→孵化决策→移交清单（模板见 `docs/incubator/移交清单模板.md`）→后续仅登记引用（不内嵌）。新立项评估走子技能 `incubator-initiation`（v1.1.0，四段孵化评估水线）；成熟技能/工具按三判据（复用率/独立性/维护成本）逐项评估独立化，未达判据暂留单源，独立化后调用率下降/无人维护则回收入本库。
+
 > **独立关联项目（仅登记不内嵌，单一信源）**：
 > - 局域网 Git 基建由**独立项目 `dev-git-hub` 为单一信源**（`/Volumes/BR256G/dev-git-hub`，授权 AUTH-014）承载——Mac 局域网 bare 中枢 + Windows 全量副本 + WAN 灾备 + git 复杂远端操作工具（mirror_push/github_push/github_ip_refresh/restore_github_push/_gh_ip_probe/github_access 标准）。**所有 git 基建方案/工具/标准以 dev-git-hub 为唯一权威（见其 交接文档.md）**；本仓库**不保留实现**，仅经 **薄封装代理调用**（tools/ 下同名代理注入 PROJECT_ROOT 指向目标仓库）+ 引用登记。接口共享：dev-git-hub 脚本以 `PROJECT_ROOT`/`DPB_ROOT` 环境变量为目标仓库工作根（读其远端/台账），本仓库代理转发时注入。避免技能库膨胀与硬件配置耦合。详见 `/Volumes/BR256G/dev-git-hub/交接文档.md` 与 `/Volumes/BR256G/dev-git-hub/README.md`。
 > - 定时任务管理由**独立项目 `dev-task-scheduler` 为单一信源**（`/Volumes/BR256G/dev-task-scheduler`，授权 AUTH-015）承载——基于 APScheduler 3.11.3 的跨项目调度引擎（幂等/重试/告警/状态持久化）。**所有调度器方案/工具/标准以 dev-task-scheduler 为唯一权威（见其 README.md）**；本仓库**不保留实现**，仅经 **薄封装代理调用**（tools/scheduler_proxy.py 注入 PROJECT_ROOT 指向目标仓库）+ 引用登记。避免技能库膨胀。详见 `/Volumes/BR256G/dev-task-scheduler/README.md`。

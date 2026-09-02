@@ -5,6 +5,7 @@
 > **档位**：LIGHT（本地证据，复用项目群全量评估报告）
 > **评审模式**：多视角自评（复用全量评估 8 维评分）
 > **评审结果**：🟢 SIGNED_OFF（v3.0 方案已采纳，评分 94/100 强烈推荐独立）
+> **真实外部信号**：①项目已经 Phase 2 脚手架 `dist/scaffold_phase2.py` 实际创建（审计 OP-AUDIT-069，本地路径可验证）；②先例项目 dev-task-scheduler 实际存在运行（`tools/scheduler_proxy.py` 实测可调）；③8 维评分锚点实测存在（`docs/reviews/评审报告_项目群全量评估_含已独立项目_20260901.md`）
 > **技能版本**：incubator-initiation v1.0.0 + best-practice-solution v1.2.1
 
 ---
