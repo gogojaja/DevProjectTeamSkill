@@ -30,3 +30,5 @@ AUTH-022,gogojajadeMac-mini,dev-project-mgmt 项目管理工具集,目录,/Volum
 AUTH-023,gogojajadeMac-mini,dev-security-tools 安全审计工具集,目录,/Volumes/BR256G/dev-security-tools,创建/读写,gogo(本机),2026-09-01,2027-12-31,有效,Phase 2 项目独立：安全审计工具集（评分96/100），与本项目解耦；孵化器INC-2026-09-01-002立项通过,执行
 AUTH-024,gogojajadeMac-mini,dev-test-tools 测试工具集,目录,/Volumes/BR256G/dev-test-tools,创建/读写,gogo(本机),2026-09-01,2027-12-31,有效,Phase 2 项目独立：测试工具集（评分95/100），与本项目解耦；孵化器INC-2026-09-01-003立项通过,执行
 AUTH-025,gogojajadeMac-mini,publish_production 生产发布全局技能目录写入,全局技能目录,"~/.config/opencode/skills, ~/.trae-cn/skills, ~/.workbuddy/skills, ~/.claude/skills, ~/.copilot/skills, ~/dev-project-team-skill/v21.12.0",写,<user>(本机),2026-09-02,本会话,有效,孵化器立项技能 v1.1.0 生产发布；脚本内置备份留档（不可变版本目录）；仅本次对话有效,OK
+AUTH-025,达瓦扎西,所有关联项目批量更新,目录,D:\Myprojects\*,读取/拉取,gogoj\gogoj,2026-09-02,2026-09-02,有效,用户指令'所有关联项目批量更新'(本次会话),执行
+AUTH-026,达瓦扎西,全局库写操作(publish_production),目录,C:\Users\gogoj\.config\opencode\skills; C:\Users\gogoj\.trae-cn\skills; C:\Users\gogoj\.workbuddy\skills; C:\Users\gogoj\.claude\skills; C:\Users\gogoj\.copilot\skills,读写/覆盖,gogoj\gogoj,2026-09-02,2026-09-02,有效,用户指令'publish_production v21.12.0'(本次会话),执行
