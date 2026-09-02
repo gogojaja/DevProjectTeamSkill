@@ -33,3 +33,4 @@ AUTH-025,gogojajadeMac-mini,publish_production 生产发布全局技能目录写
 AUTH-025,达瓦扎西,所有关联项目批量更新,目录,D:\Myprojects\*,读取/拉取,gogoj\gogoj,2026-09-02,2026-09-02,有效,用户指令'所有关联项目批量更新'(本次会话),执行
 AUTH-026,达瓦扎西,全局库写操作(publish_production),目录,C:\Users\gogoj\.config\opencode\skills; C:\Users\gogoj\.trae-cn\skills; C:\Users\gogoj\.workbuddy\skills; C:\Users\gogoj\.claude\skills; C:\Users\gogoj\.copilot\skills,读写/覆盖,gogoj\gogoj,2026-09-02,2026-09-02,有效,用户指令'publish_production v21.12.0'(本次会话),执行
 AUTH-027,达瓦扎西,全局 git 钩子写操作,文件,C:\Users\gogoj\.git\hooks\post-commit,创建/覆盖,gogoj\gogoj,2026-09-03,2026-09-03,有效,用户指令'配置全局 post-commit 钩子实现自动三推'(本次会话),执行
+AUTH-028,达瓦扎西,GitHub/Gitee 双推,仓库,https://github.com/gogojaja/DevProjectTeamSkill.git; https://gitee.com/gogojaja/DevProjectTeamSkill.git,推送,gogoj\gogoj,2026-09-03,2026-09-03,有效,用户指令'推送'(本次会话),执行
