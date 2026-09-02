@@ -200,6 +200,7 @@ def resolve_packages(handoff_l1: dict, user_instruction: str = "") -> list[str]:
 | 最佳实践方案 | `./skills/best-practice-solution/` | 给方案/选型/最佳实践/可靠方案/第三方评审/全量评审 | 四段双轨水线：Triage 分级→调研锚定→双栏草案→LIGHT 自检/FULL 多视角评审→收敛；缺省 LIGHT（≤2500 token，知识优先 web 条件化），黑名单/显式要求走 FULL（≤20000 token），来源分级 T1/T2/T3 |
 | 最佳实践方案·路由仲裁 | `./skills/best-practice-solution/` §1.2 | 互斥命中时 | `技术选型+需行业依据`→最佳实践方案；`ADR 正式化/编号/追溯`→`role-architecture`；`对已有代码/文档做评审、质量门禁`→多视角验证；无法判定取最严档（FULL 优先）并留痕 |
 | 模型选择 | `./skills/model-selection/` | 模型选择/模型推荐/模型清单/模型定价/模型场景匹配 | 管理大模型提供商清单（42+模型）、定价、能力矩阵，根据任务类型（S0~S3）推荐最优模型，输出选型建议与跨场景适配方案 |
+| 孵化器立项 | `./skills/incubator-initiation/` | 立项评估/方案调研/可行性分析/独立化评估/孵化器启动 | 四段孵化评估水线：方案调研→可行性五维+独立性三判据→孵化决策三选一（移交/继续孵化/放弃）+3 视角评审聚合→移交清单六段+登记闭环；只产出立项建议书（docs/incubator/INC-*.md）不代落地 |
 
 ---
 

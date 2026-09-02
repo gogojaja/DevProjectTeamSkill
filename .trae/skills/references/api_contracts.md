@@ -694,6 +694,26 @@ DevProjectTeamSkill（总控）
 
 ---
 
-**文档版本**：v21.1.1
-**最后更新**：2026-08-19（§11 best-practice-solution 升级 v1.2.0：4 问分级 + 路由仲裁 + 三态聚合矩阵 + 预算口径统一（评审6000/外部核验4000）+ 知识优先 web 条件化 + SSRF 统一清单 + confidence 映射表）
+## 13. incubator-initiation（孵化器立项阶段子技能）
+
+**调用方**：DevProjectTeamSkill §4.1 嵌套能力 / 用户提出新独立项目/技能/工具孵化立项需求
+**核心 action**：四段孵化评估水线（详见 `dev-project-team-skill/skills/incubator-initiation/SKILL.md`）
+**职责边界**：只产出立项建议书（`docs/incubator/INC-*.md`）与登记，不代落地；落地交对应独立项目运营者。
+**路由仲裁**：`业务项目启动/章程/RACI`→`role-project-init`；`通用方案选型`→`best-practice-solution`；`ADR 正式化`→`role-architecture`。
+
+| action | 用途 | 典型调用时机 |
+|--------|------|-------------|
+| `incubation_research` | 方案调研：资产盘点（同类技能/工具/存量文档）+ 先例对照 + 行业标准锚定 + 技术路线初选 | 立项评估起点 |
+| `feasibility_check` | 可行性：五维矩阵（技术/经济/合规/资源/时间）+ 独立性三判据（复用率/独立性/维护成本，逐项量化证据；存量 8 维评分复用） | 调研完成后 |
+| `incubation_decide` | 孵化决策：三选一（移交独立项目/继续孵化/放弃，合规低一票否决）+ 3 视角评审聚合（SIGNED_OFF/CHANGES_REQUESTED/BLOCKED）+ 决策记录草案 | 可行性判定后 |
+| `handover_register` | 移交清单：建议书六段落盘（INC-编号规则）+ 登记闭环五项（project-registry/AGENTS.md/授权/审计/交接断点）+ 移交前脱敏 + 复评条件 | 决策为移交/继续孵化时 |
+
+**协作**：评审编排与决策记录草案格式复用 `best-practice-solution`（§2.2.4b/§3.5）；聚合矩阵引用 `multi-perspective-validation` 决策矩阵；决策记录草案交 `role-architecture` 正式化 ADR；移交落盘前跑 `desensitize.py` 扫描（铁律 #8）；跨项目授权走 `14_授权登记.csv`（铁律 #7a），留痕走 `13_安全审计台账.csv`（`tools/audit.py`）。
+
+**档位与预算**：LIGHT 缺省 ≤2500 token（存量评估可复用/有先例对照，纯本地 0 网络调用）；FULL ≤10000 token（调研 3000 + 可行性 2000 + 评审 3000 + 移交 2000），联网 ≤2 次 websearch + ≤2 次 webfetch，FULL 须 ≥1 真实外部信号；收敛修订 ≤2 轮。
+
+---
+
+**文档版本**：v21.1.2
+**最后更新**：2026-09-02（§13 incubator-initiation 新增：四段孵化评估水线（调研/可行性五维+三判据/孵化决策三选一+评审聚合/移交清单六段+登记闭环），只评估不落地职责边界。此前 2026-08-19：§11 best-practice-solution 升级 v1.2.0）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
