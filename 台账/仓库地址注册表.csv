@@ -1,0 +1,9 @@
+项目名称,本地路径,GitHub SSH 地址,Gitee 地址,协议,状态,备注
+DevProjectTeamSkill,D:\MyProjects\DevProjectTeamSkill,git@github.com:gogojaja/DevProjectTeamSkill.git,https://gitee.com/gogojaja/DevProjectTeamSkill.git,SSH+HTTPS镜像,活跃,本仓库；双推 origin+mirror
+dev-git-hub,D:\MyProjects\dev-git-hub,git@github.com:gogojaja/dev-git-hub.git,,SSH,已移交,局域网 Git 基建
+dev-model-router,D:\MyProjects\dev-model-router,git@github.com:gogojaja/dev-model-router.git,,SSH,已移交,多模型分层编排
+dev-project-mgmt,D:\MyProjects\dev-project-mgmt,git@github.com:gogojaja/dev-project-mgmt.git,,SSH,已移交,项目管理工具集
+dev-security-tools,D:\MyProjects\dev-security-tools,git@github.com:gogojaja/dev-security-tools.git,,SSH,已移交,安全审计工具集
+dev-task-scheduler,D:\MyProjects\dev-task-scheduler,git@github.com:gogojaja/dev-task-scheduler.git,,SSH,已移交,定时任务管理
+dev-test-tools,D:\MyProjects\dev-test-tools,git@github.com:gogojaja/dev-test-tools.git,,SSH,已移交,测试工具集
+lark-training-ppt-generator,D:\MyProjects\lark-training-ppt-generator,git@github.com:gogojaja/lark-training-ppt-generator.git,,SSH,活跃,飞书培训PPT生成器
