@@ -26,22 +26,6 @@ DevProjectTeamSkill,阶段 v21.3.x增强改造 复盘,,,,,否,已完成,,复盘�
 DevProjectTeamSkill,阶段 v21.3.x复盘 复盘,,,,,否,已完成,,复盘结论: ,2026-09-03
 DevProjectTeamSkill,阶段 v21.11.0 复盘,,,,,否,已完成,,复盘结论: 落地四工具+接入fixed文门禁;owner:gogo;deadline:2026-08-31[已关闭],2026-09-03
 DevProjectTeamSkill,阶段 v21.11.0-反信号观察 复盘,,,,,否,已完成,,复盘结论: 完成四工具真实调用序列并留痕;owner:gogo;deadline:2026-08-29（owner+deadline 已齐，符合 Atlassian 复盘闭环标准）[已关闭],2026-09-03
-DevProjectTeamSkill,迭代 IT-01,,,,,否,进行中,,迭代目标: ,2026-09-03
-DevProjectTeamSkill,迭代 IT-01 复盘,,,,,否,已完成,,复盘结论: ,2026-09-03
-DevProjectTeamSkill,阶段 需求分析,,,,,否,进行中,,阶段目标: ,2026-09-03
-DevProjectTeamSkill,阶段 架构设计,,,,,否,进行中,,阶段目标: ,2026-09-03
-DevProjectTeamSkill,阶段 编码开发,,,,,否,进行中,,阶段目标: ,2026-09-03
-DevProjectTeamSkill,阶段 测试执行,,,,,否,进行中,,阶段目标: ,2026-09-03
-DevProjectTeamSkill,阶段 投产发布,,,,,否,进行中,,阶段目标: ,2026-09-03
-DevProjectTeamSkill,阶段 总控保障,,,,,否,进行中,,阶段目标: ,2026-09-03
-DevProjectTeamSkill,阶段 M2需求基线 复盘,,,,,否,已完成,,复盘结论: ①M3 起所有标识符先登记追溯矩阵再展开设计；②收集环节强制完整性检查当轮闭环,2026-09-03
-DevProjectTeamSkill,阶段 M2授权时效检查 复盘,,,,,否,已完成,,复盘结论: M3 开始凡本项目内授权操作经 register_auth 落本地台账,2026-09-03
-DevProjectTeamSkill,阶段 M3架构基线 复盘,,,,,否,已完成,,复盘结论: ①M4 开发时严格遵循架构视图目录结构；②M5 测试用例补全 REQ→TC 追溯,2026-09-03
-DevProjectTeamSkill,阶段 M4功能开发 复盘,,,,,否,已完成,,复盘结论: ①M5 补全 REQ→TC 测试追溯；②CLI 集成测试覆盖四子命令；③确认 Python 版本要求（3.9+ vs 3.10+）,2026-09-03
-DevProjectTeamSkill,阶段 M5测试就绪 复盘,,,,,否,已完成,,复盘结论: ①v1.1 补充低覆盖模块测试；②M6 发布前在 Linux/Windows 验证；③更新章程 Python 版本要求为 3.9+,2026-09-03
-DevProjectTeamSkill,阶段 M6发布验收 复盘,,,,,否,已完成,,复盘结论: ①v1.1 在 Linux/Windows CI 环境补测；②v1.1 验证 pip install -e . 入口,2026-09-03
-DevProjectTeamSkill,阶段 开发实现,,,,,否,进行中,,阶段目标: ,2026-09-03
-DevProjectTeamSkill,阶段 测试验证,,,,,否,进行中,,阶段目标: ,2026-09-03
 dev-model-router,迭代 IT-01,,,,,否,进行中,,迭代目标: ,2026-09-03
 dev-model-router,迭代 IT-02,,,,,否,进行中,,迭代目标: ,2026-09-03
 dev-model-router,迭代 IT-01 复盘,,,,,否,已完成,,复盘结论: ,2026-09-03
