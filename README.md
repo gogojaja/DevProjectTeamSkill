@@ -1,6 +1,6 @@
 # DevProjectTeamSkill 技能库
 
-**版本**：v21.8.0 ｜ **发布日期**：2026-08-20 ｜ **结构**：9 角色包 + 1 编排器
+**版本**：v21.12.0 ｜ **发布日期**：2026-09-01 ｜ **结构**：10 角色包 + 1 编排器
 
 ## 项目简介
 
@@ -11,7 +11,7 @@ AI Agent 在本仓库的职责是**维护技能库本身**（skill 编写 / 结�
 ## 核心定位
 
 - **本体即源码**：`.trae/skills/` 是唯一事实来源，所有角色包、标准、共享库都在其中。
-- **9 角色包 + 1 编排器**：编排器负责路由、调度、阶段门禁、上下文压缩与跨会话交接；9 个角色包各司其职、互不越界。
+- **10 角色包 + 1 编排器**：编排器负责路由、调度、阶段门禁、上下文压缩与跨会话交接；10 个角色包各司其职、互不越界。
 - **闭环执行**：每个技能维护产物须具备「闭环执行系统」章节（任务入口 / 状态机 / 验收门禁 / 失败恢复 / 交接审计），经校验工具通过后才可发布。
 - **单源共享**：公共标准与共享库只存 `shared/`，角色包以相对引用复用，打包时自动内嵌，禁止手工复制。
 - **强约束治理**：源码单源、`description` 150~250 字符、CSV 输出、敏感信息三级分级、系统/外部文件操作须经授权→备份→留痕。
@@ -21,9 +21,9 @@ AI Agent 在本仓库的职责是**维护技能库本身**（skill 编写 / 结�
 ```
 DevProjectTeamSkill/
 ├── .trae/skills/          技能源码（唯一事实来源）
-│   ├── SKILL_INDEX.md      角色包路由索引（#0 编排器 + #1~#9 角色包）
+│   ├── SKILL_INDEX.md      角色包路由索引（#0 编排器 + #1~#10 角色包）
 │   ├── dev-project-team-skill/   编排器（薄壳）
-│   ├── role-*/             9 个角色包
+│   ├── role-*/             10 个角色包
 │   ├── references/         公共标准（token / csv / api 契约 / 环境 / 模型 / 铁律）
 │   └── shared/             单源共享库（governance / evolution / authoring + references 副本）
 ├── tools/                  打包 / 部署 / 固化 / 校验 / CMDB 脚本（.sh + .py 双实现）
@@ -56,6 +56,7 @@ DevProjectTeamSkill/
 | 7 | role-governance | 总控保障 | 台账读写 / 阶段评审 / 门禁 / 基线固化 / 变更审计 / 归档 / 交接 |
 | 8 | role-program-mgmt | 项目群 / 项目集 | 项目群 / 项目集 / 多项目协同 / PMO / 依赖 / 里程碑对齐 / 收益 / IMS |
 | 9 | role-mgmt-consulting | 项目管理咨询 | 项目管理咨询 / PMO 咨询 / 成熟度评估 / 差距分析 / 方法论定制 / 变革管理 / 咨询建议书 / PMO 蓝图 / 教练辅导 |
+| 10 | role-project-mgmt | 项目经理执行层 | 项目管理 / 日常管控 / RAID / 进展报告 / 变更协调 / 经验教训 / 干系人沟通 / 阶段状态跟踪（不涉及具体工程交付） |
 
 ## 快速开始
 
@@ -85,7 +86,7 @@ git commit
 ## 打包与部署
 
 ```sh
-bash tools/package_skills.sh               # 打包全部 9 角色包到 dist/
+bash tools/package_skills.sh               # 打包全部 10 角色包到 dist/
 bash tools/package_skills.sh --role role-testing
 bash tools/deploy_skills.sh --roles role-a,role-b   # 部署到 .github/.claude/.agents/ 及全局库
 bash tools/solidify.sh "说明"               # 快照→刷新交接断点→打包→部署
@@ -121,4 +122,4 @@ bash tools/solidify.sh "说明"               # 快照→刷新交接断点→�
 
 ---
 
-**文档版本**：v21.8.0 ｜ **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
+**文档版本**：v21.12.0 ｜ **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

@@ -1,7 +1,7 @@
 # REPO_STRUCTURE — 仓库目录树与目录职责
 
 > 权威规则见根 `AGENTS.md`；本文件为目录结构视图与入库 / gitignored 划分说明。
-> 编排器文档版本：v21.7.0。
+> 编排器文档版本：v21.12.0。
 
 ## 顶层目录树
 
@@ -9,11 +9,11 @@
 DevProjectTeamSkill/
 ├── .trae/
 │   └── skills/                     # ★ 唯一事实来源（全部技能源码）
-│       ├── SKILL_INDEX.md          # 10 包路由索引（#0 编排器 + #1~#9 角色包）
+│       ├── SKILL_INDEX.md          # 10 包路由索引（#0 编排器 + #1~#10 角色包）
 │       ├── references/             # 公共标准（token / csv / api 契约 / 环境 / 模型 / 铁律 / 咨询）
 │       ├── shared/                 # 单源共享库（governance / evolution / authoring + references 副本）
 │       ├── dev-project-team-skill/ # 编排器（薄壳：路由表 + 调度 / 压缩规则）
-│       └── role-*/                 # 9 角色包（各含 SKILL.md + domain/ 流程 + *__resources/ 明细）
+│       └── role-*/                 # 10 角色包（各含 SKILL.md + domain/ 流程 + *__resources/ 明细）
 ├── tools/                          # 打包 / 部署 / 固化 / 校验 / CMDB 脚本（.sh + .py 双实现）
 │   └── cmdb/                       # 轻量级 CMDB CLI（注册 / 查询 / 释放 / 冲突检测，SQLite）
 ├── scripts/                        # 钩子安装等辅助脚本（install-hooks.sh）
@@ -73,4 +73,4 @@ DevProjectTeamSkill/
 
 ---
 
-**文档版本**：v21.7.0 ｜ **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
+**文档版本**：v21.12.0 ｜ **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

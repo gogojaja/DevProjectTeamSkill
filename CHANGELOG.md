@@ -1,7 +1,7 @@
 # CHANGELOG — DevProjectTeamSkill 版本演进史
 
 > 版本基于各角色包 SKILL.md 版本号与 SKILL_INDEX.md 末尾推断整理。
-> 编排器文档版本：v21.7.0（2026-08-18）。
+> 编排器文档版本：v21.12.0（2026-09-01）。
 
 ## [v20.2.0] - 约2026-08-04 - 初始框架
 
@@ -107,4 +107,73 @@
 
 ---
 
-**文档版本**：v21.8.0 ｜ **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
+## [v21.8.1] - 2026-08-20 - 生产发布集补全缺陷修复
+
+- 修复 `tools/`（github_push.py/_gh_ip_probe.py 等）与 `docs/`（github_ip_records.csv 等）未纳入发布/部署/固化复制集、全局库按文档调用工具路径不存在的缺陷。
+- `publish_production`/`deploy_skills`/`solidify` 复制集统一纳入 tools+docs，脱敏门禁扫描范围扩展至 tools/docs 并豁免规则定义示例与占位符；版本目录、项目级三目录、全局库同步生效。
+
+---
+
+## [v21.8.2] - 2026-08-22 - 本体全面评审 v21.8.2 缺陷修复批次
+
+- **D-01** `role-architecture` description 扩充至 150+ 字符（补「架构评估/技术选型」触发词），descriptions 门禁 18/18 全绿。
+- **D-02** 初始化《需求-架构-代码追溯矩阵.csv》（铁律 #10 落地）——补录存量 11 REQ / 5 AE / 17 MOD / 6 TC，`check_traceability.py` 门禁通过（无孤儿无断链）。
+- **D-03** 以 `references/` 为基准重建 `shared/references/` 副本消除 4 文件漂移 + 补 `traceability_standard.md` 副本（铁律 #1 单源合规）。
+- **D-04** 仓库卫生：`lint_repo.py` 白名单更新（`.codebuddy/` + `projects_registry.csv`），评审报告归档 `docs/reviews/`，清理残留文件，lint 23 error→0。
+
+---
+
+## [v21.9.0] - 2026-08-27 - 新增「项目管理模式」+ 项目经理执行层
+
+- **新增第 11 角色包 `role-project-mgmt`**（项目经理执行层 v21.0.0）：对齐 PRINCE2 治理与日常管理分离 + PMBOK 十大知识领域，覆盖日常管控循环/RAID/阶段计划/进展报告/变更协调/经验教训。
+- 编排器 §3 执行模式新增「项目管理模式」；§4 路由表增 #10 `role-project-mgmt`；§5 调度新增「工程角色协调只读」铁律。
+- 新增 `role-project-mgmt/domain/upgrade-threshold.md`（轻量→建角色升级阈值）。
+- SKILL_INDEX / AGENTS 同步 10 角色包计数。
+
+---
+
+## [v21.10.0] - 2026-08-27 - 大批量任务成本预警 + 开发平台/模型知识库
+
+- 编排器 §2.2 新增 §2.2-9「大批量任务成本预警」铁律：超阈值（文件>20/输出>50K tok/大文档>5K 行/多轮 agent 循环）须先提示估算成本并三选一（A 只定方案/B 分步执行/C 指定平台模型）。
+- 新增 `references/dev_platform_catalog.md`（开发平台 + 模型三层 + 公开定价快照 + 场景映射 + 大批量推荐组合）。
+- 新增 `台账/40_大模型成本台账.csv`（实际成本账本，与 `21_模型选型.csv` 决策台账分工）。
+
+---
+
+## [v21.10.1] - 2026-08-27 - 生产发布工具多目标全局同步
+
+- `publish_production.py` 新增 `--no-extra-globals`/`--all-globals`/`--extra-globals trae,workbuddy` 参数与 `sync_into()` 精确同步（仅清本仓库发布集子项、保护用户其他全局技能）。
+- 支持一次性把发布集铺到 opencode/trae-cn/workbuddy 三端全局目录；v21.10.1 = v21.10.0 内容 + 增强版发布工具。
+
+---
+
+## [v21.10.2] - 2026-08-27 - Office 文档深度脱敏模块
+
+- **文档脱敏工具升级 v1.1.0→v1.2.0**：新增 `tools/desensitize/office_desensitize.py`——docx 跨 run 段落级替换 / xlsx sharedStrings 替换 / OLE2 .doc·xls 等长字节替换 / zip 归档内嵌文档递归 / `--strip-images` 图片删除 / 文件名目录名脱敏 / 备份+执行记录+残余校验闭环；零第三方依赖；回归测试 3 例全过。
+
+---
+
+## [v21.10.3] - 2026-08-27 - 范围跟踪工具 ROOT 解析修复 + 发布级门禁修复
+
+- `tools/scope_tracker.py` 与 `tools/check_traceability.py` 原 `ROOT = dirname(dirname(__file__))` 在部署副本（全局技能目录）误指技能库根，导致读写错 台账/；改为 `find_project_root()` 按 `--root` CLI / `PROJECT_ROOT` 环境变量 / CWD 与 `__file__` 向上找项目标记 / 兜底解析。
+- `cmd_init` 加 `--reset-ledgers` 安全重写表头护栏（仅无数据行时）；三端全局副本已同步。
+- 修复编排器 SKILL.md UTF-8 BOM 致发布级门禁误报，并重发布同步至 v21.10.3。
+
+---
+
+## [v21.11.0] - 2026-08-29 - 任务级按需加载模式
+
+- **P3 交接优化**：编排器 §3 执行模式新增「任务级按需加载」；新增 §2.4 任务级加载逻辑（路由决策/映射表/加载算法伪代码/兼容回退）。
+- 新增 `domain/skill-loader.md`（任务类型→角色包映射表 + 关键词推断 + 加载算法 + L1 摘要字段规格）。
+- 交接文档 L1 新增「当前任务类型」字段；回退无任务类型时自动回退阶段渐进加载，完全向后兼容。
+
+---
+
+## [v21.12.0] - 2026-09-01 - 任务输出模型推荐（强制规则）
+
+- §5 调度新增规则 8：每条任务输出最后一行必须附带 `📦 推荐模型` 行（格式/判定/例外见 `references/model_selection.md` §5）。
+- 使模型推荐从手动行为固化为技能标准，所有项目可统一执行。
+
+---
+
+**文档版本**：v21.12.0 ｜ **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

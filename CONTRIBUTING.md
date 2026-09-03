@@ -28,7 +28,7 @@
 
 ## ④ 版本管理
 
-- 使用 **git tag** 管理版本：`git tag vX.Y.Z` 对应各角色包 / 编排器版本号（如 v21.7.0）。
+- 使用 **git tag** 管理版本：`git tag vX.Y.Z` 对应各角色包 / 编排器版本号（如 v21.12.0）。
 - **不再使用** `skills_backup_*` / `skills_legacy_*` 等手工备份目录（已被 gitignored，且可由 `tools/deploy_skills` 重新生成）。
 - 版本号规则：主版本大重构、次版本新增角色包 / 能力、修订版本修正 / 增强；与 `SKILL_INDEX.md` 末尾「文档版本」保持一致。
 
@@ -50,4 +50,4 @@
 
 ---
 
-**文档版本**：v21.7.0 ｜ **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
+**文档版本**：v21.12.0 ｜ **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
