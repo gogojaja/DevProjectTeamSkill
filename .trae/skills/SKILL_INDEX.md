@@ -58,8 +58,8 @@
 
 ---
 
-**文档版本**：v21.12.0
-**最后更新**：2026-09-05（条目21 插件机制 v1.0.0：插件接口规范 + 注册表 + 降级处理 + SKILL_INDEX 标注。此前 Phase 1-2：路径外部化 + TwinForge 文档分离）
+**文档版本**：v21.12.1
+**最后更新**：2026-09-06（条目21 插件机制 v1.0.0：插件接口规范 + 注册表 + 降级处理 + SKILL_INDEX 标注。此前 Phase 1-2：路径外部化 + TwinForge 文档分离）
 
 19. **孵化器立项阶段技能（v1.1.0）**：内嵌子技能 `incubator-initiation`——支撑新独立项目/技能/工具的立项评估：四段孵化评估水线（方案调研→可行性五维+独立性三判据→孵化决策三选一+3 视角评审聚合→移交清单六段+登记闭环），输出立项建议书（`docs/incubator/INC-*.md`）；**只评估不落地**，落地交对应独立项目运营者独立执行；方案来源 `docs/孵化器模式与git剥离方案.md`，协同机制见 `docs/多项目协同与隔离维护机制方案.md`，独立项目登记见 `references/project-registry.md`；触发词 `立项评估`/`方案调研`/`可行性分析`/`独立化评估`/`孵化器启动`，详见 `dev-project-team-skill/skills/incubator-initiation/SKILL.md`。
 
@@ -67,5 +67,7 @@
 
 21. **插件机制（v1.0.0）**：核心功能独立运行，插件按需增强。插件发现三级动态解析（环境变量 > 同级目录约定 > 配置文件）；插件注册表 `references/plugin_registry.json`（7 个已知插件）；接口规范 `references/plugin_interface.md`；配置模板 `.env.example`。**插件工具**（需安装对应插件）：`mirror_push/github_push/github_ip_refresh`（→ dev-git-hub）、`scheduler_proxy`（→ dev-task-scheduler）、`model_router_proxy`（→ dev-model-router）；插件缺失时输出安装指引 + 替代方案。**核心工具**（无插件依赖）：`solidify/package_skills/deploy_skills/publish_production/check_*/audit/desensitize/cmdb/mcp_server` 等。详见 `references/plugin_interface.md`。
 
+
+22. **方案制定流程（v1.0.0）**：内嵌子技能 `plan-creation`——通用项目级方案制定流程（对齐 IEEE 828 / PMBOK / PRINCE2）；8 步生命周期（需求采集与可行性→方案编写→预审+正式评审→修订闭环+基线化→执行计划WBS→执行+监控→变更控制→收尾复盘）；Step 1-4 必选、Step 5-8 按需；三档裁剪（简单<=3文件/标准4-10文件/复杂>10或跨项目）；五维评审（完整性25%+可行性25%+一致性20%+风险15%+可测性15%，Go>=3.5）；交付物三件套（方案+执行计划+评审报告）；与 `best-practice-solution` 互补（技术选型→BPS，项目级方案→plan-creation）；触发词 `制定方案`/`写方案`/`实施方案`/`方案评审`/`执行计划`，详见 `dev-project-team-skill/skills/plan-creation/SKILL.md`。
 ---
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
