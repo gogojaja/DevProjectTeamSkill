@@ -1,0 +1,11 @@
+评审编号,评审视角,评审对象,评审结论,风险等级,具体发现,建议修改,是否阻断
+R-01,架构师,Job 分层设计,通过,低,"三 Job 渐进式设计合理：syntax-test → skill-gate → package-verify，依赖关系清晰。","建议 Job 2 的硬门禁失败时采用 continue-on-error 模式收集全部结果（而非首个失败即停），方便一次性修复。",否
+R-02,架构师,触发条件,通过,低,"push/PR/schedule/dispatch 四触发覆盖全面；PR 快速验证 + 夜间全量分层策略正确。","建议 schedule 改为每周一次（而非每日），单人项目无需消耗每日配额。方案已符合（每周日）。",否
+R-03,架构师,与现有工作流关系,通过,低,"三者互补不重叠：ci-skill-gate（本库结构）+ nightly-quality-gate（跨项目）+ nightly-code-complete（AI 补全）。",建议在工作流文件头部注释中明确说明三者关系，方便后续维护者理解。,否
+R-04,架构师,不纳入 CI 项,有条件通过,中,"check_github_connectivity 排除正确（CI 网络不同）；solidify/publish 排除正确（本地操作）。","建议后续考虑增加 check_traceability.py 到 Job 2（追溯矩阵检查），但当前追溯台账可能尚未建立，暂列可选。",否
+R-05,安全,CI 权限最小化,通过,低,"方案中 contents: read（PR 路径）+ checks: write（结果回写），权限最小化合理。","建议 push main 路径如需创建 tag/release 才提升 contents 权限；当前 Job 3 仅 schedule 运行，可限定 contents: read。",否
+R-06,安全,门禁工具无副作用,通过,低,"全部 14 个 check 工具为只读静态分析（py_compile/文件存在性/正则匹配），不修改文件系统，不安装依赖。","建议 CI 中 desensitize --scan 仅扫描不修改（确认不传 -o 参数），方案应明确。",否
+R-07,安全,Secrets 暴露风险,通过,低,"方案未涉及 secrets 注入（门禁工具不需要凭据），无泄露面。","建议 workflow 中不声明多余 secrets（如 LLM_TOKEN），与 nightly-code-complete 隔离。",否
+R-08,治理,门禁结果可解释性,通过,低,"硬门禁 ❌ + 软门禁 ⚠ 的区分清晰，PR 审查者一目了然。","建议在 workflow 输出中为每个门禁步骤添加中文步骤标题（如 [1/8] 版本一致性），对齐 solidify.py 输出风格。",否
+R-09,治理,维护成本,通过,低,"单一 YAML 文件维护成本低；门禁工具已存在，CI 仅编排调用。","建议门禁工具新增/删除时同步更新 CI workflow（可在 AGENTS.md 中登记此约束）。",否
+R-10,治理,整体方案,通过,低,"方案务实，利用已有 14 个 check 工具，无重复造轮子；分层策略控制 CI 时间。","建议 Phase 完成后更新 AGENTS.md 命令段，增加 CI workflow 说明。",否

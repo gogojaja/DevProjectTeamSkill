@@ -112,6 +112,24 @@ python tools/publish_production.py                # 跨平台/Windows 主推
 - 其他项目 opencode 通过全局库自动发现生产技能；本项目开发用项目级三目录
 - 生产发布为外部目录操作，按铁律 #7/#7a `register_auth` 授权 + `.backup/` 备份 + 台账留痕
 
+### CI/CD 流水线（GitHub Actions，2026-09-05 起）
+
+> 三个工作流互补不重叠：
+> - `ci-skill-gate.yml` → 技能库自身结构/门禁验证（本仓库）
+> - `nightly-quality-gate.yml` → 跨项目 registry 质量门禁（外部项目）
+> - `nightly-code-complete.yml` → AI 代码补全（draft PR 模式）
+
+```yaml
+# ci-skill-gate.yml（技能库专项 CI）
+# 触发：push main / PR main / 每周日 schedule / 手动
+# Job 1: syntax-test   → Python 编译 + 单元测试
+# Job 2: skill-gate    → 8 项门禁（5 硬 + 1 软 + lint_repo + skill_links）
+# Job 3: package-verify → 打包 + 脱敏扫描（仅 schedule/手动）
+```
+
+- **门禁工具变更时须同步更新 CI workflow**（新增/删除 check 工具 → 调整 Job 2 步骤）
+- 硬门禁失败 → PR 显示 ❌；软门禁失败 → PR 显示 ⚠ warning（不阻止）
+
 ### 其他工具
 
 ```sh

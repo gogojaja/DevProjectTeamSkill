@@ -38,6 +38,7 @@ WHITELIST_FILES = {
     'AGENTS.md', 'opencode.json', 'README.md', '交接文档.md',
     'CHANGELOG.md', 'CONTRIBUTING.md',
     '.gitattributes', '.gitignore', '.agent-loop-enabled',
+    '.env.example',  # 环境变量配置模板（插件链路检查依赖）
     'projects_registry.csv',  # nightly_quality_gate.py 硬编码依赖的 registry（登记测试命令等）
 }
 # 中文文档豁免命名检查的目录（以仓库根相对路径前缀匹配）

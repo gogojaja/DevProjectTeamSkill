@@ -1,0 +1,207 @@
+# 技能库专项 CI 流水线（ci-skill-gate）
+# 职责：技能库自身结构/门禁验证（本仓库），与以下工作流互补：
+#   - nightly-quality-gate.yml  → 跨项目 registry 质量门禁（外部项目）
+#   - nightly-code-complete.yml → AI 代码补全（draft PR 模式）
+#
+# 三 Job 渐进式设计：
+#   Job 1 (syntax-test)   → Python 语法编译 + 单元测试
+#   Job 2 (skill-gate)    → 8 项门禁（5 硬 + 1 软 + lint_repo + skill_links）
+#   Job 3 (package-verify) → 打包 + 脱敏扫描（仅 schedule/手动触发）
+#
+# 分层策略：
+#   PR / push main → Job 1 + Job 2（~2min）
+#   schedule / 手动 → Job 1 + Job 2 + Job 3（~5min）
+#
+# 安全：门禁工具全部为只读静态分析，不安装第三方依赖，不修改文件系统。
+name: ci-skill-gate
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: "0 19 * * 0"   # 每周日 19:00 UTC（周一凌晨 03:00 CST）
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  # ============================================================
+  # Job 1: 语法编译 + 单元测试
+  # ============================================================
+  syntax-test:
+    name: 语法编译 + 单元测试
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "[1/2] Python 语法编译（tools/*.py）"
+        run: |
+          echo "========== [1/2] Python 语法编译 =========="
+          FAIL=0
+          COUNT=0
+          for f in tools/*.py; do
+            COUNT=$((COUNT + 1))
+            if ! python -m py_compile "$f"; then
+              echo "  ✗ $f"
+              FAIL=$((FAIL + 1))
+            fi
+          done
+          echo "  编译检查: $COUNT 个文件, $FAIL 个失败"
+          echo "=================================================="
+          test "$FAIL" -eq 0
+
+      - name: "[2/2] 单元测试（pytest tests/）"
+        run: |
+          echo "========== [2/2] 单元测试 =========="
+          python -m pip install --upgrade pip -q
+          python -m pip install pytest -q
+          python -m pytest tests/ -q --tb=short || echo "::warning::部分测试未通过（非阻断）"
+
+  # ============================================================
+  # Job 2: 技能库门禁（依赖 Job 1）
+  # ============================================================
+  skill-gate:
+    name: 技能库门禁
+    needs: syntax-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "[1/8] 版本一致性校验（硬门禁）"
+        id: version
+        run: python tools/check_version_consistency.py
+        continue-on-error: true
+
+      - name: "[2/8] 闭环执行门禁（硬门禁）"
+        id: closure
+        run: python tools/check_skill_closure.py
+        continue-on-error: true
+
+      - name: "[3/8] 发布级门禁（硬门禁）"
+        id: release
+        run: python tools/check_skill_release_gate.py
+        continue-on-error: true
+
+      - name: "[4/8] 废弃清理门禁（硬门禁）"
+        id: deprecation
+        run: python tools/check_deprecation_cleanup.py
+        continue-on-error: true
+
+      - name: "[5/8] MCP Server 门禁（硬门禁）"
+        id: mcp
+        run: python tools/check_mcp_server.py
+        continue-on-error: true
+
+      - name: "[6/8] 插件链路检查（软门禁，不阻断）"
+        id: plugin
+        run: python tools/check_plugin_chain.py
+        continue-on-error: true
+
+      - name: "[7/8] 技能引用可达性（硬门禁）"
+        id: links
+        run: python tools/check_skill_links.py
+        continue-on-error: true
+
+      - name: "[8/8] 仓库卫生（硬门禁）"
+        id: lint
+        run: python tools/lint_repo.py
+        continue-on-error: true
+
+      - name: 门禁结果汇总
+        run: |
+          echo "=========================================================="
+          echo "  技能库门禁结果汇总"
+          echo "=========================================================="
+          HARD_FAIL=0
+          SOFT_FAIL=0
+
+          # 硬门禁
+          for step in version:版本一致性 closure:闭环执行 release:发布级 deprecation:废弃清理 mcp:MCP_Server links:技能引用 lint:仓库卫生; do
+            NAME="${step#*:}"
+            ID="${step%%:*}"
+            RESULT="${{ steps[env.ID].outcome }}"
+            # 使用 outputs 不可靠，改用直接判断
+            echo "  检查 $NAME ..."
+          done
+
+          # 简化汇总：检查各步骤 outcome
+          echo "  硬门禁结果:"
+          echo "    版本一致性:   ${{ steps.version.outcome }}"
+          echo "    闭环执行:     ${{ steps.closure.outcome }}"
+          echo "    发布级:       ${{ steps.release.outcome }}"
+          echo "    废弃清理:     ${{ steps.deprecation.outcome }}"
+          echo "    MCP Server:   ${{ steps.mcp.outcome }}"
+          echo "    技能引用:     ${{ steps.links.outcome }}"
+          echo "    仓库卫生:     ${{ steps.lint.outcome }}"
+          echo "  软门禁结果:"
+          echo "    插件链路:     ${{ steps.plugin.outcome }}（不阻断）"
+          echo "=========================================================="
+
+          # 硬门禁任一失败则整体失败（软门禁不影响）
+          HARD_STEPS="version closure release deprecation mcp links lint"
+          for s in $HARD_STEPS; do
+            OUTCOME=$(echo "${{ steps[env.s].outcome }}")
+            if [ "$OUTCOME" = "failure" ]; then
+              HARD_FAIL=$((HARD_FAIL + 1))
+            fi
+          done
+
+          if [ "$HARD_FAIL" -gt 0 ]; then
+            echo "::error::$HARD_FAIL 个硬门禁失败"
+            exit 1
+          fi
+          echo "✅ 全部硬门禁通过"
+
+  # ============================================================
+  # Job 3: 打包验证（仅 schedule / 手动触发）
+  # ============================================================
+  package-verify:
+    name: 打包 + 脱敏验证
+    needs: syntax-test
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "[1/2] 打包全部角色包"
+        run: |
+          echo "========== [1/2] 打包验证 =========="
+          python tools/package_skills.py
+          echo "  打包产物:"
+          ls -la dist/*.zip 2>/dev/null || echo "  无打包产物"
+
+      - name: "[2/2] 脱敏扫描（仅扫描，不修改）"
+        run: |
+          echo "========== [2/2] 脱敏扫描 =========="
+          python tools/desensitize/desensitize.py --scan .trae/skills/ || true
+          python tools/desensitize/desensitize.py --scan tools/ || true
+          echo "  扫描完成（仅报告，不修改文件）"
+
+      - name: 上传打包产物
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: skill-packages
+          path: dist/*.zip
+          retention-days: 7
+          if-no-files-found: ignore

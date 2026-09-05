@@ -30,6 +30,8 @@ import os
 import re
 import sys
 
+sys.stdout.reconfigure(encoding='utf-8')
+
 _THIS = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REPO_ROOT = os.environ.get("PROJECT_ROOT", _THIS)
 ROOT = os.path.join(REPO_ROOT, '.trae', 'skills')
