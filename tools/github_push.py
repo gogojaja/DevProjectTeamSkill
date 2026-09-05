@@ -12,4 +12,4 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _hub_proxy import run_proxy
 
 if __name__ == "__main__":
-    sys.exit(run_proxy("github_push.py", "github_push.py"))
+    sys.exit(run_proxy("github_push.py", "github_push.py", native_fallback=True))

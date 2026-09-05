@@ -12,4 +12,4 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _hub_proxy import run_proxy
 
 if __name__ == "__main__":
-    sys.exit(run_proxy("mirror_push.py", "mirror_push.py"))
+    sys.exit(run_proxy("mirror_push.py", "mirror_push.py", native_fallback=True))

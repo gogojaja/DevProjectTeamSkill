@@ -49,9 +49,11 @@ def find_hub_script(script_name):
     return script if script.exists() else None
 
 
-def run_proxy(script_name, label="proxy"):
+def run_proxy(script_name, label="proxy", native_fallback=False):
     """
     通用代理转发：定位 dev-git-hub 对应脚本并转发 sys.argv，注入 PROJECT_ROOT。
+    native_fallback=True 时，dev-git-hub 缺失且脚本为推送类（*push*）时，
+    降级为原生 git push（无 token/真实IP/熔断/台账，仅基础推送）。
     返回退出码（int）。供各代理脚本 main() 调用。
     """
     import subprocess
@@ -59,6 +61,8 @@ def run_proxy(script_name, label="proxy"):
 
     hub_script = find_hub_script(script_name)
     if hub_script is None:
+        if native_fallback and "push" in script_name:
+            return _native_push_fallback()
         print("[error] dev-git-hub 工具缺失: tools/%s" % script_name, file=sys.stderr)
         print("        安装方式：", file=sys.stderr)
         print("          1. 将 dev-git-hub 项目 clone 到本仓库同级目录（../dev-git-hub）", file=sys.stderr)
@@ -72,3 +76,67 @@ def run_proxy(script_name, label="proxy"):
     env["PROJECT_ROOT"] = str(PROJECT_ROOT)
     cmd = [sys.executable or "python3", str(hub_script)] + sys.argv[1:]
     return subprocess.call(cmd, env=env)
+
+
+def _native_push_fallback():
+    """dev-git-hub 缺失时的降级兜底：原生 git push 到全部已配置远端。
+    无 token 注入/真实 IP/熔断/台账，仅基础推送（SSH 远端直接可用）。
+    返回退出码（0=全部成功，1=存在失败）。"""
+    import subprocess
+    import sys
+
+    print("[降级] dev-git-hub 不可用，使用原生 git push 兜底", file=sys.stderr)
+    print("       （无 token/真实IP/熔断/台账；SSH 远端可直接使用）", file=sys.stderr)
+
+    # 获取全部已配置远端
+    try:
+        result = subprocess.run(
+            ["git", "remote"], cwd=str(PROJECT_ROOT),
+            capture_output=True, text=True, encoding="utf-8", errors="replace"
+        )
+        remotes = [r.strip() for r in result.stdout.strip().splitlines() if r.strip()]
+    except Exception:
+        remotes = []
+
+    if not remotes:
+        print("[error] 未找到任何 git remote", file=sys.stderr)
+        return 1
+
+    # 获取当前分支
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=str(PROJECT_ROOT),
+            capture_output=True, text=True, encoding="utf-8", errors="replace"
+        )
+        branch = result.stdout.strip() or "main"
+    except Exception:
+        branch = "main"
+
+    failed = 0
+    for remote in remotes:
+        print("[push] %s ..." % remote)
+        try:
+            result = subprocess.run(
+                ["git", "push", remote, branch], cwd=str(PROJECT_ROOT),
+                capture_output=True, text=True, encoding="utf-8", errors="replace",
+                timeout=60
+            )
+            out = (result.stdout + result.stderr).strip()
+            if result.returncode == 0:
+                if "up-to-date" in out or "Everything up-to-date" in out:
+                    print("  [已同步] %s" % remote)
+                else:
+                    last = out.splitlines()[-1] if out else "成功"
+                    print("  [成功] %s: %s" % (remote, last))
+            else:
+                last = out.splitlines()[-1] if out else "失败"
+                print("  [失败] %s: %s" % (remote, last))
+                failed += 1
+        except subprocess.TimeoutExpired:
+            print("  [超时] %s" % remote)
+            failed += 1
+        except Exception as e:
+            print("  [异常] %s: %s" % (remote, e))
+            failed += 1
+
+    return 1 if failed else 0
