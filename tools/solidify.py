@@ -54,6 +54,23 @@ def run_deprecation_cleanup():
     return r.returncode
 
 
+def run_mcp_server_check():
+    """第 5 硬门禁：MCP Server 门禁，检查语法/工具计数/脚本可达性/依赖声明。"""
+    r = _run_script('check_mcp_server.py')
+    print('   ✓ MCP Server 门禁校验通过' if r.returncode == 0 else '   ✗ MCP Server 门禁失败')
+    return r.returncode
+
+
+def run_plugin_chain_check():
+    """第 6 软门禁：插件链路检查，检查代理脚本/注册表/环境变量模板。不阻断固化。"""
+    r = _run_script('check_plugin_chain.py')
+    if r.returncode == 0:
+        print('   ✓ 插件链路检查通过（软门禁，不阻断）')
+    else:
+        print('   ⚠ 插件链路检查有告警（软门禁，不阻断固化）')
+    return r.returncode
+
+
 def run_deploy():
     # 开发固化仅部署项目级三目录；全局库（生产消费载体）由 publish_production 独占
     return _run_script('deploy_skills.py', '--skip-global').returncode
@@ -159,28 +176,34 @@ if __name__ == '__main__':
         if os.path.isfile(p):
             m = re.search(r'技能版本\*\*[：:]\s*(v[0-9]+\.[0-9]+\.[0-9]+)', open(p, encoding='utf-8').read())
             print(f'   {r:<40} {m.group(1) if m else "v?"}')
-    print('[1a/5] 版本一致性校验（硬门禁）')
+    print('[1a/6] 版本一致性校验（硬门禁）')
     if run_version_check() != 0:
         print('❌ 版本一致性校验未通过，中止固化。请先统一各包元数据/页脚版本。')
         sys.exit(1)
-    print('[1b/5] 闭环执行门禁校验（硬门禁）')
+    print('[1b/6] 闭环执行门禁校验（硬门禁）')
     if run_closure_check() != 0:
         print('❌ 闭环执行门禁未通过，中止固化。请先补齐“闭环执行系统”章节与关键门禁项。')
         sys.exit(1)
-    print('[1c/5] 发布级门禁校验（硬门禁）')
+    print('[1c/6] 发布级门禁校验（硬门禁）')
     if run_release_gate() != 0:
         print('❌ 发布级门禁未通过，中止固化。请先补齐 frontmatter、metadata 与闭环执行结构。')
         sys.exit(1)
-    print('[1d/5] 废弃清理门禁校验（硬门禁）')
+    print('[1d/6] 废弃清理门禁校验（硬门禁）')
     if run_deprecation_cleanup() != 0:
         print('❌ 废弃清理门禁未通过，中止固化。请先彻底移除废弃资产残留（引用/端口/进程/LaunchAgent）。')
         sys.exit(1)
-    print('[2/5] 刷新交接文档断点区')
+    print('[1e/6] MCP Server 门禁校验（硬门禁）')
+    if run_mcp_server_check() != 0:
+        print('❌ MCP Server 门禁未通过，中止固化。请检查 tools/mcp_server/ 目录完整性。')
+        sys.exit(1)
+    print('[1f/6] 插件链路检查（软门禁，不阻断）')
+    run_plugin_chain_check()
+    print('[2/6] 刷新交接文档断点区')
     if not dry_run:
         refresh_handoff(stamp, note)
     else:
         print('   (dry-run) refresh_handoff skipped')
-    print('[3/5] 快照')
+    print('[3/6] 快照')
     m = re.search(r'技能版本\*\*[：:]\s*(v[0-9]+\.[0-9]+\.[0-9]+)',
                   open(os.path.join(SKILLS_DIR, 'dev-project-team-skill', 'SKILL.md'), encoding='utf-8').read())
     v = m.group(1) if m else 'v21.0.0'
@@ -188,14 +211,14 @@ if __name__ == '__main__':
         snapshot(v)
     else:
         print(f'   (dry-run) snapshot {v} skipped')
-    print('[4/5] 打包 dist')
+    print('[4/6] 打包 dist')
     if not dry_run:
         if run_package() != 0:
             print('   ✗ package_skills.py 失败'); sys.exit(1)
         print('   ✓ package_skills.py 完成')
     else:
         print('   (dry-run) package_skills.py skipped')
-    print('[5/5] 部署项目级三目录 (全局库由 publish_production 独占)')
+    print('[5/6] 部署项目级三目录 (全局库由 publish_production 独占)')
     if not dry_run:
         if run_deploy() != 0:
             print('   ✗ deploy_skills.py 失败'); sys.exit(1)

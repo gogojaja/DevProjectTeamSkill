@@ -63,6 +63,7 @@ def parse_args(argv):
     extra_list = None
     all_globals = False
     no_extra = False
+    verify = False
     i = 0
     while i < len(argv):
         a = argv[i]
@@ -80,18 +81,21 @@ def parse_args(argv):
             all_globals = True; i += 1
         elif a == "--extra-globals":
             extra_list = [x.strip() for x in argv[i + 1].split(",") if x.strip()]; i += 2
+        elif a == "--verify":
+            verify = True; i += 1
         elif a in ("-h", "--help"):
             print("用法: publish_production.py [--version <vX.Y.Z>] [--target-dir <dir>] "
-                  "[--dry-run] [--gate-desensitize]\n"
+                  "[--dry-run] [--gate-desensitize] [--verify]\n"
                   "      [--no-extra-globals | --extra-globals trae,workbuddy | --all-globals]")
             print("  默认: 除 opencode 全局库外，自动同步到已安装工具(父目录存在)的全局技能目录")
             print("  --no-extra-globals : 仅发布到 opencode 全局库(原行为)")
             print("  --extra-globals    : 显式指定额外全局目标(trae/trae-cn/workbuddy/claude/copilot/agents)")
             print("  --all-globals       : 全部已知工具全局目录(即使未安装也创建)")
+            print("  --verify           : 发布后验证消费端文件完整性")
             sys.exit(0)
         else:
             print(f"未知参数: {a}"); sys.exit(1)
-    return target_root, version, dry_run, gate_only, extra_list, all_globals, no_extra
+    return target_root, version, dry_run, gate_only, extra_list, all_globals, no_extra, verify
 
 
 def read_version():
@@ -375,7 +379,7 @@ def run_desensitize_gate(skills_dir=None, report_path=None):
 
 
 def main():
-    target_root, version, dry_run, gate_only, extra_list, all_globals, no_extra = parse_args(sys.argv[1:])
+    target_root, version, dry_run, gate_only, extra_list, all_globals, no_extra, verify = parse_args(sys.argv[1:])
     if version is None:
         version = read_version()
 
@@ -422,8 +426,17 @@ def main():
         else:
             copy_skills_to(ver_dir)
 
-    # 4. current 软链（原子切换）
+    # 4. current 软链（原子切换）+ 回滚指针
     current = os.path.join(target_root, "current")
+    # 回滚指针：记录当前 current 指向，方便回滚
+    if not dry_run and (os.path.islink(current) or os.path.exists(current)):
+        prev_target = os.path.basename(os.path.realpath(current)) if os.path.islink(current) else "unknown"
+        backup_dir = os.path.join(ROOT, ".backup")
+        os.makedirs(backup_dir, exist_ok=True)
+        rollback_file = os.path.join(backup_dir, "last_production_version.txt")
+        with open(rollback_file, "w", encoding="utf-8") as f:
+            f.write(prev_target)
+        print(f"  回滚指针已记录: {prev_target} → {rollback_file}")
     if dry_run:
         print(f"  (dry-run) 将设置 current -> v{version}")
     else:
@@ -480,6 +493,32 @@ def main():
         print(f"  版本目录: {ver_dir}  SHA256={dir_hash(ver_dir) if os.path.isdir(ver_dir) else '-'}")
         print(f"  current   -> {os.path.realpath(current) if os.path.exists(current) else '-'}")
     print("  发布完成。")
+
+    # 7. 消费端验证（--verify）
+    if verify and not dry_run:
+        print("\n  [消费端验证]")
+        verify_ok = True
+        # 检查 opencode 全局库
+        if os.path.isdir(GLOBAL_SKILLS):
+            skill_index = os.path.join(GLOBAL_SKILLS, "SKILL_INDEX.md")
+            if os.path.isfile(skill_index):
+                print(f"  ✓ SKILL_INDEX.md 存在于全局库")
+            else:
+                print(f"  ✗ SKILL_INDEX.md 缺失于全局库: {GLOBAL_SKILLS}")
+                verify_ok = False
+            # 检查角色包目录数
+            role_dirs = [d for d in os.listdir(GLOBAL_SKILLS) if os.path.isdir(os.path.join(GLOBAL_SKILLS, d)) and d.startswith("role-")]
+            if len(role_dirs) >= 9:
+                print(f"  ✓ 角色包目录数: {len(role_dirs)} (≥9)")
+            else:
+                print(f"  ✗ 角色包目录数不足: {len(role_dirs)} (<9)")
+                verify_ok = False
+        else:
+            print(f"  ⚠ 全局库不存在: {GLOBAL_SKILLS} (可能尚未发布)")
+        if verify_ok:
+            print("  消费端验证通过")
+        else:
+            print("  消费端验证存在告警，请检查")
 
 if __name__ == "__main__":
     import hashlib
