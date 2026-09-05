@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+[姊妹文件声明] 本文件与 dev-git-hub/tools/load_secret.py 为功能双胞胎（整改 R-2 双份保留，2026-09-05）：
+  本侧 ROOT 支持 PROJECT_ROOT 环境变量覆盖（技能库本地工具 nightly_code_complete 等以模块方式导入，无法代理化；
+  且技能库凭据含非 git 类如 llm_token）；hub 侧固定为自身仓库根。除 ROOT 推导外功能必须一致，修改须双侧同步。
 load_secret.py — 跨平台凭据读取（铁律 #3 A 级：真实值只经 env / .secrets / 系统钥匙串，绝不入库）
 
 优先级（跨平台一致）：
