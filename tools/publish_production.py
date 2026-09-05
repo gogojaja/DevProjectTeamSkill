@@ -382,6 +382,9 @@ def main():
     target_root, version, dry_run, gate_only, extra_list, all_globals, no_extra, verify = parse_args(sys.argv[1:])
     if version is None:
         version = read_version()
+    else:
+        # 规范化：去除可能的 'v' 前缀（防止 --version v21.12.0 导致 vv21.12.0）
+        version = version.lstrip('v')
 
     if gate_only:
         if not run_desensitize_gate():
