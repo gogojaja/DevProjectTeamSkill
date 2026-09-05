@@ -11,8 +11,8 @@
   },
   {
     "id": "EV-302",
-    "claim": "独立项目 dev-git-hub 已建（AUTH-014，/Volumes/BR256G/dev-git-hub，7 文件：README/config/install_mac/install_windows/sync_policy），承载 LAN 中枢+Windows 副本+WAN 灾备——git 基建独立化先例已具备，可承接 git 复杂操作",
-    "source": "/Volumes/BR256G/dev-git-hub/ + AUTH-014 授权登记",
+    "claim": "独立项目 dev-git-hub 已建（AUTH-014，同级目录约定 ../dev-git-hub，7 文件：README/config/install_mac/install_windows/sync_policy），承载 LAN 中枢+Windows 副本+WAN 灾备——git 基建独立化先例已具备，可承接 git 复杂操作",
+    "source": "dev-git-hub 仓库 + AUTH-014 授权登记",
     "tier": "T1",
     "cross_check": 1,
     "access_date": "2026-08-30",

@@ -10,7 +10,7 @@
 2. 进入该工具的 **MCP / MCP Servers** 面板（各工具入口见下表）。
 3. 找到 `dev-project-team-skill`，确认状态为 **已连接 / Connected / 绿点**。
 4. 实测调用：在对话/命令中调用一个 MCP 工具，例如列出技能 `skill_list`，或执行门禁 `run_gate`，确认返回正常（非报错、非超时）。
-5. 若状态异常，优先排查：① venv 路径是否存在（`/Volumes/BR256G/DevProjectTeamSkill/.venv/bin/python`）；② server 文件是否存在；③ 网络/权限（opencode 全局库需在 `~/.config/opencode/skills` 发布后才对本仓库外生效）。
+5. 若状态异常，优先排查：① venv 路径是否存在（`<repo-root>/.venv/bin/python`）；② server 文件是否存在（`tools/mcp_server/skills_mcp_server.py`）；③ 网络/权限（opencode 全局库需在 `~/.config/opencode/skills` 发布后才对本仓库外生效）。
 
 ## 各工具验证入口
 

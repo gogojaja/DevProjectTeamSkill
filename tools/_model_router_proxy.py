@@ -50,8 +50,12 @@ def run_model_router_cli(args=None):
     model_router_root = find_model_router_root()
     if model_router_root is None:
         print("[error] dev-model-router 工具缺失", file=sys.stderr)
-        print("        请先初始化 dev-model-router 项目", file=sys.stderr)
-        print("        或设置环境变量 DEV_MODEL_ROUTER_ROOT 指向项目根目录", file=sys.stderr)
+        print("        安装方式：", file=sys.stderr)
+        print("          1. 将 dev-model-router 项目 clone 到本仓库同级目录（../dev-model-router）", file=sys.stderr)
+        print("          2. 或设置环境变量 DEV_MODEL_ROUTER_ROOT 指向项目根目录", file=sys.stderr)
+        print("          3. 或创建配置文件 .model_router_root 写入绝对路径", file=sys.stderr)
+        print("        替代方案：多模型编排功能不可用；可直接配置模型端点使用", file=sys.stderr)
+        print("        详见 references/plugin_interface.md", file=sys.stderr)
         return 1
 
     env = os.environ.copy()

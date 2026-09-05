@@ -60,9 +60,12 @@ def run_proxy(script_name, label="proxy"):
     hub_script = find_hub_script(script_name)
     if hub_script is None:
         print("[error] dev-git-hub 工具缺失: tools/%s" % script_name, file=sys.stderr)
-        print("        请先初始化 dev-git-hub 项目（运行 scripts/bootstrap_remotes.sh 或 .py）",
-              file=sys.stderr)
-        print("        或设置环境变量 DEV_GIT_HUB_ROOT 指向 dev-git-hub 根目录", file=sys.stderr)
+        print("        安装方式：", file=sys.stderr)
+        print("          1. 将 dev-git-hub 项目 clone 到本仓库同级目录（../dev-git-hub）", file=sys.stderr)
+        print("          2. 或设置环境变量 DEV_GIT_HUB_ROOT 指向 dev-git-hub 根目录", file=sys.stderr)
+        print("          3. 或创建配置文件 .hub_root 写入绝对路径", file=sys.stderr)
+        print("        替代方案：本地 git 操作不受影响；远端推送可用 git push origin 兜底", file=sys.stderr)
+        print("        详见 references/plugin_interface.md", file=sys.stderr)
         return 1
 
     env = os.environ.copy()

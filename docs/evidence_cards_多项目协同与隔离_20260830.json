@@ -12,7 +12,7 @@
   {
     "id": "EV-502",
     "claim": "dev-git-hub 已独立成仓库（AUTH-014，本地 git 仓库 + hub/origin/mirror 三远端 + .gitignore 隔离敏感），须保持完整性与独立性——本项目维护它时不可混入本项目仓库",
-    "source": "/Volumes/BR256G/dev-git-hub/（独立仓库已验证）",
+    "source": "dev-git-hub 仓库（独立仓库已验证）",
     "tier": "T1",
     "cross_check": 1,
     "access_date": "2026-08-30",

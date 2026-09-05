@@ -37,12 +37,12 @@ opencode 通过 `skills.paths` 配置指向技能源码目录（本仓库 `.trae
 ```jsonc
 {
   "skills": {
-    "paths": ["/Volumes/BR256G/DevProjectTeamSkill/.trae/skills"]
+    "paths": ["<repo-root>/.trae/skills"]
   }
 }
 ```
 
-> 注意：本仓库位于 USB 卷（`/Volumes/BR256G/...`），拔盘后全局配置失效；
+> 注意：如本仓库位于可移动存储（如 USB 卷），拔盘后全局配置失效；
 > 如需脱离源码常驻，改用 `bash tools/deploy_skills.sh` 部署到 `~/.config/opencode/skills/`。
 
 ### 2.3 双平台注意事项

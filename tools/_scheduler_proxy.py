@@ -50,8 +50,12 @@ def run_scheduler_cli(args=None):
     scheduler_root = find_scheduler_root()
     if scheduler_root is None:
         print("[error] dev-task-scheduler 工具缺失", file=sys.stderr)
-        print("        请先初始化 dev-task-scheduler 项目", file=sys.stderr)
-        print("        或设置环境变量 DEV_TASK_SCHEDULER_ROOT 指向项目根目录", file=sys.stderr)
+        print("        安装方式：", file=sys.stderr)
+        print("          1. 将 dev-task-scheduler 项目 clone 到本仓库同级目录（../dev-task-scheduler）", file=sys.stderr)
+        print("          2. 或设置环境变量 DEV_TASK_SCHEDULER_ROOT 指向项目根目录", file=sys.stderr)
+        print("          3. 或创建配置文件 .scheduler_root 写入绝对路径", file=sys.stderr)
+        print("        替代方案：定时任务功能不可用；核心技能库其他功能不受影响", file=sys.stderr)
+        print("        详见 references/plugin_interface.md", file=sys.stderr)
         return 1
 
     env = os.environ.copy()

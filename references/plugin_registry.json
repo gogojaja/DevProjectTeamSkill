@@ -1,0 +1,84 @@
+{
+  "$schema": "插件注册表 — DevProjectTeamSkill 可选插件清单",
+  "version": "1.0.0",
+  "updated": "2026-09-05",
+  "plugins": [
+    {
+      "name": "dev-git-hub",
+      "env_var": "DEV_GIT_HUB_ROOT",
+      "auth": "AUTH-014",
+      "category": "infrastructure",
+      "required": false,
+      "tools": ["mirror_push", "github_push", "github_ip_refresh", "restore_github_push", "_gh_ip_probe", "check_github_connectivity"],
+      "proxy_module": "_hub_proxy",
+      "fallback": "本地 git 操作（init/commit/log/diff）不受影响；远端推送需安装插件或使用 git push origin 兜底",
+      "description": "Git 基建（LAN 中枢 + Windows 副本 + WAN 灾备 + 真实 IP 推送）"
+    },
+    {
+      "name": "dev-task-scheduler",
+      "env_var": "DEV_TASK_SCHEDULER_ROOT",
+      "auth": "AUTH-015",
+      "category": "infrastructure",
+      "required": false,
+      "tools": ["scheduler_cli"],
+      "proxy_module": "_scheduler_proxy",
+      "fallback": "定时任务功能不可用；核心技能库其他功能不受影响",
+      "description": "定时任务管理（基于 APScheduler 3.11.3 的跨项目调度引擎）"
+    },
+    {
+      "name": "dev-model-router",
+      "env_var": "DEV_MODEL_ROUTER_ROOT",
+      "auth": "AUTH-016",
+      "category": "infrastructure",
+      "required": false,
+      "tools": ["model_router_cli"],
+      "proxy_module": "_model_router_proxy",
+      "fallback": "多模型编排功能不可用；可直接配置模型端点使用",
+      "description": "多模型分层编排（Router + DAG + Executor 三层架构）"
+    },
+    {
+      "name": "dev-project-mgmt",
+      "env_var": "DEV_PROJECT_MGMT_ROOT",
+      "auth": "AUTH-022",
+      "category": "tool",
+      "required": false,
+      "tools": ["raid_manager", "progress_reporter", "change_coordinator", "evm_calculator"],
+      "proxy_module": null,
+      "fallback": "项目管理工具不可用；方法论技能（role-project-mgmt）不受影响",
+      "description": "项目管理工具集（RAID 台账/进展报告/变更协调/EVM 计算）"
+    },
+    {
+      "name": "dev-security-tools",
+      "env_var": "DEV_SECURITY_TOOLS_ROOT",
+      "auth": "AUTH-023",
+      "category": "tool",
+      "required": false,
+      "tools": ["audit_ledger", "credential_scanner", "boundary_checker", "secret_detector"],
+      "proxy_module": null,
+      "fallback": "新增安全工具不可用；本仓库现有 audit.py / desensitize/ 保留原位不受影响",
+      "description": "安全审计工具集（审计台账/凭据扫描/边界检查/密钥检测）"
+    },
+    {
+      "name": "dev-test-tools",
+      "env_var": "DEV_TEST_TOOLS_ROOT",
+      "auth": "AUTH-024",
+      "category": "tool",
+      "required": false,
+      "tools": ["batch_test_runner", "coverage_aggregator", "defect_ledger", "test_reporter"],
+      "proxy_module": null,
+      "fallback": "测试工具不可用；方法论技能（role-testing）不受影响",
+      "description": "测试工具集（跨项目批量执行/覆盖率聚合/缺陷台账/报告生成）"
+    },
+    {
+      "name": "free-api-hub",
+      "env_var": "FREE_API_HUB_ROOT",
+      "auth": null,
+      "category": "service",
+      "required": false,
+      "tools": ["model_list", "balance_check"],
+      "proxy_module": null,
+      "fallback": "免费 API 聚合不可用；可直接配置模型端点或使用付费 API",
+      "description": "API 聚合服务（模型清单/余额/费用管理；选型建议已转为本库 model-selection 技能）"
+    }
+  ]
+}
