@@ -1,0 +1,26 @@
+评审维度,评审项,评审结论,评分(1-5),问题/建议,状态
+完整性,方案目标是否明确量化,目标清晰（7→15 Tools, 2→6 Prompts, 自动注册3工具）,5,无问题,SIGNED_OFF
+完整性,方案范围是否明确边界,纳入/排除范围清晰（P0/P1纳入，P2/P3排除）,5,无问题,SIGNED_OFF
+完整性,交付物清单是否完整,方案+计划+评审报告+代码+测试五件套,4,建议补充单元测试覆盖范围明细,CHANGES_REQUESTED
+完整性,执行计划WBS是否可执行,4阶段11任务，预计5.5h,4,建议细化每阶段验收节点,CHANGES_REQUESTED
+可行性,MCP工具扩充技术可行性,基于现有FastMCP框架扩展，技术成熟,5,无问题,SIGNED_OFF
+可行性,客户端自动注册技术可行性,需处理多工具配置文件格式差异，有一定复杂度,4,建议先实现opencode+TRAE两个主要工具,CLOSED
+可行性,新增工具与现有脚本兼容性,包装现有CLI工具，零逻辑复制,5,无问题,SIGNED_OFF
+可行性,跨平台兼容性（Windows/macOS/Linux）,Python实现+路径动态解析,4,建议增加Windows路径测试用例,CHANGES_REQUESTED
+一致性,与现有铁律对齐（授权/备份/留痕）,Tier2工具默认dry_run，写操作需确认,5,无问题,SIGNED_OFF
+一致性,与现有MCP Server架构一致,使用FastMCP装饰器，与现有7个工具风格统一,5,无问题,SIGNED_OFF
+一致性,与现有门禁体系兼容,check_mcp_server.py阈值需从5提升到15,4,建议门禁阈值分阶段提升（5→10→15）,CHANGES_REQUESTED
+一致性,与现有发布流程集成,publish_production需增加自动注册步骤,4,建议作为可选步骤（--register-clients）,CHANGES_REQUESTED
+风险,MCP Server依赖版本冲突风险,锁定mcp[cli]<2，CI验证,4,建议增加版本兼容性测试矩阵,CLOSED
+风险,客户端配置文件损坏风险,备份原文件到.backup/，降级处理,5,无问题,SIGNED_OFF
+风险,新增工具引入回归风险,单元测试+门禁阈值提升,4,建议增加集成测试覆盖核心链路,CHANGES_REQUESTED
+风险,跨平台路径解析风险,使用os.path动态计算,4,建议增加路径解析单元测试,CLOSED
+可测性,MCP工具数量验收,≥15个（当前7+新增8）,5,可通过@mcp.tool()计数验证,SIGNED_OFF
+可测性,Prompts数量验收,≥6个（当前2+新增4）,5,可通过@mcp.prompt()计数验证,SIGNED_OFF
+可测性,客户端自动注册验收,opencode/TRAE至少2个工具可自动注册,4,建议增加注册后验证步骤（--verify）,CHANGES_REQUESTED
+可测性,MCP Server门禁验收,check_mcp_server.py通过（阈值≥15）,5,无问题,SIGNED_OFF
+可测性,单元测试覆盖率验收,新增工具均有对应测试用例,4,建议明确测试覆盖范围（至少覆盖Tier1工具）,CHANGES_REQUESTED
+总体评审,,,,,
+评审总分,五维加权（完整性25%+可行性25%+一致性20%+风险15%+可测性15%）,4.45/5.0,Go(≥3.5),无阻塞性问题,SIGNED_OFF
+评审结论,方案可行，建议按评审意见微调后执行,,,,,
+评审意见汇总,1. 补充单元测试覆盖范围明细 2. 细化每阶段验收节点 3. 客户端自动注册先实现opencode+TRAE 4. 门禁阈值分阶段提升 5. 增加Windows路径测试 6. publish_production自动注册作为可选步骤,,,,,

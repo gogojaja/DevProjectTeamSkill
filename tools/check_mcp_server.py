@@ -5,7 +5,7 @@ MCP Server 固化门禁（硬门禁）。
 
 检查项（全部为静态分析，不导入 MCP Server 模块，避免触发依赖安装）：
   1. skills_mcp_server.py 语法编译通过（py_compile）
-  2. @mcp.tool() 装饰的函数数量 ≥ 阈值（默认 5，当前实际 7 的 ~80%）
+  2. @mcp.tool() 装饰的函数数量 ≥ 阈值（默认 15，当前实际 15）
   3. 工具函数引用的核心脚本在 tools/ 中存在（可达性）
   4. requirements.txt 存在且包含 mcp 依赖声明
 
@@ -34,9 +34,14 @@ EXPECTED_SCRIPTS = [
     "mirror_push.py",
     "solidify.py",
     "publish_production.py",
+    "check_skill_links.py",
+    "scope_tracker.py",
+    "retro_cli.py",
+    "mpv_cli.py",
+    "nightly_quality_gate.py",
 ]
 
-MIN_TOOLS_DEFAULT = 5
+MIN_TOOLS_DEFAULT = 15
 
 
 def check_compile():

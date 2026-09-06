@@ -64,6 +64,7 @@ def parse_args(argv):
     all_globals = False
     no_extra = False
     verify = False
+    register_clients = False
     i = 0
     while i < len(argv):
         a = argv[i]
@@ -83,19 +84,22 @@ def parse_args(argv):
             extra_list = [x.strip() for x in argv[i + 1].split(",") if x.strip()]; i += 2
         elif a == "--verify":
             verify = True; i += 1
+        elif a == "--register-clients":
+            register_clients = True; i += 1
         elif a in ("-h", "--help"):
             print("用法: publish_production.py [--version <vX.Y.Z>] [--target-dir <dir>] "
-                  "[--dry-run] [--gate-desensitize] [--verify]\n"
+                  "[--dry-run] [--gate-desensitize] [--verify] [--register-clients]\n"
                   "      [--no-extra-globals | --extra-globals trae,workbuddy | --all-globals]")
             print("  默认: 除 opencode 全局库外，自动同步到已安装工具(父目录存在)的全局技能目录")
             print("  --no-extra-globals : 仅发布到 opencode 全局库(原行为)")
             print("  --extra-globals    : 显式指定额外全局目标(trae/trae-cn/workbuddy/claude/copilot/agents)")
             print("  --all-globals       : 全部已知工具全局目录(即使未安装也创建)")
             print("  --verify           : 发布后验证消费端文件完整性")
+            print("  --register-clients : 发布后自动注册 MCP Server 到已安装工具客户端")
             sys.exit(0)
         else:
             print(f"未知参数: {a}"); sys.exit(1)
-    return target_root, version, dry_run, gate_only, extra_list, all_globals, no_extra, verify
+    return target_root, version, dry_run, gate_only, extra_list, all_globals, no_extra, verify, register_clients
 
 
 def read_version():
@@ -379,7 +383,7 @@ def run_desensitize_gate(skills_dir=None, report_path=None):
 
 
 def main():
-    target_root, version, dry_run, gate_only, extra_list, all_globals, no_extra, verify = parse_args(sys.argv[1:])
+    target_root, version, dry_run, gate_only, extra_list, all_globals, no_extra, verify, register_clients = parse_args(sys.argv[1:])
     if version is None:
         version = read_version()
     else:
@@ -522,6 +526,21 @@ def main():
             print("  消费端验证通过")
         else:
             print("  消费端验证存在告警，请检查")
+
+    # 8. MCP 客户端自动注册（--register-clients，可选步骤）
+    if register_clients and not dry_run:
+        print("\n  [MCP 客户端自动注册]")
+        register_script = os.path.join(ROOT, "tools", "register_mcp_client.py")
+        if os.path.isfile(register_script):
+            cmd = [sys.executable, register_script, "--write"]
+            if verify:
+                cmd.append("--verify")
+            r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, encoding="utf-8", errors="replace")
+            print(r.stdout[:2000] if r.stdout else "")
+            if r.returncode != 0:
+                print(f"  ⚠ 客户端注册有告警: {r.stderr[:500]}")
+        else:
+            print(f"  ~ register_mcp_client.py 不存在，跳过")
 
 if __name__ == "__main__":
     import hashlib
