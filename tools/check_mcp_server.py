@@ -39,9 +39,11 @@ EXPECTED_SCRIPTS = [
     "retro_cli.py",
     "mpv_cli.py",
     "nightly_quality_gate.py",
+    "project_mgmt_proxy.py",
+    "_project_mgmt_proxy.py",
 ]
 
-MIN_TOOLS_DEFAULT = 15
+MIN_TOOLS_DEFAULT = 21
 
 
 def check_compile():

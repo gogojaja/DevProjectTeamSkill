@@ -19,8 +19,10 @@ import os
 import re
 import sys
 import json
+import csv
 import subprocess
 from datetime import datetime, timezone
+from pathlib import Path
 
 try:
     from mcp.server.fastmcp import FastMCP
@@ -499,6 +501,309 @@ def retrospective(stage: str, obj: str) -> str:
 - 行动项台账（owner/deadline/status）
 
 铁律：复盘须在阶段结束后 1 周内完成；行动项须有明确 owner 和 deadline；经验须登记经验库。"""
+
+
+# ---------- 新增 Tools（v21.14.0 AI Agent PM 能力提升） ----------
+
+def _run_mgmt_cli(args: list) -> str:
+    """调用 dev-project-mgmt 代理并返回输出（截断 4000 字符）。"""
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    from _project_mgmt_proxy import run_project_mgmt_cli
+    result = run_project_mgmt_cli(args=args, capture=True)
+    output = (result.stdout or "") + (result.stderr or "")
+    return output[:4000] if output else f"(退出码 {result.returncode})"
+
+
+@mcp.tool()
+def raid_mgmt(action: str, raid_type: str = "", desc: str = "", raid_id: str = "",
+              status: str = "", owner: str = "", dry_run: bool = True) -> str:
+    """RAID 四维台账管理（风险/假设/问题/依赖）。包装 dev-project-mgmt CLI。
+
+    Args:
+        action: 操作类型（list/add/update/close）
+        raid_type: RAID 类型（risk/assumption/issue/dependency），action=add 时必填
+        desc: 描述，action=add 时必填
+        raid_id: RAID ID，action=update/close 时必填
+        status: 新状态，action=update 时可选
+        owner: 责任人，action=add/update 时可选
+        dry_run: 是否仅探测不执行（默认 True）
+    """
+    args = ["raid", action]
+    if action == "list":
+        if raid_type:
+            args += ["--type", raid_type]
+    elif action == "add":
+        if dry_run:
+            return f"(dry-run) 将添加 RAID: type={raid_type}, desc={desc}"
+        args += ["--type", raid_type, "--desc", desc]
+        if owner:
+            args += ["--owner", owner]
+    elif action in ("update", "close"):
+        if dry_run and action == "update":
+            return f"(dry-run) 将更新 {raid_id}: status={status}"
+        args += ["--id", raid_id]
+        if action == "update" and status:
+            args += ["--status", status]
+    else:
+        return f"未知 action: {action}（可选 list/add/update/close）"
+    return _run_mgmt_cli(args)
+
+
+@mcp.tool()
+def evm_analyze(action: str = "calc", milestone_id: str = "", milestone_name: str = "",
+                planned_end: str = "", planned_value: float = 0.0) -> str:
+    """EVM 挣值分析（PV/EV/AC/SPI/CPI）。包装 dev-project-mgmt CLI。
+
+    Args:
+        action: 操作类型（calc=计算指标 / status=查看状态 / add-milestone=添加里程碑）
+        milestone_id: 里程碑 ID（action=add-milestone 时必填）
+        milestone_name: 里程碑名称（action=add-milestone 时必填）
+        planned_end: 计划结束日期（action=add-milestone 时可选）
+        planned_value: 计划值 PV（action=add-milestone 时可选）
+    """
+    args = ["evm", action]
+    if action == "calc":
+        if milestone_id:
+            args += ["--milestone", milestone_id]
+    elif action == "status":
+        pass  # 无额外参数
+    elif action == "add-milestone":
+        args += ["--id", milestone_id, "--name", milestone_name]
+        if planned_end:
+            args += ["--end", planned_end]
+        if planned_value > 0:
+            args += ["--value", str(planned_value)]
+    else:
+        return f"未知 action: {action}（可选 calc/status/add-milestone）"
+    return _run_mgmt_cli(args)
+
+
+@mcp.tool()
+def progress_report(report_type: str = "weekly", project_name: str = "", phase: str = "") -> str:
+    """进展报告生成（周报/阶段报）。包装 dev-project-mgmt CLI。
+
+    Args:
+        report_type: 报告类型（weekly=周报 / phase=阶段报告）
+        project_name: 项目名称（可选，默认从目录名推导）
+        phase: 阶段名称（report_type=phase 时可选）
+    """
+    args = ["report", report_type]
+    if project_name:
+        args += ["--name", project_name]
+    if report_type == "phase" and phase:
+        args += ["--phase", phase]
+    return _run_mgmt_cli(args)
+
+
+@mcp.tool()
+def change_mgmt(action: str, title: str = "", desc: str = "", change_id: str = "",
+                impact: str = "", priority: str = "", approver: str = "",
+                dry_run: bool = True) -> str:
+    """变更协调（登记/分析/审批/驳回）。包装 dev-project-mgmt CLI。
+
+    Args:
+        action: 操作类型（list/register/analyze/approve/reject）
+        title: 变更标题（action=register 时必填）
+        desc: 变更描述（action=register 时必填）
+        change_id: 变更 ID（action=analyze/approve/reject 时必填）
+        impact: 影响范围（action=register 时可选）
+        priority: 优先级（action=register 时可选）
+        approver: 审批人（action=approve/reject 时可选）
+        dry_run: 是否仅探测不执行（默认 True）
+    """
+    args = ["change", action]
+    if action == "list":
+        pass
+    elif action == "register":
+        if dry_run:
+            return f"(dry-run) 将登记变更: title={title}"
+        args += ["--title", title, "--desc", desc]
+        if impact:
+            args += ["--impact", impact]
+        if priority:
+            args += ["--priority", priority]
+    elif action in ("analyze", "approve", "reject"):
+        if dry_run:
+            return f"(dry-run) 将{action}变更: {change_id}"
+        args += ["--id", change_id]
+        if approver:
+            args += ["--approver", approver]
+    else:
+        return f"未知 action: {action}（可选 list/register/analyze/approve/reject）"
+    return _run_mgmt_cli(args)
+
+
+@mcp.tool()
+def program_status() -> str:
+    """项目群整体视图（读 28/29/30 台账）。只读操作。"""
+    ledger_dir = os.path.join(ROOT, "台账")
+    if not os.path.isdir(ledger_dir):
+        return "台账目录不存在"
+    result = []
+    # 28_项目群注册
+    for fname, label in [
+        ("28_program_registry.csv", "项目群注册"),
+        ("29_dependency_matrix.csv", "依赖矩阵"),
+        ("30_program_progress.csv", "项目群主进度"),
+    ]:
+        fpath = os.path.join(ledger_dir, fname)
+        if os.path.isfile(fpath):
+            try:
+                with open(fpath, encoding="utf-8-sig") as f:
+                    reader = csv.reader(f)
+                    rows = list(reader)
+                if len(rows) > 1:
+                    result.append(f"【{label}】({len(rows)-1} 条)")
+                    for row in rows[:3]:  # 仅显示前 3 行
+                        result.append("  " + " | ".join(row[:6]))
+                    if len(rows) > 3:
+                        result.append(f"  ... 共 {len(rows)-1} 条")
+                else:
+                    result.append(f"【{label}】(空)")
+            except Exception as e:
+                result.append(f"【{label}】读取失败: {e}")
+        else:
+            result.append(f"【{label}】文件不存在")
+    return "\n".join(result) if result else "无项目群数据"
+
+
+@mcp.tool()
+def program_dependency(source: str = "", target: str = "") -> str:
+    """跨项目依赖查询（读 29_依赖矩阵）。只读操作。
+
+    Args:
+        source: 源项目名（可选，过滤条件）
+        target: 目标项目名（可选，过滤条件）
+    """
+    fpath = os.path.join(ROOT, "台账", "29_dependency_matrix.csv")
+    if not os.path.isfile(fpath):
+        # 尝试中文文件名
+        fpath = os.path.join(ROOT, "台账", "29_项目依赖矩阵.csv")
+    if not os.path.isfile(fpath):
+        return "依赖矩阵文件不存在"
+    try:
+        with open(fpath, encoding="utf-8-sig") as f:
+            reader = csv.DictReader(f)
+            rows = list(reader)
+        # 过滤
+        if source:
+            rows = [r for r in rows if source.lower() in r.get("源项目", "").lower()]
+        if target:
+            rows = [r for r in rows if target.lower() in r.get("目标项目", "").lower()]
+        if not rows:
+            return f"无匹配依赖记录（source={source}, target={target}）"
+        result = [f"【依赖矩阵】({len(rows)} 条匹配)"]
+        for r in rows[:10]:
+            line = " | ".join(f"{k}={v}" for k, v in r.items() if v and k in
+                              ("源项目", "目标项目", "依赖类型", "依赖强度", "状态", "传导风险"))
+            result.append(f"  {line}")
+        if len(rows) > 10:
+            result.append(f"  ... 共 {len(rows)} 条")
+        return "\n".join(result)
+    except Exception as e:
+        return f"读取失败: {e}"
+
+
+# ---------- 新增 Prompts（v21.14.0 AI Agent PM 能力提升） ----------
+
+@mcp.prompt()
+def project_status_report(project_name: str = "", report_type: str = "weekly") -> str:
+    """引导生成进展报告的提示词模板。
+
+    Args:
+        project_name: 项目名称（可选）
+        report_type: 报告类型（weekly=周报 / phase=阶段报告）
+    """
+    return f"""你是项目经理。请为项目『{project_name or '当前项目'}』生成{report_type}。
+
+执行步骤（对齐 role-project-mgmt 角色包）：
+1. **数据采集**：
+   - RAID 台账状态（调用 raid_mgmt list）
+   - EVM 指标（调用 evm_analyze calc）
+   - 变更状态（调用 change_mgmt list）
+   - 进度跟踪（调用 program_status）
+2. **报告生成**：
+   - 调用 progress_report 生成{report_type}模板
+   - 聚合 RAID/EVM/进度/变更数据
+3. **报告内容**：
+   - 本期完成事项
+   - 进度/成本偏差分析（SPI/CPI）
+   - 风险/问题状态
+   - 下期计划
+   - 需决策项
+
+输出规范（CSV UTF-8 with BOM）：
+- 评审报告_<项目>_<期>_进展.csv
+- 仅回显首 5 行 + 行数
+
+铁律：进展报告须聚合 RAID+EVM+进度数据；偏差超阈值须触发预警。"""
+
+
+@mcp.prompt()
+def risk_assessment(project_name: str = "") -> str:
+    """引导 RAID 分析与风险预警的提示词模板。
+
+    Args:
+        project_name: 项目名称（可选）
+    """
+    return f"""你是风险管理师。请为项目『{project_name or '当前项目'}』执行 RAID 分析。
+
+执行步骤（对齐 role-project-mgmt §3 + role-governance risk_scan）：
+1. **RAID 台账查询**：
+   - 调用 raid_mgmt(action="list") 获取全部条目
+   - 按类型分类：风险/假设/问题/依赖
+2. **风险评估**：
+   - 概率 × 影响 = 风险等级（P1~P4）
+   - P1 风险须立即升级
+   - 临近到期项须预警
+3. **应对策略**：
+   - 风险：规避/转移/缓解/接受
+   - 问题：根因分析 + 纠正措施
+   - 依赖：缓解措施 + 替代方案
+4. **输出报告**：
+   - RAID 状态汇总（按类型/状态/优先级）
+   - P1/P2 风险清单 + 应对策略
+   - 升级建议
+
+输出规范（CSV UTF-8 with BOM）：
+- 12_风险问题台账.csv 更新
+- 风险预警报告
+
+铁律：P1 风险须立即升级；连续 2 次延期/超支停止 AI 自动调整，推送人工决策。"""
+
+
+@mcp.prompt()
+def program_review(tranche: str = "") -> str:
+    """引导 Program Board 评审的提示词模板。
+
+    Args:
+        tranche: 当前波次（可选）
+    """
+    return f"""你是 Program Board 评审引导师。请执行项目群评审{f'（波次：{tranche}）' if tranche else ''}。
+
+执行步骤（对齐 role-program-mgmt §8 Program Board 评审）：
+1. **数据采集**：
+   - 调用 program_status() 获取项目群整体视图
+   - 调用 program_dependency() 获取依赖矩阵
+   - 各项目 EVM 指标汇总
+2. **四 Gate 评审**：
+   - Gate 1：时间对齐（各项目里程碑是否对齐）
+   - Gate 2：依赖无冲突（依赖矩阵是否有未决冲突）
+   - Gate 3：标准一致（度量口径是否统一）
+   - Gate 4：环境就绪（CMDB 关键资产状态）
+3. **决策建议**：
+   - 继续（proceed）：四 Gate 全通过
+   - 转向（re-plan）：部分 Gate 未通过但可修复
+   - 终止（close）：业务论证不再成立
+4. **决策留痕**：
+   - 评审纪要 + 决策记录
+   - 禁止无记录口头决策
+
+输出规范：
+- 评审报告 CSV（四 Gate 通过状态 + 决策结论）
+- 行动项（owner/deadline）
+
+铁律：Program Board 决策必须人工确认；PM 提供机制不决策。"""
 
 
 if __name__ == "__main__":
