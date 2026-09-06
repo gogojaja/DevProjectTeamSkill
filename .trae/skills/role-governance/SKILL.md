@@ -41,6 +41,7 @@ description: "用户提到台账、阶段评审、门禁、变更审计、EVM、
 | 文档管理 | doc_manage | `domain/doc-management.md`（文档生命周期/命名规范/密级/归档审计；dev-doc-manager 技能化，项目群级配置管理见 role-program-mgmt 31 台账） |
 | 技能自省 | evolve_start / ctx_health_check | `../dev-project-team-skill/skills/self-improve/SKILL.md`（PDCA/哈希链/健康监控） |
 | 技能维护 | skill-authoring | `../shared/authoring.md`（强制闭环执行系统门禁） |
+| 分支治理 | branch_governance | `domain/branch-governance.md`（单一分支策略 + pre-push hook + 审计脚本） |
 
 ## 4. 铁律
 
