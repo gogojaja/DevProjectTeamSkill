@@ -102,3 +102,8 @@ scan_report*.csv
 
 # MCP 运行 venv（依赖环境，非源码，铁律#12 类运行时产物）
 .venv/
+
+# Agent Runtime 运行时台账（事件总线/待决策/决策记录，自动追加，铁律#12）
+台账/40_事件总线.jsonl
+台账/41_待决策队列.jsonl
+台账/42_决策记录.jsonl

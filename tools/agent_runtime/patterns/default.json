@@ -1,0 +1,66 @@
+{
+  "_comment": "默认决策模式 — 已知安全场景的自动响应规则。auto_execute 仅用于已有安全保护的操作。",
+  "_version": "1.0.0",
+  "patterns": [
+    {
+      "id": "auto-heal-diverged",
+      "description": "远端分叉 → 自动调用 self_heal 修复（有 --force-with-lease + 备份保护）",
+      "match": {"event": "git.diverged"},
+      "action": "self_heal",
+      "params": {"dry_run": false},
+      "risk": "Tier3",
+      "auto_execute": true,
+      "safety_note": "self_heal 内置备份 + --force-with-lease，已有安全保护"
+    },
+    {
+      "id": "commit-run-gates",
+      "description": "提交事件 → 跑三道门禁 + 双推（兼容 agent_loop v1 行为）",
+      "match": {"event": "git.commit"},
+      "action": "run_gates_and_push",
+      "params": {},
+      "risk": "Tier2",
+      "auto_execute": true,
+      "safety_note": "门禁未过则不双推，仅记录"
+    },
+    {
+      "id": "gate-fail-escalate",
+      "description": "门禁失败 → 阻断推送 + 写待决策队列 + 记录审计",
+      "match": {"event": "gate.fail"},
+      "action": "escalate",
+      "params": {"notify": true, "block_push": true},
+      "risk": "Tier2",
+      "auto_execute": true,
+      "safety_note": "仅阻断和记录，不做破坏性操作"
+    },
+    {
+      "id": "push-fail-retry",
+      "description": "推送失败 → 记录待决策（不自动重试，避免死循环）",
+      "match": {"event": "git.push_fail"},
+      "action": "escalate",
+      "params": {"notify": true, "block_push": false},
+      "risk": "Tier2",
+      "auto_execute": true,
+      "safety_note": "仅记录，不自动重试"
+    },
+    {
+      "id": "nightly-quality-scan",
+      "description": "定时夜间扫描 → 跑质量门禁 + 脱敏复查",
+      "match": {"event": "schedule.tick", "task": "nightly_scan"},
+      "action": "nightly_quality_gate",
+      "params": {"dry_run": false},
+      "risk": "Tier2",
+      "auto_execute": true,
+      "safety_note": "只读扫描 + 记录，无副作用"
+    },
+    {
+      "id": "health-check-anomaly",
+      "description": "健康检查异常 → 诊断 + 记录待决策",
+      "match": {"event": "health.check"},
+      "action": "escalate",
+      "params": {"notify": true, "block_push": false},
+      "risk": "Tier1",
+      "auto_execute": true,
+      "safety_note": "只读诊断 + 记录"
+    }
+  ]
+}
