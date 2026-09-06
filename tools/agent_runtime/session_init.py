@@ -35,6 +35,14 @@ if hasattr(sys.stdout, "reconfigure"):
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+# 导入 memory_store 模块（用于深度集成）
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+try:
+    from tools.memory_store import get_active as memory_get_active
+    HAS_MEMORY_STORE = True
+except ImportError:
+    HAS_MEMORY_STORE = False
+
 from event_bus import get_event_bus
 from decision_engine import DecisionEngine
 
@@ -132,8 +140,11 @@ class SessionBriefing:
         history = self.engine.decision_history(limit=10)
         auto_processed = [d for d in history if d.get("auto_execute")]
 
-        # 5. 记忆摘要
-        memory_records = _read_jsonl(MEMORY_STORE, limit=20)
+        # 5. 记忆摘要（优先使用 memory_store.get_active 过滤已过期条目）
+        if HAS_MEMORY_STORE:
+            memory_records = memory_get_active(limit=20)
+        else:
+            memory_records = _read_jsonl(MEMORY_STORE, limit=20)
         memory_summary = self._summarize_memory(memory_records)
 
         # 6. 建议行动
