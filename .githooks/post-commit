@@ -55,8 +55,8 @@ elif command -v python3 >/dev/null 2>&1; then
 fi
 
 if [ -n "$PY" ]; then
-  AGENT_LOOP_ACTIVE=1 "$PY" tools/agent_loop.py --trigger hook || true
+  AGENT_LOOP_ACTIVE=1 "$PY" tools/agent_runtime/agent_loop_v2.py --trigger hook --compat v1 || true
 elif command -v py >/dev/null 2>&1; then
   WINP=$(pwd -W 2>/dev/null || pwd)
-  AGENT_LOOP_ACTIVE=1 py -3.11 "$WINP/tools/agent_loop.py" --trigger hook || true
+  AGENT_LOOP_ACTIVE=1 py -3.11 "$WINP/tools/agent_runtime/agent_loop_v2.py" --trigger hook --compat v1 || true
 fi
