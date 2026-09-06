@@ -103,12 +103,12 @@ class TestMCPServerPMExpansion(unittest.TestCase):
         cls.root = ROOT
         cls.mcp_server_path = ROOT / "tools" / "mcp_server" / "skills_mcp_server.py"
 
-    def test_01_tool_count_21(self):
-        """测试 1：MCP Tools 数量 ≥ 21。"""
+    def test_01_tool_count_24(self):
+        """测试 1：MCP Tools 数量 ≥ 24。"""
         with open(self.mcp_server_path, encoding="utf-8") as f:
             content = f.read()
         count = content.count("@mcp.tool()")
-        self.assertGreaterEqual(count, 21, f"MCP Tools 数量不足: {count} < 21")
+        self.assertGreaterEqual(count, 24, f"MCP Tools 数量不足: {count} < 24")
 
     def test_02_prompt_count_9(self):
         """测试 2：MCP Prompts 数量 ≥ 9。"""
@@ -118,7 +118,7 @@ class TestMCPServerPMExpansion(unittest.TestCase):
         self.assertGreaterEqual(count, 9, f"MCP Prompts 数量不足: {count} < 9")
 
     def test_03_new_tools_exist(self):
-        """测试 3：新增 6 个 PM Tools 函数定义存在。"""
+        """测试 3：新增 9 个 PM Tools 函数定义存在。"""
         with open(self.mcp_server_path, encoding="utf-8") as f:
             content = f.read()
         new_tools = [
@@ -128,6 +128,9 @@ class TestMCPServerPMExpansion(unittest.TestCase):
             "def change_mgmt(",
             "def program_status(",
             "def program_dependency(",
+            "def risk_scan(",
+            "def resource_conflict(",
+            "def portfolio_summary(",
         ]
         for tool in new_tools:
             self.assertIn(tool, content, f"新增 PM Tool 未定义: {tool}")
@@ -172,11 +175,11 @@ class TestMCPServerGateThreshold(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, f"门禁失败: {result.stderr}")
 
-    def test_02_tool_threshold_21(self):
-        """测试 2：门禁阈值 ≥ 21。"""
+    def test_02_tool_threshold_24(self):
+        """测试 2：门禁阈值 ≥ 24。"""
         with open(self.check_script, encoding="utf-8") as f:
             content = f.read()
-        self.assertIn("MIN_TOOLS_DEFAULT = 21", content)
+        self.assertIn("MIN_TOOLS_DEFAULT = 24", content)
 
     def test_03_proxy_in_expected_scripts(self):
         """测试 3：proxy 脚本在 EXPECTED_SCRIPTS 中。"""

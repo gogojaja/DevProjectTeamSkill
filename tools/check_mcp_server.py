@@ -43,7 +43,7 @@ EXPECTED_SCRIPTS = [
     "_project_mgmt_proxy.py",
 ]
 
-MIN_TOOLS_DEFAULT = 21
+MIN_TOOLS_DEFAULT = 24
 
 
 def check_compile():

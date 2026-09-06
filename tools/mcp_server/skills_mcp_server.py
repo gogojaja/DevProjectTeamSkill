@@ -704,6 +704,207 @@ def program_dependency(source: str = "", target: str = "") -> str:
         return f"读取失败: {e}"
 
 
+# ---------- 新增 Tools（v21.15.0 PM 覆盖率提升） ----------
+
+@mcp.tool()
+def risk_scan(severity: str = "P1") -> str:
+    """风险扫描：扫描 RAID 台账中高风险项 + 临近到期预警。只读操作。
+
+    Args:
+        severity: 过滤风险等级（P1=紧急/P2=高/P3=中/P4=低，默认仅 P1）
+    """
+    # 尝试多种 RAID 台账文件名
+    ledger_dir = os.path.join(ROOT, "台账")
+    raid_files = ["RAID台账.csv", "12_风险问题台账.csv", "12_risk_issue_ledger.csv"]
+    raid_path = None
+    for fname in raid_files:
+        p = os.path.join(ledger_dir, fname)
+        if os.path.isfile(p):
+            raid_path = p
+            break
+    if raid_path is None:
+        return "RAID 台账文件不存在（已检查: %s）。请先通过 raid_mgmt 工具创建。" % ", ".join(raid_files)
+    try:
+        with open(raid_path, encoding="utf-8-sig") as f:
+            reader = csv.DictReader(f)
+            rows = list(reader)
+        if not rows:
+            return "RAID 台账为空"
+        # 风险等级计算：概率 × 影响
+        severity_map = {"P1": 4, "P2": 3, "P3": 2, "P4": 1}
+        threshold = severity_map.get(severity, 4)
+        high_risks = []
+        for r in rows:
+            # 尝试解析概率和影响
+            prob_str = r.get("概率", r.get("probability", ""))
+            impact_str = r.get("影响", r.get("impact", ""))
+            prob = _parse_level(prob_str, default=1)
+            impact = _parse_level(impact_str, default=1)
+            level = prob * impact
+            if level >= threshold:
+                r["_risk_score"] = level
+                high_risks.append(r)
+        # 按风险分降序
+        high_risks.sort(key=lambda x: x.get("_risk_score", 0), reverse=True)
+        if not high_risks:
+            return f"无 {severity} 及以上风险（共 {len(rows)} 条 RAID 记录）"
+        result = [f"【风险扫描】{len(high_risks)} 条 {severity}+ 风险（共 {len(rows)} 条 RAID）"]
+        for r in high_risks[:10]:
+            raid_id = r.get("RAID_ID", r.get("ID", "?"))
+            desc = r.get("描述", r.get("desc", ""))[:40]
+            status = r.get("状态", r.get("status", "?"))
+            owner = r.get("责任人", r.get("owner", "?"))
+            score = r.get("_risk_score", "?")
+            result.append(f"  [{raid_id}] 风险分={score} 状态={status} 责任人={owner} | {desc}")
+        if len(high_risks) > 10:
+            result.append(f"  ... 共 {len(high_risks)} 条")
+        result.append(f"\n铁律：P1 风险须立即升级；连续 2 次延期停止 AI 自动调整，推送人工决策。")
+        return "\n".join(result)
+    except Exception as e:
+        return f"风险扫描失败: {e}"
+
+
+def _parse_level(s: str, default: int = 1) -> int:
+    """解析风险等级字符串为数值。"""
+    if not s:
+        return default
+    s = s.strip().lower()
+    if s in ("高", "high", "h", "4", "5"):
+        return 4
+    if s in ("中", "medium", "m", "3"):
+        return 3
+    if s in ("低", "low", "l", "1", "2"):
+        return 2
+    try:
+        return int(s)
+    except ValueError:
+        return default
+
+
+@mcp.tool()
+def resource_conflict(resource: str = "") -> str:
+    """资源冲突检测：扫描依赖矩阵中共享资源依赖 + 冲突预警。只读操作。
+
+    Args:
+        resource: 资源名称过滤（可选，模糊匹配）
+    """
+    fpath = os.path.join(ROOT, "台账", "29_dependency_matrix.csv")
+    if not os.path.isfile(fpath):
+        fpath = os.path.join(ROOT, "台账", "29_项目依赖矩阵.csv")
+    if not os.path.isfile(fpath):
+        return "依赖矩阵文件不存在"
+    try:
+        with open(fpath, encoding="utf-8-sig") as f:
+            reader = csv.DictReader(f)
+            rows = list(reader)
+        if not rows:
+            return "依赖矩阵为空"
+        # 提取共享资源（依赖对象列）
+        resource_deps = {}  # resource -> list of rows
+        for r in rows:
+            dep_obj = r.get("依赖对象", r.get("dep_object", ""))
+            intensity = r.get("依赖强度(硬/软)", r.get("依赖强度", ""))
+            if not dep_obj:
+                continue
+            # 模糊匹配
+            if resource and resource.lower() not in dep_obj.lower():
+                continue
+            key = dep_obj.strip()
+            if key not in resource_deps:
+                resource_deps[key] = []
+            resource_deps[key].append(r)
+        # 检测冲突：同一资源被 >=2 个源项目硬依赖
+        conflicts = []
+        for res, deps in resource_deps.items():
+            sources = set()
+            hard_count = 0
+            for d in deps:
+                src = d.get("源项目", d.get("source", ""))
+                intensity = d.get("依赖强度(硬/软)", d.get("依赖强度", ""))
+                if src:
+                    sources.add(src)
+                if "硬" in intensity:
+                    hard_count += 1
+            if len(sources) >= 2 or hard_count >= 2:
+                conflicts.append({
+                    "resource": res,
+                    "sources": sources,
+                    "dep_count": len(deps),
+                    "hard_count": hard_count,
+                })
+        if not conflicts:
+            filter_msg = f"（过滤: {resource}）" if resource else ""
+            return f"无资源冲突{filter_msg}（共 {len(resource_deps)} 个资源依赖）"
+        result = [f"【资源冲突】{len(conflicts)} 个冲突（共 {len(resource_deps)} 个资源）"]
+        for c in conflicts[:10]:
+            srcs = ", ".join(c["sources"])
+            result.append(
+                f"  ⚠ {c['resource']}  "
+                f"源项目={srcs}  "
+                f"依赖数={c['dep_count']}  "
+                f"硬依赖={c['hard_count']}"
+            )
+        if len(conflicts) > 10:
+            result.append(f"  ... 共 {len(conflicts)} 个冲突")
+        result.append(f"\n缓解建议：错峰调度 / 增配资源 / 降级依赖（硬→软）")
+        return "\n".join(result)
+    except Exception as e:
+        return f"资源冲突检测失败: {e}"
+
+
+@mcp.tool()
+def portfolio_summary() -> str:
+    """组合治理摘要：全部项目群状态 + 收益兑现概览。只读操作。"""
+    ledger_dir = os.path.join(ROOT, "台账")
+    # 1. 读 28_项目群注册
+    reg_path = os.path.join(ledger_dir, "28_program_registry.csv")
+    if not os.path.isfile(reg_path):
+        return "项目群注册文件不存在（28_program_registry.csv）"
+    try:
+        with open(reg_path, encoding="utf-8-sig") as f:
+            reader = csv.DictReader(f)
+            programs = list(reader)
+        if not programs:
+            return "项目群注册为空"
+        result = [f"【组合治理摘要】{len(programs)} 个项目群"]
+        for pg in programs:
+            pg_id = pg.get("编号", "?")
+            name = pg.get("名称", "?")
+            status = pg.get("状态", "?")
+            goal = pg.get("收益目标", pg.get("战略目标", ""))[:60]
+            members = pg.get("成员项目清单", "")
+            member_count = len([m for m in members.split(";") if m.strip()]) if members else 0
+            tranche = pg.get("tranche划分", "")
+            result.append(f"\n  [{pg_id}] {name}")
+            result.append(f"    状态={status}  成员项目={member_count}个")
+            result.append(f"    收益目标: {goal}")
+            if tranche:
+                result.append(f"    波次: {tranche[:60]}")
+        # 2. 汇总 30_项目群主进度
+        prog_path = os.path.join(ledger_dir, "30_program_progress.csv")
+        if os.path.isfile(prog_path):
+            with open(prog_path, encoding="utf-8-sig") as f:
+                reader = csv.DictReader(f)
+                progress_rows = list(reader)
+            if progress_rows:
+                # 统计 SPI
+                spis = []
+                for r in progress_rows:
+                    spi_str = r.get("SPI", "")
+                    try:
+                        spis.append(float(spi_str))
+                    except (ValueError, TypeError):
+                        pass
+                if spis:
+                    avg_spi = sum(spis) / len(spis)
+                    health = "✅ 健康" if avg_spi >= 1.0 else ("⚠️ 偏差" if avg_spi >= 0.8 else "❗ 严重滞后")
+                    result.append(f"\n  【进度健康度】平均 SPI={avg_spi:.2f} {health}")
+                    result.append(f"    里程碑总数: {len(progress_rows)}")
+        return "\n".join(result)
+    except Exception as e:
+        return f"组合治理摘要读取失败: {e}"
+
+
 # ---------- 新增 Prompts（v21.14.0 AI Agent PM 能力提升） ----------
 
 @mcp.prompt()
