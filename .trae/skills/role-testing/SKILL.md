@@ -29,6 +29,9 @@ description: "用户提到测试策略、测试计划、用例设计、测试环
 | 总结门禁 | write_report / stage_review | `domain/summary.md`（对接总控） |
 | Excel 需求评审（S-01） | xlsx_review | `domain/xlsx_review.md`（T-01→规则检查→T-03→T-04 端到端） |
 | AI 代码审查（S-04） | code_review | `domain/code_review.md`（T-08 多层分析→脱敏→门禁） |
+| Excel 自动修复（S-02） | xlsx_auto_fix | `domain/xlsx_auto_fix.md`（T-05→T-06→T-04 修复闭环） |
+| 安全扫描套件（S-05） | security_scan | `domain/security_scan.md`（T-09+脱敏+审计→聚合报告） |
+| 评审复查（S-06） | review_recheck | `domain/review_recheck.md`（T-06→T-03→T-04 复查闭环） |
 
 ## 4. 测试铁律
 

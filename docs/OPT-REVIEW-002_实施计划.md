@@ -31,13 +31,13 @@
 
 | 序号 | 交付物 | 工时 | 依赖 | 状态 |
 |:---:|---|:---:|---|:---:|
-| 2.1 | T-09 dep_vuln_scan | 3.0h | pip-audit/OSV | TODO |
-| 2.2 | T-11 req_quality | 3.0h | 无 | TODO |
-| 2.3 | T-04 defect_ledger_sync | 1.5h | 无 | TODO |
-| 2.4 | T-05 xlsx_cell_fix | 1.5h | openpyxl | TODO |
-| 2.5 | S-02 xlsx-auto-fix | 2.0h | T-05/T-06 | TODO |
-| 2.6 | S-05 security-scan-suite | 2.0h | T-09 | TODO |
-| 2.7 | S-06 review-recheck | 1.5h | T-06 | TODO |
+| 2.1 | T-09 dep_vuln_scan | 3.0h | pip-audit/OSV | DONE |
+| 2.2 | T-11 req_quality | 3.0h | 无 | DONE |
+| 2.3 | T-04 defect_ledger_sync | 1.5h | 无 | DONE |
+| 2.4 | T-05 xlsx_cell_fix | 1.5h | openpyxl | DONE |
+| 2.5 | S-02 xlsx-auto-fix | 2.0h | T-05/T-06 | DONE |
+| 2.6 | S-05 security-scan-suite | 2.0h | T-09 | DONE |
+| 2.7 | S-06 review-recheck | 1.5h | T-06 | DONE |
 
 ---
 
@@ -58,6 +58,6 @@
 
 | 里程碑 | 内容 | 预计完成 |
 |:---:|------|:---:|
-| M1 | Phase 1 完成：文档评审自动化 + AI 代码审查 | 本会话 |
-| M2 | Phase 2 完成：安全扫描 + 需求质量 + 修复闭环 | +2 人天 |
+| M1 | Phase 1 完成：文档评审自动化 + AI 代码审查 | 已完成 |
+| M2 | Phase 2 完成：安全扫描 + 需求质量 + 修复闭环 | 已完成 |
 | M3 | Phase 3 完成：架构合规 + 环境比对 + 效能度量 | +2 人天 |
