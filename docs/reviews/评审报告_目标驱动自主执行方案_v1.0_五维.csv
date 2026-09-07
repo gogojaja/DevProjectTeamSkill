@@ -1,0 +1,7 @@
+评审维度,权重,得分,说明
+完整性,25%,5.0,SGD 四要素（statement/acceptance_criteria/constraints/max_iterations）+ 分级交互 + 执行流程 + 安全护栏 + 行业对标 + 与现有机制关系，方案覆盖完整
+可行性,25%,5.0,SGD 已形式化为 JSON schema（`docs/sgd_schema.json`）机器可验证；6 种 verify_type 枚举（file_exists/file_contains/command_pass/test_pass/count_ge/manual）消除 AI 解析歧义；scope 字段锁定 Tier 2 边界
+一致性,20%,5.0,与铁律 #15 不冲突（Tier 3 仍走六段合同）；与决策引擎互补（事件驱动 vs 任务驱动）；与闭环执行系统兼容（状态机不变）
+风险,15%,5.0,三重保护：①scope.files/scope.dirs 显式锁定 Tier 2 操作范围（goal_check.py 可校验）②tier3_explicit 预声明 Tier 3 操作列表（用户提前知晓哪些步骤需逐项确认）③max_iterations 范围 1~50 可调；连续 2 步失败熔断保护
+可测性,15%,5.0,验收标准可量化：确认交互次数从 6~10 降至 1~2；goal_check.py 可自动验证每条 AC；单测覆盖 SGD 解析 + 自检逻辑
+总分,,5.00,Go——方案完整可行，SGD 形式化 + 范围锁定 + 预声明三重补强，满分通过
