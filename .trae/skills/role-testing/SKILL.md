@@ -27,6 +27,8 @@ description: "用户提到测试策略、测试计划、用例设计、测试环
 | 环境数据 | prepare_env | `domain/preparation.md`（环境/数据/Mock/配置/冒烟） |
 | 执行缺陷 | execute_test / manage_defect | `domain/execution.md`（风险序/探索性/缺陷生命周期） |
 | 总结门禁 | write_report / stage_review | `domain/summary.md`（对接总控） |
+| Excel 需求评审（S-01） | xlsx_review | `domain/xlsx_review.md`（T-01→规则检查→T-03→T-04 端到端） |
+| AI 代码审查（S-04） | code_review | `domain/code_review.md`（T-08 多层分析→脱敏→门禁） |
 
 ## 4. 测试铁律
 

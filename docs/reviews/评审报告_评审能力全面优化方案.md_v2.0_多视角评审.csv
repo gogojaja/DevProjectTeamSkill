@@ -1,0 +1,6 @@
+﻿perspective,check_id,check_name,status,severity,evidence,confidence
+architect,ARCH-001,架构一致性与技术路线,pass,medium,方案与 Phase A 事件驱动中枢架构完全一致（§五 Agent 集成复用 agent_runtime 零新建基础设施）;技术选型全部复用已验证组件（openpyxl/argparse/CSV 规范）;§十三职责边界澄清避免架构重叠;§十二 ACTION_REGISTRY 扩展规范与 decision_engine.py 现有模式一致,high
+code,CODE-001,代码质量与可实施性,pass,medium,13 工具均遵循项目 CLI 标准（--help/PROJECT_ROOT/CSV 输出）;§十四 T-08 三级降级策略确保弱环境可用;T-09 离线缓存方案避免网络单点故障;§十六单测覆盖率≥80% 目标明确;工具间依赖清晰（§七）,high
+security,SECU-001,安全合规与数据保护,pass,medium,方案遵循铁律 #3 脱敏（评审报告 CSV UTF-8 BOM）;T-09 依赖扫描补齐供应链安全缺口（P11）;S-05 安全扫描套件与 nightly_quality_gate 编排关系明确（§十三）;T-08 误报率量化控制（§十七 ≤20%）;无 A 级凭据写入风险,high
+test,TEST-001,测试完备性与验收标准,pass,medium,§十五全量验收 19 项（13 工具 + 6 技能全覆盖）;§十六 5 个集成测试场景覆盖关键链路（文档评审/修复闭环/代码审查/安全扫描/效能闭环）;单测覆盖率≥80% 目标;回归测试策略明确（不破坏现有 40 项单测）,high
+cost,COST-001,成本与可演进性,pass,medium,总工时 46.5h（含 15% 缓冲）分 3 Phase 渐进交付;Phase 间设 0.5 天缓冲间隔防级联延迟;§十七工具维护三指标（月调用<5 评估废弃/故障>10% 触发修复/工时>2h 评估重构）确保长期可演进;T-13 review_metrics 提供效能度量闭环,high
