@@ -124,6 +124,8 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 | 项目群协同 | `role-program-mgmt` | `role-governance`、`role-project-mgmt` | 项目群/项目集/多项目协同/PMO/依赖/里程碑 |
 | 管理咨询 | `role-mgmt-consulting` | `role-program-mgmt` | 项目管理咨询/PMO咨询/成熟度评估/差距分析 |
 | 项目日常管控 | `role-project-mgmt` | `role-governance`、相关执行包(只读) | 项目管理/日常管控/RAID/进展报告/变更协调 |
+| 组合管理/战略对齐 | `portfolio-mgmt`、`okr-strategy` | `role-program-mgmt` | 组合管理/战略评分/投资选择/OKR/战略对齐/KPI |
+| 资源与沟通管理 | `resource-ops`、`stakeholder-comms` | `role-project-mgmt` | 资源容量/技能矩阵/负载均衡/干系人映射/沟通计划 |
 
 #### 2.4.3 加载算法伪代码
 
@@ -207,6 +209,10 @@ def resolve_packages(handoff_l1: dict, user_instruction: str = "") -> list[str]:
 | 模型选择 | `./skills/model-selection/` | 模型选择/模型推荐/模型清单/模型定价/模型场景匹配 | 管理大模型提供商清单（42+模型）、定价、能力矩阵，根据任务类型（S0~S3）推荐最优模型，输出选型建议与跨场景适配方案 |
 | 孵化器立项 | `./skills/incubator-initiation/` | 立项评估/方案调研/可行性分析/独立化评估/孵化器启动 | 四段孵化评估水线：方案调研→可行性五维+独立性三判据→孵化决策三选一（移交/继续孵化/放弃）+3 视角评审聚合→移交清单六段+登记闭环；只产出立项建议书（docs/incubator/INC-*.md）不代落地 |
 | 方案制定 | `./skills/plan-creation/` | 制定方案/写方案/实施方案/方案评审/执行计划 | 8 步生命周期（需求采集→方案编写→预审+评审→修订基线→WBS分解→执行监控→变更控制→收尾复盘）；五维评审（完整性25%+可行性25%+一致性20%+风险15%+可测性15%）；三档裁剪（简单/标准/复杂）；交付物三件套（方案+计划+评审报告）；与 best-practice-solution 互补（技术选型→BPS，项目级方案→plan-creation） |
+| 项目组合管理 | `./skills/portfolio-mgmt/` | 组合管理/战略评分/投资选择/组合优化/组合评审/价值兑现 | 组合注册与分类、5 维战略评分（对齐度30%/ROI25%/风险20%/可行性15%/紧迫度10%）、组合平衡分析、Portfolio Review Board、价值兑现跟踪；工具 `portfolio_ops.py` + MCP `portfolio_register/portfolio_score/portfolio_dashboard` |
+| OKR/战略对齐 | `./skills/okr-strategy/` | OKR/战略对齐/KPI/战略主题/对齐度/孤儿项目 | OKR 层级管理（组织→项目群→项目）、战略主题映射、OKR 评分（0~1.0）、对齐度审计（孤儿项目检测）；工具 `okr_ops.py` + MCP `okr_manage/alignment_check` |
+| 资源运营管理 | `./skills/resource-ops/` | 资源容量/技能矩阵/资源分配/负载均衡/单点故障 | 资源容量规划（利用率）、技能矩阵（熟练度1~5）、资源负载均衡（过载>85%/闲置<50%）、单点故障检测；工具 `resource_ops.py` + MCP `resource_capacity` |
+| 干系人沟通管理 | `./skills/stakeholder-comms/` | 干系人映射/权力利益/参与度/沟通计划/沟通记录 | 干系人映射（权力-利益4象限）、参与度评估（C/U/N/S/A）、沟通计划与记录、升级机制增强；工具 `comms_ops.py` + MCP `comms_plan` |
 
 ---
 

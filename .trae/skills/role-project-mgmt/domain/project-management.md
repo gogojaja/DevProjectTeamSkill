@@ -52,7 +52,46 @@ description: "Project manager execution-layer skill: daily control loop across P
 3. 提交 `role-governance` 的 `scope-change` 复核 + 门禁留痕（`13_安全审计台账.csv`）；
 4. 闭环跟踪至关闭，结果回写 RAID 与进展报告。
 
-## 6. 经验教训
+## 6. 采购管理（PMBOK Procurement Management）
+
+> 对齐 PMBOK 采购知识领域；工具支撑 `tools/procurement_ops.py`
+
+### 6.1 采购计划（Make-or-Buy 分析）
+
+| 分析维度 | 自制 | 外购/外包 |
+|----------|------|----------|
+| 核心能力 | 保留（核心竞争力不外购） | 非核心/专业领域 |
+| 成本对比 | 内部人力+机会成本 | 合同金额+管理成本 |
+| 风险 | 技术能力/交付延期 | 供应商依赖/知识产权 |
+| 决策留痕 | 记入 `台账/53_采购登记.csv`（采购策略列） |
+
+### 6.2 供应商评估（加权评分矩阵）
+
+| 评估维度 | 权重 | 评分范围 |
+|----------|------|----------|
+| 技术能力 | 25% | 1~5 |
+| 价格 | 20% | 1~5 |
+| 交付能力 | 20% | 1~5 |
+| 质量保证 | 20% | 1~5 |
+| 服务水平 | 15% | 1~5 |
+| **加权总分** | 100% | 1~5 |
+
+- 供应商评估结果写入 `台账/53_采购登记.csv`（技术/价格/交付/质量/服务评分 + 加权总分列）；
+- 工具：`python3 tools/procurement_ops.py evaluate --vendor <名称> --tech N --price N --delivery N --quality N --service N`
+
+### 6.3 合同跟踪与里程碑付款
+
+- 采购登记后跟踪里程碑付款节点（`台账/53_采购登记.csv` 里程碑/已付款列）；
+- 工具：`python3 tools/procurement_ops.py track --item <采购项> --milestone <节点> --paid <金额>`
+
+### 6.4 采购仪表盘
+
+- 工具：`python3 tools/procurement_ops.py dashboard`
+- 输出：采购项总数、已评估数、总金额/已付款/付款率
+
+> 台账：`台账/53_采购登记.csv`（UTF-8 with BOM，禁止 .xlsx，回显首 5 行 + 行数）
+
+## 7. 经验教训
 
 - 阶段末/问题关闭后登记经验教训（`23_复用资产.csv` 同源，或独立 `经验教训_<项目>.csv`）；
 - 复盘要点：何因、何果、可复用流程/工具/降 Token 措施；
