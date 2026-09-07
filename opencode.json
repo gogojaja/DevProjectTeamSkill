@@ -1,7 +1,7 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "ark-coding/deepseek-v4-flash",
-  "small_model": "ollama/qwen2.5-coder:7b",
+  "model": "mac-ollama/qwen2.5-coder:14b",
+  "small_model": "mac-ollama/nomic-embed-text:latest",
   "provider": {
     "deepseek": {
       "npm": "@ai-sdk/openai-compatible",
@@ -23,6 +23,17 @@
       },
       "models": {
         "qwen2.5-coder:7b": { "name": "qwen2.5-coder:7b" }
+      }
+    },
+    "mac-ollama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Mac mini 14B (Tailscale)",
+      "options": {
+        "baseURL": "http://100.101.130.81:11434/v1"
+      },
+      "models": {
+        "qwen2.5-coder:14b": { "name": "qwen2.5-coder:14b (Mac mini)" },
+        "nomic-embed-text:latest": { "name": "nomic-embed-text (Mac mini)" }
       }
     },
     "ark-coding": {
