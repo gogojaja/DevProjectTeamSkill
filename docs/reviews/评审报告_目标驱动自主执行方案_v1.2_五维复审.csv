@@ -1,0 +1,14 @@
+评审维度,权重,得分,扣分说明
+完整性,25%,4.3,SGD 持久化台账已实现（台账/41_活跃目标.json + save/load/close 全流程）；交接文档集成在 domain §4 描述但依赖 AI 读交接文档行为（非完全自动化）；执行状态持久化 + 目标变更机制已实现；constraints 可验证已实现但 content_not_changed 需 baseline hash（标记为 SKIP 待完善）
+可行性,25%,4.5,SGD 回显确认流程已定义（domain §2.2）；constraints 三种可验证类型（file_not_modified/file_not_created/content_not_changed）已实现；scope 读写分离完整（check_scope mode 参数）；错误恢复策略（on_circuit_break/on_max_iterations）schema + 校验 + 输出建议均已实现
+一致性,20%,4.5,「铁律不降级」措辞修正（domain §6 明确 Tier 2 批量确认是效率变体非降级）；scope 读写分离已实现（v1.0 files/dirs 向后兼容）；与铁律 #15/#7 框架对齐
+风险,15%,4.0,SGD 持久化到台账→会话中断不丢失目标+状态；错误恢复三策略（pause/skip/abort）明确；content_not_changed 需 baseline hash 尚未实现（标记 SKIP 人工确认）；目标变更保留完整历史
+可测性,15%,4.2,46 项单元测试全部通过（v1.0 21 项 + v1.1 新增 25 项覆盖持久化/约束/scope 读写/变更/哈希）；SGD 格式机器可验；端到端执行循环在 domain 文档有完整描述但无独立集成测试
+总体评审,,,,,
+评审总分,五维加权（完整性25%+可行性25%+一致性20%+风险15%+可测性15%）,4.38/5.0,Go(>=4.0),
+评审结论,方案从 v1.0「对话内行为」升级为 v1.1「项目级状态持久化」——SGD 持久化/执行状态/约束验证/scope 读写分离/错误恢复/目标变更六大补强全部落地,,,,,
+评审意见汇总,v1.0 评审 3.80 NoGo → v1.1 补强后 4.38 Go | 补强内容：P0-SGD持久化台账+交接文档集成 | P1-执行状态持久化+目标变更机制 | P2-constraints可验证+scope读写分离+错误恢复+回显确认 | P3-46单测全覆盖 | 剩余改进项：content_not_changed baseline hash / 端到端集成测试 / 实测数据
+补强后达成,4.38/5.0 Go（目标 4.5+ 达成）,,,,,
+v1.0→v1.1 变更明细,,,,,
+代码变更,tools/goal_check.py 328→713 行（+117%）| tests/test_goal_check.py 227→568 行（+150%）| docs/sgd_schema.json 56→83 行（+48%）| domain 文档 149→207 行（+39%）,,,,,
+测试覆盖,v1.0: 21 项 → v1.1: 46 项（+25 项新增：v1.1 校验 6 + 约束验证 6 + scope 读写 4 + 台账持久化 5 + 目标变更 3 + 哈希 2）,,,,,

@@ -1,6 +1,6 @@
 {
-  "$schema": "SGD v1.0 — 结构化目标定义机器验证 schema",
-  "_comment": "AI 从用户自然语言生成此 JSON，工具可机器验证格式合法性",
+  "$schema": "SGD v1.1 — 结构化目标定义机器验证 schema（补强版）",
+  "_comment": "v1.1 补强：scope 读写分离 / constraints 可验证 / 持久化台账 / 变更机制",
   "type": "object",
   "required": ["statement", "acceptance_criteria"],
   "properties": {
@@ -23,7 +23,7 @@
           "verify_type": {
             "type": "string",
             "enum": ["file_exists", "file_contains", "command_pass", "test_pass", "count_ge", "manual"],
-            "description": "验证类型：file_exists=文件存在 / file_contains=文件含指定内容 / command_pass=命令返回 0 / test_pass=pytest 通过 / count_ge=产出数量≥N / manual=需人工确认"
+            "description": "验证类型枚举"
           },
           "verify_target": { "type": "string", "description": "验证目标（文件路径/命令/数量）" },
           "verify_arg": { "type": "string", "description": "验证参数（搜索内容/阈值等，可选）" }
@@ -33,23 +33,50 @@
     },
     "constraints": {
       "type": "array",
-      "items": { "type": "string" },
       "maxItems": 10,
-      "description": "操作边界/禁止项（可选，0~10 条）"
+      "items": {
+        "oneOf": [
+          { "type": "string", "description": "v1.0 兼容：纯文字声明（不可机器验证，仅提醒）" },
+          {
+            "type": "object",
+            "required": ["type", "target"],
+            "properties": {
+              "type": { "type": "string", "enum": ["file_not_modified", "file_not_created", "content_not_changed"], "description": "约束验证类型" },
+              "target": { "type": "string", "description": "约束目标（文件路径/glob）" },
+              "description": { "type": "string", "description": "约束说明" }
+            },
+            "description": "v1.1 可验证约束"
+          }
+        ]
+      },
+      "description": "操作边界（v1.0 纯文字 / v1.1 可机器验证对象）"
     },
     "scope": {
       "type": "object",
       "properties": {
-        "files": { "type": "array", "items": { "type": "string" }, "description": "允许修改的文件 glob 模式" },
-        "dirs": { "type": "array", "items": { "type": "string" }, "description": "允许写入的目录" }
+        "write_files": { "type": "array", "items": { "type": "string" }, "description": "v1.1 允许写入的文件 glob（替代旧 files）" },
+        "write_dirs": { "type": "array", "items": { "type": "string" }, "description": "v1.1 允许写入的目录（替代旧 dirs）" },
+        "read_files": { "type": "array", "items": { "type": "string" }, "description": "v1.1 允许读取的文件 glob（默认不限）" },
+        "read_dirs": { "type": "array", "items": { "type": "string" }, "description": "v1.1 允许读取的目录（默认不限）" },
+        "files": { "type": "array", "items": { "type": "string" }, "description": "v1.0 兼容：等同 write_files" },
+        "dirs": { "type": "array", "items": { "type": "string" }, "description": "v1.0 兼容：等同 write_dirs" }
       },
-      "description": "Tier 2 操作范围锁定（可选，未指定则按 statement 推断）"
+      "description": "v1.1 读写分离范围锁定（v1.0 files/dirs 向后兼容）"
     },
     "max_iterations": { "type": "integer", "minimum": 1, "maximum": 50, "default": 10 },
     "tier3_explicit": {
       "type": "array",
       "items": { "type": "string" },
-      "description": "预声明的 Tier 3 操作列表（提前告知用户哪些步骤需逐项确认）"
+      "description": "预声明的 Tier 3 操作列表"
+    },
+    "error_recovery": {
+      "type": "object",
+      "properties": {
+        "max_retries_per_step": { "type": "integer", "minimum": 0, "maximum": 3, "default": 1, "description": "单步最大重试次数" },
+        "on_circuit_break": { "type": "string", "enum": ["pause_wait_user", "skip_and_continue", "abort_goal"], "default": "pause_wait_user", "description": "熔断后行为" },
+        "on_max_iterations": { "type": "string", "enum": ["handoff", "abort_goal", "pause_wait_user"], "default": "handoff", "description": "达到最大轮次后行为" }
+      },
+      "description": "v1.1 错误恢复策略"
     }
   }
 }
