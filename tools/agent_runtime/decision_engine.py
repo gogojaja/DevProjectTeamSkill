@@ -131,12 +131,39 @@ def _action_nightly_quality_gate(params, event, dry_run=False):
     return _run_tool("quality_gate.py", *args, dry_run=dry_run)
 
 
+def _action_code_review(params, event, dry_run=False):
+    """OPT-REVIEW-002: 提交后代码审查 → T-08 code_review_agent。"""
+    diff_range = params.get("diff_range", "HEAD~1")
+    args = ["--diff", diff_range]
+    if dry_run:
+        args.append("--dry-run")
+    return _run_tool("code_review_agent.py", *args, dry_run=dry_run)
+
+
+def _action_security_scan(params, event, dry_run=False):
+    """OPT-REVIEW-002: 依赖漏洞扫描 → T-09 dep_vuln_scan。"""
+    args = []
+    if params.get("offline"):
+        args.append("--offline")
+    return _run_tool("dep_vuln_scan.py", *args, dry_run=dry_run)
+
+
+def _action_arch_compliance(params, event, dry_run=False):
+    """OPT-REVIEW-002: 架构合规检查 → T-10 arch_compliance。"""
+    adr_dir = params.get("adr_dir", os.path.join(ROOT, "架构资产"))
+    args = ["--adr-dir", adr_dir]
+    return _run_tool("arch_compliance.py", *args, dry_run=dry_run)
+
+
 # 动作注册表
 ACTION_REGISTRY = {
     "run_gates_and_push": _action_run_gates_and_push,
     "self_heal": _action_self_heal,
     "escalate": _action_escalate,
     "nightly_quality_gate": _action_nightly_quality_gate,
+    "code_review": _action_code_review,
+    "security_scan": _action_security_scan,
+    "arch_compliance": _action_arch_compliance,
 }
 
 

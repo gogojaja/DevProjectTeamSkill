@@ -61,6 +61,46 @@
       "risk": "Tier1",
       "auto_execute": true,
       "safety_note": "只读诊断 + 记录"
+    },
+    {
+      "id": "code-review-on-commit",
+      "description": "OPT-REVIEW-002: 提交后自动代码审查 → T-08 多层分析 → 报告 → 门禁判定",
+      "match": {"event": "git.commit", "trigger": "code_review"},
+      "action": "code_review",
+      "params": {"diff_range": "HEAD~1"},
+      "risk": "Tier2",
+      "auto_execute": false,
+      "safety_note": "只读分析 + 报告落盘，不修改代码"
+    },
+    {
+      "id": "security-scan-nightly",
+      "description": "OPT-REVIEW-002: 夜间依赖漏洞扫描 → T-09 + 脱敏扫描 → 安全报告",
+      "match": {"event": "schedule.tick", "task": "nightly_scan", "trigger": "security_scan"},
+      "action": "security_scan",
+      "params": {"offline": false},
+      "risk": "Tier2",
+      "auto_execute": true,
+      "safety_note": "只读扫描 + 记录，无副作用"
+    },
+    {
+      "id": "arch-compliance-check",
+      "description": "OPT-REVIEW-002: 周度架构合规检查 → T-10 ADR 约束扫描 → 报告",
+      "match": {"event": "schedule.tick", "task": "arch_compliance"},
+      "action": "arch_compliance",
+      "params": {"adr_dir": "架构资产"},
+      "risk": "Tier1",
+      "auto_execute": true,
+      "safety_note": "只读扫描 + 报告落盘"
+    },
+    {
+      "id": "gate-fail-security",
+      "description": "OPT-REVIEW-002: 安全门禁失败 → 阻断 + 升级待决策",
+      "match": {"event": "gate.fail", "gate_type": "security"},
+      "action": "escalate",
+      "params": {"notify": true, "block_push": true, "severity": "high"},
+      "risk": "Tier2",
+      "auto_execute": true,
+      "safety_note": "仅阻断和记录，不做破坏性操作"
     }
   ]
 }
