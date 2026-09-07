@@ -343,6 +343,32 @@ GitHub 为境外服务器，**网络访问不稳定 + 存在地缘政治风险**
 ### 4. 同步台账
 - `台账/32_镜像同步记录.csv`（UTF-8 BOM）：同步编号 / 同步时间 / 源commit / 目标remote / 远程URL(脱敏) / 状态 / 耗时秒 / 说明。每次双推追加，便于审计与故障回溯。
 
+## 开发阶段技能主动驱动协议（I2 上下文注入）
+
+> 行业锚定：BP-02 DORA Shift-Left + BP-06 AI-Augmented Development
+> 配套工具：impl_advisor.py (T2) / scaffold_cli.py (T4) / arch_fitness.py (T1) / pattern_guard.py (T3) / adr_trace.py (T5)
+
+当项目进入开发阶段，AI Agent 编码前必须执行以下上下文加载流程：
+
+```
+Agent 接到编码任务
+  │
+  ├─ 1. 调用 impl_advisory(module, file) → 获取实现建议卡
+  ├─ 2. 建议卡包含：架构约束 + 模式推荐 + 编码约束 + 参考骨架
+  ├─ 3. 可选：调用 scaffold_module(name, layer, lang) 生成模块骨架
+  ├─ 4. Agent 按建议卡编码
+  └─ 5. 编码完成后调用 pattern_check(file) → 获取模式合规反馈
+```
+
+**MCP 工具调用方式**（通过 dev-project-team-skill MCP 服务）：
+- `impl_advisory(module="orders")` — 编码前获取实现建议
+- `scaffold_module(name="orders", layer="business", lang="python")` — 生成模块骨架
+- `arch_fitness_check()` — 检查架构依赖方向
+- `pattern_check(file="src/orders/service.py")` — 检查反模式
+- `adr_traceability()` — ADR 追溯扫描
+
+**夜间巡检已集成**：`nightly_quality_gate.py` 自动执行 ArchFitness + PatternQuality + ADRTraceability 三视角。
+
 ## 效率约定
 
 - 先读根 `SKILL.md` 路由表 → 命中后只读目标文件，**禁止**一次性 Read 全部文件。

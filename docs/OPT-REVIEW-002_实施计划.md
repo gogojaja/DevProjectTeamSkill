@@ -45,12 +45,12 @@
 
 | 序号 | 交付物 | 工时 | 依赖 | 状态 |
 |:---:|---|:---:|---|:---:|
-| 3.1 | T-02 xlsx_diff | 1.0h | T-01 | TODO |
-| 3.2 | T-07 docx_structure_extract | 1.5h | python-docx | TODO |
-| 3.3 | T-10 arch_compliance | 3.0h | ADR 目录 | TODO |
-| 3.4 | T-12 env_compare | 2.0h | 无 | TODO |
-| 3.5 | T-13 review_metrics | 2.0h | 评审报告+台账 | TODO |
-| 3.6 | S-03 docx-requirement-review | 4.0h | T-07 | TODO |
+| 3.1 | T-02 xlsx_diff | 1.0h | T-01 | DONE |
+| 3.2 | T-07 docx_structure_extract | 1.5h | python-docx | DONE |
+| 3.3 | T-10 arch_compliance | 3.0h | ADR 目录 | DONE |
+| 3.4 | T-12 env_compare | 2.0h | 无 | DONE |
+| 3.5 | T-13 review_metrics | 2.0h | 评审报告+台账 | DONE |
+| 3.6 | S-03 docx-requirement-review | 4.0h | T-07 | DONE |
 
 ---
 
@@ -60,4 +60,4 @@
 |:---:|------|:---:|
 | M1 | Phase 1 完成：文档评审自动化 + AI 代码审查 | 已完成 |
 | M2 | Phase 2 完成：安全扫描 + 需求质量 + 修复闭环 | 已完成 |
-| M3 | Phase 3 完成：架构合规 + 环境比对 + 效能度量 | +2 人天 |
+| M3 | Phase 3 完成：架构合规 + 环境比对 + 效能度量 | 已完成 |

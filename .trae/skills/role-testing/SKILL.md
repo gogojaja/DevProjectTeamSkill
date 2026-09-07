@@ -32,6 +32,7 @@ description: "用户提到测试策略、测试计划、用例设计、测试环
 | Excel 自动修复（S-02） | xlsx_auto_fix | `domain/xlsx_auto_fix.md`（T-05→T-06→T-04 修复闭环） |
 | 安全扫描套件（S-05） | security_scan | `domain/security_scan.md`（T-09+脱敏+审计→聚合报告） |
 | 评审复查（S-06） | review_recheck | `domain/review_recheck.md`（T-06→T-03→T-04 复查闭环） |
+| Word 需求评审（S-03） | docx_review | `domain/docx_review.md`（T-07→IEEE830→T-03→T-04） |
 
 ## 4. 测试铁律
 

@@ -95,7 +95,25 @@ else
   echo "⚠ 未定位到 python.exe，跳过结构门禁（手动运行: py -3.11 tools/lint_repo.py）" >&2
 fi
 
-# ---- 6. 执行合同闸门软提示（铁律 #15，非阻断） ----
+# ---- 6. 开发阶段技能护栏（T1/T3，软提示不阻断，BP-03 Guardrails-not-Gates） ----
+# 架构适配度 + 反模式检测：仅输出建议，不阻断提交（除非设环境变量 DEV_STRICT=1）
+if [ -f "$repo_root/tools/arch_fitness.py" ] && [ -f "$repo_root/tools/pattern_guard.py" ]; then
+  PY_DEV=$(command -v python3 2>/dev/null || command -v python 2>/dev/null || echo "")
+  if [ -n "$PY_DEV" ]; then
+    echo "🏗 开发阶段技能护栏（软提示）…"
+    "$PY_DEV" "$repo_root/tools/arch_fitness.py" run --incremental --dry-run 2>/dev/null | head -5 || true
+    "$PY_DEV" "$repo_root/tools/pattern_guard.py" run --dry-run 2>/dev/null | head -5 || true
+    if [ "${DEV_STRICT:-0}" = "1" ]; then
+      # 严格模式：架构违规阻断提交
+      if ! "$PY_DEV" "$repo_root/tools/arch_fitness.py" run --incremental 2>/dev/null; then
+        echo "❌ DEV_STRICT=1: 架构适配度检查失败，提交阻断" >&2
+        fail=1
+      fi
+    fi
+  fi
+fi
+
+# ---- 7. 执行合同闸门软提示（铁律 #15，非阻断） ----
 # 若本次提交涉及门禁相关文件（AGENTS.md / 台账13 / tools/audit.py / 技能源），
 # 提醒 AI 操作须已走「六段执行合同」并在 13 台账留痕确认词（不阻断提交）。
 gate_hit=""

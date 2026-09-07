@@ -190,6 +190,28 @@ def run_project(p, dry=False, webhook=""):
             gate_rows.append([rid, now, alias, "SecurityReviewer", "SKIP", "", "desensitize 缺失或无新增产物",
                               "宿主未安装 desensitize"])
 
+    # 3.5) 开发阶段技能主动驱动三视角（T1/T3/T5）
+    dev_tools = [
+        ("ArchFitness", "tools/arch_fitness.py", ["run", "--target", path or alias]),
+        ("PatternQuality", "tools/pattern_guard.py", ["run"]),
+        ("ADRTraceability", "tools/adr_trace.py", ["run", "--target", path or alias]),
+    ]
+    for view_name, script, script_args in dev_tools:
+        script_path = os.path.join(TOOLS, script)
+        if not os.path.exists(script_path):
+            gate_rows.append([rid, now, alias, view_name, "SKIP", "", "script missing", "%s not found" % script])
+            continue
+        if dry:
+            print("[nightly][dry] will run %s" % view_name)
+            continue
+        dok, dout, derr = _run([sys.executable, script_path] + script_args)
+        gate_rows.append([rid, now, alias, view_name, "PASS" if dok else "WARN", "",
+                          "dev-phase fitness", dout.strip()[:200] if dout.strip() else "no output"])
+        if not dok:
+            pending.append(["DB", alias, "dev_fitness_%s" % view_name,
+                            "%s detected issues" % view_name,
+                            "dev-phase architecture compliance, daytime review", "pending", ""])
+
     # 4) AI 语义评审：默认关闭；开启时仅记录、非阻断（EV-004）
     if AI_ENV:
         for v, tgt in (("SecurityReviewer", "AI 语义安全视角"), ("PerformanceEngineer", "AI 语义性能视角")):
