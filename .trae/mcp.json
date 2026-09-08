@@ -2,8 +2,9 @@
   "mcpServers": {
     "dev-project-team-skill": {
       "type": "stdio",
-      "command": "${workspaceFolder}/.venv/bin/python",
+      "command": "py",
       "args": [
+        "-3.11",
         "${workspaceFolder}/tools/mcp_server/skills_mcp_server.py"
       ],
       "env": {

@@ -89,6 +89,12 @@ DEFAULT_RULES = {
                 "replacement": r'\1***',
                 "example": "password=mySecret123"
             },
+        ],
+        # 豁免：文档术语 / 模板变量 / 运行时密码提示代码（非真实凭据）
+        "exempt_patterns": [
+            r'(?i)^Bearer\s+Token$',   # 文档术语 "Bearer Token"，非真实 JWT
+            r'\$',                      # 环境变量模板 ${DB_PASSWORD}（正则在 { 前截断，匹配文本为 password: $）
+            r'getpass',                 # Python getpass.getpass() 运行时提示
         ]
     },
 

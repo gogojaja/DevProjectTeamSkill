@@ -107,3 +107,6 @@ scan_report*.csv
 台账/40_事件总线.jsonl
 台账/41_待决策队列.jsonl
 台账/42_决策记录.jsonl
+
+# 项目模板（属 Project-management 资产，本仓库不得入库；已核对其与源副本逐文件哈希相同）
+项目模板/

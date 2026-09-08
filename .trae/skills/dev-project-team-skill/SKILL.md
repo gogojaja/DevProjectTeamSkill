@@ -16,10 +16,11 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.15.0
+- **技能版本**：v21.18.0
 - **版本发布日期**：2026-09-08
 - **版本变更记录**：
-  - v21.15.0：技能独立部署升级 阶段A（2026-09-08）——§4.1 路由表 plan-creation/portfolio-mgmt/okr-strategy/resource-ops/stakeholder-comms 5 技能从编排器内嵌子技能 `./skills/{name}/` 提升为**顶层独立可部署技能** `../{name}/` 并标注；5 技能已补 frontmatter/三段版本/闭环执行系统/skill.manifest.json，注册 SKILL_INDEX + STANDALONE_SKILLS，脱离编排器可独立打包部署运行；编排器路由指向同步更新，能力语义不变。
+  - v21.18.0：技能独立部署升级 A+B+C（2026-09-08）——§4.1 路由表 plan-creation/portfolio-mgmt/okr-strategy/resource-ops/stakeholder-comms 5 技能从编排器内嵌子技能 `./skills/{name}/` 提升为**顶层独立可部署技能** `../{name}/` 并标注；5 技能已补 frontmatter/三段版本/闭环执行系统/skill.manifest.json，注册 SKILL_INDEX + STANDALONE_SKILLS，脱离编排器可独立打包部署运行；编排器路由指向同步更新，能力语义不变。B 阶段新建 schedule-cost（进度成本EVM）/risk-mgmt（风险RAID）2 顶层独立技能 + 重新内化 dev-project-mgmt evm_calculator/raid_manager + MCP risk_scan 为本地权威工具 tools/evm_ops.py/raid_ops.py（单一信源）+ STANDALONE_SKILLS 6→8（6 处一致）+ SKILL_INDEX 条目 29~30 + references/evm_standard.md/raid_standard.md；C 阶段 8 技能端到端自包含验证通过 + AAR 复盘沉淀。（原 v21.15.0 技能线，合并远端 v21.17.0 治理线后版本号重定为 v21.18.0）
+  - v21.17.0：新增「AI 自动检测承诺」铁律（2026-09-08）——`references/iron_rules.md` §3.2 新增 §3.2.8 AI 自动检测承诺（强制行为）：①AI 创建/编辑文件前必须自动执行敏感信息扫描；②发现即提示，按 A/B/C 分级报告；③建议脱敏方案；④未经用户确认拒绝直接保存；⑤提醒外部存储。新增 `references/pre-commit-hook-template.sh` 三关检测模板（.gitignore + gitleaks + 反向映射表）。新增 `docs/AI敏感信息自动检测工作流.md`。触发场景：用户提出「AI 能否自动识别敏感信息」需求，据此固化本铁律。
   - v21.14.0：「目标驱动自主执行」v1.1 补强（OPT-GOAL-001，2026-09-07）——①SGD 持久化台账（`台账/41_活跃目标.json`，save/load/close 全流程）；②执行状态持久化（迭代计数/AC 状态跨会话保留）；③scope 读写分离（write_files/write_dirs vs read_files/read_dirs，v1.0 files/dirs 向后兼容）；④constraints 可机器验证（file_not_modified/file_not_created/content_not_changed）；⑤错误恢复策略（on_circuit_break/on_max_iterations）；⑥目标变更机制（amend + 变更历史）；⑦SGD 回显确认流程；⑧`goal_check.py` 713 行（v1.0 328 行）+ 46 单测（v1.0 21 项）全部通过；⑨`docs/sgd_schema.json` 升级 v1.1。五维评审从 3.80 NoGo 补强至 4.5+ Go。
   - v21.13.0：新增「目标驱动自主执行」模式（OPT-GOAL-001，2026-09-07）——①§2.2 新增铁律 #13（SGD 四要素 + 分级交互 + 完成度自检 + 安全护栏）；②§3 新增执行模式「目标驱动自主执行」；③§5 新增调度规则 #13（分级交互规则）；④新增 `domain/goal-driven-execution.md`（完整流程/SGD 模板/自检算法/护栏）；⑤新增 `tools/goal_check.py`（完成度自检工具）。预期效果：确认交互次数从 6~10 降至 1~2，用户无需反复说"继续"。
 - **版本变更记录**：
@@ -199,7 +200,7 @@ def resolve_packages(handoff_l1: dict, user_instruction: str = "") -> list[str]:
 - **角色隔离**：各角色任务必须在对应角色包内完成，禁止跨角色执行；§2 公共底座对全角色强制生效；
 - 角色明细读取：命中后 Read 对应包 `SKILL.md` 路由表 → 只读目标 `domain/*.md`。
 
-### 4.1 嵌套能力与独立可部署技能路由（编排器扩展，v21.4.0；v21.15.0 起 5 技能提升顶层独立）
+### 4.1 嵌套能力与独立可部署技能路由（编排器扩展，v21.4.0；v21.18.0 起 5 技能提升顶层独立）
 
 | 能力 | 位置 | 触发 | 说明 |
 |------|------|------|------|
@@ -306,5 +307,5 @@ def resolve_packages(handoff_l1: dict, user_instruction: str = "") -> list[str]:
 
 ---
 
-**文档版本**：v21.15.0 **最后更新**：2026-09-08（技能独立部署升级 阶段A：§4.1 路由 5 技能 plan-creation/portfolio-mgmt/okr-strategy/resource-ops/stakeholder-comms 提升为顶层独立可部署技能，路径 `./skills/`→`../`，标注独立可部署技能；此前 v21.14.0 目标驱动自主执行 v1.1 补强）
+**文档版本**：v21.18.0 **最后更新**：2026-09-08（技能独立部署升级 A+B+C：8 顶层独立可部署技能 scope-tracking/plan-creation/portfolio-mgmt/okr-strategy/resource-ops/stakeholder-comms/schedule-cost/risk-mgmt + EVM/RAID 重新内化 tools/evm_ops.py·raid_ops.py；合并远端 v21.17.0 治理线[§3.2 泄密禁入库最高级铁律 / §3.2.7 脱敏映射安全存储 / §3.2.8 AI 自动检测承诺]，版本号由 v21.15.0 重定为 v21.18.0 接续治理线）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

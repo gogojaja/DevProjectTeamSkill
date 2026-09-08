@@ -43,7 +43,7 @@ BACKUP_DIR = os.path.join(ROOT, ".backup")
 # MCP Server 配置片段
 MCP_SERVER_CONFIG = {
     "command": sys.executable,
-    "args": [os.path.join("tools", "mcp_server", "skills_mcp_server.py")],
+    "args": [os.path.join(ROOT, "tools", "mcp_server", "skills_mcp_server.py")],
     "cwd": ROOT,
     "env": {
         "PROJECT_ROOT": ROOT

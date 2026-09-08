@@ -718,7 +718,7 @@ def program_dependency(source: str = "", target: str = "") -> str:
         return f"读取失败: {e}"
 
 
-# ---------- 新增 Tools（v21.15.0 PM 覆盖率提升） ----------
+# ---------- 新增 Tools（v21.18.0 PM 覆盖率提升） ----------
 
 @mcp.tool()
 def risk_scan(severity: str = "P1") -> str:

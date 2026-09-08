@@ -59,7 +59,7 @@
 
 ---
 
-**文档版本**：v21.15.0
+**文档版本**：v21.18.0
 **最后更新**：2026-09-08（技能独立部署升级 阶段B：新增条目29 `schedule-cost`（进度成本EVM）+ 条目30 `risk-mgmt`（风险RAID）2 个独立可部署技能；**重新内化** dev-project-mgmt evm_calculator/raid_manager + MCP risk_scan 为本地权威工具 evm_ops.py/raid_ops.py（数据源统一台账 CSV，dev-project-mgmt 保留兼容）；role-governance progress-cost.md/risk.md 与 MCP evm_analyze/raid_mgmt/risk_scan 瘦引用委派；独立可部署技能 header 更新为 8 项 STANDALONE_SKILLS（阶段A+B）。此前阶段A 条目22/24~27，条目23 `scope-tracking` v1.2.0）
 
 19. **孵化器立项阶段技能（v1.1.0）**：内嵌子技能 `incubator-initiation`——支撑新独立项目/技能/工具的立项评估：四段孵化评估水线（方案调研→可行性五维+独立性三判据→孵化决策三选一+3 视角评审聚合→移交清单六段+登记闭环），输出立项建议书（`docs/incubator/INC-*.md`）；**只评估不落地**，落地交对应独立项目运营者独立执行；方案来源 `docs/孵化器模式与git剥离方案.md`，协同机制见 `docs/多项目协同与隔离维护机制方案.md`，独立项目登记见 `references/project-registry.md`；触发词 `立项评估`/`方案调研`/`可行性分析`/`独立化评估`/`孵化器启动`，详见 `dev-project-team-skill/skills/incubator-initiation/SKILL.md`。
