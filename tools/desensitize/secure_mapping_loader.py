@@ -26,7 +26,7 @@
 
 import os
 import sys
-import zipfile
+import pyzipper
 import tempfile
 import shutil
 import getpass
@@ -69,14 +69,14 @@ class SecureMappingLoader:
             # 解压到临时目录
             self.temp_dir = Path(tempfile.mkdtemp(prefix="desensitize_"))
             
-            with zipfile.ZipFile(self.zip_path, 'r') as zf:
+            with pyzipper.AESZipFile(self.zip_path, 'r') as zf:
                 # 验证密码并解压
                 zf.extractall(self.temp_dir, pwd=password.encode('utf-8'))
                 
                 # 加载元数据
                 metadata_file = self.temp_dir / "metadata.json"
                 if metadata_file.exists():
-                    with open(metadata_file, 'r', encoding='utf-8') as f:
+                    with open(metadata_file, 'r', encoding='utf-8-sig') as f:
                         self.metadata = json.load(f)
                 
                 # 加载映射
@@ -229,14 +229,20 @@ class SecureMappingLoader:
             self.STATE_FILE.unlink()
     
     def _read_mapping(self, filepath: Path) -> Dict[str, str]:
-        """读取映射文件（CSV 格式）"""
+        """读取映射文件（CSV 格式）
+        
+        支持两种规则类型：
+        - 替换规则：keyword -> replacement（replacement 非空）
+        - 删除规则：keyword -> ""（replacement 为空，表示删除）
+        """
         mapping = {}
-        with open(filepath, 'r', encoding='utf-8') as f:
+        with open(filepath, 'r', encoding='utf-8-sig') as f:
             reader = csv.DictReader(f)
             for row in reader:
                 keyword = row.get('keyword', '').strip()
                 replacement = row.get('replacement', '').strip()
-                if keyword and replacement:
+                # 只要 keyword 非空即纳入映射（replacement 可为空 = 删除规则）
+                if keyword:
                     mapping[keyword] = replacement
         return mapping
     
