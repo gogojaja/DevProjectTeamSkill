@@ -33,6 +33,7 @@ CLI（跨平台）：
 import os
 import sys
 import io
+import re
 import csv
 import json
 import glob
@@ -56,6 +57,40 @@ VALID_VERIFY_TYPES = ("file_exists", "file_contains", "command_pass", "test_pass
 VALID_CONSTRAINT_TYPES = ("file_not_modified", "file_not_created", "content_not_changed")
 VALID_RECOVERY_ON_BREAK = ("pause_wait_user", "skip_and_continue", "abort_goal")
 VALID_RECOVERY_ON_MAX = ("handoff", "abort_goal", "pause_wait_user")
+
+# ── command_pass 危险命令拦截护栏 ──────────────────────────────
+# 设计语义（domain/goal-driven-execution.md）：command_pass 执行“完整命令”并判返回码=0，
+# 本质需要 shell 解析（管道/重定向/&&/绝对路径）。故保留 shell=True，但对破坏性/越权命令
+# 做前置阻断，防止 SGD 中误写或恶意命令经 shell 执行造成不可逆损害（纵深防御，配合 scope 护栏）。
+DANGEROUS_COMMAND_PATTERNS = (
+    (r"\brm\s+-\w*[rf]", "rm 强制/递归删除"),
+    (r"\brmdir\s+/\w*s", "rmdir 递归删除"),
+    (r"\bdel\s+/\w*[sq]", "del 静默/递归删除"),
+    (r"\bRemove-Item\b[^|;&]*-(Recurse|Force)", "PowerShell 强制/递归删除"),
+    (r"\bformat\s+[a-z]:", "format 格式化磁盘"),
+    (r"\bmkfs(\.|\s)", "mkfs 重建文件系统"),
+    (r"\bdd\s+if=", "dd 裸磁盘写入"),
+    (r"\b(shutdown|reboot|halt|poweroff)\b", "关机/重启"),
+    (r":\(\)\s*\{.*\}\s*;\s*:", "fork 炸弹"),
+    (r"\bgit\s+push\b[^|;&]*(--force\b|\s-f\b)", "git 强制推送"),
+    (r">\s*/dev/(sd|nvme|hd|disk)", "重定向写裸设备"),
+    (r"\b(curl|wget)\b[^|]*\|\s*(ba|z|da|fi)?sh\b", "管道执行远程脚本"),
+)
+
+
+def _match_dangerous_command(cmd):
+    """检查命令是否命中危险命令模式。
+
+    Returns:
+        tuple|None: 命中返回 (说明, 匹配片段)，否则 None。
+    """
+    if not cmd:
+        return None
+    for pat, desc in DANGEROUS_COMMAND_PATTERNS:
+        m = re.search(pat, cmd, re.IGNORECASE)
+        if m:
+            return (desc, m.group(0))
+    return None
 
 
 # ── 台账持久化 ────────────────────────────────────────────────
@@ -381,9 +416,13 @@ def verify_ac(ac, root):
             return {"status": "FAIL", "detail": "读取失败: %s" % str(e)}
 
     if vtype == "command_pass":
+        # 安全护栏：前置拦截破坏性/越权命令（保留 shell=True 完整命令语义）
+        danger = _match_dangerous_command(target)
+        if danger:
+            return {"status": "FAIL", "detail": "命令被安全护栏拦截[%s]: %s" % (danger[0], target[:60])}
         try:
             r = subprocess.run(
-                target, shell=True, cwd=root,
+                target, shell=True, cwd=root,  # nosec B602 - 完整命令语义需 shell 解析；破坏性命令已由 _match_dangerous_command 前置拦截
                 capture_output=True, timeout=30
             )
             if r.returncode == 0:
