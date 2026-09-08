@@ -1,0 +1,7 @@
+﻿keyword,replacement,type,description
+# 脱敏字典示例（仅供参考，真实映射请存放在 D:\MyProjects\.secrets\）
+# 使用方法：复制本文件并替换为真实映射规则，然后打包为加密ZIP
+# 详细指南：见 D:\MyProjects\.secrets\README.md
+internal-dev-host,<hostname>,hostname,内部主机名示例
+xxx.xxx.xxx.xxx,<ip>,ip,内网IP示例（占位符）
+project-alpha,<project>,project,项目代号示例
