@@ -16,9 +16,10 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.19.0
+- **技能版本**：v21.19.1
 - **版本发布日期**：2026-09-09
 - **版本变更记录**：
+  - v21.19.1：goal_check.py command_pass shell 安全护栏（2026-09-09）——保留 `shell=True`「完整命令」语义（管道/重定向/&&/Windows 绝对路径依赖 shell 解析），新增 `DANGEROUS_COMMAND_PATTERNS`（12 类破坏性/越权命令：rm -rf、rmdir /s、del /s、Remove-Item -Recurse|-Force、format、mkfs、dd if=、shutdown/reboot、fork 炸弹、git push --force、裸设备重定向、curl|wget 管道执行远程脚本）+ `_match_dangerous_command()` 前置拦截（命中即 FAIL 不实际执行）+ `# nosec B602` 标注（抑制 post-commit agent-loop 把 bandit B602 自主改写为 shell=False）；`tests/test_goal_check.py` +4 单测（危险命令拦截×2 / Windows 绝对路径 PASS / shell 元字符 && PASS），50 passed。修复并发固化 6758fd9 因 deploy 覆盖 guard 导致的 2 个失败测试。
   - v21.19.0：全角色自动调起机制 + 新增 2 角色包（2026-09-09）——①新增 `role-operations`（运维/SRE：监控告警/故障分级响应/巡检/备份恢复/容量规划/性能调优/SLA）+ `role-security`（安全工程：安全评审/漏洞管理/渗透测试/凭据管理/合规审计/安全事件响应），角色总数 10→12，补齐 SDLC 投产后运维与全程安全两个缺口；②`references/iron_rules.md` §10 升级为「角色加载铁律」：**每一个任务都必须在角色上下文中执行，没有「无角色」工作状态；角色加载是系统的责任，不是用户的责任**，附 12 角色任务性质映射表；③`domain/skill-loader.md` v1.0→v1.1、状态「草案」→「生效」，新增优先级 0「任务语义自动识别」（路由算法首步 `infer_from_task_semantics()`，不依赖用户触发词）+ 三条禁止行为（禁止未加载角色就执行 / 禁止等待触发词 / 禁止以「用户没说启用」跳过）；④`role-development` v21.5.0→v21.6.0 新增 §4 开发人员基本素养铁律（部署即验证/环境先行/根因思维/诚实汇报/用户视角/安全编码），源自 Mac mini LaunchDaemon 外部卷不可达事件复盘；⑤修复 7 个 `tools/` 脚本 `ALL_ROLES` 硬编码清单漏新角色（solidify/package_skills/publish_production/deploy_skills/check_version_consistency/check_skill_closure/check_skill_release_gate）+ `mcp_server` 路由提示词由「触发词速查」升级为「任务性质速查」（12 角色全覆盖）。三道硬门禁（版本一致性/闭环执行/发布级）对 12 角色全部通过。
   - v21.18.0：技能独立部署升级 A+B+C（2026-09-08）——§4.1 路由表 plan-creation/portfolio-mgmt/okr-strategy/resource-ops/stakeholder-comms 5 技能从编排器内嵌子技能 `./skills/{name}/` 提升为**顶层独立可部署技能** `../{name}/` 并标注；5 技能已补 frontmatter/三段版本/闭环执行系统/skill.manifest.json，注册 SKILL_INDEX + STANDALONE_SKILLS，脱离编排器可独立打包部署运行；编排器路由指向同步更新，能力语义不变。B 阶段新建 schedule-cost（进度成本EVM）/risk-mgmt（风险RAID）2 顶层独立技能 + 重新内化 dev-project-mgmt evm_calculator/raid_manager + MCP risk_scan 为本地权威工具 tools/evm_ops.py/raid_ops.py（单一信源）+ STANDALONE_SKILLS 6→8（6 处一致）+ SKILL_INDEX 条目 29~30 + references/evm_standard.md/raid_standard.md；C 阶段 8 技能端到端自包含验证通过 + AAR 复盘沉淀。（原 v21.15.0 技能线，合并远端 v21.17.0 治理线后版本号重定为 v21.18.0）
   - v21.17.0：新增「AI 自动检测承诺」铁律（2026-09-08）——`references/iron_rules.md` §3.2 新增 §3.2.8 AI 自动检测承诺（强制行为）：①AI 创建/编辑文件前必须自动执行敏感信息扫描；②发现即提示，按 A/B/C 分级报告；③建议脱敏方案；④未经用户确认拒绝直接保存；⑤提醒外部存储。新增 `references/pre-commit-hook-template.sh` 三关检测模板（.gitignore + gitleaks + 反向映射表）。新增 `docs/AI敏感信息自动检测工作流.md`。触发场景：用户提出「AI 能否自动识别敏感信息」需求，据此固化本铁律。
@@ -316,5 +317,5 @@ def resolve_packages(handoff_l1: dict, user_instruction: str = "") -> list[str]:
 
 ---
 
-**文档版本**：v21.19.0 **最后更新**：2026-09-09（全角色自动调起机制：新增 role-operations（运维/SRE）+ role-security（安全工程）2 角色包，角色总数 10→12；iron_rules §10 升级为「角色加载铁律」——每个任务必须在角色上下文中执行，角色加载是系统责任不是用户责任；skill-loader v1.1 新增优先级 0 任务语义自动识别，不依赖触发词；role-development §4 开发人员基本素养铁律；修复 7 个 tools/ 脚本 ALL_ROLES 漏新角色 + mcp_server 路由提示词升级）
+**文档版本**：v21.19.1 **最后更新**：2026-09-09（goal_check.py command_pass shell 安全护栏：保留 shell=True 完整命令语义 + DANGEROUS_COMMAND_PATTERNS 12 类破坏性命令前置拦截 + _match_dangerous_command 命中即 FAIL + nosec B602 抑制 agent-loop 自主改写 + 4 单测 50 passed，修复 6758fd9 的 2 个失败测试；此前 v21.19.0（2026-09-09）：全角色自动调起机制，新增 role-operations（运维/SRE）+ role-security（安全工程）2 角色包，角色总数 10→12；iron_rules §10 升级为「角色加载铁律」；skill-loader v1.1 新增优先级 0 任务语义自动识别；role-development §4 开发人员基本素养铁律；修复 7 个 tools/ 脚本 ALL_ROLES 漏新角色 + mcp_server 路由提示词升级）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
