@@ -13,7 +13,8 @@ DEFAULT_TARGETS = [os.path.join(ROOT, t) for t in
                    ('.github/skills', '.claude/skills', '.agents/skills')] + [GLOBAL_SKILLS]
 ALL_ROLES = ['dev-project-team-skill','role-project-init','role-requirements-analysis',
              'role-architecture','role-development','role-testing','role-deployment','role-governance',
-             'role-program-mgmt','role-mgmt-consulting','role-project-mgmt']
+             'role-program-mgmt','role-mgmt-consulting','role-project-mgmt',
+             'role-operations','role-security']
 # 独立可部署技能（非角色包）：无 --roles 全量部署时一并同步到镜像（与 deploy_skills.sh 全量语义对齐）
 STANDALONE_SKILLS = ['scope-tracking', 'plan-creation', 'portfolio-mgmt', 'okr-strategy', 'resource-ops', 'stakeholder-comms', 'schedule-cost', 'risk-mgmt']
 

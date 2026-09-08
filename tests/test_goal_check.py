@@ -142,6 +142,33 @@ class TestVerifyAC(unittest.TestCase):
         result = verify_ac(ac, self.tmpdir)
         self.assertEqual(result["status"], "FAIL")
 
+    def test_command_pass_dangerous_rm_blocked(self):
+        """command_pass: 危险命令 rm -rf 被安全护栏前置拦截 → FAIL（detail 含“护栏”，证明未实际执行）"""
+        ac = {"verify_type": "command_pass", "verify_target": "rm -rf /tmp/_sgd_guard_probe_nonexistent"}
+        result = verify_ac(ac, self.tmpdir)
+        self.assertEqual(result["status"], "FAIL")
+        self.assertIn("护栏", result["detail"])
+
+    def test_command_pass_dangerous_format_blocked(self):
+        """command_pass: 危险命令 format c: 被安全护栏拦截 → FAIL"""
+        ac = {"verify_type": "command_pass", "verify_target": "format c:"}
+        result = verify_ac(ac, self.tmpdir)
+        self.assertEqual(result["status"], "FAIL")
+        self.assertIn("护栏", result["detail"])
+
+    def test_command_pass_windows_abspath(self):
+        """command_pass: Windows 绝对路径（含反斜杠）命令 → PASS
+        证明保留 shell=True 语义；若误用 shlex.split(posix=True) 会吃掉反斜杠致假阴性"""
+        ac = {"verify_type": "command_pass", "verify_target": sys.executable + " -c \"import sys; sys.exit(0)\""}
+        result = verify_ac(ac, self.tmpdir)
+        self.assertEqual(result["status"], "PASS")
+
+    def test_command_pass_shell_metachar(self):
+        """command_pass: shell 元字符（&&）复合命令 → PASS，证明保留 shell 解析（domain 文档要求“完整命令”）"""
+        ac = {"verify_type": "command_pass", "verify_target": "echo guard_ok && echo second"}
+        result = verify_ac(ac, self.tmpdir)
+        self.assertEqual(result["status"], "PASS")
+
     def test_manual(self):
         """manual: 始终返回 MANUAL"""
         ac = {"verify_type": "manual", "description": "需人工确认"}
