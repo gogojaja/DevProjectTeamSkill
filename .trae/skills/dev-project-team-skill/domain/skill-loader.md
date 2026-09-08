@@ -43,29 +43,64 @@
 
 | 优先级 | 来源 | 说明 |
 |--------|------|------|
-| 1 | **交接文档 L1 核心摘要** `当前任务类型` 字段 | 固化时自动生成，最高优先级 |
-| 2 | 用户显式指令 | "启用需求分析师" 等显式触发 |
+| **0（最高）** | **任务语义自动识别** | 接收到任何任务时，先分析任务性质（写代码？部署？测试？设计？管理？），自动加载对应角色。**不需要用户说触发词。** |
+| 1 | 交接文档 L1 核心摘要 `当前任务类型` 字段 | 固化时自动生成，跨会话延续 |
+| 2 | 用户显式指令 | “启用需求分析师”等显式触发（覆盖自动识别） |
 | 3 | 阶段上下文推断 | 基于当前阶段推断默认任务类型 |
 
-### 3.2 路由算法
+> **核心原则**：角色加载是系统的责任，不是用户的责任。用户只需要描述任务，系统自动判断属于哪个角色领域并加载执行。
+
+### 3.2 任务语义自动识别规则（优先级 0）
+
+接收到任何任务时，按以下规则判断任务性质并自动加载角色：
+
+| 任务特征（做了什么） | 自动加载角色 |
+|--------------------------|----------------|
+| 写代码、写脚本、修改配置文件、部署服务、配置定时任务、修复 Bug、重构 | `role-development` |
+| 设计架构、技术选型、写 ADR、定义接口、数据建模 | `role-architecture` |
+| 写测试用例、执行测试、分析缺陷、测试报告 | `role-testing` |
+| 发布上线、回滚、部署策略、Go-Live | `role-deployment` |
+| 收集需求、写 SRS、需求分析、需求变更 | `role-requirements-analysis` |
+| 台账、评审、门禁、基线固化、审计 | `role-governance` |
+| 进度、RAID、变更协调、日常管控 | `role-project-mgmt` |
+| 多项目协同、PMO、依赖矩阵 | `role-program-mgmt` |
+| 监控、告警、故障响应、巡检、备份恢复、容量规划、性能调优、SLA | `role-operations` |
+| 安全评审、漏洞扫描、渗透测试、凭据管理、加密、合规审计、安全事件 | `role-security` |
+
+**执行流程**：
+1. 接收任务 → 分析任务性质（上表匹配）
+2. 自动加载对应角色包（Read 角色 SKILL.md）
+3. 按角色包内的流程、铁律、验收标准执行
+4. 多角色任务：按子任务独立路由，分别加载
+
+**禁止行为**：
+- 禁止在未加载角色的情况下执行该角色领域的工作
+- 禁止等待用户说触发词才加载角色
+- 禁止以“用户没说启用角色”为由跳过角色规范
+
+### 3.3 路由算法
 
 ```python
-def resolve_skill_packages(handoff_l1: dict, user_instruction: str = "") -> list[str]:
+def resolve_skill_packages(task_content: str, handoff_l1: dict = None, user_instruction: str = "") -> list[str]:
     """
     解析需加载的角色包列表
-    返回：按加载顺序的角色包目录名列表
+    优先级：任务语义自动识别 > L1 交接 > 用户显式 > 阶段推断
     """
-    # 1. 从 L1 获取任务类型
-    task_type = handoff_l1.get("当前任务类型", "")
+    # 0. 最高优先：从任务内容自动识别角色
+    task_type = infer_from_task_semantics(task_content)
     
-    # 2. 若 L1 无，尝试从用户指令推断
+    # 1. 若语义识别未命中，从 L1 获取
+    if not task_type and handoff_l1:
+        task_type = handoff_l1.get("当前任务类型", "")
+    
+    # 2. 若 L1 无，尝试从用户显式指令推断
     if not task_type:
         task_type = infer_from_instruction(user_instruction)
     
     # 3. 映射到角色包
     packages = TASK_TYPE_TO_PACKAGES.get(task_type, [])
     
-    # 4. 总控包始终加载（只读模式可选）
+    # 4. 总控包始终可选加载
     if "role-governance" not in packages:
         packages.append("role-governance")
     
@@ -163,6 +198,6 @@ def resolve_skill_packages(handoff_l1: dict, user_instruction: str = "") -> list
 
 ---
 
-**文档版本**：v1.0
-**最后更新**：2026-08-28
-**状态**：草案（待评审通过后进入编排器集成）
+**文档版本**：v1.1
+**最后更新**：2026-09-09
+**状态**：生效（已集成到编排器路由流程）

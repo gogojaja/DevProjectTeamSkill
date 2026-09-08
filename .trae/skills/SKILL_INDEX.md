@@ -21,6 +21,8 @@
 | 8 | role-program-mgmt | 项目群/项目集 | 项目群 / 项目集 / 多项目协同 / PMO / 依赖 / 里程碑对齐 / 收益 / IMS | role-program-mgmt/ |
 | 9 | role-mgmt-consulting | 项目管理咨询 | 项目管理咨询 / PMO 咨询 / 成熟度评估 / 差距分析 / 方法论定制 / 变革管理 / 咨询建议书 / PMO 蓝图 / 教练辅导 | role-mgmt-consulting/ |
 | 10 | role-project-mgmt | 项目经理执行层 | 项目管理 / 日常管控 / RAID / 进展报告 / 变更协调 / 经验教训 / 干系人沟通 / 阶段状态跟踪（不涉及具体工程交付） | role-project-mgmt/ |
+| 11 | role-operations | 运维/SRE | 监控 / 告警 / 故障响应 / 服务健康 / 巡检 / 备份恢复 / 容量规划 / 性能调优 / SLA / 可用性 / 日志分析 / 变更窗口 | role-operations/ |
+| 12 | role-security | 安全工程 | 安全评审 / 漏洞扫描 / 渗透测试 / 安全加固 / 凭据管理 / 访问控制 / 安全合规 / 安全事件 / 加密 / 认证授权 / OWASP / 等保 | role-security/ |
 
 ## 使用规则
 
