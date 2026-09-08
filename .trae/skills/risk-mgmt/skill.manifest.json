@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "skill": "risk-mgmt",
+  "version": "v1.0.0",
+  "self_contained": true,
+  "runtime": "python3",
+  "entrypoint": "tools/raid_ops.py",
+  "bundle_tools": [
+    "raid_ops.py"
+  ],
+  "bundle_tests": [
+    "test_raid_ops.py"
+  ],
+  "bundle_source": {
+    "tools": "tools",
+    "tests": "tests"
+  },
+  "requires_references": [
+    "raid_standard.md"
+  ],
+  "cli": [
+    "list",
+    "add",
+    "update",
+    "close",
+    "scan"
+  ],
+  "single_source_of_truth": "权威工具与测试保留在仓库根 tools/ 与 tests/（单一信源）；本 manifest 声明打包/部署期按名注入到技能包 tools/ 与 tests/ 的自包含副本，使 zip/部署产物可脱离编排器独立运行（python3 tools/raid_ops.py scan）。RAID 四维 CRUD + 状态流转内化自 dev-project-mgmt raid_manager.py，概率×影响分级内化自 MCP risk_scan，数据源统一台账 12_风险问题台账.csv；本技能为 RAID/风险新权威，dev-project-mgmt 保留兼容不强制退役。角色包（role-governance/risk.md）与 MCP raid_mgmt/risk_scan 一律引用或委派，禁止复制实现逻辑。",
+  "notes": "raid_ops.py 经 PROJECT_ROOT 环境变量解析目标项目根，无论副本位于何处读写的都是目标项目的 台账/12_风险问题台账.csv（兼容旧名 RAID台账.csv 只读）。参考标准 raid_standard.md 由 package/deploy 从 .trae/skills/references/ 注入包内 references/。"
+}

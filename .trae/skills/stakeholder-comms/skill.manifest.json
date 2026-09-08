@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0",
+  "skill": "stakeholder-comms",
+  "version": "v1.0.0",
+  "self_contained": true,
+  "runtime": "python3",
+  "entrypoint": "tools/comms_ops.py",
+  "bundle_tools": [
+    "comms_ops.py"
+  ],
+  "bundle_tests": [
+    "test_comms_ops.py"
+  ],
+  "bundle_source": {
+    "tools": "tools",
+    "tests": "tests"
+  },
+  "requires_references": [],
+  "cli": [
+    "stakeholder",
+    "engage",
+    "plan",
+    "log",
+    "dashboard"
+  ],
+  "single_source_of_truth": "权威工具 comms_ops.py 保留在仓库根 tools/（单一信源）；本 manifest 声明打包/部署期按名注入到技能包 tools/ 与 tests/ 的自包含副本，使 zip/部署产物可脱离编排器独立运行（python3 tools/comms_ops.py ...）。编排器路由与 MCP comms_plan 一律引用或委派，禁止复制权力-利益映射/参与度差距逻辑；问题升级机制（P1~P4）归 role-project-init define_issue_escalation，本技能不复制。",
+  "notes": "干系人沟通（PMBOK Stakeholder/Comms Mgmt/Salience Model）：权力-利益矩阵（重点管理/保持满意/保持知情/最少关注）+ 参与度阶梯 U<N<C<S<A 差距策略 + 沟通计划/记录；台账 50/51/52。工具无 escalate 命令，升级机制归 role-project-init。"
+}

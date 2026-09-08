@@ -14,6 +14,8 @@ DEFAULT_TARGETS = [os.path.join(ROOT, t) for t in
 ALL_ROLES = ['dev-project-team-skill','role-project-init','role-requirements-analysis',
              'role-architecture','role-development','role-testing','role-deployment','role-governance',
              'role-program-mgmt','role-mgmt-consulting','role-project-mgmt']
+# 独立可部署技能（非角色包）：无 --roles 全量部署时一并同步到镜像（与 deploy_skills.sh 全量语义对齐）
+STANDALONE_SKILLS = ['scope-tracking', 'plan-creation', 'portfolio-mgmt', 'okr-strategy', 'resource-ops', 'stakeholder-comms', 'schedule-cost', 'risk-mgmt']
 
 def parse_args(argv):
     targets = []
@@ -44,7 +46,8 @@ def parse_args(argv):
             targets = [os.path.join(ROOT, t) for t in ('.github/skills', '.claude/skills', '.agents/skills')]
         else:
             targets = DEFAULT_TARGETS
-    return targets, roles, dry_run, as_json
+    # 无 --roles 时全量同步（角色包 + 独立可部署技能），与 deploy_skills.sh 一致；避免空参部署反而 rmtree 擦除镜像角色包
+    return targets, (roles or ALL_ROLES + STANDALONE_SKILLS), dry_run, as_json
 
 def check_names(roles):
     fail = 0
@@ -65,6 +68,41 @@ def check_names(roles):
         sys.exit(1)
     print('  ✓ frontmatter name 校验通过')
 
+def inject_bundled(src, dst):
+    """按 skill.manifest.json 注入自包含工具/测试副本（B1 单一信源）。
+
+    使部署后的技能目录本身自包含（<target>/<skill>/tools|tests），可独立拷走运行。
+    无 manifest 的角色包行为不变（零回归）；与根 tools/ 整体拷贝共存不冲突。
+    """
+    import json
+    mf = os.path.join(src, 'skill.manifest.json')
+    if not os.path.isfile(mf):
+        return 0
+    try:
+        with open(mf, encoding='utf-8') as f:
+            m = json.load(f)
+    except Exception as e:
+        print(f'  ⚠ skill.manifest.json 解析失败，跳过注入: {e}')
+        return 0
+    bsrc = m.get('bundle_source', {}) or {}
+    specs = [('bundle_tools', bsrc.get('tools', 'tools'), 'tools'),
+             ('bundle_tests', bsrc.get('tests', 'tests'), 'tests')]
+    n = 0
+    for key, src_sub, dst_sub in specs:
+        for name in (m.get(key, []) or []):
+            s = os.path.join(ROOT, src_sub, name)
+            if not os.path.isfile(s):
+                print(f'  ⚠ manifest 声明缺失（{key}）: {s}')
+                continue
+            d = os.path.join(dst, dst_sub)
+            os.makedirs(d, exist_ok=True)
+            shutil.copy(s, os.path.join(d, name))
+            n += 1
+    if n:
+        print(f'  ✓ {os.path.basename(dst)}: 按 manifest 注入自包含副本 {n} 个')
+    return n
+
+
 def deploy_target(target, roles):
     print(f'部署 → {target} ({",".join(roles)})')
     try:
@@ -80,6 +118,7 @@ def deploy_target(target, roles):
             try:
                 shutil.copytree(src, os.path.join(target, r),
                                 ignore=shutil.ignore_patterns('*.pyc'))
+                inject_bundled(src, os.path.join(target, r))  # 自包含注入（无 manifest 则跳过）
             except OSError as e:
                 print(f'  ✗ 复制 {r} 失败: {e}')
         else:

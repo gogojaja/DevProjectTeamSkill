@@ -517,7 +517,10 @@ def _run_mgmt_cli(args: list) -> str:
 @mcp.tool()
 def raid_mgmt(action: str, raid_type: str = "", desc: str = "", raid_id: str = "",
               status: str = "", owner: str = "", dry_run: bool = True) -> str:
-    """RAID 四维台账管理（风险/假设/问题/依赖）。包装 dev-project-mgmt CLI。
+    """RAID 四维台账管理（风险/假设/问题/依赖）。
+
+    委派本地权威工具 tools/raid_ops.py（risk-mgmt 技能单一信源，内化自
+    dev-project-mgmt raid_manager），不再委派 dev-project-mgmt CLI。
 
     Args:
         action: 操作类型（list/add/update/close）
@@ -528,31 +531,38 @@ def raid_mgmt(action: str, raid_type: str = "", desc: str = "", raid_id: str = "
         owner: 责任人，action=add/update 时可选
         dry_run: 是否仅探测不执行（默认 True）
     """
-    args = ["raid", action]
+    script = os.path.join(ROOT, "tools", "raid_ops.py")
+    if not os.path.isfile(script):
+        return "raid_ops.py 不存在，请检查 tools/ 目录（risk-mgmt 技能权威工具）"
     if action == "list":
+        cmd = [sys.executable, script, "list"]
         if raid_type:
-            args += ["--type", raid_type]
+            cmd += ["--type", raid_type]
     elif action == "add":
         if dry_run:
             return f"(dry-run) 将添加 RAID: type={raid_type}, desc={desc}"
-        args += ["--type", raid_type, "--desc", desc]
+        cmd = [sys.executable, script, "add", "--type", raid_type, "--desc", desc]
         if owner:
-            args += ["--owner", owner]
+            cmd += ["--owner", owner]
     elif action in ("update", "close"):
         if dry_run and action == "update":
             return f"(dry-run) 将更新 {raid_id}: status={status}"
-        args += ["--id", raid_id]
+        cmd = [sys.executable, script, action, "--id", raid_id]
         if action == "update" and status:
-            args += ["--status", status]
+            cmd += ["--status", status]
     else:
         return f"未知 action: {action}（可选 list/add/update/close）"
-    return _run_mgmt_cli(args)
+    r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+    return (r.stdout + r.stderr)[:4000]
 
 
 @mcp.tool()
 def evm_analyze(action: str = "calc", milestone_id: str = "", milestone_name: str = "",
                 planned_end: str = "", planned_value: float = 0.0) -> str:
-    """EVM 挣值分析（PV/EV/AC/SPI/CPI）。包装 dev-project-mgmt CLI。
+    """EVM 挣值分析（PV/EV/AC/SPI/CPI）。
+
+    委派本地权威工具 tools/evm_ops.py（schedule-cost 技能单一信源，内化自
+    dev-project-mgmt evm_calculator，公式一致），不再委派 dev-project-mgmt CLI。
 
     Args:
         action: 操作类型（calc=计算指标 / status=查看状态 / add-milestone=添加里程碑）
@@ -561,21 +571,25 @@ def evm_analyze(action: str = "calc", milestone_id: str = "", milestone_name: st
         planned_end: 计划结束日期（action=add-milestone 时可选）
         planned_value: 计划值 PV（action=add-milestone 时可选）
     """
-    args = ["evm", action]
+    script = os.path.join(ROOT, "tools", "evm_ops.py")
+    if not os.path.isfile(script):
+        return "evm_ops.py 不存在，请检查 tools/ 目录（schedule-cost 技能权威工具）"
     if action == "calc":
+        cmd = [sys.executable, script, "calc"]
         if milestone_id:
-            args += ["--milestone", milestone_id]
+            cmd += ["--milestone", milestone_id]
     elif action == "status":
-        pass  # 无额外参数
+        cmd = [sys.executable, script, "status"]
     elif action == "add-milestone":
-        args += ["--id", milestone_id, "--name", milestone_name]
+        cmd = [sys.executable, script, "add-milestone", "--id", milestone_id, "--name", milestone_name]
         if planned_end:
-            args += ["--end", planned_end]
+            cmd += ["--end", planned_end]
         if planned_value > 0:
-            args += ["--value", str(planned_value)]
+            cmd += ["--value", str(planned_value)]
     else:
         return f"未知 action: {action}（可选 calc/status/add-milestone）"
-    return _run_mgmt_cli(args)
+    r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+    return (r.stdout + r.stderr)[:4000]
 
 
 @mcp.tool()
@@ -708,77 +722,20 @@ def program_dependency(source: str = "", target: str = "") -> str:
 
 @mcp.tool()
 def risk_scan(severity: str = "P1") -> str:
-    """风险扫描：扫描 RAID 台账中高风险项 + 临近到期预警。只读操作。
+    """风险扫描：概率×影响分级扫描 RAID 台账高风险项。只读操作。
+
+    委派本地权威工具 tools/raid_ops.py scan（risk-mgmt 技能单一信源，内化自
+    dev-project-mgmt raid_manager + 原 MCP 内联 risk_scan 分级逻辑）。
 
     Args:
         severity: 过滤风险等级（P1=紧急/P2=高/P3=中/P4=低，默认仅 P1）
     """
-    # 尝试多种 RAID 台账文件名
-    ledger_dir = os.path.join(ROOT, "台账")
-    raid_files = ["RAID台账.csv", "12_风险问题台账.csv", "12_risk_issue_ledger.csv"]
-    raid_path = None
-    for fname in raid_files:
-        p = os.path.join(ledger_dir, fname)
-        if os.path.isfile(p):
-            raid_path = p
-            break
-    if raid_path is None:
-        return "RAID 台账文件不存在（已检查: %s）。请先通过 raid_mgmt 工具创建。" % ", ".join(raid_files)
-    try:
-        with open(raid_path, encoding="utf-8-sig") as f:
-            reader = csv.DictReader(f)
-            rows = list(reader)
-        if not rows:
-            return "RAID 台账为空"
-        # 风险等级计算：概率 × 影响
-        severity_map = {"P1": 4, "P2": 3, "P3": 2, "P4": 1}
-        threshold = severity_map.get(severity, 4)
-        high_risks = []
-        for r in rows:
-            # 尝试解析概率和影响
-            prob_str = r.get("概率", r.get("probability", ""))
-            impact_str = r.get("影响", r.get("impact", ""))
-            prob = _parse_level(prob_str, default=1)
-            impact = _parse_level(impact_str, default=1)
-            level = prob * impact
-            if level >= threshold:
-                r["_risk_score"] = level
-                high_risks.append(r)
-        # 按风险分降序
-        high_risks.sort(key=lambda x: x.get("_risk_score", 0), reverse=True)
-        if not high_risks:
-            return f"无 {severity} 及以上风险（共 {len(rows)} 条 RAID 记录）"
-        result = [f"【风险扫描】{len(high_risks)} 条 {severity}+ 风险（共 {len(rows)} 条 RAID）"]
-        for r in high_risks[:10]:
-            raid_id = r.get("RAID_ID", r.get("ID", "?"))
-            desc = r.get("描述", r.get("desc", ""))[:40]
-            status = r.get("状态", r.get("status", "?"))
-            owner = r.get("责任人", r.get("owner", "?"))
-            score = r.get("_risk_score", "?")
-            result.append(f"  [{raid_id}] 风险分={score} 状态={status} 责任人={owner} | {desc}")
-        if len(high_risks) > 10:
-            result.append(f"  ... 共 {len(high_risks)} 条")
-        result.append(f"\n铁律：P1 风险须立即升级；连续 2 次延期停止 AI 自动调整，推送人工决策。")
-        return "\n".join(result)
-    except Exception as e:
-        return f"风险扫描失败: {e}"
-
-
-def _parse_level(s: str, default: int = 1) -> int:
-    """解析风险等级字符串为数值。"""
-    if not s:
-        return default
-    s = s.strip().lower()
-    if s in ("高", "high", "h", "4", "5"):
-        return 4
-    if s in ("中", "medium", "m", "3"):
-        return 3
-    if s in ("低", "low", "l", "1", "2"):
-        return 2
-    try:
-        return int(s)
-    except ValueError:
-        return default
+    script = os.path.join(ROOT, "tools", "raid_ops.py")
+    if not os.path.isfile(script):
+        return "raid_ops.py 不存在，请检查 tools/ 目录（risk-mgmt 技能权威工具）"
+    cmd = [sys.executable, script, "scan", "--severity", severity]
+    r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+    return (r.stdout + r.stderr)[:4000]
 
 
 @mcp.tool()

@@ -15,6 +15,8 @@ ALL_ROLES = ['dev-project-team-skill','role-project-init','role-requirements-ana
               'role-program-mgmt','role-mgmt-consulting','role-project-mgmt']
 SUB_SKILLS = ['best-practice-solution','commit-protocol','incubator-initiation','lsp-ast-integration','model-selection','multi-perspective-validation',
               'project-memory','self-improve','team-orchestration','worktree-isolation']
+# 独立可部署技能（顶层自包含包，路径 SKILLS_DIR/{name}/SKILL.md）：阶段A 新增发布级门禁遍历
+STANDALONE_SKILLS = ['scope-tracking', 'plan-creation', 'portfolio-mgmt', 'okr-strategy', 'resource-ops', 'stakeholder-comms', 'schedule-cost', 'risk-mgmt']
 
 
 def read_text(path):
@@ -102,6 +104,21 @@ def main():
         else:
             print(f'  ✗ {label:<36} 发布级门禁失败')
             for e in errs:
+                print(f'      - {e}')
+            failed += 1
+
+    # 独立可部署技能（顶层自包含）纳入发布级门禁（阶段A 扩展）
+    for name in STANDALONE_SKILLS:
+        p = os.path.join(SKILLS_DIR, name, 'SKILL.md')
+        if not os.path.isfile(p):
+            continue
+        ok, errors = check_skill(name)
+        label = f'{name} (standalone)'
+        if ok:
+            print(f'  ✓ {label:<36} 发布级门禁通过')
+        else:
+            print(f'  ✗ {label:<36} 发布级门禁失败')
+            for e in errors:
                 print(f'      - {e}')
             failed += 1
     print('=' * 50)

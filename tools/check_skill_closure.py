@@ -17,6 +17,8 @@ ALL_ROLES = ['dev-project-team-skill','role-project-init','role-requirements-ana
 SUB_SKILLS = ['best-practice-solution','commit-protocol','incubator-initiation','lsp-ast-integration','model-selection','multi-perspective-validation',
               'project-memory','self-improve','team-orchestration','worktree-isolation',
               'customize-opencode']
+# 独立可部署技能（顶层自包含包，路径 SKILLS_DIR/{name}/SKILL.md）：阶段A 新增闭环门禁遍历
+STANDALONE_SKILLS = ['scope-tracking', 'plan-creation', 'portfolio-mgmt', 'okr-strategy', 'resource-ops', 'stakeholder-comms', 'schedule-cost', 'risk-mgmt']
 
 REQUIRED_KEYS = [
     '任务入口',
@@ -61,6 +63,22 @@ def main():
     for sub in SUB_SKILLS:
         path = os.path.join(SKILLS_DIR, 'dev-project-team-skill', 'skills', sub, 'SKILL.md')
         label = f'{sub} (sub)'
+        if not os.path.isfile(path):
+            print(f'  ~ {label:<36} 未安装（跳过）')
+            continue
+        with open(path, encoding='utf-8') as fh:
+            content = fh.read()
+        ok, reason = check_closure(content)
+        if ok:
+            print(f'  ✓ {label:<36} 闭环执行门禁通过')
+        else:
+            print(f'  ✗ {label:<36} {reason}')
+            failed += 1
+
+    # 独立可部署技能（顶层自包含）纳入闭环门禁（阶段A 扩展）
+    for name in STANDALONE_SKILLS:
+        path = os.path.join(SKILLS_DIR, name, 'SKILL.md')
+        label = f'{name} (standalone)'
         if not os.path.isfile(path):
             print(f'  ~ {label:<36} 未安装（跳过）')
             continue

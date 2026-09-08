@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "skill": "plan-creation",
+  "version": "v1.0.0",
+  "self_contained": true,
+  "runtime": "markdown",
+  "entrypoint": "SKILL.md",
+  "bundle_tools": [],
+  "bundle_tests": [],
+  "bundle_source": {
+    "tools": "tools",
+    "tests": "tests"
+  },
+  "bundle_domain": [
+    "plan_templates.md",
+    "review_criteria.md",
+    "workflow_rules.md"
+  ],
+  "requires_references": [],
+  "cli": [],
+  "single_source_of_truth": "本技能为纯文档方法论技能，无独立 CLI 工具；单一信源为技能包内 domain/ 三文件（plan_templates.md 方案模板 / review_criteria.md 五维评审标准 / workflow_rules.md 复杂度分级与裁剪规则），随技能目录整体打包分发，无需从仓库根 tools/ 注入副本。评审执行/基线固化/变更审计一律委派 role-governance 的 stage_review/solidify/change_audit，技术选型决策委派 best-practice-solution，本技能不复制上述工具实现。",
+  "notes": "方案制定流程（IEEE 828 / PMBOK 规划过程组 / PRINCE2 阶段门禁）：8 步生命周期（需求采集与可行性→方案编写含风险→预审+正式评审→修订闭环+基线化→WBS分解→执行监控→变更控制→AAR复盘）；三档复杂度裁剪（简单≤3文件/标准4-10/复杂>10或跨项目）；五维评审（完整性25%+可行性25%+一致性20%+风险15%+可测性15%，Go≥3.5）；交付物三件套（方案+执行计划+评审报告）。bundle_domain 为技能包内在资产声明，打包随目录整体分发。"
+}

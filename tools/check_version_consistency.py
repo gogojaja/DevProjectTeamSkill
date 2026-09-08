@@ -20,6 +20,8 @@ ALL_ROLES = ['dev-project-team-skill','role-project-init','role-requirements-ana
 SUB_SKILLS = ['best-practice-solution','commit-protocol','lsp-ast-integration','multi-perspective-validation',
               'project-memory','self-improve','team-orchestration','worktree-isolation',
               'customize-opencode']
+# 独立可部署技能（顶层自包含包，路径 SKILLS_DIR/{name}/SKILL.md）：阶段A 新增版本一致性+闭环遍历
+STANDALONE_SKILLS = ['scope-tracking', 'plan-creation', 'portfolio-mgmt', 'okr-strategy', 'resource-ops', 'stakeholder-comms', 'schedule-cost', 'risk-mgmt']
 
 VRE = re.compile(r'技能版本\*\*[：:]\s*(v[0-9]+\.[0-9]+\.[0-9]+)')       # 元数据行
 FRE = re.compile(r'\*\*文档版本\*\*[：:]\s*(v[0-9]+\.[0-9]+\.[0-9]+)')   # 页脚
@@ -137,6 +139,43 @@ def main():
                     hard += 1
                 else:
                     print(f'  ✓ {dlabel:<54} {dver}')
+
+    # 独立可部署技能（顶层自包含）纳入版本一致性 + 闭环扫描（阶段A 扩展）
+    for name in STANDALONE_SKILLS:
+        sp = os.path.join(SKILLS_DIR, name, 'SKILL.md')
+        if not os.path.isfile(sp):
+            continue
+        sc = open(sp, encoding='utf-8').read()
+        ver = VRE.search(sc).group(1) if VRE.search(sc) else None
+        foot = FRE.search(sc).group(1) if FRE.search(sc) else None
+        label = f'{name} (standalone)'
+        if not (ver and foot and ver == foot):
+            print(f'  ✗ {label:<36} 硬门禁: 元数据={ver} 页脚={foot} 不一致')
+            hard += 1
+        else:
+            print(f'  ✓ {label:<36} {ver}')
+        if not check_closure_section(sc):
+            print(f'  ✗ {label:<36} 闭环执行门禁未通过：缺少 "闭环执行系统" 或关键要素')
+            hard += 1
+        ddir = os.path.join(os.path.dirname(sp), 'domain')
+        if os.path.isdir(ddir):
+            for root, _, files in os.walk(ddir):
+                for fn in sorted(files):
+                    if not fn.endswith('.md'):
+                        continue
+                    dp = os.path.join(root, fn)
+                    dc = open(dp, encoding='utf-8').read()
+                    dver = DVRE.search(dc).group(1) if DVRE.search(dc) else None
+                    dlabel = f'{name}/domain/{fn}'
+                    if dver is None:
+                        print(f'  ~ {dlabel:<44} 无版本行（跳过，软提示）')
+                        soft += 1
+                        continue
+                    if dver != ver:
+                        print(f'  ✗ {dlabel:<44} 硬门禁: domain版本={dver} ≠ SKILL版本={ver}')
+                        hard += 1
+                    else:
+                        print(f'  ✓ {dlabel:<44} {dver}')
 
     uniq = sorted(set(v for v in versions.values() if v))
     if len(uniq) > 1:

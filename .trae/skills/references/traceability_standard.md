@@ -1,8 +1,9 @@
 # 范围跟踪与追溯一致性标准（Scope Tracking & Traceability）
 
 > 版权声明：`../COPYRIGHT.md`
-> 适用：所有启用本技能库的软件项目（对齐 PMBOK 6/7 范围管理 · IEEE 830 / ISO/IEC/IEEE 29148 · ISO 21500 · NASA SWE-059 / EN 62304 / ASPICE）
+> 适用：所有启用本技能库的软件项目（对齐 PMBOK 6/7 范围管理 · 实施整体变更控制 · IEEE 830 / ISO/IEC/IEEE 29148 · ISO 21500 · ITIL v4 变更使能 · MoSCoW · NASA SWE-059 / EN 62304 / ASPICE · ArchUnit FreezingArchRule）
 > 调用：阶段流转门禁 `stage_review` / `check_gate` 调用 `tools/scope_tracker.py`（内含 `tools/check_traceability.py` 一致性校验）自动校验
+> 权威实现：可独立部署技能 `scope-tracking`（`tools/scope_tracker.py` v1.2.0）——范围逻辑单一信源，角色包/MCP 一律引用或委派
 
 ---
 
@@ -29,9 +30,12 @@
 | NASA SWE-059 / ISO 24765 | 需求↔架构↔设计↔代码↔测试 **双向可追溯**，唯一标识，禁止「孤儿」 | §3 标识符；§7 一致性门禁 |
 | EN 62304 | **4-way traceability** + 孤儿即审计发现项 | §7 |
 | ASPICE | 每个需求分配到具体组件；定期「追溯健康自检」 | §8 健康自检 |
-| 变更控制（CCB） | 变更须评估影响、审批、记录，并触发基线版本化 | §6 变更与基线 |
+| 变更控制（CCB）/ PMBOK 实施整体变更控制 | 变更须评估影响、审批、记录，并触发基线版本化 | §6 变更与基线；§9 变更生命周期 |
+| ITIL v4 变更使能 | 变更分类 + 授权 + 记录，最大化变更成功率同时控风险 | §9.1 变更状态机 |
+| ArchUnit `FreezingArchRule` | 冻结既有基线，只阻止未经批准的劣化，允许经审批演进 | §9.3 基线冻结/比对 |
+| IEEE 需求易变性度量 | 以易变性/变更密度/未决龄量化范围稳定性 | §9.4 易变性 KPI |
 
-结论：**范围必须作为受控基线 + 连续维护的 RTM + 自动化门禁强制**，而非人工临时补表。
+结论：**范围必须作为受控基线 + 连续维护的 RTM + 自动化门禁强制 + 变更生命周期可审计**，而非人工临时补表。
 
 ---
 
@@ -156,7 +160,25 @@ Proposed → Approved → Baselined → InProgress → Implemented → Verified 
 | 实现率 | `Implemented+` 状态 REQ / 总 REQ | 随阶段爬升 |
 | 验证率 | `Verified+` 状态 REQ / 总 REQ | 交付前 100%（Must） |
 | 孤儿率 | 孤儿 AE/MOD/TC / 总数 | 0% |
-| 范围健康分 | 加权（覆盖×状态×无蔓延） | ≥ 90 门禁通过 |
+| 范围健康分 | 见 §8.1 精确模型（基准 100 逐项扣减） | ≥ 90 门禁通过 |
+
+### 8.1 范围健康分精确模型（权威公式，`scope_tracker.py health_score`）
+
+基准 100 分，逐项扣减，下限 0，保留 1 位小数。`metrics` 计算第 1-5 项；`gate`/`report` 叠加变更信号（第 6-9 项）：
+
+| # | 维度 | 扣分公式 | 场景 |
+|---|------|----------|------|
+| 1 | 覆盖缺口（架构） | `-0.2 × (未映射 AE 的需求数 / 需求总数 × 100)` | metrics/gate |
+| 2 | 覆盖缺口（测试） | `-0.2 × (未被 TC 验证的需求数 / 需求总数 × 100)` | metrics/gate |
+| 3 | 一致性违规 | `-2 × 违规数`（断链/孤儿） | metrics/gate |
+| 4 | 范围蔓延 | `-1.5 × 蔓延项`（gold-plating / 孤儿能力） | metrics/gate |
+| 5 | 范围缩水 | `-3 × 缩水项`（Must 缺实现/验证） | metrics/gate |
+| 6 | 未审批变更触及 Must/基线 | `-4 × open_unapproved_must` | gate/report（F3） |
+| 7 | 基线净漂移 | `-2 × baseline_drift` | gate/report（F4） |
+| 8 | 已判定 CR 缺审批人 | `-2 × missing_approver` | gate/report（F3） |
+| 9 | 超期未决 CR（>14 天） | `-1 × stale_cr` | gate/report（F3/F6） |
+
+> **门禁阈值**：健康分 < `--min-health`（默认 90）→ 驳回。**向后兼容**：变更信号（第 6-9 项）仅在传入 `change_signals` 时生效，`metrics` 场景与 v1.1.1 完全一致。
 
 **ASPICE 追溯健康自检清单**（每次阶段评审自问，任一「是」即待办）：
 - [ ] 是否存在无架构映射的需求？（需求-架构断链）
@@ -169,15 +191,54 @@ Proposed → Approved → Baselined → InProgress → Implemented → Verified 
 
 ---
 
-## 9. 流程嵌入（何时做）
+## 9. 变更生命周期与基线比对（v1.2.0，F2/F3/F4/F6）
+
+> 权威实现：`tools/scope_tracker.py`（`change` / `change-decide` / `baseline` / `report`）；技能明细 `scope-tracking/domain/change-control.md`·`baseline-diff.md`。
+
+### 9.1 变更请求生命周期状态机（CR 状态，区别于 §5 需求 SCOPE_STATUS）
+
+```
+提出 → 分析中 → ┬ 已批准 → 已实施 → 已关闭（终态）
+                └ 已驳回
+```
+
+- **未决状态** = {提出, 分析中}：尚无审批结论；触及 Must/基线需求即构成门禁风险（§9.2）。
+- **已判定状态** = {已批准, 已驳回, 已实施, 已关闭}：写入 `DECIDED_AT`；`已关闭` 为终态禁止再变更。
+- `change-decide` 推进状态；`--status ∈ {已批准, 已实施}` 且 `--writeback` → **回写 RTM**：受影响 REQ 行升级 `BASELINE_VER`、追加 `CHANGE_REFS`（落实 §6.1 步骤 3，禁止事后突击补表）。
+
+### 9.2 变更台账合规信号（门禁/健康分输入，F3）
+
+| 信号 | 判定 | 后果 |
+|------|------|------|
+| `open_unapproved_must` | 未决 CR 触及受保护需求（Must / 有 BASELINE_VER / 已进入 advanced 状态） | >0 且未 `--allow-open-changes` → **门禁驳回**；健康分 -4/项 |
+| `missing_approver` | 已批准/已实施/已关闭但无审批人 | 警告；健康分 -2/项 |
+| `stale_cr` | 未决 CR 提出距今 > 14 天（`STALE_CR_DAYS`） | 警告；健康分 -1/项 |
+
+### 9.3 基线冻结与真实蔓延/缩水比对（F4，ArchUnit FreezingArchRule 思路）
+
+- `baseline freeze --ver vX.Y.Z`：全量冻结当前 RTM 的 REQ 集到 `范围基准快照.csv`（append-only，同名覆盖需 `--force`），作为历史锚点。
+- `baseline diff --against vX.Y.Z [--strict]`：当前 RTM 逐需求比对冻结基线，**区分是否经审批**：
+  - **真实蔓延** = 未被已审批 CR 覆盖的新增 REQ；**真实缩水** = 未被已审批 CR 覆盖的删除 REQ；**真实降级** = 未审批的优先级下调。
+  - `baseline_drift = 真实蔓延 + 真实缩水 + 真实降级`；已审批变更（`--writeback` 回写后）**不计入漂移**（变更经审批即合法的量化体现）。
+  - `--strict`：`baseline_drift > 0` 时 exit 1（CI 阻断）；`gate --against-baseline` 将 drift 纳入健康分（-2/项）。
+
+### 9.4 需求易变性 KPI（F6，IEEE 需求易变性度量）
+
+`metrics`/`report` 输出范围稳定性：需求易变性（发生变更的需求数 / 需求总数 %）、变更单计数（未决/已批/已驳）、未决 CR 平均龄（天）、变更密度（CR / 需求）。`report --json` 汇总覆盖度/一致性/稳定性/变更合规/基线漂移/健康分为结构化输出，供 MCP `scope_metrics` 与 PMO 仪表盘消费。
+
+---
+
+## 10. 流程嵌入（何时做）
 
 - **需求分析阶段**：建立 `REQ-<nnn>`，初始化 RTM（含扩展维度），状态 `Proposed→Approved`。
 - **架构/开发阶段**：补充 `AE/MOD`，完成 `REQ→AE→MOD` 映射，状态推进至 `InProgress→Implemented`，`check_gate` 校验无孤儿。
 - **测试阶段**：补充 `TC`，状态推进至 `Verified→Closed`。
-- **每阶段 `stage_review`**：自动跑 `scope_tracker.py gate`（含一致性 + 蔓延/缩水 + 健康分），**未通过不得流转**。
-- **变更时**：走 §6 变更流程，升级 `BASELINE_VER`，同步 RTM（连续追溯）。
+- **基线固化后**：`baseline freeze --ver vX.Y.Z` 冻结范围基准，作为后续漂移比对锚点。
+- **每阶段 `stage_review`**：自动跑 `scope_tracker.py gate`（含一致性 + 蔓延/缩水 + 变更合规 + 基线漂移 + 健康分），**未通过不得流转**。
+- **变更时**：走 §6/§9 变更流程（`change` 登记 → `change-decide` 审批 → `--writeback` 回写基线），升级 `BASELINE_VER`，同步 RTM（连续追溯）。
+- **监控/汇报**：`report --json` 供 MCP/PMO 消费；迭代中 `baseline diff --strict` 阻断未审批漂移。
 
 ---
 
-**文档版本**：v1.1.1　**最后更新**：2026-08-25（审计整改：§3.1 补存量 ID 兼容规则——`REQ-0x`/`REQ-ITx-0x` 为历史合法变体，新增条目统一三位；scope_tracker 契约登记 api_contracts §1.2）
+**文档版本**：v1.2.0　**最后更新**：2026-09-08（最佳实践升级：§8.1 范围健康分精确模型（权威公式）；新增 §9 变更生命周期状态机（F2）+ 变更台账合规信号（F3）+ 基线冻结与真实蔓延/缩水比对（F4）+ 需求易变性 KPI（F6），原 §9 流程嵌入顺延为 §10；对齐 scope_tracker.py v1.2.0，支撑独立可部署技能 scope-tracking。此前 v1.1.1：§3.1 存量 ID 兼容规则）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

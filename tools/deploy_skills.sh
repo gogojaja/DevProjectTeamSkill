@@ -5,7 +5,7 @@
 #
 # 变更（v20 -> v21）:
 #   - 新增 --roles <role-a,role-b,...> 按需部署指定角色包（注入型工具防全量注入）
-#   - 不带 --roles 默认全量部署 10 个角色包
+#   - 不带 --roles 默认全量部署（角色包 + 独立可部署技能 scope-tracking）
 #   - 部署时同步 SKILL_INDEX.md + references/
 #   - 注入型工具（TRAE 等递归读目录）推荐 --roles 只放需要的包
 #
@@ -83,8 +83,20 @@ ALL_ROLES=(
   role-project-mgmt
 )
 
+# 独立可部署技能（非角色包）：无 --roles 全量部署时一并同步到镜像
+STANDALONE_SKILLS=(
+  scope-tracking
+  plan-creation
+  portfolio-mgmt
+  okr-strategy
+  resource-ops
+  stakeholder-comms
+  schedule-cost
+  risk-mgmt
+)
+
 if [[ ${#ROLES[@]} -eq 0 ]]; then
-  ROLES=("${ALL_ROLES[@]}")
+  ROLES=("${ALL_ROLES[@]}" "${STANDALONE_SKILLS[@]}")
 fi
 
 # frontmatter name 与目录名一致性校验（只校验待部署角色）
@@ -99,6 +111,33 @@ check_names() {
   done
   [[ $fail -eq 0 ]] || { echo "frontmatter 校验未通过，中止部署" >&2; exit 1; }
   echo "  ✓ frontmatter name 校验通过"
+}
+
+# 按 skill.manifest.json 注入自包含工具/测试副本（B1 单一信源；与 deploy_skills.py inject_bundled 对齐）
+inject_bundled() {
+  local src="$1" dst="$2"
+  [[ -f "$src/skill.manifest.json" ]] || return 0
+  python3 - "$src" "$dst" "$ROOT" <<'PY'
+import json, os, shutil, sys
+src, dst, root = sys.argv[1], sys.argv[2], sys.argv[3]
+try:
+    m = json.load(open(os.path.join(src, 'skill.manifest.json'), encoding='utf-8'))
+except Exception as e:
+    print('  WARN skill.manifest.json parse failed, skip inject:', e); sys.exit(0)
+bs = m.get('bundle_source', {}) or {}
+specs = [('bundle_tools', bs.get('tools', 'tools'), 'tools'),
+         ('bundle_tests', bs.get('tests', 'tests'), 'tests')]
+n = 0
+for key, ssub, dsub in specs:
+    for name in (m.get(key, []) or []):
+        s = os.path.join(root, ssub, name)
+        if not os.path.isfile(s):
+            print('  WARN manifest declares missing (%s): %s' % (key, s)); continue
+        d = os.path.join(dst, dsub); os.makedirs(d, exist_ok=True)
+        shutil.copy(s, os.path.join(d, name)); n += 1
+if n:
+    print('  OK %s: injected %d self-contained copies (tools/+tests/)' % (os.path.basename(dst), n))
+PY
 }
 
 deploy_target() {
@@ -117,6 +156,7 @@ deploy_target() {
         mkdir -p "$target/$r/$(dirname "$rel")"
         cp "$f" "$target/$r/$rel"
       done < <(find "$SKILLS_DIR/$r" -type f ! -name "*.pyc" 2>/dev/null)
+      inject_bundled "$SKILLS_DIR/$r" "$target/$r"   # 自包含注入（无 manifest 则跳过）
     else
       echo "  ✗ 技能库无角色包 $r" >&2
     fi

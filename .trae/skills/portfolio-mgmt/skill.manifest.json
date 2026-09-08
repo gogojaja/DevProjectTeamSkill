@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "skill": "portfolio-mgmt",
+  "version": "v1.0.0",
+  "self_contained": true,
+  "runtime": "python3",
+  "entrypoint": "tools/portfolio_ops.py",
+  "bundle_tools": [
+    "portfolio_ops.py"
+  ],
+  "bundle_tests": [
+    "test_portfolio_ops.py"
+  ],
+  "bundle_source": {
+    "tools": "tools",
+    "tests": "tests"
+  },
+  "requires_references": [],
+  "cli": [
+    "register",
+    "score",
+    "balance",
+    "optimize",
+    "review",
+    "track",
+    "dashboard"
+  ],
+  "single_source_of_truth": "权威工具 portfolio_ops.py 保留在仓库根 tools/（单一信源）；本 manifest 声明打包/部署期按名注入到技能包 tools/ 与 tests/ 的自包含副本，使 zip/部署产物可脱离编排器独立运行（python3 tools/portfolio_ops.py ...）。编排器路由与 MCP portfolio_register/portfolio_score/portfolio_dashboard 一律引用或委派，禁止复制组合评分/决策逻辑。",
+  "notes": "组合管理（PMI PfM/MoP/SAFe LPM）：5 维战略评分（对齐度30%/ROI25%/风险20%/可行性15%/紧迫度10%）+ PRB 决策（Proceed/Accelerate/Pause/Terminate）+ 价值兑现跟踪；台账 43/44/45。"
+}

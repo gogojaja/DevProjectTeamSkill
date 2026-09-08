@@ -2,6 +2,7 @@
 
 > 技能库根只读入口：**工具/编排器据此选择角色包**，每包一行（含编排器共 11 条）。
 > 子技能明细由各角色包根 SKILL.md 路由表承载，本索引不重复。
+> **独立可部署技能**（顶层自包含包，脱离编排器可直接加载，见文末编号条目）：`scope-tracking`（范围跟踪，条目 23）、`plan-creation`（方案制定，条目 22）、`portfolio-mgmt`（组合管理，条目 24）、`okr-strategy`（OKR战略对齐，条目 25）、`resource-ops`（资源运营，条目 26）、`stakeholder-comms`（干系人沟通，条目 27）、`schedule-cost`（进度成本EVM，条目 29）、`risk-mgmt`（风险RAID，条目 30）——共 8 项 STANDALONE_SKILLS（阶段A+B）。
 > 规范详见 `references/token_standard.md` §1。
 > **弱模型适配**：能力弱模型下技能识别与执行规范见 `references/weak_model_compatibility.md`（description 单语言/触发词前置）。
 > **目录访问边界**：本项目可读写/删除范围=本项目目录（`台账/26_访问边界.csv`），本项目目录外访问须经 `register_auth` 授权（默认仅本次对话），见 `references/iron_rules.md` §1a。
@@ -58,8 +59,8 @@
 
 ---
 
-**文档版本**：v21.12.1
-**最后更新**：2026-09-06（条目21 插件机制 v1.0.0：插件接口规范 + 注册表 + 降级处理 + SKILL_INDEX 标注。此前 Phase 1-2：路径外部化 + TwinForge 文档分离）
+**文档版本**：v21.15.0
+**最后更新**：2026-09-08（技能独立部署升级 阶段B：新增条目29 `schedule-cost`（进度成本EVM）+ 条目30 `risk-mgmt`（风险RAID）2 个独立可部署技能；**重新内化** dev-project-mgmt evm_calculator/raid_manager + MCP risk_scan 为本地权威工具 evm_ops.py/raid_ops.py（数据源统一台账 CSV，dev-project-mgmt 保留兼容）；role-governance progress-cost.md/risk.md 与 MCP evm_analyze/raid_mgmt/risk_scan 瘦引用委派；独立可部署技能 header 更新为 8 项 STANDALONE_SKILLS（阶段A+B）。此前阶段A 条目22/24~27，条目23 `scope-tracking` v1.2.0）
 
 19. **孵化器立项阶段技能（v1.1.0）**：内嵌子技能 `incubator-initiation`——支撑新独立项目/技能/工具的立项评估：四段孵化评估水线（方案调研→可行性五维+独立性三判据→孵化决策三选一+3 视角评审聚合→移交清单六段+登记闭环），输出立项建议书（`docs/incubator/INC-*.md`）；**只评估不落地**，落地交对应独立项目运营者独立执行；方案来源 `docs/孵化器模式与git剥离方案.md`，协同机制见 `docs/多项目协同与隔离维护机制方案.md`，独立项目登记见 `references/project-registry.md`；触发词 `立项评估`/`方案调研`/`可行性分析`/`独立化评估`/`孵化器启动`，详见 `dev-project-team-skill/skills/incubator-initiation/SKILL.md`。
 
@@ -68,6 +69,20 @@
 21. **插件机制（v1.0.0）**：核心功能独立运行，插件按需增强。插件发现三级动态解析（环境变量 > 同级目录约定 > 配置文件）；插件注册表 `references/plugin_registry.json`（7 个已知插件）；接口规范 `references/plugin_interface.md`；配置模板 `.env.example`。**插件工具**（需安装对应插件）：`mirror_push/github_push/github_ip_refresh`（→ dev-git-hub）、`scheduler_proxy`（→ dev-task-scheduler）、`model_router_proxy`（→ dev-model-router）；插件缺失时输出安装指引 + 替代方案。**核心工具**（无插件依赖）：`solidify/package_skills/deploy_skills/publish_production/check_*/audit/desensitize/cmdb/mcp_server` 等。详见 `references/plugin_interface.md`。
 
 
-22. **方案制定流程（v1.0.0）**：内嵌子技能 `plan-creation`——通用项目级方案制定流程（对齐 IEEE 828 / PMBOK / PRINCE2）；8 步生命周期（需求采集与可行性→方案编写→预审+正式评审→修订闭环+基线化→执行计划WBS→执行+监控→变更控制→收尾复盘）；Step 1-4 必选、Step 5-8 按需；三档裁剪（简单<=3文件/标准4-10文件/复杂>10或跨项目）；五维评审（完整性25%+可行性25%+一致性20%+风险15%+可测性15%，Go>=3.5）；交付物三件套（方案+执行计划+评审报告）；与 `best-practice-solution` 互补（技术选型→BPS，项目级方案→plan-creation）；触发词 `制定方案`/`写方案`/`实施方案`/`方案评审`/`执行计划`，详见 `dev-project-team-skill/skills/plan-creation/SKILL.md`。
+22. **方案制定流程（v1.0.0）**：**独立可部署技能** `plan-creation`（顶层自包含技能包 `.trae/skills/plan-creation/`，v1.0.0 从编排器内嵌子技能提升为独立可部署）——通用项目级方案制定流程（对齐 IEEE 828 / PMBOK / PRINCE2）；8 步生命周期（需求采集与可行性→方案编写→预审+正式评审→修订闭环+基线化→执行计划WBS→执行+监控→变更控制→收尾复盘）；Step 1-4 必选、Step 5-8 按需；三档裁剪（简单<=3文件/标准4-10文件/复杂>10或跨项目）；五维评审（完整性25%+可行性25%+一致性20%+风险15%+可测性15%，Go>=3.5）；交付物三件套（方案+执行计划+评审报告）；与 `best-practice-solution` 互补（技术选型→BPS，项目级方案→plan-creation）；纯文档方法论技能（无 CLI 工具，domain/ 三文件随包，评审/固化/变更委派 role-governance）；触发词 `制定方案`/`写方案`/`实施方案`/`方案评审`/`执行计划`，详见 `plan-creation/SKILL.md`。
+
+23. **范围跟踪技能（v1.2.0）**：**独立可部署技能** `scope-tracking`（顶层自包含技能包 `.trae/skills/scope-tracking/`，非内嵌子技能，脱离编排器可直接加载）——范围基准/门禁/变更生命周期/基线比对的**权威实现**（单一信源）；工具 `tools/scope_tracker.py` v1.2.0（`init`/`metrics`/`gate`/`change`/`change-decide`/`baseline`/`report`），标准 `references/traceability_standard.md` v1.2.0（§8.1 范围健康分精确模型 / §9 变更生命周期与基线比对）；自包含打包经 `skill.manifest.json` 声明，`package_skills.py`/`deploy_skills.py` 按 manifest 注入 `scope_tracker.py`/`check_traceability.py`/`test_scope_tracker.py` 副本到产物 `tools/`+`tests/`（zip 内测试可自跑绿，无 manifest 的角色包零回归）；role-governance/`scope-change.md`、role-requirements/`lifecycle.md` 与 MCP `scope_metrics`/`change_mgmt` 均**瘦引用委派**本技能，不复制范围裁决逻辑；触发词 `范围基准`/`范围门禁`/`范围跟踪`/`范围蔓延`/`变更生命周期`/`基线冻结`/`基线比对`，详见 `scope-tracking/SKILL.md`。
+
+24. **项目组合管理技能（v1.0.0）**：**独立可部署技能** `portfolio-mgmt`（顶层自包含技能包 `.trae/skills/portfolio-mgmt/`，v1.0.0 从编排器内嵌子技能提升为独立可部署）——组织级项目投资决策能力（PMI PfM/MoP/SAFe LPM）；组合注册与分类、5 维战略评分（对齐度30%/ROI25%/风险20%/可行性15%/紧迫度10% 加权）、组合平衡分析、优化建议、Portfolio Review Board 决策（Proceed/Accelerate/Pause/Terminate）、价值兑现跟踪；权威工具 `tools/portfolio_ops.py`（register/score/balance/optimize/review/track/dashboard），自包含打包经 `skill.manifest.json` 注入 `portfolio_ops.py`+`test_portfolio_ops.py` 副本；台账 43/44/45；触发词 `组合管理`/`战略评分`/`投资评审`/`组合优化`/`价值兑现`，详见 `portfolio-mgmt/SKILL.md`。
+
+25. **OKR战略对齐技能（v1.0.0）**：**独立可部署技能** `okr-strategy`（顶层自包含技能包 `.trae/skills/okr-strategy/`，v1.0.0 从编排器内嵌子技能提升为独立可部署）——OKR/KPI 战略对齐（Doerr OKR/Kaplan-Norton BSC/SAFe Strategic Themes）；OKR 层级管理（组织→项目群→项目）、战略主题映射、OKR 评分（0~1.0 分级：失败/未达预期/理想/超额/过于保守）、对齐度审计（孤儿项目检测）；权威工具 `tools/okr_ops.py`（create/update/score/map/audit/dashboard），自包含打包经 `skill.manifest.json` 注入 `okr_ops.py`+`test_okr_ops.py` 副本；台账 46/47；触发词 `OKR`/`战略对齐`/`KPI`/`对齐度审计`/`孤儿项目`，详见 `okr-strategy/SKILL.md`。
+
+26. **资源运营管理技能（v1.0.0）**：**独立可部署技能** `resource-ops`（顶层自包含技能包 `.trae/skills/resource-ops/`，v1.0.0 从编排器内嵌子技能提升为独立可部署）——资源运营（PMI Resource Mgmt/TOC/Skills Matrix）；容量登记、资源分配（利用率重算）、负载均衡（过载>85%/健康≥50%/闲置<50%）、技能矩阵（熟练度1~5）、单点故障检测；权威工具 `tools/resource_ops.py`（capacity/allocate/balance/skill/singlespot），自包含打包经 `skill.manifest.json` 注入 `resource_ops.py`+`test_resource_ops.py` 副本；台账 48/49；触发词 `资源容量`/`技能矩阵`/`负载均衡`/`资源分配`/`单点故障`，详见 `resource-ops/SKILL.md`。
+
+27. **干系人沟通管理技能（v1.0.0）**：**独立可部署技能** `stakeholder-comms`（顶层自包含技能包 `.trae/skills/stakeholder-comms/`，v1.0.0 从编排器内嵌子技能提升为独立可部署）——干系人沟通（PMBOK Stakeholder/Comms Mgmt/Salience Model）；权力-利益矩阵（重点管理/保持满意/保持知情/最少关注）、参与度阶梯 U<N<C<S<A 差距策略、沟通计划与记录；权威工具 `tools/comms_ops.py`（stakeholder/engage/plan/log/dashboard），自包含打包经 `skill.manifest.json` 注入 `comms_ops.py`+`test_comms_ops.py` 副本；问题升级机制（P1~P4）归 role-project-init，本技能不复制；台账 50/51/52；触发词 `干系人映射`/`沟通计划`/`参与度评估`/`权力利益矩阵`，详见 `stakeholder-comms/SKILL.md`。
+
+29. **进度成本管理技能（v1.0.0）**：**独立可部署技能** `schedule-cost`（顶层自包含技能包 `.trae/skills/schedule-cost/`，v1.0.0 首个独立可部署进度成本技能）——进度与成本挣值管理（PMBOK 进度/成本知识领域、ANSI/EIA-748 EVM、0/100 规则、CPM、BAC）；里程碑状态机与 0/100 挣值、PV/BAC 三级回退、EVM 核心指标（PV/EV/AC/CPI/SPI/CV/SV/准点率）、健康判定（CPI≥1.0 且 SPI≥1.0 ✅ / ≥0.9 ⚠️ / else ❗）、周期复盘与偏差纠偏；权威工具 `tools/evm_ops.py` v1.0.0（calc/status/add-milestone/update-milestone），**重新内化 dev-project-mgmt evm_calculator**（数据源改台账 CSV，EVM 公式一致，dev-project-mgmt 保留兼容），标准 `references/evm_standard.md` v1.0.0；自包含打包经 `skill.manifest.json` 注入 `evm_ops.py`+`test_evm_ops.py` 副本；role-governance/`progress-cost.md` 与 MCP `evm_analyze` 均**瘦引用委派**本技能；触发词 `进度管理`/`成本管理`/`挣值分析`/`EVM`/`CPI`/`SPI`/`里程碑`/`准点率`，详见 `schedule-cost/SKILL.md`。
+
+30. **风险与RAID管理技能（v1.0.0）**：**独立可部署技能** `risk-mgmt`（顶层自包含技能包 `.trae/skills/risk-mgmt/`，v1.0.0 首个独立可部署风险与 RAID 管理技能）——风险登记册与 RAID 四维管理（PMBOK 风险知识领域、ISO 31000、PRINCE2 风险、概率-影响矩阵、升级阶梯、RACI）；RAID 四维（risk/assumption/issue/dependency）登记册、七类风险预设、概率×影响分级（SEVERITY_MAP P1≥12/P2≥8/P3≥4/P4<4）、状态机流转、应对策略五选、问题分级 P1~P4 与四级升级阶梯 L1~L4；权威工具 `tools/raid_ops.py` v1.0.0（list/add/update/close/scan），**重新内化 dev-project-mgmt raid_manager + MCP risk_scan**（数据源统一台账 12_风险问题台账.csv，分级阈值统一到权威实现，dev-project-mgmt 保留兼容），标准 `references/raid_standard.md` v1.0.0；自包含打包经 `skill.manifest.json` 注入 `raid_ops.py`+`test_raid_ops.py` 副本；role-governance/`risk.md` 与 MCP `raid_mgmt`/`risk_scan` 均**瘦引用委派**本技能；触发词 `风险登记册`/`风险巡检`/`RAID`/`概率影响`/`风险应对`/`问题升级`/`P1P2P3P4`，详见 `risk-mgmt/SKILL.md`。
 ---
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

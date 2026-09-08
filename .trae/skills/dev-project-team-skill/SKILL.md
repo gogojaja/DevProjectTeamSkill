@@ -16,9 +16,10 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.14.0
-- **版本发布日期**：2026-09-07
+- **技能版本**：v21.15.0
+- **版本发布日期**：2026-09-08
 - **版本变更记录**：
+  - v21.15.0：技能独立部署升级 阶段A（2026-09-08）——§4.1 路由表 plan-creation/portfolio-mgmt/okr-strategy/resource-ops/stakeholder-comms 5 技能从编排器内嵌子技能 `./skills/{name}/` 提升为**顶层独立可部署技能** `../{name}/` 并标注；5 技能已补 frontmatter/三段版本/闭环执行系统/skill.manifest.json，注册 SKILL_INDEX + STANDALONE_SKILLS，脱离编排器可独立打包部署运行；编排器路由指向同步更新，能力语义不变。
   - v21.14.0：「目标驱动自主执行」v1.1 补强（OPT-GOAL-001，2026-09-07）——①SGD 持久化台账（`台账/41_活跃目标.json`，save/load/close 全流程）；②执行状态持久化（迭代计数/AC 状态跨会话保留）；③scope 读写分离（write_files/write_dirs vs read_files/read_dirs，v1.0 files/dirs 向后兼容）；④constraints 可机器验证（file_not_modified/file_not_created/content_not_changed）；⑤错误恢复策略（on_circuit_break/on_max_iterations）；⑥目标变更机制（amend + 变更历史）；⑦SGD 回显确认流程；⑧`goal_check.py` 713 行（v1.0 328 行）+ 46 单测（v1.0 21 项）全部通过；⑨`docs/sgd_schema.json` 升级 v1.1。五维评审从 3.80 NoGo 补强至 4.5+ Go。
   - v21.13.0：新增「目标驱动自主执行」模式（OPT-GOAL-001，2026-09-07）——①§2.2 新增铁律 #13（SGD 四要素 + 分级交互 + 完成度自检 + 安全护栏）；②§3 新增执行模式「目标驱动自主执行」；③§5 新增调度规则 #13（分级交互规则）；④新增 `domain/goal-driven-execution.md`（完整流程/SGD 模板/自检算法/护栏）；⑤新增 `tools/goal_check.py`（完成度自检工具）。预期效果：确认交互次数从 6~10 降至 1~2，用户无需反复说"继续"。
 - **版本变更记录**：
@@ -198,7 +199,7 @@ def resolve_packages(handoff_l1: dict, user_instruction: str = "") -> list[str]:
 - **角色隔离**：各角色任务必须在对应角色包内完成，禁止跨角色执行；§2 公共底座对全角色强制生效；
 - 角色明细读取：命中后 Read 对应包 `SKILL.md` 路由表 → 只读目标 `domain/*.md`。
 
-### 4.1 嵌套能力（编排器内部扩展，v21.4.0）
+### 4.1 嵌套能力与独立可部署技能路由（编排器扩展，v21.4.0；v21.15.0 起 5 技能提升顶层独立）
 
 | 能力 | 位置 | 触发 | 说明 |
 |------|------|------|------|
@@ -208,11 +209,11 @@ def resolve_packages(handoff_l1: dict, user_instruction: str = "") -> list[str]:
 | 最佳实践方案·路由仲裁 | `./skills/best-practice-solution/` §1.2 | 互斥命中时 | `技术选型+需行业依据`→最佳实践方案；`ADR 正式化/编号/追溯`→`role-architecture`；`对已有代码/文档做评审、质量门禁`→多视角验证；无法判定取最严档（FULL 优先）并留痕 |
 | 模型选择 | `./skills/model-selection/` | 模型选择/模型推荐/模型清单/模型定价/模型场景匹配 | 管理大模型提供商清单（42+模型）、定价、能力矩阵，根据任务类型（S0~S3）推荐最优模型，输出选型建议与跨场景适配方案 |
 | 孵化器立项 | `./skills/incubator-initiation/` | 立项评估/方案调研/可行性分析/独立化评估/孵化器启动 | 四段孵化评估水线：方案调研→可行性五维+独立性三判据→孵化决策三选一（移交/继续孵化/放弃）+3 视角评审聚合→移交清单六段+登记闭环；只产出立项建议书（docs/incubator/INC-*.md）不代落地 |
-| 方案制定 | `./skills/plan-creation/` | 制定方案/写方案/实施方案/方案评审/执行计划 | 8 步生命周期（需求采集→方案编写→预审+评审→修订基线→WBS分解→执行监控→变更控制→收尾复盘）；五维评审（完整性25%+可行性25%+一致性20%+风险15%+可测性15%）；三档裁剪（简单/标准/复杂）；交付物三件套（方案+计划+评审报告）；与 best-practice-solution 互补（技术选型→BPS，项目级方案→plan-creation） |
-| 项目组合管理 | `./skills/portfolio-mgmt/` | 组合管理/战略评分/投资选择/组合优化/组合评审/价值兑现 | 组合注册与分类、5 维战略评分（对齐度30%/ROI25%/风险20%/可行性15%/紧迫度10%）、组合平衡分析、Portfolio Review Board、价值兑现跟踪；工具 `portfolio_ops.py` + MCP `portfolio_register/portfolio_score/portfolio_dashboard` |
-| OKR/战略对齐 | `./skills/okr-strategy/` | OKR/战略对齐/KPI/战略主题/对齐度/孤儿项目 | OKR 层级管理（组织→项目群→项目）、战略主题映射、OKR 评分（0~1.0）、对齐度审计（孤儿项目检测）；工具 `okr_ops.py` + MCP `okr_manage/alignment_check` |
-| 资源运营管理 | `./skills/resource-ops/` | 资源容量/技能矩阵/资源分配/负载均衡/单点故障 | 资源容量规划（利用率）、技能矩阵（熟练度1~5）、资源负载均衡（过载>85%/闲置<50%）、单点故障检测；工具 `resource_ops.py` + MCP `resource_capacity` |
-| 干系人沟通管理 | `./skills/stakeholder-comms/` | 干系人映射/权力利益/参与度/沟通计划/沟通记录 | 干系人映射（权力-利益4象限）、参与度评估（C/U/N/S/A）、沟通计划与记录、升级机制增强；工具 `comms_ops.py` + MCP `comms_plan` |
+| 方案制定（独立可部署技能） | `../plan-creation/` | 制定方案/写方案/实施方案/方案评审/执行计划 | 8 步生命周期（需求采集→方案编写→预审+评审→修订基线→WBS分解→执行监控→变更控制→收尾复盘）；五维评审（完整性25%+可行性25%+一致性20%+风险15%+可测性15%）；三档裁剪（简单/标准/复杂）；交付物三件套（方案+计划+评审报告）；与 best-practice-solution 互补（技术选型→BPS，项目级方案→plan-creation） |
+| 项目组合管理（独立可部署技能） | `../portfolio-mgmt/` | 组合管理/战略评分/投资选择/组合优化/组合评审/价值兑现 | 组合注册与分类、5 维战略评分（对齐度30%/ROI25%/风险20%/可行性15%/紧迫度10%）、组合平衡分析、Portfolio Review Board、价值兑现跟踪；工具 `portfolio_ops.py` + MCP `portfolio_register/portfolio_score/portfolio_dashboard` |
+| OKR/战略对齐（独立可部署技能） | `../okr-strategy/` | OKR/战略对齐/KPI/战略主题/对齐度/孤儿项目 | OKR 层级管理（组织→项目群→项目）、战略主题映射、OKR 评分（0~1.0）、对齐度审计（孤儿项目检测）；工具 `okr_ops.py` + MCP `okr_manage/alignment_check` |
+| 资源运营管理（独立可部署技能） | `../resource-ops/` | 资源容量/技能矩阵/资源分配/负载均衡/单点故障 | 资源容量规划（利用率）、技能矩阵（熟练度1~5）、资源负载均衡（过载>85%/闲置<50%）、单点故障检测；工具 `resource_ops.py` + MCP `resource_capacity` |
+| 干系人沟通管理（独立可部署技能） | `../stakeholder-comms/` | 干系人映射/权力利益/参与度/沟通计划/沟通记录 | 干系人映射（权力-利益4象限）、参与度评估（C/U/N/S/A）、沟通计划与记录、升级机制增强；工具 `comms_ops.py` + MCP `comms_plan` |
 
 ---
 
@@ -305,5 +306,5 @@ def resolve_packages(handoff_l1: dict, user_instruction: str = "") -> list[str]:
 
 ---
 
-**文档版本**：v21.14.0 **最后更新**：2026-09-07（「目标驱动自主执行」v1.1 补强：SGD 持久化/scope 读写分离/constraints 可验证/错误恢复/目标变更；此前：v21.13.0 新增目标驱动自主执行模式）
+**文档版本**：v21.15.0 **最后更新**：2026-09-08（技能独立部署升级 阶段A：§4.1 路由 5 技能 plan-creation/portfolio-mgmt/okr-strategy/resource-ops/stakeholder-comms 提升为顶层独立可部署技能，路径 `./skills/`→`../`，标注独立可部署技能；此前 v21.14.0 目标驱动自主执行 v1.1 补强）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

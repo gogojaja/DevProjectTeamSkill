@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "skill": "scope-tracking",
+  "version": "v1.2.0",
+  "self_contained": true,
+  "runtime": "python3",
+  "entrypoint": "tools/scope_tracker.py",
+  "bundle_tools": [
+    "scope_tracker.py",
+    "check_traceability.py"
+  ],
+  "bundle_tests": [
+    "test_scope_tracker.py"
+  ],
+  "bundle_source": {
+    "tools": "tools",
+    "tests": "tests"
+  },
+  "requires_references": [
+    "traceability_standard.md"
+  ],
+  "cli": [
+    "init",
+    "metrics",
+    "gate",
+    "change",
+    "change-decide",
+    "baseline",
+    "report"
+  ],
+  "single_source_of_truth": "权威工具与测试保留在仓库根 tools/ 与 tests/（单一信源）；本 manifest 声明打包/部署期按名注入到技能包 tools/ 与 tests/ 的自包含副本，使 zip/部署产物可脱离编排器独立运行（python3 tools/scope_tracker.py ...）。角色包（role-governance/scope-change.md、role-requirements-analysis/lifecycle.md）与 MCP scope_metrics 一律引用或委派，禁止复制实现逻辑。",
+  "notes": "check_traceability.py 为共享独立工具（铁律#10 / CI / nightly gate 引用），此处仅注入只读副本供自包含运行，其权威路径仍在仓库根 tools/，不被本技能吞并。"
+}

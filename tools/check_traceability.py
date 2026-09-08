@@ -26,6 +26,14 @@ import sys
 import csv
 import argparse
 
+# Windows 控制台 UTF-8 输出（修复 GBK 下打印 ✓/✗ 触发 UnicodeEncodeError 崩溃，与 scope_tracker.py 同源）
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, 'reconfigure'):
+        try:
+            _stream.reconfigure(encoding='utf-8', errors='replace')
+        except Exception:
+            pass
+
 # --- 项目根解析（修复部署副本场景 ROOT 错位，与 scope_tracker.py 同源）---
 _PROJECT_MARKERS = ('台账', 'AGENTS.md', 'SKILL_INDEX.md', '交接文档.md', 'dev-project-team-skill')
 

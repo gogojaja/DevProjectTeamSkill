@@ -25,7 +25,7 @@ description: "Requirements lifecycle management sub-skill covering requirement r
 
 **环节 1 评审**（`review_requirements`）：评审五维度（范围合规/功能逻辑质量/工程规范-结构与编号/风险安全-威胁建模与合规/范围跟踪-无缩水蔓延，详 §一 `requirements-lifecycle-skill__resources/requirements_lifecycle_details.md`）。前置门禁：追溯覆盖率 100% / 冲突消解记录为空或全部关闭 / 每条需求含量化验收标准 / 无合规违规。流程：自检门禁全通过 → 调 `stage_review` 传入 SRS 与校验报告 → 缺陷分级录入「质量缺陷台账」逐条整改 → 最多 2 轮整改复核 → 严重/主要缺陷闭环 + `check_gate` 通过后 `stage_close` 固化需求基线。
 
-**环节 2 变更分析**（`change_analysis`）：基线固化后任何新增/修改/删除/范围调整触发。变更登记至 `需求变更记录.csv` → 按已选维度逐项评估（触及必选维度 func/sec/data/env 时强制全维度扫描）→ 追溯矩阵影响评估 → 生成《需求变更影响评估表》转 `change_audit` 等用户「同意」→ 审批后 `update_traceability` 更新追溯矩阵。
+**环节 2 变更分析**（`change_analysis`）：基线固化后任何新增/修改/删除/范围调整触发。变更登记至 `需求变更记录.csv` → 按已选维度逐项评估（触及必选维度 func/sec/data/env 时强制全维度扫描）→ 追溯矩阵影响评估 → 生成《需求变更影响评估表》转 `change_audit` 等用户「同意」→ 审批后 `update_traceability` 更新追溯矩阵。**变更生命周期状态机（提出→分析→批准/驳回→实施→关闭）、审批回写范围基准版本、基线冻结与真实蔓延/缩水比对委派独立可部署技能 `scope-tracking`（`tools/scope_tracker.py` v1.2.0，`domain/change-control.md`·`baseline-diff.md`）；本环节只做需求级影响分析与 `08_需求追溯矩阵.csv` 维护，不复制范围裁决逻辑（单一信源）。**
 
 **环节 3 追溯矩阵**（`update_traceability`）：结构（需求编号|描述|来源|优先级|关联功能模块|关联接口|关联数据实体|关联测试用例|关联设计文档|变更记录）写入 `台账/08_需求追溯矩阵.csv`。方向：正向 需求→功能模块→设计文档→代码→测试用例；反向 逆序。维护：每条需求增删改后自动更新；阶段评审强制校验完整性，断链判定为缺陷；追溯矩阵作为 SRS 第 10 个 Sheet 同步输出。
 
@@ -40,7 +40,7 @@ description: "Requirements lifecycle management sub-skill covering requirement r
 ## 4. 边界（刹车规则）
 
 - 评审：第 2 轮整改仍存严重/主要缺陷 → 停止自动修复，人工介入；门禁未达标 → 禁止评审通过，转整改
-- 变更：同一需求连续 3 次无审批变更 → 冻结基准预警；未审批先实施 → 暂停，补审批
+- 变更：同一需求连续 3 次无审批变更 → 冻结基准预警（`scope-tracking/domain/baseline-diff.md` `baseline freeze`）；未审批先实施 → 暂停，补审批；范围门禁/变更合规裁决委派 `scope-tracking`（单一信源）
 - **需求基线权威**：需求基线是设计与开发的唯一权威基准；设计/开发阶段评审发现已实现功能 ≠ 需求基线 → 一律以需求基线为准，偏差即缺陷、返工实现；**禁止以已实现内容逆向修正需求基线**；需求基线调整仅允许经合法 `change_analysis`+`change_audit` 审批触发（来源限范围调整/接口变化/合规新规/新诉求/缺陷澄清，来源为「已实现内容」驳回）
 - 追溯：断链率超过 20% → 暂停流转，要求补全追溯关系
 
@@ -49,4 +49,4 @@ description: "Requirements lifecycle management sub-skill covering requirement r
 > 目录规范详见 `../../shared/references/directory_structure.md`
 > 协作接口详见 `../../shared/references/api_contracts.md`
 
-**文档版本**：v21.0.1 | **最后更新**：2026-08-15（需求基线权威铁律） | **知识产权所有**：段波（duanbo.douglas@163.com）
+**文档版本**：v21.0.2 | **最后更新**：2026-09-08（瘦引用：范围变更生命周期/基线冻结比对/范围门禁裁决委派独立可部署技能 `scope-tracking`（scope_tracker.py v1.2.0），本文件保留需求级评审/变更影响分析/08 需求追溯矩阵） | **知识产权所有**：段波（duanbo.douglas@163.com）

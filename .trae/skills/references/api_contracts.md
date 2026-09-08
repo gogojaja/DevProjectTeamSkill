@@ -129,16 +129,19 @@ DevProjectTeamSkill（总控）
 
 > 范围门禁校验、产出物条目化比对、范围跟踪检查为 `check_gate`/`stage_review` 协同子步骤。
 
-**依赖工具契约**（范围跟踪自动化，标准 `references/traceability_standard.md` v1.1.1）：
+**依赖工具契约**（范围跟踪自动化，权威实现=独立可部署技能 `scope-tracking`，标准 `references/traceability_standard.md` v1.2.0）：
 
 | 工具 | 子命令 | 用途 | 输出 / 退出码 |
 |------|--------|------|---------------|
 | `tools/scope_tracker.py` | `init` | 初始化 RTM（扩展列）+ `06/07_范围台账.csv` 表头 | 0 |
 | | `metrics [--write]` | 覆盖度/健康分卡；`--write` 追加 `07_范围跟踪台账.csv` 快照 | 0 成功 / 1 矩阵缺失 |
-| | `gate [--max-violations N] [--min-health 90]` | 三方一致性 + 蔓延/缩水 + 健康门禁，写 07 快照 | 0 通过 / 1 驳回 / 2 一致性校验异常 |
-| | `change --req --title --impact-* --baseline-*` | 登记 `CR-<nnn>` 至 `06_范围变更台账.csv`（五维影响） | 0 |
+| | `gate [--max-violations N] [--min-health 90] [--against-baseline V] [--allow-open-changes]` | 三方一致性 + 蔓延/缩水 + 变更合规 + 基线漂移 + 健康门禁，写 07 快照 | 0 通过 / 1 驳回 / 2 一致性异常(fail-closed) |
+| | `change --req --title --impact-* --baseline-*` | 登记 `CR-<nnn>` 至 `06_范围变更台账.csv`（五维影响，状态=提出） | 0 |
+| | `change-decide --id --status [--approver --baseline-to --writeback]` | 推进变更生命周期；批准+`--writeback` 回写 RTM 基线版本+CHANGE_REFS | 0 成功 / 1 非法状态或 CR 缺失 |
+| | `baseline freeze/diff/list [--ver --against --force --strict]` | 冻结范围基准快照 / 比对真实蔓延·缩水 / 列已冻结版本 | 0；`diff --strict` 检出漂移=1 |
+| | `report [--json] [--against-baseline V]` | 范围状态综合报告（覆盖/一致/稳定/变更合规/漂移/健康分）；`--json` 供 MCP/PMO | 0 |
 
-> 数据源：`台账/需求-架构-代码追溯矩阵.csv`（11 列 = 5 基础 + 6 扩展）；`gate` 内部复用 `tools/check_traceability.py` 一致性校验，异常时 fail-closed（exit 2，防门禁假绿）。
+> 数据源：`台账/需求-架构-代码追溯矩阵.csv`（11 列 = 5 基础 + 6 扩展）· `06_范围变更台账.csv` · `07_范围跟踪台账.csv` · `范围基准快照.csv`（F4 冻结基线）；`gate` 内部复用 `tools/check_traceability.py` 一致性校验，异常时 fail-closed（exit 2，防门禁假绿）。
 
 ### 1.3 progress-cost（项目进度与成本管理子域）
 
@@ -150,6 +153,17 @@ DevProjectTeamSkill（总控）
 | `update_milestone` | 更新里程碑、工时、成本（含 EVM 分析） | 阶段验收通过后 |
 
 > 前置里程碑门禁校验为 `check_gate` 协同子步骤。
+
+**依赖工具契约**（进度成本 EVM 自动化，权威实现=独立可部署技能 `schedule-cost`，标准 `references/evm_standard.md` v1.0.0，内化自 dev-project-mgmt `evm_calculator.py`）：
+
+| 工具 | 子命令 | 用途 | 输出 / 退出码 |
+|------|--------|------|---------------|
+| `tools/evm_ops.py` | `add-milestone --id --name [--start --end --value]` | 登记里程碑至 `09_进度跟踪台账.csv`（含计划值 PV） | 0 成功 / 1 重复 ID |
+| | `update-milestone --id [--status --actual-end --completion]` | 更新里程碑状态/实际完成日/完成率（已完成自动补实际日期） | 0 成功 / 1 里程碑不存在或台账空 |
+| | `calc [--milestone M1] [--json]` | EVM 挣值分析 PV/EV/AC/CPI/SPI/CV/SV/准点率 + 健康判定；`--json` 供 MCP/PMO | 0（无数据友好提示亦 0） |
+| | `status` | 全里程碑状态清单 + EVM 概览 | 0 |
+
+> 数据源：`台账/03_进度基准.csv`（阶段/里程碑/计划日期）· `04_成本基准.csv`（成本阈值=BAC）· `09_进度跟踪台账.csv`（PV/EV 主源）· `10_成本消耗台账.csv`（AC 主源）；EV 采里程碑 0/100 规则，AC 缺失回退时间进度比估算（标注 `ac_source`），公式与 dev-project-mgmt 一致。MCP `evm_analyze` 以 subprocess 委派本工具。
 
 ### 1.4 quality-gate（项目质量与门禁管理子域）
 
@@ -169,6 +183,18 @@ DevProjectTeamSkill（总控）
 | action | 用途 | 典型调用时机 |
 |--------|------|-------------|
 | `risk_scan` | 风险巡检（登记册更新/新风险识别/等级评估） | 定期、阶段切换、重大变更 |
+
+**依赖工具契约**（RAID 与风险扫描自动化，权威实现=独立可部署技能 `risk-mgmt`，标准 `references/raid_standard.md` v1.0.0，内化自 dev-project-mgmt `raid_manager.py` + MCP `risk_scan`）：
+
+| 工具 | 子命令 | 用途 | 输出 / 退出码 |
+|------|--------|------|---------------|
+| `tools/raid_ops.py` | `add --type --desc [--probability --impact --owner --priority --notes]` | 登记 RAID 四维条目至 `12_风险问题台账.csv`（自动定级 P1~P4 + 默认状态） | 0 成功 / 1 无效类型 |
+| | `list [--type --status]` | 按类型/状态过滤 RAID 清单（含风险分与等级） | 0 成功 / 1 无效类型 |
+| | `update --id [--status --owner --probability --impact --notes]` | 推进状态流转（合法性校验）+ 应对策略落地 | 0 成功 / 1 条目不存在或非法流转 |
+| | `close --id` | 关闭 RAID 条目（终态校验，自动填关闭日期，幂等） | 0 成功 / 1 条目不存在或非法流转 |
+| | `scan [--severity P1] [--json]` | 概率×影响分级扫描（排除已关闭，风险分降序）；`--json` 供 MCP/PMO | 0（无数据友好提示亦 0） |
+
+> 数据源：`台账/12_风险问题台账.csv`（兼容旧名 `RAID台账.csv` 只读）；RAID 四维=risk/assumption/issue/dependency，状态流转 open→{mitigating,investigating,closed}（closed 终态），风险分=概率×影响（高4/中3/低2）→ P1≥12/P2≥8/P3≥4/P4<4，与 dev-project-mgmt `raid_manager` + MCP `risk_scan` 一致。MCP `raid_mgmt`/`risk_scan` 以 subprocess 委派本工具。
 
 ### 1.6 security-audit（项目安全审计子域）
 
