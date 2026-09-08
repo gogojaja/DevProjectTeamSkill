@@ -81,6 +81,8 @@ ALL_ROLES=(
   role-program-mgmt
   role-mgmt-consulting
   role-project-mgmt
+  role-operations
+  role-security
 )
 
 # 独立可部署技能（非角色包）：无 --roles 全量部署时一并同步到镜像

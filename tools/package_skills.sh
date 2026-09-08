@@ -35,7 +35,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# 全部角色包（8 个）
+# 全部角色包（13 个：1 编排器 + 12 角色）
 ALL_ROLES=(
   dev-project-team-skill
   role-project-init
@@ -48,6 +48,8 @@ ALL_ROLES=(
   role-program-mgmt
   role-mgmt-consulting
   role-project-mgmt
+  role-operations
+  role-security
 )
 
 # 待处理角色

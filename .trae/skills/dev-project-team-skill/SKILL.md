@@ -16,9 +16,10 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.18.0
-- **版本发布日期**：2026-09-08
+- **技能版本**：v21.19.0
+- **版本发布日期**：2026-09-09
 - **版本变更记录**：
+  - v21.19.0：全角色自动调起机制 + 新增 2 角色包（2026-09-09）——①新增 `role-operations`（运维/SRE：监控告警/故障分级响应/巡检/备份恢复/容量规划/性能调优/SLA）+ `role-security`（安全工程：安全评审/漏洞管理/渗透测试/凭据管理/合规审计/安全事件响应），角色总数 10→12，补齐 SDLC 投产后运维与全程安全两个缺口；②`references/iron_rules.md` §10 升级为「角色加载铁律」：**每一个任务都必须在角色上下文中执行，没有「无角色」工作状态；角色加载是系统的责任，不是用户的责任**，附 12 角色任务性质映射表；③`domain/skill-loader.md` v1.0→v1.1、状态「草案」→「生效」，新增优先级 0「任务语义自动识别」（路由算法首步 `infer_from_task_semantics()`，不依赖用户触发词）+ 三条禁止行为（禁止未加载角色就执行 / 禁止等待触发词 / 禁止以「用户没说启用」跳过）；④`role-development` v21.5.0→v21.6.0 新增 §4 开发人员基本素养铁律（部署即验证/环境先行/根因思维/诚实汇报/用户视角/安全编码），源自 Mac mini LaunchDaemon 外部卷不可达事件复盘；⑤修复 7 个 `tools/` 脚本 `ALL_ROLES` 硬编码清单漏新角色（solidify/package_skills/publish_production/deploy_skills/check_version_consistency/check_skill_closure/check_skill_release_gate）+ `mcp_server` 路由提示词由「触发词速查」升级为「任务性质速查」（12 角色全覆盖）。三道硬门禁（版本一致性/闭环执行/发布级）对 12 角色全部通过。
   - v21.18.0：技能独立部署升级 A+B+C（2026-09-08）——§4.1 路由表 plan-creation/portfolio-mgmt/okr-strategy/resource-ops/stakeholder-comms 5 技能从编排器内嵌子技能 `./skills/{name}/` 提升为**顶层独立可部署技能** `../{name}/` 并标注；5 技能已补 frontmatter/三段版本/闭环执行系统/skill.manifest.json，注册 SKILL_INDEX + STANDALONE_SKILLS，脱离编排器可独立打包部署运行；编排器路由指向同步更新，能力语义不变。B 阶段新建 schedule-cost（进度成本EVM）/risk-mgmt（风险RAID）2 顶层独立技能 + 重新内化 dev-project-mgmt evm_calculator/raid_manager + MCP risk_scan 为本地权威工具 tools/evm_ops.py/raid_ops.py（单一信源）+ STANDALONE_SKILLS 6→8（6 处一致）+ SKILL_INDEX 条目 29~30 + references/evm_standard.md/raid_standard.md；C 阶段 8 技能端到端自包含验证通过 + AAR 复盘沉淀。（原 v21.15.0 技能线，合并远端 v21.17.0 治理线后版本号重定为 v21.18.0）
   - v21.17.0：新增「AI 自动检测承诺」铁律（2026-09-08）——`references/iron_rules.md` §3.2 新增 §3.2.8 AI 自动检测承诺（强制行为）：①AI 创建/编辑文件前必须自动执行敏感信息扫描；②发现即提示，按 A/B/C 分级报告；③建议脱敏方案；④未经用户确认拒绝直接保存；⑤提醒外部存储。新增 `references/pre-commit-hook-template.sh` 三关检测模板（.gitignore + gitleaks + 反向映射表）。新增 `docs/AI敏感信息自动检测工作流.md`。触发场景：用户提出「AI 能否自动识别敏感信息」需求，据此固化本铁律。
   - v21.14.0：「目标驱动自主执行」v1.1 补强（OPT-GOAL-001，2026-09-07）——①SGD 持久化台账（`台账/41_活跃目标.json`，save/load/close 全流程）；②执行状态持久化（迭代计数/AC 状态跨会话保留）；③scope 读写分离（write_files/write_dirs vs read_files/read_dirs，v1.0 files/dirs 向后兼容）；④constraints 可机器验证（file_not_modified/file_not_created/content_not_changed）；⑤错误恢复策略（on_circuit_break/on_max_iterations）；⑥目标变更机制（amend + 变更历史）；⑦SGD 回显确认流程；⑧`goal_check.py` 713 行（v1.0 328 行）+ 46 单测（v1.0 21 项）全部通过；⑨`docs/sgd_schema.json` 升级 v1.1。五维评审从 3.80 NoGo 补强至 4.5+ Go。
@@ -126,8 +127,12 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 | 项目群协同 | `role-program-mgmt` | `role-governance`、`role-project-mgmt` | 项目群/项目集/多项目协同/PMO/依赖/里程碑 |
 | 管理咨询 | `role-mgmt-consulting` | `role-program-mgmt` | 项目管理咨询/PMO咨询/成熟度评估/差距分析 |
 | 项目日常管控 | `role-project-mgmt` | `role-governance`、相关执行包(只读) | 项目管理/日常管控/RAID/进展报告/变更协调 |
+| 运维保障 | `role-operations` | `role-development`、`role-governance` | 监控/告警/故障响应/巡检/备份恢复/容量/性能调优/SLA |
+| 安全工程 | `role-security` | `role-architecture`、`role-governance` | 安全评审/漏洞/渗透测试/凭据管理/加密/合规审计/安全事件 |
 | 组合管理/战略对齐 | `portfolio-mgmt`、`okr-strategy` | `role-program-mgmt` | 组合管理/战略评分/投资选择/OKR/战略对齐/KPI |
 | 资源与沟通管理 | `resource-ops`、`stakeholder-comms` | `role-project-mgmt` | 资源容量/技能矩阵/负载均衡/干系人映射/沟通计划 |
+
+> **路由铁律（优先级 0）**：上表按**任务性质**自动匹配，**不依赖用户说触发词**——触发词列仅供匹配置信度参考。每一个任务都必须在角色上下文中执行，没有「无角色」工作状态；角色加载是系统的责任，不是用户的责任。多角色任务按子任务独立路由。详见 `domain/skill-loader.md` §3.2 与 `shared/references/iron_rules.md` §10。
 
 #### 2.4.3 加载算法伪代码
 
@@ -195,6 +200,10 @@ def resolve_packages(handoff_l1: dict, user_instruction: str = "") -> list[str]:
 | 8 | role-program-mgmt | 项目群/项目集 | 项目群/项目集/多项目协同/PMO/依赖/里程碑对齐/收益/IMS | role-program-mgmt/ |
 | 9 | role-mgmt-consulting | 项目管理咨询 | 项目管理咨询/PMO咨询/成熟度评估/差距分析/方法论定制/变革管理/咨询建议书/PMO蓝图/教练辅导 | role-mgmt-consulting/ |
 | 10 | role-project-mgmt | 项目经理执行层 | 项目管理/日常管控/RAID/进展报告/变更协调/经验教训/干系人沟通/阶段状态跟踪（不涉及具体工程交付） | role-project-mgmt/ |
+| 11 | role-operations | 运维/SRE | 监控/告警/故障响应/服务健康/巡检/备份恢复/容量规划/性能调优/SLA/可用性/日志分析/变更窗口 | role-operations/ |
+| 12 | role-security | 安全工程 | 安全评审/漏洞扫描/渗透测试/安全加固/凭据管理/访问控制/安全合规/安全事件/加密/认证授权/OWASP/等保 | role-security/ |
+
+- **自动调起（铁律）**：本表 12 个角色包由系统根据任务性质自动加载，无需用户说触发词；禁止在未加载角色的情况下执行任何专业领域工作（`shared/references/iron_rules.md` §10）。
 
 - **元技能自省**：`shared/evolution.md`（SkillEvolutionSkill）按需触发，执行完毕即卸载；
 - **角色隔离**：各角色任务必须在对应角色包内完成，禁止跨角色执行；§2 公共底座对全角色强制生效；
@@ -307,5 +316,5 @@ def resolve_packages(handoff_l1: dict, user_instruction: str = "") -> list[str]:
 
 ---
 
-**文档版本**：v21.18.0 **最后更新**：2026-09-08（技能独立部署升级 A+B+C：8 顶层独立可部署技能 scope-tracking/plan-creation/portfolio-mgmt/okr-strategy/resource-ops/stakeholder-comms/schedule-cost/risk-mgmt + EVM/RAID 重新内化 tools/evm_ops.py·raid_ops.py；合并远端 v21.17.0 治理线[§3.2 泄密禁入库最高级铁律 / §3.2.7 脱敏映射安全存储 / §3.2.8 AI 自动检测承诺]，版本号由 v21.15.0 重定为 v21.18.0 接续治理线）
+**文档版本**：v21.19.0 **最后更新**：2026-09-09（全角色自动调起机制：新增 role-operations（运维/SRE）+ role-security（安全工程）2 角色包，角色总数 10→12；iron_rules §10 升级为「角色加载铁律」——每个任务必须在角色上下文中执行，角色加载是系统责任不是用户责任；skill-loader v1.1 新增优先级 0 任务语义自动识别，不依赖触发词；role-development §4 开发人员基本素养铁律；修复 7 个 tools/ 脚本 ALL_ROLES 漏新角色 + mcp_server 路由提示词升级）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

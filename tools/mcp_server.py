@@ -242,20 +242,25 @@ def route_role(user_request: str) -> str:
 
 请按以下步骤执行：
 1. 读取 skill://index 获取角色包索引清单
-2. 根据用户请求中的触发词匹配角色包（参考索引表中的触发词列）
+2. 判断任务性质，匹配角色包（优先级0：任务语义自动识别，不依赖用户说触发词；触发词仅作后备）
 3. 读取匹配角色包的 skill://<角色包名>/SKILL.md
 4. 按 SKILL.md 中的流程执行用户请求
-5. 如涉及多角色协同，按编排器路由表组合加载
+5. 如涉及多角色协同，按子任务独立路由，分别加载对应角色
 
-触发词速查：
+铁律：每一个任务都必须在角色上下文中执行，没有「无角色」工作状态。角色加载是系统的责任，不是用户的责任。
+
+任务性质速查：
   - 启动/立项/章程/干系人/RACI → role-project-init
   - 需求/SRS/需求规格 → role-requirements-analysis
   - 架构/ADR/C4/数据架构 → role-architecture
-  - 开发/编码/代码评审/单元测试 → role-development
+  - 开发/编码/代码评审/单元测试/脚本/配置/修 Bug → role-development
   - 测试/用例/缺陷 → role-testing
-  - 投产/部署/发布/回滚 → role-deployment
-  - 台账/评审/门禁/基线固化/审计 → role-governance
-  - 项目群/多项目/PMO → role-program-mgmt
+  - 投产/部署/发布/回滚/Go-Live → role-deployment
+  - 监控/告警/故障响应/巡检/备份恢复/容量/性能/SLA → role-operations
+  - 安全评审/漏洞/渗透/凭据/加密/合规/安全事件 → role-security
+  - 台账/评审/门禁/基线固化/审计/技能维护 → role-governance
+  - 项目群/多项目/PMO决策层 → role-program-mgmt
+  - 项目管理/日常管控/RAID/进展报告 → role-project-mgmt
   - 咨询/成熟度/PMO设计 → role-mgmt-consulting
 """
 

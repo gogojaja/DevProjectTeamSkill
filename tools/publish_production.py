@@ -44,7 +44,8 @@ else:
 
 ALL_ROLES = ["dev-project-team-skill", "role-project-init", "role-requirements-analysis",
              "role-architecture", "role-development", "role-testing", "role-deployment",
-             "role-governance", "role-program-mgmt", "role-mgmt-consulting", "role-project-mgmt"]
+             "role-governance", "role-program-mgmt", "role-mgmt-consulting", "role-project-mgmt",
+             "role-operations", "role-security"]
 
 TOOLS = {
     "version": os.path.join(ROOT, "tools", "check_version_consistency.py"),

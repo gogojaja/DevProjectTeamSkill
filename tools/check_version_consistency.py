@@ -16,7 +16,8 @@ ROOT = os.environ.get("PROJECT_ROOT", os.path.dirname(os.path.dirname(os.path.ab
 SKILLS_DIR = os.environ.get('SKILLS_DIR', os.path.join(ROOT, '.trae', 'skills'))
 ALL_ROLES = ['dev-project-team-skill','role-project-init','role-requirements-analysis',
               'role-architecture','role-development','role-testing','role-deployment','role-governance',
-              'role-program-mgmt','role-mgmt-consulting','role-project-mgmt']
+              'role-program-mgmt','role-mgmt-consulting','role-project-mgmt',
+              'role-operations','role-security']
 SUB_SKILLS = ['best-practice-solution','commit-protocol','lsp-ast-integration','multi-perspective-validation',
               'project-memory','self-improve','team-orchestration','worktree-isolation',
               'customize-opencode']

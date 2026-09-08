@@ -42,7 +42,8 @@ echo "[1/6] 当前角色包清单与版本:"
 ALL_ROLES=(
   dev-project-team-skill role-project-init role-requirements-analysis
   role-architecture role-development role-testing role-deployment role-governance
-  role-program-mgmt role-mgmt-consulting
+  role-program-mgmt role-mgmt-consulting role-project-mgmt
+  role-operations role-security
 )
 SKILL_COUNT=0
 for r in "${ALL_ROLES[@]}"; do

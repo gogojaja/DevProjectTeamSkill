@@ -8,7 +8,8 @@ DIST = os.path.join(ROOT, 'dist')
 HANDOFF = os.path.join(ROOT, '交接文档.md')
 ALL_ROLES = ['dev-project-team-skill','role-project-init','role-requirements-analysis',
              'role-architecture','role-development','role-testing','role-deployment','role-governance',
-             'role-program-mgmt','role-mgmt-consulting','role-project-mgmt']
+             'role-program-mgmt','role-mgmt-consulting','role-project-mgmt',
+             'role-operations','role-security']
 # 独立可部署技能（非角色包）：随全量打包一并产出自包含 zip；三门禁校验器（check_*）已新增 STANDALONE_SKILLS 独立遍历分支（S1~S3），与 ALL_ROLES/SUB_SKILLS 语义隔离不污染
 STANDALONE_SKILLS = ['scope-tracking', 'plan-creation', 'portfolio-mgmt', 'okr-strategy', 'resource-ops', 'stakeholder-comms', 'schedule-cost', 'risk-mgmt']
 

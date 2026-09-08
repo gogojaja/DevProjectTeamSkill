@@ -3,7 +3,9 @@
 
 ## 项目定位
 
-DevProjectTeamSkill：软件研发全生命周期多角色编排技能库（10 个角色包 + 1 个编排器）。本体即技能源码，不是业务应用。AI Agent 在本仓库的职责是**维护技能库本身**（skill 编写/结构/打包/部署），不是执行软件项目业务。
+DevProjectTeamSkill：软件研发全生命周期多角色编排技能库（12 个角色包 + 1 个编排器）。本体即技能源码，不是业务应用。AI Agent 在本仓库的职责是**维护技能库本身**（skill 编写/结构/打包/部署），不是执行软件项目业务。
+
+> **角色自动调起铁律**：每一个任务都必须在角色上下文中执行，没有「无角色」工作状态。系统根据任务性质自动匹配并加载角色包，**不依赖用户说触发词**；角色加载是系统的责任，不是用户的责任。映射表见 `.trae/skills/shared/references/iron_rules.md` §10 与 `.trae/skills/dev-project-team-skill/domain/skill-loader.md` §3.2。
 
 > **孵化器定位（M2，ADR-2026-08-30-001 方向，详见 `docs/孵化器模式与git剥离方案.md`）**：本库同时承担**项目孵化器**职能——产出初始方案/架构决策（ADR 草案）/可行性分析/技能工具定义，**只出方案不代落地**（落地交被孵化项目自身运营者）。孵化生命周期：方案调研→可行性五维→孵化决策→移交清单（模板见 `docs/incubator/移交清单模板.md`）→后续仅登记引用（不内嵌）。新立项评估走子技能 `incubator-initiation`（v1.1.0，四段孵化评估水线）；成熟技能/工具按三判据（复用率/独立性/维护成本）逐项评估独立化，未达判据暂留单源，独立化后调用率下降/无人维护则回收入本库。
 
@@ -79,7 +81,7 @@ python scripts/bootstrap_remotes.py     # 跨平台/Windows 主推
 
 **macOS / Linux（bash）：**
 ```sh
-bash tools/package_skills.sh            # 打包全部 10 角色包到 dist/
+bash tools/package_skills.sh            # 打包全部 12 角色包到 dist/
 bash tools/package_skills.sh --role role-testing
 bash tools/deploy_skills.sh --roles role-a,role-b
 bash tools/solidify.sh "说明"           # 一键固化：3 硬门禁+交接刷新+快照+打包+部署项目级三目录(不碰全局库)
