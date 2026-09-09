@@ -12,6 +12,7 @@
 测试范围：Tier1 只读工具全覆盖，Tier2 写工具仅测试 dry_run 模式。
 """
 import os
+import re
 import sys
 import json
 import tempfile
@@ -172,7 +173,13 @@ class TestMCPServerGateThreshold(unittest.TestCase):
         """测试 2：门禁阈值 ≥ 15。"""
         with open(self.check_script, encoding="utf-8") as f:
             content = f.read()
-        self.assertIn("MIN_TOOLS_DEFAULT = 15", content)
+        # 按 docstring 意图断言「阈值 ≥ 15」，而非硬编码字面量 "= 15"：
+        # 原实现 assertIn("MIN_TOOLS_DEFAULT = 15") 在阈值随能力扩张升至 24
+        # （commit 87787ac：+3 MCP Tools 阈值 21→24）后即永久变红，
+        # 而红着的套件会掩盖真实失败（v21.24.1 修正）。
+        m = re.search(r"MIN_TOOLS_DEFAULT\s*=\s*(\d+)", content)
+        self.assertIsNotNone(m, "check_mcp_server.py 未定义 MIN_TOOLS_DEFAULT")
+        self.assertGreaterEqual(int(m.group(1)), 15, f"门禁工具数阈值过低: {m.group(1)}")
 
 
 class TestNewToolsIntegration(unittest.TestCase):
