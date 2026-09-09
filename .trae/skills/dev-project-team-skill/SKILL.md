@@ -16,9 +16,10 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.19.1
+- **技能版本**：v21.20.0
 - **版本发布日期**：2026-09-09
 - **版本变更记录**：
+  - v21.20.0：新增 §2.4.5 任务协调官默认流程（2026-09-09）——补齐自主 Agent L4→L5 协调官闭环（提案卡 P-001）：编排器收到任务先做复杂度判定，单子任务走现有直接路由不变，多子任务（≥2 角色/≥2 独立子目标）自动进 Planner→Dispatcher→Executor→Verifier→闭环，无需 team/ultrawork 关键词；抽象角色绑定现有角色包（分析拆解=编排器+team-orchestration plan，指派=§2.4.2 映射表+role-project-mgmt 协调只读，执行=对应 role-* 包，验收=role-governance check_gate/config_audit 任务级签署）；并行/仲裁复用 team-orchestration，提前确认复用铁律#10，减少交互复用铁律#13 SGD，打断-修正经 SGD amend+deviation-detection；无新角色零 ALL_ROLES 硬编码同步。
   - v21.19.1：goal_check.py command_pass shell 安全护栏（2026-09-09）——保留 `shell=True`「完整命令」语义（管道/重定向/&&/Windows 绝对路径依赖 shell 解析），新增 `DANGEROUS_COMMAND_PATTERNS`（12 类破坏性/越权命令：rm -rf、rmdir /s、del /s、Remove-Item -Recurse|-Force、format、mkfs、dd if=、shutdown/reboot、fork 炸弹、git push --force、裸设备重定向、curl|wget 管道执行远程脚本）+ `_match_dangerous_command()` 前置拦截（命中即 FAIL 不实际执行）+ `# nosec B602` 标注（抑制 post-commit agent-loop 把 bandit B602 自主改写为 shell=False）；`tests/test_goal_check.py` +4 单测（危险命令拦截×2 / Windows 绝对路径 PASS / shell 元字符 && PASS），50 passed。修复并发固化 6758fd9 因 deploy 覆盖 guard 导致的 2 个失败测试。
   - v21.19.0：全角色自动调起机制 + 新增 2 角色包（2026-09-09）——①新增 `role-operations`（运维/SRE：监控告警/故障分级响应/巡检/备份恢复/容量规划/性能调优/SLA）+ `role-security`（安全工程：安全评审/漏洞管理/渗透测试/凭据管理/合规审计/安全事件响应），角色总数 10→12，补齐 SDLC 投产后运维与全程安全两个缺口；②`references/iron_rules.md` §10 升级为「角色加载铁律」：**每一个任务都必须在角色上下文中执行，没有「无角色」工作状态；角色加载是系统的责任，不是用户的责任**，附 12 角色任务性质映射表；③`domain/skill-loader.md` v1.0→v1.1、状态「草案」→「生效」，新增优先级 0「任务语义自动识别」（路由算法首步 `infer_from_task_semantics()`，不依赖用户触发词）+ 三条禁止行为（禁止未加载角色就执行 / 禁止等待触发词 / 禁止以「用户没说启用」跳过）；④`role-development` v21.5.0→v21.6.0 新增 §4 开发人员基本素养铁律（部署即验证/环境先行/根因思维/诚实汇报/用户视角/安全编码），源自 Mac mini LaunchDaemon 外部卷不可达事件复盘；⑤修复 7 个 `tools/` 脚本 `ALL_ROLES` 硬编码清单漏新角色（solidify/package_skills/publish_production/deploy_skills/check_version_consistency/check_skill_closure/check_skill_release_gate）+ `mcp_server` 路由提示词由「触发词速查」升级为「任务性质速查」（12 角色全覆盖）。三道硬门禁（版本一致性/闭环执行/发布级）对 12 角色全部通过。
   - v21.18.0：技能独立部署升级 A+B+C（2026-09-08）——§4.1 路由表 plan-creation/portfolio-mgmt/okr-strategy/resource-ops/stakeholder-comms 5 技能从编排器内嵌子技能 `./skills/{name}/` 提升为**顶层独立可部署技能** `../{name}/` 并标注；5 技能已补 frontmatter/三段版本/闭环执行系统/skill.manifest.json，注册 SKILL_INDEX + STANDALONE_SKILLS，脱离编排器可独立打包部署运行；编排器路由指向同步更新，能力语义不变。B 阶段新建 schedule-cost（进度成本EVM）/risk-mgmt（风险RAID）2 顶层独立技能 + 重新内化 dev-project-mgmt evm_calculator/raid_manager + MCP risk_scan 为本地权威工具 tools/evm_ops.py/raid_ops.py（单一信源）+ STANDALONE_SKILLS 6→8（6 处一致）+ SKILL_INDEX 条目 29~30 + references/evm_standard.md/raid_standard.md；C 阶段 8 技能端到端自包含验证通过 + AAR 复盘沉淀。（原 v21.15.0 技能线，合并远端 v21.17.0 治理线后版本号重定为 v21.18.0）
@@ -167,6 +168,26 @@ def resolve_packages(handoff_l1: dict, user_instruction: str = "") -> list[str]:
 - **显式优先**：用户显式指定角色包优先于自动路由
 - **总控包始终可用**：`role-governance` 作为横向支撑始终可选加载
 - **L1 摘要生成器**：`tools/handoff_summarizer.py` 在固化时自动提取/生成 `当前任务类型` 字段
+
+#### 2.4.5 任务协调官默认流程（复杂度阈值触发，v21.20.0）
+
+> 补齐自主 Agent L4→L5 协调官闭环（提案卡 `docs/任务协调官默认闭环_提案卡P-001_v1.0.md`）。**默认生效，无需 team/ultrawork 关键词。**
+
+**第一步·复杂度判定**：编排器收到任务先判定是否需拆解——
+- **单子任务**（仅需 1 个角色包、单一交付目标）→ 走 §2.4.1~§2.4.3 现有直接路由，**流程完全不变**（保护简单任务路径）；
+- **多子任务**（需 ≥2 个不同角色包协作，或含 ≥2 个可独立推进的交付子目标）→ **自动进入协调官闭环**。
+
+**第二步·协调官闭环（Planner→Dispatcher→Executor→Verifier→闭环，全部绑定现有角色）**：
+
+| 阶段 | 职责 | 承载（复用，不新建） |
+|------|------|--------------------|
+| 分析/拆解 Planner | 需求澄清 + 拆子任务 + 建依赖图(DAG) | 编排器 + `team-orchestration` plan 阶段（Planner=S3 强模型） |
+| 指派 Dispatcher | 每个子任务按 §2.4.2 映射表分派到具体角色包，独立路由 | 编排器路由 + `role-project-mgmt`（协调只读） |
+| 执行 Executor | 各角色包在各自上下文执行（Tier1/2 自主、Tier3 逐项确认） | 对应 `role-*` 角色包 |
+| 验收 Verifier | **任务级**闭环签署：逐子任务对照 AC + 全局一致性 | `role-governance` `check_gate`/`config_audit`（按引用绑定，不新建机制） |
+| 闭环/回退 | 全部子任务验收通过→交付+`solidify`；任一未过→有界修复(≤3 轮)或升级用户 | 编排器 + `role-governance` |
+
+**衔接铁律（不重复、不颠覆）**：并行细节/冲突仲裁复用 `team-orchestration`（§6 P0~P6），本流程仅把其触发从关键词升级为复杂度自动判定；提前一次性确认复用铁律 #10 六段合同；减少交互复用铁律 #13 SGD 分级交互；用户可随时打断，经 SGD `amend`（目标变更+变更历史）重规划、`self-improve/deviation-detection` 捕获偏差（P2 深化）。
 
 ---
 
@@ -317,5 +338,5 @@ def resolve_packages(handoff_l1: dict, user_instruction: str = "") -> list[str]:
 
 ---
 
-**文档版本**：v21.19.1 **最后更新**：2026-09-09（goal_check.py command_pass shell 安全护栏：保留 shell=True 完整命令语义 + DANGEROUS_COMMAND_PATTERNS 12 类破坏性命令前置拦截 + _match_dangerous_command 命中即 FAIL + nosec B602 抑制 agent-loop 自主改写 + 4 单测 50 passed，修复 6758fd9 的 2 个失败测试；此前 v21.19.0（2026-09-09）：全角色自动调起机制，新增 role-operations（运维/SRE）+ role-security（安全工程）2 角色包，角色总数 10→12；iron_rules §10 升级为「角色加载铁律」；skill-loader v1.1 新增优先级 0 任务语义自动识别；role-development §4 开发人员基本素养铁律；修复 7 个 tools/ 脚本 ALL_ROLES 漏新角色 + mcp_server 路由提示词升级）
+**文档版本**：v21.20.0 **最后更新**：2026-09-09（新增 §2.4.5 任务协调官默认流程：复杂度阈值触发的 Planner→Dispatcher→Executor→Verifier→验收闭环，绑定现有角色包、验收复用 role-governance 门禁、无新角色；提案卡 docs/任务协调官默认闭环_提案卡P-001_v1.0.md；此前 v21.19.1：goal_check.py command_pass shell 安全护栏：保留 shell=True 完整命令语义 + DANGEROUS_COMMAND_PATTERNS 12 类破坏性命令前置拦截 + _match_dangerous_command 命中即 FAIL + nosec B602 抑制 agent-loop 自主改写 + 4 单测 50 passed，修复 6758fd9 的 2 个失败测试；此前 v21.19.0（2026-09-09）：全角色自动调起机制，新增 role-operations（运维/SRE）+ role-security（安全工程）2 角色包，角色总数 10→12；iron_rules §10 升级为「角色加载铁律」；skill-loader v1.1 新增优先级 0 任务语义自动识别；role-development §4 开发人员基本素养铁律；修复 7 个 tools/ 脚本 ALL_ROLES 漏新角色 + mcp_server 路由提示词升级）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
