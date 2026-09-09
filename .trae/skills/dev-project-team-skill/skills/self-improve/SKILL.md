@@ -5,7 +5,7 @@ description: "用户提到自我改进、技能迭代、流程优化、改进提
 
 # Self-Improve 自我改进循环
 
-- **技能版本**：v1.1.0　**发布日期**：2026-08-18
+- **技能版本**：v1.2.0　**发布日期**：2026-09-09
 
 > 版权声明：`../../../references/COPYRIGHT.md`　Token 标准：`../../../references/token_standard.md`　编排器：`../../SKILL.md`
 
@@ -163,6 +163,7 @@ graph LR
 | `domain/experiment-evaluation.md` | 实验评估：A/B 对照设计、指标、回归验证 |
 | `domain/versioned-release.md` | 版本化发布：版本记录、solidify 固化、交接刷新 |
 | `domain/lesson-harvesting.md` | 经验沉淀：复盘卡片、可复用资产、失败教训 |
+| `domain/interaction-harvest.md` | **交互自动收割**：同类任务确认交互≥N轮(默认3)→抽取「确认清单模板」→create_memory 沉淀→下次 Planner 阶段提前复用（提案卡 P-002b，补齐诉求 #6） |
 
 ---
 
@@ -188,7 +189,7 @@ graph LR
 ### 3. 执行动作层
 - 执行步骤 1：自省诊断（`domain/self-diagnosis.md`，PDCA/哈希链/上下文健康），发现偏差；
 - 执行步骤 2：偏差侦测（`domain/deviation-detection.md`）+ 根因分析（`domain/root-cause-analysis.md`）；
-- 执行步骤 3：形成改进提案（`domain/improvement-proposal.md`）→ 实验评估（`domain/experiment-evaluation.md`）→ 版本化发布（`domain/versioned-release.md`）→ 经验沉淀（`domain/lesson-harvesting.md`）；
+- 执行步骤 3：形成改进提案（`domain/improvement-proposal.md`）→ 实验评估（`domain/experiment-evaluation.md`）→ 版本化发布（`domain/versioned-release.md`）→ 经验沉淀（`domain/lesson-harvesting.md`）；同类任务确认交互≥N轮时自动收割为可复用确认清单模板（`domain/interaction-harvest.md`，create_memory 沉淀）；
 - 所需工具/脚本：`domain/*.md` 各环节明细、`tools/check_*` 校验门禁、`tools/solidify.sh`；
 - 输入输出约束：改进对象仅限声明范围内；涉技能库本体须用户显式授权（authoring.md §2）；产出走版本化发布，禁止直接改源码。
 
@@ -221,6 +222,6 @@ graph LR
 
 ---
 
-**文档版本**：v1.1.0　**最后更新**：2026-08-18（繁体转简体 + 新增闭环执行系统章节，技能库本体评审修复）
+**文档版本**：v1.2.0　**最后更新**：2026-09-09（新增 domain/interaction-harvest.md 交互自动收割：确认交互≥N轮→抽取确认清单模板→create_memory 沉淀→下次 Planner 提前复用，补齐诉求 #6，提案卡 P-002b；此前 v1.1.0（2026-08-18）：繁体转简体 + 新增闭环执行系统章节）
 
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

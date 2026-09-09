@@ -268,4 +268,46 @@ graph TD
 
 ---
 
-**文档版本**: v1.0.0  **最后更新**: 2026-08-08
+## 6. 抽象角色 → 13 角色包绑定表（v1.1.0）
+
+> 承接编排器 §2.4.5 协调官闭环（提案卡 P-002a）。Dispatcher 阶段用本表把 `TaskNode.role`（抽象）解析为具体 `role-*` 包；任务类型判定沿用编排器 §2.4.2 映射表（单一信息源，本表不重复定义）。
+
+### 6.1 绑定表
+
+| 抽象角色(TaskNode.role) | 默认角色包 | 按任务类型细化 |
+|------------------------|-----------|---------------|
+| planner | `dev-project-team-skill`(编排器) + `role-project-mgmt`(协调只读) | — |
+| architect | `role-architecture` | 需求/PRD→`role-requirements-analysis`；安全架构→`role-security` |
+| executor | `role-development` | 部署→`role-deployment`；运维→`role-operations`；安全→`role-security`；测试脚本→`role-testing` |
+| test-engineer | `role-testing` | 安全测试→`role-security` |
+| verifier | `role-governance`(`check_gate`/`config_audit`) | 安全评审→`role-security` |
+| writer | 对应产出角色 + `role-governance`(`doc_manage`) | 项目群文档→`role-program-mgmt`；咨询文档→`role-mgmt-consulting` |
+| (立项) | `role-project-init` | 章程/干系人/RACI |
+
+### 6.2 解析函数
+
+```python
+def resolve_role(abstract_role: str, task_type: str) -> str:
+    """Dispatcher 阶段：抽象角色 + 任务类型 → 具体 role-* 包。
+    任务类型沿用编排器 §2.4.2 映射表，本函数只做绑定。"""
+    BINDING = {
+        ("architect", "安全架构"): "role-security",
+        ("architect", "*"): "role-architecture",
+        ("executor", "部署"): "role-deployment",
+        ("executor", "运维"): "role-operations",
+        ("executor", "安全"): "role-security",
+        ("executor", "测试"): "role-testing",
+        ("executor", "*"): "role-development",
+        ("test-engineer", "*"): "role-testing",
+        ("verifier", "*"): "role-governance",
+        ("planner", "*"): "role-project-mgmt",
+        ("writer", "*"): "role-governance",
+    }
+    return BINDING.get((abstract_role, task_type)) or BINDING.get((abstract_role, "*"))
+```
+
+> **13 角色包全覆盖校验**：编排器+role-project-mgmt(planner)、role-architecture/role-requirements-analysis/role-security(architect)、role-development/role-deployment/role-operations/role-security/role-testing(executor)、role-testing(test-engineer)、role-governance(verifier/writer)、role-project-init(立项)、role-program-mgmt(项目群文档)、role-mgmt-consulting(咨询文档)——13 个全命中。
+
+---
+
+**文档版本**: v1.1.0  **最后更新**: 2026-09-09

@@ -5,7 +5,7 @@ description: "用户提到并行编排、团队流水线、多角色并行、tea
 
 # Team Orchestration 并行编排层
 
-- **技能版本**：v1.2.0　**发布日期**：2026-08-18
+- **技能版本**：v1.3.0　**发布日期**：2026-09-09
 
 > 版权声明：`../../../references/COPYRIGHT.md`　Token 标准：`../../../references/token_standard.md`　编排器：`../../SKILL.md`
 
@@ -131,7 +131,7 @@ verify,security,pass,"bandit 0 issues",high,narrow,"渗透测试未跑"
 | `domain/ultrawork.md` | 工作窃取队列实现、MVCC 状态同步、模型路由表 |
 | `domain/ralph-loop.md` | 持久循环状态机、重试策略、根因分析模板 |
 | `domain/ultraqa.md` | QA 循环参数、验证器清单、签署协议 |
-| `domain/dependency-graph.md` | DAG 构建算法、拓扑排序、关键路径识别 |
+| `domain/dependency-graph.md` | DAG 构建算法、拓扑排序、关键路径识别；**§6 抽象角色→13 角色包绑定表 + `resolve_role()`**（承接编排器 §2.4.5 协调官闭环的 Dispatcher 指派，提案卡 P-002a） |
 | `domain/priority-arbitration.md` | **多角色并行优先级仲裁**：方案冲突时按 P0~P6 裁决（需求基线/总控→安全→架构→测试→开发→部署→文档），一票否决与领域速查表 |
 
 ---
@@ -200,5 +200,5 @@ verify,security,pass,"bandit 0 issues",high,narrow,"渗透测试未跑"
 
 ---
 
-**文档版本**：v1.2.0　**最后更新**：2026-08-18（新增闭环执行系统 §7，技能库本体评审修复）
+**文档版本**：v1.3.0　**最后更新**：2026-09-09（dependency-graph.md 新增 §6 抽象角色→13 角色包绑定表 + resolve_role()，承接编排器 §2.4.5 协调官闭环 Dispatcher 指派，提案卡 P-002a；此前 v1.2.0（2026-08-18）：新增闭环执行系统 §7，技能库本体评审修复）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
