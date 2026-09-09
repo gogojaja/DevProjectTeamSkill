@@ -47,6 +47,25 @@ def _read_version():
     return "unknown"
 
 
+def _run(cmd):
+    """统一子进程调用（13 个 MCP tool 共用），显式 UTF-8 解码。
+
+    根因（v21.24.1）：Windows 中文系统下 text=True 未指定 encoding 即按 locale(GBK) 解码，
+    而被包装的门禁脚本内部执行 sys.stdout.reconfigure(encoding='utf-8') 后吐 UTF-8 字节，
+    GBK 解码失败发生在 subprocess 的 _readerthread 线程内 → buffer 未 append →
+    communicate() 返回 None → r.stdout is None。旧写法 (r.stdout + r.stderr) 因此抛
+    TypeError: NoneType + str；v21.23.1 的 (r.stdout or "") 仅消除了异常，
+    门禁输出仍全部丢失（tool 返回空串）。errors="replace" 保证任何非法字节
+    都不再杀死 reader 线程，输出完整回传。
+
+    stdin=DEVNULL：本 server 以 stdio transport 运行（见文末 mcp.run()），子进程
+    若继承 stdin 即继承 MCP 的 JSON-RPC 协议通道，显式切断。
+    """
+    return subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True,
+                          encoding="utf-8", errors="replace",
+                          stdin=subprocess.DEVNULL)
+
+
 # ---------- Tools（包装现有 CLI，零逻辑复制） ----------
 
 @mcp.tool()
@@ -95,7 +114,7 @@ def run_gate(skill: str = "dev-project-team-skill", gate: str = "closure") -> st
     if gate not in scripts:
         return f"未知 gate: {gate}（可选 {list(scripts)}）"
     cmd = [sys.executable, os.path.join(ROOT, "tools", scripts[gate]), skill]
-    r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+    r = _run(cmd)
     return ((r.stdout or "") + (r.stderr or ""))[:4000]
 
 
@@ -108,7 +127,7 @@ def estimate_cost(model: str, in_tok: int, out_tok: int, batch: bool = False, ap
         cmd.append("--batch")
     if append:
         cmd.append("--append")
-    r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+    r = _run(cmd)
     return ((r.stdout or "") + (r.stderr or ""))[:4000]
 
 
@@ -118,7 +137,7 @@ def solidify(note: str, dry_run: bool = True) -> str:
     if dry_run:
         return "（安全默认）经 MCP 的 solidify 仅允许 dry_run 探测；正式固化请在本地终端执行：bash tools/solidify.sh \"<说明>\""
     cmd = ["bash", os.path.join(ROOT, "tools", "solidify.sh"), note]
-    r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+    r = _run(cmd)
     return ((r.stdout or "") + (r.stderr or ""))[:4000]
 
 
@@ -127,7 +146,7 @@ def publish_production(dry_run: bool = True) -> str:
     """生产发布（全局库 + 多工具全局生效 + 生成 MCP 版本清单）。默认 dry_run=True 仅探测；正式发布请在本地终端执行。"""
     cmd = [sys.executable, os.path.join(ROOT, "tools", "publish_production.py")] + (["--dry-run"] if dry_run else [])
     if dry_run:
-        r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+        r = _run(cmd)
         return ((r.stdout or "") + (r.stderr or ""))[:4000]
     return "（安全默认）经 MCP 的正式发布被禁用；请在本地终端执行：python3 tools/publish_production.py"
 
@@ -136,7 +155,7 @@ def publish_production(dry_run: bool = True) -> str:
 def mirror_push() -> str:
     """双推 GitHub + Gitee 镜像，返回推送结果（包装 tools/mirror_push.py）。"""
     cmd = [sys.executable, os.path.join(ROOT, "tools", "mirror_push.py")]
-    r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+    r = _run(cmd)
     return ((r.stdout or "") + (r.stderr or ""))[:4000]
 
 
@@ -185,7 +204,7 @@ def skill_links() -> str:
     if not os.path.isfile(script):
         return "check_skill_links.py 不存在，请检查 tools/ 目录"
     cmd = [sys.executable, script]
-    r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+    r = _run(cmd)
     return ((r.stdout or "") + (r.stderr or ""))[:4000]
 
 
@@ -234,7 +253,7 @@ def scope_metrics(write: bool = False) -> str:
     cmd = [sys.executable, script, "metrics"]
     if write:
         cmd.append("--write")
-    r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+    r = _run(cmd)
     return ((r.stdout or "") + (r.stderr or ""))[:4000]
 
 
@@ -262,7 +281,7 @@ def retro_harvest(stage: str, obj: str, good: str = "", improve: str = "", actio
         cmd += ["--action", action]
     if dry_run:
         return f"（安全默认）复盘 dry_run 模式。参数：stage={stage}, object={obj}, good={good}, improve={improve}"
-    r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+    r = _run(cmd)
     return ((r.stdout or "") + (r.stderr or ""))[:4000]
 
 
@@ -282,7 +301,7 @@ def review_execute(target: str, perspectives: str = "architect,security", dry_ru
     cmd = [sys.executable, script, "--target", target, "--perspectives", perspectives]
     if dry_run:
         cmd.append("--dry-run")
-    r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+    r = _run(cmd)
     return ((r.stdout or "") + (r.stderr or ""))[:4000]
 
 
@@ -303,7 +322,7 @@ def nightly_gate(action: str = "list", target: str = "", dry_run: bool = True) -
         cmd += ["--target", target]
     if dry_run and action == "run":
         cmd.append("--dry-run")
-    r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+    r = _run(cmd)
     return ((r.stdout or "") + (r.stderr or ""))[:4000]
 
 
@@ -552,7 +571,7 @@ def raid_mgmt(action: str, raid_type: str = "", desc: str = "", raid_id: str = "
             cmd += ["--status", status]
     else:
         return f"未知 action: {action}（可选 list/add/update/close）"
-    r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+    r = _run(cmd)
     return ((r.stdout or "") + (r.stderr or ""))[:4000]
 
 
@@ -588,7 +607,7 @@ def evm_analyze(action: str = "calc", milestone_id: str = "", milestone_name: st
             cmd += ["--value", str(planned_value)]
     else:
         return f"未知 action: {action}（可选 calc/status/add-milestone）"
-    r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+    r = _run(cmd)
     return ((r.stdout or "") + (r.stderr or ""))[:4000]
 
 
@@ -734,7 +753,7 @@ def risk_scan(severity: str = "P1") -> str:
     if not os.path.isfile(script):
         return "raid_ops.py 不存在，请检查 tools/ 目录（risk-mgmt 技能权威工具）"
     cmd = [sys.executable, script, "scan", "--severity", severity]
-    r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+    r = _run(cmd)
     return ((r.stdout or "") + (r.stderr or ""))[:4000]
 
 
