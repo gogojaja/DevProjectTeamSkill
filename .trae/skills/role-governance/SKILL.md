@@ -1,6 +1,6 @@
 ---
 name: "role-governance"
-description: "用户提到台账、阶段评审、门禁、变更审计、EVM、进度、风险、安全审计、基线固化、归档、交接文档、文档管理时加载本总控保障角色包：负责台账与基线初始化、五维评审与门禁、变更审计、进度成本(EVM)、风险扫描、安全审计、文档管理、基线固化/归档/交接，输出评审报告、门禁记录、审计台账与基线。用户说管控/评审/门禁/审计时加载。"
+description: "用户提到台账、阶段评审、门禁、变更审计、EVM、进度、风险、安全审计、基线固化、配置管理、配置审计、归档、交接文档、文档管理时加载本总控保障角色包：负责台账与基线初始化、五维评审与门禁、变更审计、进度成本(EVM)、风险扫描、安全审计、文档管理、配置管理聚合(CMP/CI/config_audit)、基线固化/归档/交接，输出评审报告、门禁记录、审计台账与基线。用户说管控/评审/门禁/审计/配置管理时加载。"
 ---
 
 # role-governance 总控保障角色包（文档管理员）
@@ -9,8 +9,8 @@ description: "用户提到台账、阶段评审、门禁、变更审计、EVM、
 
 ## 1. 元数据
 
-- **技能版本**：v21.4.0　**发布日期**：2026-09-01
-- **变更记录**：v21.4.0 新增文档管理能力（2026-09-01）——`domain/doc-management.md` 文档生命周期/命名规范/密级处理/归档策略/文档审计（dev-doc-manager 项目技能化，项目群规划 v3.0 评分 74/100）；与 role-program-mgmt 31_文档配置管理互补（本域治理审计，项目群域配置分发）；v21.3.4 授权默认仅本次对话有效（2026-08-15）——register_auth 未填有效期默认会话级，跨会话须显式指定到期时间；目录访问边界铁律（本项目目录外一律经授权）；同步 `shared/governance.md` R6、`references/iron_rules.md` §1、`26_访问边界.csv`；v21.3.3 补充技能维护闭环执行能力门禁（2026-08-15）——维护产出的每个技能必须具备 `闭环执行系统` 标题与标准模板，包含任务入口、状态机、验收门禁、失败恢复、交接审计，不得仅停留在描述型流程；v21.3.2 新增 register_auth 授权登记 + 阶段末授权时效检查（14_授权登记/13 留痕入 git）；v21.3.0 新增 record_env_config/retrospect_harvest/select_model 三 action（环境配置抽取/阶段复盘收割/模型选型）；v21.2.1 新增发布级门禁（release_gate 自动化质量阈值）+ 迭代评审/回顾（iteration_review），门禁分级/防绕过见 `../shared/governance.md`；v21.0.0 由 project-monitor-skill + 6 子技能 + project-governance-skill 重组为角色包；SkillEvolution/SkillAuthoring 迁至 `shared/`
+- **技能版本**：v21.5.0　**发布日期**：2026-09-09
+- **变更记录**：v21.5.0 新增配置管理聚合能力（2026-09-09）——`domain/configuration-management.md` 把分散在 5 处（CMDB/分支治理/文档管理/基线固化/发布）的 CM 要素聚合为 ISO 10007 四活动闭环，产出《配置管理计划(CMP)》模板 + `config_audit` 配置审计动作（补齐当前唯一缺口）；职责边界：环境CI 归 CMDB 单一信息源，本域仅引用不复制；对齐 PMBOK 7（CM 属整合管理）/CMMI CM PA/ITIL 4；经最佳实践评审确认 CM 为职能域而非独立角色，不新增第 14 角色包（零 ALL_ROLES 硬编码同步成本）。v21.4.0 新增文档管理能力（2026-09-01）——`domain/doc-management.md` 文档生命周期/命名规范/密级处理/归档策略/文档审计（dev-doc-manager 项目技能化，项目群规划 v3.0 评分 74/100）；与 role-program-mgmt 31_文档配置管理互补（本域治理审计，项目群域配置分发）；v21.3.4 授权默认仅本次对话有效（2026-08-15）——register_auth 未填有效期默认会话级，跨会话须显式指定到期时间；目录访问边界铁律（本项目目录外一律经授权）；同步 `shared/governance.md` R6、`references/iron_rules.md` §1、`26_访问边界.csv`；v21.3.3 补充技能维护闭环执行能力门禁（2026-08-15）——维护产出的每个技能必须具备 `闭环执行系统` 标题与标准模板，包含任务入口、状态机、验收门禁、失败恢复、交接审计，不得仅停留在描述型流程；v21.3.2 新增 register_auth 授权登记 + 阶段末授权时效检查（14_授权登记/13 留痕入 git）；v21.3.0 新增 record_env_config/retrospect_harvest/select_model 三 action（环境配置抽取/阶段复盘收割/模型选型）；v21.2.1 新增发布级门禁（release_gate 自动化质量阈值）+ 迭代评审/回顾（iteration_review），门禁分级/防绕过见 `../shared/governance.md`；v21.0.0 由 project-monitor-skill + 6 子技能 + project-governance-skill 重组为角色包；SkillEvolution/SkillAuthoring 迁至 `shared/`
 - **参考标准**：PMBOK（十大过程组/领域管控）· ISO 31000 风险
 
 ## 2. 触发规则
@@ -42,10 +42,11 @@ description: "用户提到台账、阶段评审、门禁、变更审计、EVM、
 | 技能自省 | evolve_start / ctx_health_check | `../dev-project-team-skill/skills/self-improve/SKILL.md`（PDCA/哈希链/健康监控） |
 | 技能维护 | skill-authoring | `../shared/authoring.md`（强制闭环执行系统门禁） |
 | 分支治理 | branch_governance | `domain/branch-governance.md`（单一分支策略 + pre-push hook + 审计脚本） |
+| 配置管理 | config_mgmt / config_audit | `domain/configuration-management.md`（CM 四活动聚合/CMP/CI 分类/配置审计；环境CI 归 CMDB 单一信息源，仅引用不复制；对齐 ISO 10007·PMBOK 7·CMMI CM PA） |
 
 ## 4. 铁律
 
-评审/变更/门禁/固化/归档禁止其他角色包自主处理，一律经本包；高危文件操作先 `security_audit`；审计链非删除；固化后交接文档断点区必须反映磁盘最新状态（solidify.sh）；跨模型交接优先读 `交接文档.md`；**维护产出的技能必须具备 `闭环执行系统` 标题与终审门禁，不得以纯描述型流程发版。**
+评审/变更/门禁/固化/归档禁止其他角色包自主处理，一律经本包；配置管理(CM)聚合审计经本包 `config_mgmt/config_audit`，环境CI 归 CMDB 单一信息源、本包仅引用不复制；高危文件操作先 `security_audit`；审计链非删除；固化后交接文档断点区必须反映磁盘最新状态（solidify.sh）；跨模型交接优先读 `交接文档.md`；**维护产出的技能必须具备 `闭环执行系统` 标题与终审门禁，不得以纯描述型流程发版。**
 
 ## 5. 输出规范与边界
 
@@ -108,5 +109,5 @@ description: "用户提到台账、阶段评审、门禁、变更审计、EVM、
 
 ---
 
-**文档版本**：v21.4.0　**最后更新**：2026-09-01（新增文档管理能力，dev-doc-manager 技能化）
+**文档版本**：v21.5.0　**最后更新**：2026-09-09（新增配置管理聚合能力，CM 四活动闭环 + CMP + config_audit）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
