@@ -16,9 +16,10 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.21.0
+- **技能版本**：v21.22.0
 - **版本发布日期**：2026-09-09
 - **版本变更记录**：
+  - v21.22.0：P2 收官（2026-09-09，提案卡 P-003）——新增 §2.4.6 打断-修正-重规划-沉淀闭环，补齐诉求 #7，自主 Agent 成熟度 L4.7→L5.0：五步默认路径（① pause 暂停 Executor 冻结在制品 → ② amend goal_check.py --amend 写 amendment_history+更新 台账/41_活跃目标.json → ③ replan dependency-graph §4 增量重建受影响子图+§6 绑定表重新指派 → ④ detect deviation-detection §5.1 FeedbackIngestion 解析 Deviation 登记偏差台账 → ⑤ harvest lesson-harvesting §2/§4/§5+interaction-harvest+create_memory 沉淀反哺）；全部按引用绑定现有 6 机制，零新建工具/角色/domain；衔接铁律 #13 SGD amend（禁止静默改方向）+ §2.4.5 Verifier 门禁（偏差未 resolve 不得交付）。
   - v21.21.0：P1 子技能增强（2026-09-09，提案卡 P-002）——承接 §2.4.5 协调官闭环：①team-orchestration v1.2.0→v1.3.0，dependency-graph.md 新增 §6「抽象角色→13 角色包绑定表」+ resolve_role()，Dispatcher 指派从人肉变可查表（补齐诉求 #2 拆分分派）；②self-improve v1.1.0→v1.2.0，新增 domain/interaction-harvest.md「交互自动收割」：同类任务确认≥N轮→抽取确认清单模板→create_memory 沉淀→下次 Planner 提前复用（补齐诉求 #6 交互形成经验）。两者均为子技能加法式增强，无新角色/无新工具，sink 复用现有 create_memory MCP。自主 Agent 成熟度 L4.3→L4.7。
   - v21.20.0：新增 §2.4.5 任务协调官默认流程（2026-09-09）——补齐自主 Agent L4→L5 协调官闭环（提案卡 P-001）：编排器收到任务先做复杂度判定，单子任务走现有直接路由不变，多子任务（≥2 角色/≥2 独立子目标）自动进 Planner→Dispatcher→Executor→Verifier→闭环，无需 team/ultrawork 关键词；抽象角色绑定现有角色包（分析拆解=编排器+team-orchestration plan，指派=§2.4.2 映射表+role-project-mgmt 协调只读，执行=对应 role-* 包，验收=role-governance check_gate/config_audit 任务级签署）；并行/仲裁复用 team-orchestration，提前确认复用铁律#10，减少交互复用铁律#13 SGD，打断-修正经 SGD amend+deviation-detection；无新角色零 ALL_ROLES 硬编码同步。
   - v21.19.1：goal_check.py command_pass shell 安全护栏（2026-09-09）——保留 `shell=True`「完整命令」语义（管道/重定向/&&/Windows 绝对路径依赖 shell 解析），新增 `DANGEROUS_COMMAND_PATTERNS`（12 类破坏性/越权命令：rm -rf、rmdir /s、del /s、Remove-Item -Recurse|-Force、format、mkfs、dd if=、shutdown/reboot、fork 炸弹、git push --force、裸设备重定向、curl|wget 管道执行远程脚本）+ `_match_dangerous_command()` 前置拦截（命中即 FAIL 不实际执行）+ `# nosec B602` 标注（抑制 post-commit agent-loop 把 bandit B602 自主改写为 shell=False）；`tests/test_goal_check.py` +4 单测（危险命令拦截×2 / Windows 绝对路径 PASS / shell 元字符 && PASS），50 passed。修复并发固化 6758fd9 因 deploy 覆盖 guard 导致的 2 个失败测试。
@@ -188,7 +189,27 @@ def resolve_packages(handoff_l1: dict, user_instruction: str = "") -> list[str]:
 | 验收 Verifier | **任务级**闭环签署：逐子任务对照 AC + 全局一致性 | `role-governance` `check_gate`/`config_audit`（按引用绑定，不新建机制） |
 | 闭环/回退 | 全部子任务验收通过→交付+`solidify`；任一未过→有界修复(≤3 轮)或升级用户 | 编排器 + `role-governance` |
 
-**衔接铁律（不重复、不颠覆）**：并行细节/冲突仲裁复用 `team-orchestration`（§6 P0~P6），本流程仅把其触发从关键词升级为复杂度自动判定；提前一次性确认复用铁律 #10 六段合同；减少交互复用铁律 #13 SGD 分级交互；用户可随时打断，经 SGD `amend`（目标变更+变更历史）重规划、`self-improve/deviation-detection` 捕获偏差（P2 深化）。
+**衔接铁律（不重复、不颠覆）**：并行细节/冲突仲裁复用 `team-orchestration`（§6 P0~P6），本流程仅把其触发从关键词升级为复杂度自动判定；提前一次性确认复用铁律 #10 六段合同；减少交互复用铁律 #13 SGD 分级交互；用户可随时打断，经 SGD `amend`（目标变更+变更历史）重规划、`self-improve/deviation-detection` 捕获偏差（详见 §2.4.6）。
+
+#### 2.4.6 打断-修正-重规划-沉淀闭环（v21.22.0）
+
+> 补齐诉求 #7「执行中发现偏差可随时打断并修正方向」（提案卡 `docs/打断修正闭环_提案卡P-003_v1.0.md`）。承接 §2.4.5 协调官闭环的“回退/重规划”边，**全部按引用绑定现有机制，零新建工具**。
+
+**触发**：执行（Executor）任意阶段，用户打断（“错了/停/改方向/绕过/太慢”等）或 Verifier/自检发现偏差。
+
+**五步闭环（打断→修正→重规划→捕获→沉淀）**：
+
+| 步 | 动作 | 承载（复用，不新建） |
+|----|------|--------------------|
+| ① 打断 pause | 暂停当前 Executor 子任务，冻结在制品，记录打断点 | 编排器（§2.4.5 闭环入口） |
+| ② 修正 amend | 目标/AC/约束变更 → `goal_check.py --amend --amend-reason` 写 `amendment_history`（old→new statement + AC 状态影响），更新 `台账/41_活跃目标.json` | 铁律 #13 SGD + `goal_check.py amend_goal()` |
+| ③ 重规划 replan | Planner 基于新 SGD 增量重建受影响子图（仅重算 descendants，保留未变更部分），Dispatcher 按 §6 绑定表重新指派 | `team-orchestration/domain/dependency-graph.md` §4 增量更新 + §6 绑定表 |
+| ④ 捕获 detect | 把打断/反馈解析为 Deviation（维度+严重度），登记偏差台账 | `self-improve/domain/deviation-detection.md` §5.1 FeedbackIngestion + §4 偏差台账 |
+| ⑤ 沉淀 harvest | 打断根因→复盘卡片/失败教训；重复确认→确认清单模板；反哺注入技能库 | `self-improve/domain/lesson-harvesting.md` §2/§4/§5 + `interaction-harvest.md` + `create_memory` |
+
+**闭环出口**：重规划后回到 Executor 继续（修正生效）；打断揭示目标不可达/越界 → 升级用户裁决；**偏差未 resolve 不得进入交付**（衔接 §2.4.5 Verifier 门禁）。
+
+**衔接铁律**：修正=铁律 #13 SGD `amend`（目标变更留痕，**禁止静默改方向**）；捕获=self-improve OODA 偏差侦测；沉淀=经验反哺（复用诉求 #6）；本闭环是 §2.4.5 协调官闭环“回退/重规划”边的具体化，与正常执行流互不干扰。
 
 ---
 
@@ -339,5 +360,5 @@ def resolve_packages(handoff_l1: dict, user_instruction: str = "") -> list[str]:
 
 ---
 
-**文档版本**：v21.21.0 **最后更新**：2026-09-09（P1 子技能增强（提案卡 P-002）：team-orchestration v1.3.0 dependency-graph.md §6 抽象角色→13 角色包绑定表+resolve_role()（补齐诉求#2），self-improve v1.2.0 新增 interaction-harvest.md 交互自动收割（补齐诉求#6），成熟度 L4.3→L4.7；此前 v21.20.0：新增 §2.4.5 任务协调官默认流程：复杂度阈值触发的 Planner→Dispatcher→Executor→Verifier→验收闭环，绑定现有角色包、验收复用 role-governance 门禁、无新角色；提案卡 docs/任务协调官默认闭环_提案卡P-001_v1.0.md；此前 v21.19.1：goal_check.py command_pass shell 安全护栏：保留 shell=True 完整命令语义 + DANGEROUS_COMMAND_PATTERNS 12 类破坏性命令前置拦截 + _match_dangerous_command 命中即 FAIL + nosec B602 抑制 agent-loop 自主改写 + 4 单测 50 passed，修复 6758fd9 的 2 个失败测试；此前 v21.19.0（2026-09-09）：全角色自动调起机制，新增 role-operations（运维/SRE）+ role-security（安全工程）2 角色包，角色总数 10→12；iron_rules §10 升级为「角色加载铁律」；skill-loader v1.1 新增优先级 0 任务语义自动识别；role-development §4 开发人员基本素养铁律；修复 7 个 tools/ 脚本 ALL_ROLES 漏新角色 + mcp_server 路由提示词升级）
+**文档版本**：v21.22.0 **最后更新**：2026-09-09（P2 收官（提案卡 P-003）：新增 §2.4.6 打断-修正-重规划-沉淀闭环，五步默认路径按引用串联 goal_check amend/41_活跃目标.json/dependency-graph §4+§6/deviation-detection §5.1/lesson-harvesting/interaction-harvest 六机制，补齐诉求 #7，成熟度 L4.7→L5.0；此前 v21.21.0：P1 子技能增强（提案卡 P-002）：team-orchestration v1.3.0 dependency-graph.md §6 抽象角色→13 角色包绑定表+resolve_role()（补齐诉求#2），self-improve v1.2.0 新增 interaction-harvest.md 交互自动收割（补齐诉求#6），成熟度 L4.3→L4.7；此前 v21.20.0：新增 §2.4.5 任务协调官默认流程：复杂度阈值触发的 Planner→Dispatcher→Executor→Verifier→验收闭环，绑定现有角色包、验收复用 role-governance 门禁、无新角色；提案卡 docs/任务协调官默认闭环_提案卡P-001_v1.0.md；此前 v21.19.1：goal_check.py command_pass shell 安全护栏：保留 shell=True 完整命令语义 + DANGEROUS_COMMAND_PATTERNS 12 类破坏性命令前置拦截 + _match_dangerous_command 命中即 FAIL + nosec B602 抑制 agent-loop 自主改写 + 4 单测 50 passed，修复 6758fd9 的 2 个失败测试；此前 v21.19.0（2026-09-09）：全角色自动调起机制，新增 role-operations（运维/SRE）+ role-security（安全工程）2 角色包，角色总数 10→12；iron_rules §10 升级为「角色加载铁律」；skill-loader v1.1 新增优先级 0 任务语义自动识别；role-development §4 开发人员基本素养铁律；修复 7 个 tools/ 脚本 ALL_ROLES 漏新角色 + mcp_server 路由提示词升级）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）
