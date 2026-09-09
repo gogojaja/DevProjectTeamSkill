@@ -1,0 +1,6 @@
+﻿审计时间,审计角色,审计批次,序号,审计项,CI类别,结果,证据,整改建议
+2026-09-09,role-governance,CA-20260909-01,1,基线一致性,技能包CI,偏差,"最新快照 skills_backup_v21.19.1 不含 role-governance/domain/configuration-management.md；磁盘已 v21.5.0 且三推入库，因快照以编排器版本号命名且已存在不覆盖、本次编排器版本未升，故未纳入快照","登记为可接受漂移窗口；下次编排器升版 solidify 生成新快照即自动闭合；如需立即闭合可手动指定新快照版本号重跑 solidify"
+2026-09-09,role-governance,CA-20260909-01,2,版本一致性,技能包CI,通过,"check_version_consistency.py 硬门禁通过；role-governance 元数据版本==页脚版本==v21.5.0；13 角色包各包独立演进允许差异",无
+2026-09-09,role-governance,CA-20260909-01,3,分支保护,代码CI,通过,"当前分支 main；本地仅 main；远端 origin/mirror/mac 均仅 main+HEAD，无非 main 分支残留；三端 main==b9d4227",无
+2026-09-09,role-governance,CA-20260909-01,4,文档引用完整性,文档CI,通过,"CM 域引用的 branch-governance.md / doc-management.md / cmdb-cli.py / check_version_consistency.py 全部可达；CMP 实例 docs/配置管理计划_CMP_v1.0.md 已落盘",无
+2026-09-09,role-governance,CA-20260909-01,5,环境CI占用,环境CI,通过,"CMDB 在线：1 台 dev 主机(达瓦扎西，IP 脱敏 192.168.*.*)，python/git/vscode/tailscale 等资源状态 occupied 归属 DevProjectTeamSkill，无资源冲突",无
