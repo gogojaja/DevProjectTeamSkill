@@ -96,7 +96,7 @@ def run_gate(skill: str = "dev-project-team-skill", gate: str = "closure") -> st
         return f"未知 gate: {gate}（可选 {list(scripts)}）"
     cmd = [sys.executable, os.path.join(ROOT, "tools", scripts[gate]), skill]
     r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
-    return (r.stdout + r.stderr)[:4000]
+    return ((r.stdout or "") + (r.stderr or ""))[:4000]
 
 
 @mcp.tool()
@@ -109,7 +109,7 @@ def estimate_cost(model: str, in_tok: int, out_tok: int, batch: bool = False, ap
     if append:
         cmd.append("--append")
     r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
-    return (r.stdout + r.stderr)[:4000]
+    return ((r.stdout or "") + (r.stderr or ""))[:4000]
 
 
 @mcp.tool()
@@ -119,7 +119,7 @@ def solidify(note: str, dry_run: bool = True) -> str:
         return "（安全默认）经 MCP 的 solidify 仅允许 dry_run 探测；正式固化请在本地终端执行：bash tools/solidify.sh \"<说明>\""
     cmd = ["bash", os.path.join(ROOT, "tools", "solidify.sh"), note]
     r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
-    return (r.stdout + r.stderr)[:4000]
+    return ((r.stdout or "") + (r.stderr or ""))[:4000]
 
 
 @mcp.tool()
@@ -128,7 +128,7 @@ def publish_production(dry_run: bool = True) -> str:
     cmd = [sys.executable, os.path.join(ROOT, "tools", "publish_production.py")] + (["--dry-run"] if dry_run else [])
     if dry_run:
         r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
-        return (r.stdout + r.stderr)[:4000]
+        return ((r.stdout or "") + (r.stderr or ""))[:4000]
     return "（安全默认）经 MCP 的正式发布被禁用；请在本地终端执行：python3 tools/publish_production.py"
 
 
@@ -137,7 +137,7 @@ def mirror_push() -> str:
     """双推 GitHub + Gitee 镜像，返回推送结果（包装 tools/mirror_push.py）。"""
     cmd = [sys.executable, os.path.join(ROOT, "tools", "mirror_push.py")]
     r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
-    return (r.stdout + r.stderr)[:4000]
+    return ((r.stdout or "") + (r.stderr or ""))[:4000]
 
 
 # ---------- 新增 Tools（v21.13.0 AI Agent 功能提升） ----------
@@ -186,7 +186,7 @@ def skill_links() -> str:
         return "check_skill_links.py 不存在，请检查 tools/ 目录"
     cmd = [sys.executable, script]
     r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
-    return (r.stdout + r.stderr)[:4000]
+    return ((r.stdout or "") + (r.stderr or ""))[:4000]
 
 
 @mcp.tool()
@@ -235,7 +235,7 @@ def scope_metrics(write: bool = False) -> str:
     if write:
         cmd.append("--write")
     r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
-    return (r.stdout + r.stderr)[:4000]
+    return ((r.stdout or "") + (r.stderr or ""))[:4000]
 
 
 @mcp.tool()
@@ -263,7 +263,7 @@ def retro_harvest(stage: str, obj: str, good: str = "", improve: str = "", actio
     if dry_run:
         return f"（安全默认）复盘 dry_run 模式。参数：stage={stage}, object={obj}, good={good}, improve={improve}"
     r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
-    return (r.stdout + r.stderr)[:4000]
+    return ((r.stdout or "") + (r.stderr or ""))[:4000]
 
 
 @mcp.tool()
@@ -283,7 +283,7 @@ def review_execute(target: str, perspectives: str = "architect,security", dry_ru
     if dry_run:
         cmd.append("--dry-run")
     r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
-    return (r.stdout + r.stderr)[:4000]
+    return ((r.stdout or "") + (r.stderr or ""))[:4000]
 
 
 @mcp.tool()
@@ -304,7 +304,7 @@ def nightly_gate(action: str = "list", target: str = "", dry_run: bool = True) -
     if dry_run and action == "run":
         cmd.append("--dry-run")
     r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
-    return (r.stdout + r.stderr)[:4000]
+    return ((r.stdout or "") + (r.stderr or ""))[:4000]
 
 
 @mcp.tool()
@@ -553,7 +553,7 @@ def raid_mgmt(action: str, raid_type: str = "", desc: str = "", raid_id: str = "
     else:
         return f"未知 action: {action}（可选 list/add/update/close）"
     r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
-    return (r.stdout + r.stderr)[:4000]
+    return ((r.stdout or "") + (r.stderr or ""))[:4000]
 
 
 @mcp.tool()
@@ -589,7 +589,7 @@ def evm_analyze(action: str = "calc", milestone_id: str = "", milestone_name: st
     else:
         return f"未知 action: {action}（可选 calc/status/add-milestone）"
     r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
-    return (r.stdout + r.stderr)[:4000]
+    return ((r.stdout or "") + (r.stderr or ""))[:4000]
 
 
 @mcp.tool()
@@ -735,7 +735,7 @@ def risk_scan(severity: str = "P1") -> str:
         return "raid_ops.py 不存在，请检查 tools/ 目录（risk-mgmt 技能权威工具）"
     cmd = [sys.executable, script, "scan", "--severity", severity]
     r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
-    return (r.stdout + r.stderr)[:4000]
+    return ((r.stdout or "") + (r.stderr or ""))[:4000]
 
 
 @mcp.tool()
