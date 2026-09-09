@@ -2,10 +2,16 @@
 # -*- coding: utf-8 -*-
 """description 弱模型适配校验（check_skill_descriptions）
 硬门禁（弱模型铁律，见 token_standard.md §2.1）：
-1) 每个 SKILL.md frontmatter description 长度必须 150~250 字符；
+1) 每个 SKILL.md frontmatter description 长度必须 150~450 字符；
 2) 触发词前置：首句须以「用户/当用户」开头（用户实际会说的话）而非主题标签描述；
-3) 禁止中英混排：description 不得包含英文「Load when ...」尾巴（允许专有术语 SRS/ADR/C4/EVM/LSP/AST/team 等）。
+3) 禁止中英混排：description 不得包含英文「Load when ...」尾巴，也不得附加英文关键词括注
+   （允许专有术语 SRS/ADR/C4/EVM/LSP/AST/team 等，见 ALLOWED_EN）。
 返回码 0=通过，1=有不符合项（供 solidify 中止）。
+
+长度上限沿革：v21.24.0 由 250 上调至 450——跨模型触发实测表明，触发词覆盖不足是角色
+召回失败的主因（弱模型只按首句触发词匹配），需容纳 15~18 个中文触发词 + 「不加载」反例
+排除段；单语言原则不变，收益不来自英文关键词（宿主为全量注入 + LLM 语义判断，强模型跨语言
+对齐无损，弱模型下英文反而挤占注意力预算）。
 """
 import os, sys, re, glob, json
 
@@ -14,8 +20,11 @@ sys.stdout.reconfigure(encoding='utf-8')
 ROOT = os.environ.get("PROJECT_ROOT", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SKILLS_DIR = os.environ.get('SKILLS_DIR', os.path.join(ROOT, '.trae', 'skills'))
 
-MIN_LEN, MAX_LEN = 150, 250
+MIN_LEN, MAX_LEN = 150, 450
 EN_TAIL_RE = re.compile(r'(Load when|when the user|use when)[\s\S]*$', re.I)
+# 英文关键词列表括注：字母开头 + 括号内含逗号（如 "(risk register, risk scan, ...)"）。
+# 口径与既有合法术语块区分：无逗号的 (EVM) / (CMP/CI/config_audit) / (P1~P4) 不命中。
+EN_LIST_RE = re.compile(r'\([A-Za-z][^)]*,[^)]*\)')
 # 合法专有术语（可保留在中文 description 中）
 ALLOWED_EN = {'SRS','ADR','C4','EVM','ATAM','LSP','AST','PMBOK','IEEE','BABOK','PR',
               'Git','CSV','PDF','PRJ','RTM','Go','No','S0','S1','S2','S3','team',
@@ -25,11 +34,16 @@ ALLOWED_EN = {'SRS','ADR','C4','EVM','ATAM','LSP','AST','PMBOK','IEEE','BABOK','
 
 
 def find_skill_files():
-    """遍历 .trae/skills 下所有 SKILL.md（含角色包与内嵌子技能）。"""
-    files = []
-    files += glob.glob(os.path.join(SKILLS_DIR, 'role-*', 'SKILL.md'))
-    files += glob.glob(os.path.join(SKILLS_DIR, 'dev-project-team-skill', 'SKILL.md'))
-    files += glob.glob(os.path.join(SKILLS_DIR, 'dev-project-team-skill', 'skills', '*', 'SKILL.md'))
+    """遍历 .trae/skills 下所有 SKILL.md（含角色包、编排器、独立技能与内嵌子技能）。
+
+    覆盖口径修正（v21.24.0）：原实现仅 glob `role-*` + 编排器 + 子技能（23 个），
+    9 个独立技能（scope-tracking/plan-creation/portfolio-mgmt/okr-strategy/resource-ops/
+    stakeholder-comms/schedule-cost/risk-mgmt/impl-coach）从未被检查，门禁却仍报「全部合规」，
+    构成虚假绿灯。改为通配全部顶层技能目录，自动覆盖未来新增技能。
+    """
+    files = set()
+    files.update(glob.glob(os.path.join(SKILLS_DIR, '*', 'SKILL.md')))
+    files.update(glob.glob(os.path.join(SKILLS_DIR, 'dev-project-team-skill', 'skills', '*', 'SKILL.md')))
     return sorted(files)
 
 
@@ -44,6 +58,11 @@ def extract_description(content):
 def has_mixed_english(desc):
     """检测英文尾巴（Load when 等）→ 视为中英混排不合格。"""
     return EN_TAIL_RE.search(desc) is not None
+
+
+def find_en_keyword_list(desc):
+    """检测英文关键词列表括注（单语言原则，token_standard §2.1）→ 返回命中块列表。"""
+    return EN_LIST_RE.findall(desc)
 
 
 def main():
@@ -62,13 +81,16 @@ def main():
             errors.append(f'[{rel}] description 长度 {n} 不在 {MIN_LEN}~{MAX_LEN}')
         if has_mixed_english(desc):
             errors.append(f'[{rel}] 含英文 Load when 尾巴（中英混排），须转中文')
+        en_lists = find_en_keyword_list(desc)
+        if en_lists:
+            errors.append(f'[{rel}] 含英文关键词括注（中英混排，单语言原则）：{en_lists[0][:60]}')
     # 汇总
     if errors:
         print(f'❌ description 校验失败（{len(errors)} 项）：')
         for e in errors:
             print(f'  · {e}')
         return 1
-    print(f'✅ description 校验通过（{len(files)} 个 SKILL.md 全部合规：150~250 字符 / 触发词前置 / 无英文尾巴）。')
+    print(f'✅ description 校验通过（{len(files)} 个 SKILL.md 全部合规：{MIN_LEN}~{MAX_LEN} 字符 / 触发词前置 / 无英文尾巴与英文关键词括注）。')
     return 0
 
 
