@@ -501,7 +501,8 @@ def do_desensitize(root, rules, strip_images, name_proc, report_dir, backup, dry
     if backup and not dry_run:
         ts = datetime.now().strftime('%Y%m%d_%H%M%S')
         if os.path.isdir(root):
-            bdir = f"{root.rstrip('/\\\\')}_备份_{ts}"
+            _sep = '/\\'
+            bdir = f"{root.rstrip(_sep)}_备份_{ts}"
             shutil.copytree(root, bdir)
         else:
             bdir = f"{root}_备份_{ts}"

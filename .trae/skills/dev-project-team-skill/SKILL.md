@@ -16,9 +16,10 @@ description: "用户启用全生命周期、启用某角色、切换角色、多
 ## 1. 基础元数据
 
 - **技能名称**：DevProjectTeamSkill
-- **技能版本**：v21.22.0
+- **技能版本**：v21.23.0
 - **版本发布日期**：2026-09-09
 - **版本变更记录**：
+  - v21.23.0：协调官上下文防爆约束（2026-09-09）——§2.4.5 Executor 行明确「独立子上下文执行（并行须委派 subagent/Worker）」+ 新增「上下文防爆约束」段：禁止把多 Executor 角色完整 domain 聚合进同一窗口，串行遵 §5 规则 4/5（一次一角色+切换 compaction）、真并行委派独立子上下文且协调官只持元数据+验收结果、未命中仅名称元数据+懒读取；依据 token_standard §1.3 追加式上下文，纳入 Verifier 门禁。回应用户 Q2「多角色是否上下文爆炸」。
   - v21.22.0：P2 收官（2026-09-09，提案卡 P-003）——新增 §2.4.6 打断-修正-重规划-沉淀闭环，补齐诉求 #7，自主 Agent 成熟度 L4.7→L5.0：五步默认路径（① pause 暂停 Executor 冻结在制品 → ② amend goal_check.py --amend 写 amendment_history+更新 台账/41_活跃目标.json → ③ replan dependency-graph §4 增量重建受影响子图+§6 绑定表重新指派 → ④ detect deviation-detection §5.1 FeedbackIngestion 解析 Deviation 登记偏差台账 → ⑤ harvest lesson-harvesting §2/§4/§5+interaction-harvest+create_memory 沉淀反哺）；全部按引用绑定现有 6 机制，零新建工具/角色/domain；衔接铁律 #13 SGD amend（禁止静默改方向）+ §2.4.5 Verifier 门禁（偏差未 resolve 不得交付）。
   - v21.21.0：P1 子技能增强（2026-09-09，提案卡 P-002）——承接 §2.4.5 协调官闭环：①team-orchestration v1.2.0→v1.3.0，dependency-graph.md 新增 §6「抽象角色→13 角色包绑定表」+ resolve_role()，Dispatcher 指派从人肉变可查表（补齐诉求 #2 拆分分派）；②self-improve v1.1.0→v1.2.0，新增 domain/interaction-harvest.md「交互自动收割」：同类任务确认≥N轮→抽取确认清单模板→create_memory 沉淀→下次 Planner 提前复用（补齐诉求 #6 交互形成经验）。两者均为子技能加法式增强，无新角色/无新工具，sink 复用现有 create_memory MCP。自主 Agent 成熟度 L4.3→L4.7。
   - v21.20.0：新增 §2.4.5 任务协调官默认流程（2026-09-09）——补齐自主 Agent L4→L5 协调官闭环（提案卡 P-001）：编排器收到任务先做复杂度判定，单子任务走现有直接路由不变，多子任务（≥2 角色/≥2 独立子目标）自动进 Planner→Dispatcher→Executor→Verifier→闭环，无需 team/ultrawork 关键词；抽象角色绑定现有角色包（分析拆解=编排器+team-orchestration plan，指派=§2.4.2 映射表+role-project-mgmt 协调只读，执行=对应 role-* 包，验收=role-governance check_gate/config_audit 任务级签署）；并行/仲裁复用 team-orchestration，提前确认复用铁律#10，减少交互复用铁律#13 SGD，打断-修正经 SGD amend+deviation-detection；无新角色零 ALL_ROLES 硬编码同步。
@@ -185,9 +186,11 @@ def resolve_packages(handoff_l1: dict, user_instruction: str = "") -> list[str]:
 |------|------|--------------------|
 | 分析/拆解 Planner | 需求澄清 + 拆子任务 + 建依赖图(DAG) | 编排器 + `team-orchestration` plan 阶段（Planner=S3 强模型） |
 | 指派 Dispatcher | 每个子任务按 §2.4.2 映射表分派到具体角色包，独立路由 | 编排器路由 + `role-project-mgmt`（协调只读） |
-| 执行 Executor | 各角色包在各自上下文执行（Tier1/2 自主、Tier3 逐项确认） | 对应 `role-*` 角色包 |
+| 执行 Executor | 各角色包在**独立子上下文**执行（并行须委派 subagent/Worker，禁止把多角色完整内容读入同一窗口；Tier1/2 自主、Tier3 逐项确认） | 对应 `role-*` 角色包 |
 | 验收 Verifier | **任务级**闭环签署：逐子任务对照 AC + 全局一致性 | `role-governance` `check_gate`/`config_audit`（按引用绑定，不新建机制） |
 | 闭环/回退 | 全部子任务验收通过→交付+`solidify`；任一未过→有界修复(≤3 轮)或升级用户 | 编排器 + `role-governance` |
+
+**上下文防爆约束（v21.23.0，依据 `token_standard.md` §1.3「追加式上下文，已读文件无法手动弃置」）**：协调官闭环**禁止把多个 Executor 角色的完整 `domain/*.md` 聚合进同一上下文窗口**——① 串行协作遵循 §5 调度规则 4「同一时间仅激活一个角色」+ 规则 5「切换前强制 compaction」；② 真并行时每个 Executor 子任务**必须委派独立子上下文（subagent/Worker）**，协调官（Planner/Dispatcher/Verifier）只持有子任务**元数据 + 验收结果**，不回传角色完整内容；③ 未命中角色仅保留名称元数据（§5 规则 1）+ 按需懒读取目标 `domain/*.md`（§4）。违反即触发上下文膨胀，纳入 Verifier 门禁检查项。
 
 **衔接铁律（不重复、不颠覆）**：并行细节/冲突仲裁复用 `team-orchestration`（§6 P0~P6），本流程仅把其触发从关键词升级为复杂度自动判定；提前一次性确认复用铁律 #10 六段合同；减少交互复用铁律 #13 SGD 分级交互；用户可随时打断，经 SGD `amend`（目标变更+变更历史）重规划、`self-improve/deviation-detection` 捕获偏差（详见 §2.4.6）。
 
@@ -360,5 +363,5 @@ def resolve_packages(handoff_l1: dict, user_instruction: str = "") -> list[str]:
 
 ---
 
-**文档版本**：v21.22.0 **最后更新**：2026-09-09（P2 收官（提案卡 P-003）：新增 §2.4.6 打断-修正-重规划-沉淀闭环，五步默认路径按引用串联 goal_check amend/41_活跃目标.json/dependency-graph §4+§6/deviation-detection §5.1/lesson-harvesting/interaction-harvest 六机制，补齐诉求 #7，成熟度 L4.7→L5.0；此前 v21.21.0：P1 子技能增强（提案卡 P-002）：team-orchestration v1.3.0 dependency-graph.md §6 抽象角色→13 角色包绑定表+resolve_role()（补齐诉求#2），self-improve v1.2.0 新增 interaction-harvest.md 交互自动收割（补齐诉求#6），成熟度 L4.3→L4.7；此前 v21.20.0：新增 §2.4.5 任务协调官默认流程：复杂度阈值触发的 Planner→Dispatcher→Executor→Verifier→验收闭环，绑定现有角色包、验收复用 role-governance 门禁、无新角色；提案卡 docs/任务协调官默认闭环_提案卡P-001_v1.0.md；此前 v21.19.1：goal_check.py command_pass shell 安全护栏：保留 shell=True 完整命令语义 + DANGEROUS_COMMAND_PATTERNS 12 类破坏性命令前置拦截 + _match_dangerous_command 命中即 FAIL + nosec B602 抑制 agent-loop 自主改写 + 4 单测 50 passed，修复 6758fd9 的 2 个失败测试；此前 v21.19.0（2026-09-09）：全角色自动调起机制，新增 role-operations（运维/SRE）+ role-security（安全工程）2 角色包，角色总数 10→12；iron_rules §10 升级为「角色加载铁律」；skill-loader v1.1 新增优先级 0 任务语义自动识别；role-development §4 开发人员基本素养铁律；修复 7 个 tools/ 脚本 ALL_ROLES 漏新角色 + mcp_server 路由提示词升级）
+**文档版本**：v21.23.0 **最后更新**：2026-09-09（协调官上下文防爆约束：§2.4.5 Executor 行明确独立子上下文执行+新增防爆约束段，禁止多 Executor 角色完整 domain 聚合单窗口，串行遵 §5 规则4/5、真并行委派 subagent/Worker、协调官只持元数据+验收结果，依据 token_standard §1.3，纳入 Verifier 门禁，回应用户 Q2；此前 v21.22.0：P2 收官（提案卡 P-003）：新增 §2.4.6 打断-修正-重规划-沉淀闭环，五步默认路径按引用串联 goal_check amend/41_活跃目标.json/dependency-graph §4+§6/deviation-detection §5.1/lesson-harvesting/interaction-harvest 六机制，补齐诉求 #7，成熟度 L4.7→L5.0；此前 v21.21.0：P1 子技能增强（提案卡 P-002）：team-orchestration v1.3.0 dependency-graph.md §6 抽象角色→13 角色包绑定表+resolve_role()（补齐诉求#2），self-improve v1.2.0 新增 interaction-harvest.md 交互自动收割（补齐诉求#6），成熟度 L4.3→L4.7；此前 v21.20.0：新增 §2.4.5 任务协调官默认流程：复杂度阈值触发的 Planner→Dispatcher→Executor→Verifier→验收闭环，绑定现有角色包、验收复用 role-governance 门禁、无新角色；提案卡 docs/任务协调官默认闭环_提案卡P-001_v1.0.md；此前 v21.19.1：goal_check.py command_pass shell 安全护栏：保留 shell=True 完整命令语义 + DANGEROUS_COMMAND_PATTERNS 12 类破坏性命令前置拦截 + _match_dangerous_command 命中即 FAIL + nosec B602 抑制 agent-loop 自主改写 + 4 单测 50 passed，修复 6758fd9 的 2 个失败测试；此前 v21.19.0（2026-09-09）：全角色自动调起机制，新增 role-operations（运维/SRE）+ role-security（安全工程）2 角色包，角色总数 10→12；iron_rules §10 升级为「角色加载铁律」；skill-loader v1.1 新增优先级 0 任务语义自动识别；role-development §4 开发人员基本素养铁律；修复 7 个 tools/ 脚本 ALL_ROLES 漏新角色 + mcp_server 路由提示词升级）
 **知识产权所有**：段波（验证邮箱：duanbo.douglas@163.com）

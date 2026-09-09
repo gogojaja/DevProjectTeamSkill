@@ -28,6 +28,11 @@ requirements-analysis-skill-modification-plan/
 SkillEvolutionSkill/
 .DS_Store
 
+# env-architecture-plan 渲染产物（HTML/字体/JS 库/docx 为展示与二进制产物，源码 .md 保留跟踪；铁律#4 禁 docx）
+env-architecture-plan/_shared/
+env-architecture-plan/*.html
+env-architecture-plan/*.docx
+
 # ===== è´¦å·/å¯†é’¥å®‰å…¨éš”ç¦»ï¼ˆR5ï¼šä¸å…¥åº“ï¼Œé˜²è¯¯æäº¤ï¼‰=====
 .secrets/
 .hub_root
