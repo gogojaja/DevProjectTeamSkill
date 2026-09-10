@@ -303,81 +303,119 @@ def _print_goal_status(goal):
 
 # ── SGD 格式校验 ──────────────────────────────────────────────
 
-def validate_sgd(sgd):
-    """校验 SGD JSON 格式合法性（v1.1 增强：scope 读写分离 + constraints 可验证 + error_recovery）。
-
-    Returns:
-        list: 错误列表（空 = 合法）
-    """
-    errors = []
-
-    # 必填字段
+def _validate_statement(sgd, errors):
+    """校验必填字段 statement（字符串且不少于 5 字符）。"""
     if "statement" not in sgd:
         errors.append("缺少必填字段: statement")
     elif not isinstance(sgd["statement"], str) or len(sgd["statement"]) < 5:
         errors.append("statement 必须为 5~200 字符的字符串")
 
+
+def _validate_ac_item(ac, i, errors):
+    """校验单条验收标准：id 需为 AC-N 格式，description 必填，verify_type 需在枚举内。"""
+    if not isinstance(ac, dict):
+        errors.append("AC[%d] 必须为对象" % i)
+        return
+    if "id" not in ac:
+        errors.append("AC[%d] 缺少 id" % i)
+    elif not isinstance(ac["id"], str) or not ac["id"].startswith("AC-"):
+        errors.append("AC[%d] id 格式错误（需 AC-N）" % i)
+    if "description" not in ac:
+        errors.append("AC[%d] 缺少 description" % i)
+    if "verify_type" not in ac:
+        errors.append("AC[%d] 缺少 verify_type" % i)
+    elif ac["verify_type"] not in VALID_VERIFY_TYPES:
+        errors.append("AC[%d] verify_type 非法: %s（可选: %s）" % (i, ac["verify_type"], ", ".join(VALID_VERIFY_TYPES)))
+
+
+def _validate_acceptance_criteria(sgd, errors):
+    """校验必填字段 acceptance_criteria（1~20 条数组）；集合级不合法时不再逐条校验。"""
     if "acceptance_criteria" not in sgd:
         errors.append("缺少必填字段: acceptance_criteria")
-    elif not isinstance(sgd["acceptance_criteria"], list):
+        return
+    acs = sgd["acceptance_criteria"]
+    if not isinstance(acs, list):
         errors.append("acceptance_criteria 必须为数组")
-    elif len(sgd["acceptance_criteria"]) < 1:
+        return
+    if len(acs) < 1:
         errors.append("acceptance_criteria 至少 1 条")
-    elif len(sgd["acceptance_criteria"]) > 20:
+        return
+    if len(acs) > 20:
         errors.append("acceptance_criteria 最多 20 条")
-    else:
-        for i, ac in enumerate(sgd["acceptance_criteria"]):
-            if not isinstance(ac, dict):
-                errors.append("AC[%d] 必须为对象" % i)
-                continue
-            if "id" not in ac:
-                errors.append("AC[%d] 缺少 id" % i)
-            elif not isinstance(ac["id"], str) or not ac["id"].startswith("AC-"):
-                errors.append("AC[%d] id 格式错误（需 AC-N）" % i)
-            if "description" not in ac:
-                errors.append("AC[%d] 缺少 description" % i)
-            if "verify_type" not in ac:
-                errors.append("AC[%d] 缺少 verify_type" % i)
-            elif ac["verify_type"] not in VALID_VERIFY_TYPES:
-                errors.append("AC[%d] verify_type 非法: %s（可选: %s）" % (i, ac["verify_type"], ", ".join(VALID_VERIFY_TYPES)))
+        return
+    for i, ac in enumerate(acs):
+        _validate_ac_item(ac, i, errors)
 
-    # 可选字段
-    if "max_iterations" in sgd:
-        mi = sgd["max_iterations"]
-        if not isinstance(mi, int) or mi < 1 or mi > 50:
-            errors.append("max_iterations 必须为 1~50 的整数")
 
-    if "constraints" in sgd:
-        if not isinstance(sgd["constraints"], list) or len(sgd["constraints"]) > 10:
-            errors.append("constraints 必须为数组且最多 10 条")
-        else:
-            for i, c in enumerate(sgd["constraints"]):
-                if isinstance(c, dict):
-                    if "type" not in c or c["type"] not in VALID_CONSTRAINT_TYPES:
-                        errors.append("constraint[%d] type 非法（可选: %s）" % (i, ", ".join(VALID_CONSTRAINT_TYPES)))
-                    if "target" not in c:
-                        errors.append("constraint[%d] 缺少 target" % i)
+def _validate_max_iterations(sgd, errors):
+    """校验可选字段 max_iterations（1~50 的整数）。"""
+    if "max_iterations" not in sgd:
+        return
+    mi = sgd["max_iterations"]
+    if not isinstance(mi, int) or mi < 1 or mi > 50:
+        errors.append("max_iterations 必须为 1~50 的整数")
 
-    if "scope" in sgd:
-        scope = sgd["scope"]
-        if not isinstance(scope, dict):
-            errors.append("scope 必须为对象")
-        else:
-            # v1.1 读写分离 + v1.0 兼容
-            for key in ("files", "dirs", "write_files", "write_dirs", "read_files", "read_dirs"):
-                if key in scope and not isinstance(scope[key], list):
-                    errors.append("scope.%s 必须为数组" % key)
 
-    if "error_recovery" in sgd:
-        er = sgd["error_recovery"]
-        if not isinstance(er, dict):
-            errors.append("error_recovery 必须为对象")
-        else:
-            if "on_circuit_break" in er and er["on_circuit_break"] not in VALID_RECOVERY_ON_BREAK:
-                errors.append("error_recovery.on_circuit_break 非法（可选: %s）" % ", ".join(VALID_RECOVERY_ON_BREAK))
-            if "on_max_iterations" in er and er["on_max_iterations"] not in VALID_RECOVERY_ON_MAX:
-                errors.append("error_recovery.on_max_iterations 非法（可选: %s）" % ", ".join(VALID_RECOVERY_ON_MAX))
+def _validate_constraints(sgd, errors):
+    """校验可选字段 constraints（数组且最多 10 条，每条 type 需在枚举内、target 必填）。"""
+    if "constraints" not in sgd:
+        return
+    cs = sgd["constraints"]
+    if not isinstance(cs, list) or len(cs) > 10:
+        errors.append("constraints 必须为数组且最多 10 条")
+        return
+    for i, c in enumerate(cs):
+        if not isinstance(c, dict):
+            continue
+        if "type" not in c or c["type"] not in VALID_CONSTRAINT_TYPES:
+            errors.append("constraint[%d] type 非法（可选: %s）" % (i, ", ".join(VALID_CONSTRAINT_TYPES)))
+        if "target" not in c:
+            errors.append("constraint[%d] 缺少 target" % i)
 
+
+def _validate_scope(sgd, errors):
+    """校验可选字段 scope（v1.1 读写分离 + v1.0 兼容，各路径键需为数组）。"""
+    if "scope" not in sgd:
+        return
+    scope = sgd["scope"]
+    if not isinstance(scope, dict):
+        errors.append("scope 必须为对象")
+        return
+    for key in ("files", "dirs", "write_files", "write_dirs", "read_files", "read_dirs"):
+        if key in scope and not isinstance(scope[key], list):
+            errors.append("scope.%s 必须为数组" % key)
+
+
+def _validate_error_recovery(sgd, errors):
+    """校验可选字段 error_recovery（熔断 / 达最大迭代次数的处置策略枚举）。"""
+    if "error_recovery" not in sgd:
+        return
+    er = sgd["error_recovery"]
+    if not isinstance(er, dict):
+        errors.append("error_recovery 必须为对象")
+        return
+    if "on_circuit_break" in er and er["on_circuit_break"] not in VALID_RECOVERY_ON_BREAK:
+        errors.append("error_recovery.on_circuit_break 非法（可选: %s）" % ", ".join(VALID_RECOVERY_ON_BREAK))
+    if "on_max_iterations" in er and er["on_max_iterations"] not in VALID_RECOVERY_ON_MAX:
+        errors.append("error_recovery.on_max_iterations 非法（可选: %s）" % ", ".join(VALID_RECOVERY_ON_MAX))
+
+
+def validate_sgd(sgd):
+    """校验 SGD JSON 格式合法性（v1.1 增强：scope 读写分离 + constraints 可验证 + error_recovery）。
+
+    按字段分派到各校验子函数，错误按 statement → acceptance_criteria →
+    max_iterations → constraints → scope → error_recovery 的顺序累积。
+
+    Returns:
+        list: 错误列表（空 = 合法）
+    """
+    errors = []
+    _validate_statement(sgd, errors)
+    _validate_acceptance_criteria(sgd, errors)
+    _validate_max_iterations(sgd, errors)
+    _validate_constraints(sgd, errors)
+    _validate_scope(sgd, errors)
+    _validate_error_recovery(sgd, errors)
     return errors
 
 
@@ -561,8 +599,137 @@ def check_scope(filepath, sgd, mode="write"):
 
 # ── 主入口 ────────────────────────────────────────────────────
 
+def _load_sgd(goal_path):
+    """读取 SGD JSON；文件不存在时直接终止（exit 1）。"""
+    if not os.path.exists(goal_path):
+        print("错误: SGD 文件不存在: %s" % goal_path)
+        sys.exit(1)
+    with io.open(goal_path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _print_format_errors(errors):
+    """打印格式校验失败清单。"""
+    print("SGD 格式校验失败：")
+    for e in errors:
+        print("  x %s" % e)
+
+
+def _print_validate_only_summary(sgd):
+    """仅校验模式下的摘要输出（v1.1：可验证约束 / scope 读写分离 / 错误恢复）。"""
+    print("SGD 格式校验通过 (v1.1)")
+    print("  目标: %s" % sgd.get("statement", ""))
+    print("  验收标准: %d 条" % len(sgd.get("acceptance_criteria", [])))
+    constraints = sgd.get("constraints", [])
+    verifiable = sum(1 for c in constraints if isinstance(c, dict))
+    if verifiable:
+        print("  可验证约束: %d/%d" % (verifiable, len(constraints)))
+    scope = sgd.get("scope", {})
+    if scope.get("read_files") or scope.get("read_dirs"):
+        print("  scope: 读写分离模式")
+    er = sgd.get("error_recovery", {})
+    if er:
+        print("  错误恢复: on_break=%s on_max=%s" % (
+            er.get("on_circuit_break", "pause_wait_user"),
+            er.get("on_max_iterations", "handoff")))
+
+
+def _verify_criteria(sgd):
+    """逐项验证验收标准，返回 (结果行列表, 通过数, 失败数, 待人工数)。"""
+    results = []
+    pass_count = 0
+    fail_count = 0
+    manual_count = 0
+    for ac in sgd.get("acceptance_criteria", []):
+        result = verify_ac(ac, ROOT)
+        results.append({
+            "id": ac.get("id", "?"),
+            "description": ac.get("description", ""),
+            "verify_type": ac.get("verify_type", ""),
+            "status": result["status"],
+            "detail": result["detail"],
+        })
+        if result["status"] == "PASS":
+            pass_count += 1
+        elif result["status"] == "FAIL":
+            fail_count += 1
+        else:
+            manual_count += 1
+    return results, pass_count, fail_count, manual_count
+
+
+def _conclude(fail_count, manual_count):
+    """汇总裁决：无失败无待人工 = 全部通过；无失败 = 待人工确认；否则未达标。"""
+    if fail_count == 0 and manual_count == 0:
+        return "全部通过"
+    if fail_count == 0:
+        return "待人工确认"
+    return "未达标"
+
+
+def _print_progress(sgd, results, pass_count, fail_count, manual_count, conclusion):
+    """打印目标 / 进度百分比 / 结论（v1.1）。"""
+    total = len(results)
+    pct = int(pass_count / total * 100) if total > 0 else 0
+    print("目标: %s" % sgd.get("statement", ""))
+    print("进度: %d/%d 通过 (%d%%) | 失败: %d | 待人工: %d" % (pass_count, total, pct, fail_count, manual_count))
+    print("结论: %s" % conclusion)
+
+
+def _print_constraint_violations(constraint_results):
+    """打印违反的约束（v1.1），无违反时静默。"""
+    fails = [c for c in constraint_results if c["status"] == "FAIL"]
+    if not fails:
+        return
+    print("约束违反：")
+    for c in fails:
+        print("  x [%s] %s — %s" % (c["type"], c["target"], c["detail"]))
+
+
+def _print_recovery_advice(sgd, fail_count):
+    """存在失败项时，按 error_recovery.on_circuit_break 给出恢复建议。"""
+    if fail_count <= 0:
+        return
+    on_break = sgd.get("error_recovery", {}).get("on_circuit_break", "pause_wait_user")
+    if on_break == "pause_wait_user":
+        print("建议: 暂停等待用户介入")
+    elif on_break == "skip_and_continue":
+        print("建议: 跳过失败项继续执行")
+    elif on_break == "abort_goal":
+        print("建议: 中止目标并交接")
+
+
+def _resolve_output_path(output_path):
+    """解析报告输出路径并确保父目录存在；未指定时落到 docs/reviews/ 默认报告。"""
+    if not output_path:
+        os.makedirs(os.path.join(ROOT, "docs", "reviews"), exist_ok=True)
+        output_path = os.path.join(ROOT, "docs", "reviews", "goal_check_report.csv")
+    out_dir = os.path.dirname(output_path)
+    if out_dir and not os.path.exists(out_dir):
+        os.makedirs(out_dir, exist_ok=True)
+    return output_path
+
+
+def _write_report_csv(output_path, results):
+    """写出逐项结果 CSV（utf-8-sig，供 Excel 直接打开）。"""
+    with io.open(output_path, "w", encoding="utf-8-sig", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=["id", "description", "verify_type", "status", "detail"])
+        writer.writeheader()
+        writer.writerows(results)
+
+
+def _print_result_rows(results):
+    """打印逐项结果明细行。"""
+    for r in results:
+        mark = "+" if r["status"] == "PASS" else ("x" if r["status"] == "FAIL" else "?")
+        print("  [%s] [%s] %s — %s" % (mark, r["id"], r["description"], r["detail"]))
+
+
 def goal_check(goal_path, output_path=None, validate_only=False):
     """完成度自检主入口。
+
+    流程：读取 SGD → 格式校验 →（仅校验模式则输出摘要后返回）→ 逐项验证
+    → 约束验证 → 汇总裁决与进度输出 → 写 CSV 报告 → 返回摘要。
 
     Args:
         goal_path: SGD JSON 文件路径
@@ -572,118 +739,33 @@ def goal_check(goal_path, output_path=None, validate_only=False):
     Returns:
         dict: 检查结果摘要
     """
-    if not os.path.exists(goal_path):
-        print("错误: SGD 文件不存在: %s" % goal_path)
-        sys.exit(1)
+    sgd = _load_sgd(goal_path)
 
-    with io.open(goal_path, "r", encoding="utf-8") as f:
-        sgd = json.load(f)
-
-    # 格式校验
     errors = validate_sgd(sgd)
     if errors:
-        print("SGD 格式校验失败：")
-        for e in errors:
-            print("  x %s" % e)
+        _print_format_errors(errors)
         return {"valid": False, "errors": errors}
 
     if validate_only:
-        print("SGD 格式校验通过 (v1.1)")
-        print("  目标: %s" % sgd.get("statement", ""))
-        print("  验收标准: %d 条" % len(sgd.get("acceptance_criteria", [])))
-        # v1.1 额外信息
-        constraints = sgd.get("constraints", [])
-        verifiable = sum(1 for c in constraints if isinstance(c, dict))
-        if verifiable:
-            print("  可验证约束: %d/%d" % (verifiable, len(constraints)))
-        scope = sgd.get("scope", {})
-        if scope.get("read_files") or scope.get("read_dirs"):
-            print("  scope: 读写分离模式")
-        er = sgd.get("error_recovery", {})
-        if er:
-            print("  错误恢复: on_break=%s on_max=%s" % (
-                er.get("on_circuit_break", "pause_wait_user"),
-                er.get("on_max_iterations", "handoff")))
+        _print_validate_only_summary(sgd)
         return {"valid": True, "errors": []}
 
-    # 逐项验证
-    results = []
-    pass_count = 0
-    fail_count = 0
-    manual_count = 0
-
-    for ac in sgd.get("acceptance_criteria", []):
-        result = verify_ac(ac, ROOT)
-        row = {
-            "id": ac.get("id", "?"),
-            "description": ac.get("description", ""),
-            "verify_type": ac.get("verify_type", ""),
-            "status": result["status"],
-            "detail": result["detail"],
-        }
-        results.append(row)
-        if result["status"] == "PASS":
-            pass_count += 1
-        elif result["status"] == "FAIL":
-            fail_count += 1
-        else:
-            manual_count += 1
+    results, pass_count, fail_count, manual_count = _verify_criteria(sgd)
 
     # 约束验证（v1.1）
     constraint_results = verify_constraints(sgd, ROOT)
 
-    # 总体结论
     total = len(results)
-    if fail_count == 0 and manual_count == 0:
-        conclusion = "全部通过"
-    elif fail_count == 0:
-        conclusion = "待人工确认"
-    else:
-        conclusion = "未达标"
+    conclusion = _conclude(fail_count, manual_count)
 
-    # 进度输出（v1.1）
-    pct = int(pass_count / total * 100) if total > 0 else 0
-    print("目标: %s" % sgd.get("statement", ""))
-    print("进度: %d/%d 通过 (%d%%) | 失败: %d | 待人工: %d" % (pass_count, total, pct, fail_count, manual_count))
-    print("结论: %s" % conclusion)
+    _print_progress(sgd, results, pass_count, fail_count, manual_count, conclusion)
+    _print_constraint_violations(constraint_results)
+    _print_recovery_advice(sgd, fail_count)
 
-    # 约束验证结果
-    constraint_fails = [c for c in constraint_results if c["status"] == "FAIL"]
-    if constraint_fails:
-        print("约束违反：")
-        for c in constraint_fails:
-            print("  x [%s] %s — %s" % (c["type"], c["target"], c["detail"]))
-
-    # 错误恢复建议（v1.1）
-    er = sgd.get("error_recovery", {})
-    if fail_count > 0:
-        on_break = er.get("on_circuit_break", "pause_wait_user")
-        if on_break == "pause_wait_user":
-            print("建议: 暂停等待用户介入")
-        elif on_break == "skip_and_continue":
-            print("建议: 跳过失败项继续执行")
-        elif on_break == "abort_goal":
-            print("建议: 中止目标并交接")
-
-    # 输出 CSV
-    if not output_path:
-        os.makedirs(os.path.join(ROOT, "docs", "reviews"), exist_ok=True)
-        output_path = os.path.join(ROOT, "docs", "reviews", "goal_check_report.csv")
-
-    out_dir = os.path.dirname(output_path)
-    if out_dir and not os.path.exists(out_dir):
-        os.makedirs(out_dir, exist_ok=True)
-
-    with io.open(output_path, "w", encoding="utf-8-sig", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=["id", "description", "verify_type", "status", "detail"])
-        writer.writeheader()
-        writer.writerows(results)
-
+    output_path = _resolve_output_path(output_path)
+    _write_report_csv(output_path, results)
     print("报告: %s" % output_path)
-
-    for r in results:
-        mark = "+" if r["status"] == "PASS" else ("x" if r["status"] == "FAIL" else "?")
-        print("  [%s] [%s] %s — %s" % (mark, r["id"], r["description"], r["detail"]))
+    _print_result_rows(results)
 
     return {
         "valid": True, "total": total, "pass": pass_count,

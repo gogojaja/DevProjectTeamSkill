@@ -106,81 +106,78 @@ def collect_reports():
     return out
 
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument('--scan', action='store_true', help='仅扫描展示，不阻断')
-    args = ap.parse_args()
+class AuditState:
+    """评审产物核查过程中的累积状态（软性提示 + 三类硬阻断线索）。"""
 
-    docs = walk_docs()
-    evidence_docs = collect_evidence_docs()
-    reports = collect_reports()
-    report_names = {os.path.basename(p) for p in reports}
+    def __init__(self):
+        self.warnings = []
+        self.unreachable_ev = []      # 证据卡引用不可达（硬阻断）
+        self.tmp_refs_all = []        # /tmp 挂链（硬阻断）
+        self.missing_report_docs = []  # 显式评审但缺报告 CSV（硬阻断）
 
-    # 找到包含评审结论的方案文档
-    reviewed_docs = [p for p in docs if has_review_decision(read_text(p))]
-    review_related = []
+
+def split_review_targets(docs):
+    """单次读取文档内容，分离出「含评审结论」与「命中决策/评审签署行」两类目标。"""
+    reviewed = []
+    related = []
     for p in docs:
         content = read_text(p)
-        # 命中决策/评审签署行
-        if DECISION_LINE_RE.search(content) and (REVIEW_MODE_RE.search(content) or has_review_decision(content)):
-            review_related.append((p, content))
+        decided = has_review_decision(content)
+        if decided:
+            reviewed.append(p)
+        if DECISION_LINE_RE.search(content) and (REVIEW_MODE_RE.search(content) or decided):
+            related.append((p, content))
+    return reviewed, related
 
+
+def check_report_present(p, content, rel, report_names, state):
+    """1. 评审报告 CSV 是否落盘：仅当文档显式声明评审（评审模式申明存在）才强制要求报告"""
+    if not REVIEW_MODE_RE.search(content):
+        return
+    base_hint = os.path.splitext(os.path.basename(p))[0].replace('_', '')
+    hint = base_hint[:6].lower()
+    matched = any(hint in r.lower() or '评审' in r for r in report_names)
+    if not matched:
+        state.missing_report_docs.append(rel)
+
+
+def check_evidence_and_mode(rel, content, evidence_docs, state):
+    """2/3. 证据卡入库 + 评审模式申明 + 真实外部信号（均为软性提示）"""
+    if not evidence_docs:
+        state.warnings.append('[%s] 未找到入库证据卡（docs/evidence_cards_<对象>_<日期>.json），证据链可能仅存 /tmp' % rel)
+    if not REVIEW_MODE_RE.search(content):
+        state.warnings.append('[%s] 评审报告头部缺「评审模式」申明（多视角自评 / 真实第三方，review.md §3.2）' % rel)
+    if not EXTERNAL_SIGNAL_RE.search(content):
+        state.warnings.append('[%s] 缺「真实外部信号」标注（≥1 条，缺失则评审应标记「未完成」，review.md §5 门禁）' % rel)
+
+
+def check_hard_blockers(rel, content, evidence_docs, state):
+    """4/5. /tmp 挂链与证据卡引用可达性（硬阻断：证据易失 / 证据链断裂）"""
+    tmp_hits = TMP_REF_RE.findall(content)
+    if tmp_hits:
+        state.tmp_refs_all += [(rel, t) for t in set(tmp_hits)]
+    for ev_ref in EVIDENCE_REF_RE.findall(content):
+        ref_basename = ev_ref.split('/')[-1]
+        if not any(ref_basename == os.path.basename(e) for e in evidence_docs):
+            state.unreachable_ev.append((rel, ev_ref))
+
+
+def summarize_problems(state):
+    """汇总硬性问题（阻断固化），顺序与原实现一致。"""
     problems = []
-    warnings = []
-    unreachable_ev = []   # 证据卡引用不可达（硬阻断）
-    tmp_refs_all = []
-    missing_report_docs = []
-
-    if not reviewed_docs:
-        print('   ✓ 未发现含评审结论的方案文档，评审产物门禁通过（前向兼容）')
-        return 0
-
-    print('   ⚠ 检测到 %d 个含 FULL 评审结论的文档，校验评审产物：' % len(reviewed_docs))
-
-    for p, content in review_related:
-        rel = os.path.relpath(p, ROOT)
-        print('     - %s' % rel)
-
-        # 1. 评审报告 CSV 是否落盘：仅当文档显式声明评审（评审模式申明存在）才强制要求报告
-        if REVIEW_MODE_RE.search(content):
-            base_hint = os.path.splitext(os.path.basename(p))[0].replace('_', '')
-            matched = [r for r in report_names if base_hint[:6].lower() in r.lower() or '评审' in r]
-            if not matched:
-                missing_report_docs.append(rel)
-
-        # 2. 证据卡是否入库（docs/evidence_cards_*.json）
-        if not evidence_docs:
-            warnings.append('[%s] 未找到入库证据卡（docs/evidence_cards_<对象>_<日期>.json），证据链可能仅存 /tmp' % rel)
-
-        # 3. 评审模式申明 + 真实外部信号
-        if not REVIEW_MODE_RE.search(content):
-            warnings.append('[%s] 评审报告头部缺「评审模式」申明（多视角自评 / 真实第三方，review.md §3.2）' % rel)
-        if not EXTERNAL_SIGNAL_RE.search(content):
-            warnings.append('[%s] 缺「真实外部信号」标注（≥1 条，缺失则评审应标记「未完成」，review.md §5 门禁）' % rel)
-
-        # 4. /tmp 挂链检查（硬阻断：证据易失）
-        tmp_hits = TMP_REF_RE.findall(content)
-        if tmp_hits:
-            tmp_refs_all += [(rel, t) for t in set(tmp_hits)]
-
-        # 5. 证据卡引用可达性（硬阻断：文件不存在则证据链断裂）
-        ev_refs = EVIDENCE_REF_RE.findall(content)
-        for ev_ref in ev_refs:
-            ref_basename = ev_ref.split('/')[-1]
-            found = any(ref_basename == os.path.basename(e) for e in evidence_docs)
-            if not found:
-                unreachable_ev.append((rel, ev_ref))
-
-    # ===== 硬性问题汇总（阻断固化） =====
-    if unreachable_ev:
-        problems.append('证据卡引用不可达 %d 处（文件未入库，证据链断裂）：' % len(unreachable_ev))
-        for rel, ref in unreachable_ev[:8]:
+    if state.unreachable_ev:
+        problems.append('证据卡引用不可达 %d 处（文件未入库，证据链断裂）：' % len(state.unreachable_ev))
+        for rel, ref in state.unreachable_ev[:8]:
             problems.append('     - [%s] 引用 %s 未在 docs/ 找到入库文件' % (rel, ref))
-    if tmp_refs_all:
-        problems.append('/tmp 挂链 %d 处（证据易失，须复制入库后改指 docs/）' % len(tmp_refs_all))
-    if missing_report_docs:
-        problems.append('存在显式评审声明的文档但未找到评审报告 CSV（docs/reviews/ 应存 评审报告_<对象>_<版本>_<视角>.csv）：%s' % '、'.join(missing_report_docs[:5]))
+    if state.tmp_refs_all:
+        problems.append('/tmp 挂链 %d 处（证据易失，须复制入库后改指 docs/）' % len(state.tmp_refs_all))
+    if state.missing_report_docs:
+        problems.append('存在显式评审声明的文档但未找到评审报告 CSV（docs/reviews/ 应存 评审报告_<对象>_<版本>_<视角>.csv）：%s' % '、'.join(state.missing_report_docs[:5]))
+    return problems
 
+
+def emit_result(problems, warnings, scan_mode):
+    """输出门禁结论并返回退出码（硬性问题存在且非 --scan 时返回 1）。"""
     print()
     if problems:
         print('   ✗ 评审产物门禁未通过，中止固化。硬性问题：', file=sys.stderr)
@@ -189,7 +186,7 @@ def main():
         print('   ~ 软性提示（建议修复）：', file=sys.stderr)
         for line in warnings:
             print('     - ' + line, file=sys.stderr)
-        if args.scan:
+        if scan_mode:
             print('   → 当前为 --scan 模式，仅展示，不阻断。')
             return 0
         return 1
@@ -200,6 +197,33 @@ def main():
         for line in warnings:
             print('     - ' + line)
     return 0
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--scan', action='store_true', help='仅扫描展示，不阻断')
+    args = ap.parse_args()
+
+    docs = walk_docs()
+    evidence_docs = collect_evidence_docs()
+    report_names = {os.path.basename(p) for p in collect_reports()}
+
+    reviewed_docs, review_related = split_review_targets(docs)
+    if not reviewed_docs:
+        print('   ✓ 未发现含评审结论的方案文档，评审产物门禁通过（前向兼容）')
+        return 0
+
+    print('   ⚠ 检测到 %d 个含 FULL 评审结论的文档，校验评审产物：' % len(reviewed_docs))
+
+    state = AuditState()
+    for p, content in review_related:
+        rel = os.path.relpath(p, ROOT)
+        print('     - %s' % rel)
+        check_report_present(p, content, rel, report_names, state)
+        check_evidence_and_mode(rel, content, evidence_docs, state)
+        check_hard_blockers(rel, content, evidence_docs, state)
+
+    return emit_result(summarize_problems(state), state.warnings, args.scan)
 
 
 if __name__ == '__main__':

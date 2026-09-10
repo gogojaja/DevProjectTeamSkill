@@ -109,94 +109,101 @@ def notify(level, msg, project="", webhook=""):
             print("[nightly] webhook 失败(不阻断): %s" % e)
 
 
-def run_project(p, dry=False, webhook=""):
-    alias = p["project_alias"]
-    path = p.get("project_path", "").strip()
-    test_cmd = p.get("test_cmd", "").strip()
-    secret_ref = p.get("secret_ref", "").strip()
-    print("[nightly] ── %s ──" % alias)
+def _phase_credential(alias, secret_ref, pending):
+    """0) 凭据前置检查：需要凭据但无法经 load_secret 解析 → 待决策（4.9.2 类别1）。"""
+    if not secret_ref:
+        return
+    ok, _, err = _run(["tools/load_secret.py", secret_ref]) if os.path.exists(
+        os.path.join(TOOLS, "load_secret.py")) else (False, "", "load_secret 不存在")
+    if not ok:
+        pending.append(["DB", alias, "credential_missing",
+                        "secret_ref 无法解析（真实值走 .secrets/，铁律#3）",
+                        "夜间无法运行需凭据步骤", "pending", ""])
+        print("[nightly] 凭据缺失 → 待决策(不阻断): %s" % secret_ref)
 
-    pending = []
-    gate_rows = []
-    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    rid = _next_id(GATE, "QG")
 
-    # 0) 凭据前置检查：需要凭据但无法经 load_secret 解析 → 待决策（4.9.2 类别1）
-    if secret_ref:
-        ok, _, err = _run(["tools/load_secret.py", secret_ref]) if os.path.exists(
-            os.path.join(TOOLS, "load_secret.py")) else (False, "", "load_secret 不存在")
-        if not ok:
-            pending.append(["DB", alias, "credential_missing",
-                            "secret_ref 无法解析（真实值走 .secrets/，铁律#3）",
-                            "夜间无法运行需凭据步骤", "pending", ""])
-            print("[nightly] 凭据缺失 → 待决策(不阻断): %s" % secret_ref)
-
-    # 1) quality_gate run（自动视角）
+def _phase_quality_gate(alias, path, dry, rid, now, pending, gate_rows):
+    """1) quality_gate run（自动视角：版本一致性 + 发布级门禁）。"""
     if dry:
         print("[nightly][dry] 将执行 quality_gate run --target %s" % alias)
-    else:
-        qok, qout, qerr = _run(["tools/quality_gate.py", "run", "--target",
-                                alias or path or "(未指定)"])
-        gate_rows.append([rid, now, alias or path, "Architect", "PASS" if qok else "FAIL", "",
-                          "version+closure 门禁", "quality_gate 自动校验"])
-        gate_rows.append([rid, now, alias or path, "CodeReviewer", "PASS" if qok else "FAIL", "",
-                          "release_gate", "quality_gate 自动校验"])
-        if not qok:
-            pending.append(["DB", alias, "high_severity_fail",
-                            "自动门禁 FAIL（版本一致性/发布级）",
-                            "高严重度阻断发现，日间研判", "pending", ""])
-            print("[nightly] 门禁 FAIL → 待决策(不阻断整夜)")
+        return
+    qok, qout, qerr = _run(["tools/quality_gate.py", "run", "--target",
+                            alias or path or "(未指定)"])
+    gate_rows.append([rid, now, alias or path, "Architect", "PASS" if qok else "FAIL", "",
+                      "version+closure 门禁", "quality_gate 自动校验"])
+    gate_rows.append([rid, now, alias or path, "CodeReviewer", "PASS" if qok else "FAIL", "",
+                      "release_gate", "quality_gate 自动校验"])
+    if not qok:
+        pending.append(["DB", alias, "high_severity_fail",
+                        "自动门禁 FAIL（版本一致性/发布级）",
+                        "高严重度阻断发现，日间研判", "pending", ""])
+        print("[nightly] 门禁 FAIL → 待决策(不阻断整夜)")
 
-    # 2) 单元测试全量（registry test_cmd）
-    if test_cmd and not dry:
-        # 直接执行项目测试命令（registry 定义，默认 pytest）
-        import shlex
-        cmd = shlex.split(test_cmd)
-        try:
-            r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True,
-                               encoding="utf-8", timeout=3600)
-            tok = r.returncode == 0
-            tout, terr = r.stdout or "", r.stderr or ""
-        except subprocess.TimeoutExpired:
-            tok, tout, terr = False, "", "timeout"
-        except Exception as e:  # noqa: BLE001
-            tok, tout, terr = False, "", str(e)
-        gate_rows.append([rid, now, alias, "TestEngineer", "PASS" if tok else "FAIL", "" if tok else "high",
-                          test_cmd, "单测全量"])
-        if not tok:
-            pending.append(["DB", alias, "unit_test_fail",
-                            "单测失败 %s" % (terr or tout)[:200],
-                            "跨模块回归，日间研判 flaky 与否", "pending", ""])
-            print("[nightly] 单测失败 → 待决策(不阻断整夜)")
 
-    # 3) 脱敏扫描（铁律 #8，只扫本次新增产物 36/39 CSV，不扫全仓历史避免存量 B 级误判）
-    if not dry:
-        den_path = os.path.join(TOOLS, "desensitize", "desensitize.py")
-        nightly_artifacts = []
-        for f in (GATE, DECISION_Q):
-            if os.path.exists(f):
-                nightly_artifacts.append(f)
-        if os.path.exists(den_path) and nightly_artifacts:
-            sok, sout, _ = _run([den_path, "--scan"] + nightly_artifacts + ["--report",
-                                 os.path.join(ROOT, "台账", "scan_report_nightly.csv")])
-            gate_rows.append([rid, now, alias, "SecurityReviewer",
-                              "PASS" if sok else "WARN", "", "desensitize --scan(新增产物)",
-                              "脱敏扫描（只扫不改）"])
-            if not sok:
-                pending.append(["DB", alias, "desensitize_hit",
-                                "脱敏扫描命中（仅新增产物，报告见 scan_report_nightly.csv）",
-                                "脱敏疑似项，日间研判", "pending", ""])
-        else:
-            gate_rows.append([rid, now, alias, "SecurityReviewer", "SKIP", "", "desensitize 缺失或无新增产物",
-                              "宿主未安装 desensitize"])
+def _phase_unit_tests(alias, test_cmd, dry, rid, now, pending, gate_rows):
+    """2) 单元测试全量（registry test_cmd）。"""
+    if not test_cmd or dry:
+        return
+    # 直接执行项目测试命令（registry 定义，默认 pytest）
+    import shlex
+    cmd = shlex.split(test_cmd)
+    try:
+        r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True,
+                           encoding="utf-8", timeout=3600)
+        tok = r.returncode == 0
+        tout, terr = r.stdout or "", r.stderr or ""
+    except subprocess.TimeoutExpired:
+        tok, tout, terr = False, "", "timeout"
+    except Exception as e:  # noqa: BLE001
+        tok, tout, terr = False, "", str(e)
+    gate_rows.append([rid, now, alias, "TestEngineer", "PASS" if tok else "FAIL", "" if tok else "high",
+                      test_cmd, "单测全量"])
+    if not tok:
+        pending.append(["DB", alias, "unit_test_fail",
+                        "单测失败 %s" % (terr or tout)[:200],
+                        "跨模块回归，日间研判 flaky 与否", "pending", ""])
+        print("[nightly] 单测失败 → 待决策(不阻断整夜)")
 
-    # 3.5) 开发阶段技能主动驱动三视角（T1/T3/T5）
-    dev_tools = [
-        ("ArchFitness", "tools/arch_fitness.py", ["run", "--target", path or alias]),
+
+def _nightly_artifacts():
+    """收集本次新增的夜间产物（36/39 CSV）。"""
+    return [f for f in (GATE, DECISION_Q) if os.path.exists(f)]
+
+
+def _phase_desensitize(alias, dry, rid, now, pending, gate_rows):
+    """3) 脱敏扫描（铁律 #8，只扫本次新增产物，不扫全仓历史避免存量 B 级误判）。"""
+    if dry:
+        return
+    den_path = os.path.join(TOOLS, "desensitize", "desensitize.py")
+    nightly_artifacts = _nightly_artifacts()
+    if not (os.path.exists(den_path) and nightly_artifacts):
+        gate_rows.append([rid, now, alias, "SecurityReviewer", "SKIP", "", "desensitize 缺失或无新增产物",
+                          "宿主未安装 desensitize"])
+        return
+    sok, sout, _ = _run([den_path, "--scan"] + nightly_artifacts + ["--report",
+                         os.path.join(ROOT, "台账", "scan_report_nightly.csv")])
+    gate_rows.append([rid, now, alias, "SecurityReviewer",
+                      "PASS" if sok else "WARN", "", "desensitize --scan(新增产物)",
+                      "脱敏扫描（只扫不改）"])
+    if not sok:
+        pending.append(["DB", alias, "desensitize_hit",
+                        "脱敏扫描命中（仅新增产物，报告见 scan_report_nightly.csv）",
+                        "脱敏疑似项，日间研判", "pending", ""])
+
+
+def _dev_view_tools(path, alias):
+    """开发阶段三视角（T1/T3/T5）的工具清单。"""
+    target = path or alias
+    return [
+        ("ArchFitness", "tools/arch_fitness.py", ["run", "--target", target]),
         ("PatternQuality", "tools/pattern_guard.py", ["run"]),
-        ("ADRTraceability", "tools/adr_trace.py", ["run", "--target", path or alias]),
+        ("ADRTraceability", "tools/adr_trace.py", ["run", "--target", target]),
     ]
-    for view_name, script, script_args in dev_tools:
+
+
+def _phase_dev_views(alias, path, dry, rid, now, pending, gate_rows):
+    """3.5) 开发阶段技能主动驱动三视角（T1/T3/T5）。"""
+    for view_name, script, script_args in _dev_view_tools(path, alias):
         script_path = os.path.join(TOOLS, script)
         if not os.path.exists(script_path):
             gate_rows.append([rid, now, alias, view_name, "SKIP", "", "script missing", "%s not found" % script])
@@ -212,7 +219,9 @@ def run_project(p, dry=False, webhook=""):
                             "%s detected issues" % view_name,
                             "dev-phase architecture compliance, daytime review", "pending", ""])
 
-    # 4) AI 语义评审：默认关闭；开启时仅记录、非阻断（EV-004）
+
+def _phase_ai_review(alias, rid, now, gate_rows):
+    """4) AI 语义评审：默认关闭；开启时仅记录、非阻断（EV-004）。"""
     if AI_ENV:
         for v, tgt in (("SecurityReviewer", "AI 语义安全视角"), ("PerformanceEngineer", "AI 语义性能视角")):
             print("[nightly][AI] 记录(非阻断): %s" % tgt)
@@ -222,29 +231,60 @@ def run_project(p, dry=False, webhook=""):
         # 用户错误设置了 AI_BUDGET 但未开开关 → 提示
         print("[nightly] 注意：AI_BUDGET 已设但 ENABLE_AI_REVIEW 未开，AI 评审未启用")
 
-    # 5) 写 36 门记录（dry 不写）
-    if gate_rows and not dry:
-        _append(GATE,
-                ["评审编号", "时间", "目标", "视角", "状态", "严重度", "证据", "结论"], gate_rows)
-        print("[nightly] 36_质量门记录.csv 追加 %d 行 (QG-%s)" % (len(gate_rows), rid.split("-")[-1]))
+
+def _write_gate_rows(gate_rows, dry, rid):
+    """5) 写 36 门记录（dry 不写）。"""
+    if not gate_rows or dry:
+        return
+    _append(GATE,
+            ["评审编号", "时间", "目标", "视角", "状态", "严重度", "证据", "结论"], gate_rows)
+    print("[nightly] 36_质量门记录.csv 追加 %d 行 (QG-%s)" % (len(gate_rows), rid.split("-")[-1]))
+
+
+def _enqueue_pending(pending, dry):
+    """7) 待决策入 39 队列（含日间 replay 字段）。"""
+    if not pending or dry:
+        return
+    now2 = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    rows = []
+    for i, (dtype, palias, cat, payload, rationale, status, _) in enumerate(pending, 1):
+        sid = _next_id(DECISION_Q, "DB")
+        exp = (datetime.datetime.now() + datetime.timedelta(hours=12)).strftime("%Y-%m-%d %H:%M")
+        rows.append([sid, now2, palias, cat, payload, rationale, status, exp, "", "", ""])
+    _append(DECISION_Q,
+            ["decision_id", "time", "project_alias", "category", "payload", "rationale",
+             "status", "expires_at", "daytime_decision", "approver", "rollback"], rows)
+    print("[nightly] 39_待决策事项.csv 追加 %d 条" % len(rows))
+
+
+def run_project(p, dry=False, webhook=""):
+    """对单个项目执行夜间门禁全流程（阶段 0~8），返回 0=全绿、1=存在 FAIL。"""
+    alias = p["project_alias"]
+    path = p.get("project_path", "").strip()
+    test_cmd = p.get("test_cmd", "").strip()
+    secret_ref = p.get("secret_ref", "").strip()
+    print("[nightly] ── %s ──" % alias)
+
+    pending = []
+    gate_rows = []
+    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    rid = _next_id(GATE, "QG")
+
+    _phase_credential(alias, secret_ref, pending)
+    _phase_quality_gate(alias, path, dry, rid, now, pending, gate_rows)
+    _phase_unit_tests(alias, test_cmd, dry, rid, now, pending, gate_rows)
+    _phase_desensitize(alias, dry, rid, now, pending, gate_rows)
+    _phase_dev_views(alias, path, dry, rid, now, pending, gate_rows)
+    _phase_ai_review(alias, rid, now, gate_rows)
+
+    _write_gate_rows(gate_rows, dry, rid)
 
     # 6) 聚合裁决（只取自动视角 + 单测，AI 不阻断）
     fails = [r for r in gate_rows if r[4] == "FAIL"]
     decision = "CHANGES_REQUESTED" if fails else "SIGNED_OFF"
     print("[nightly] %s 裁决=%s (自动视角 FAIL=%d, 待决策=%d)" % (alias, decision, len(fails), len(pending)))
 
-    # 7) 待决策入 39 队列（含日间 replay 字段）
-    if pending and not dry:
-        now2 = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        rows = []
-        for i, (dtype, palias, cat, payload, rationale, status, _) in enumerate(pending, 1):
-            sid = _next_id(DECISION_Q, "DB")
-            exp = (datetime.datetime.now() + datetime.timedelta(hours=12)).strftime("%Y-%m-%d %H:%M")
-            rows.append([sid, now2, palias, cat, payload, rationale, status, exp, "", "", ""])
-        _append(DECISION_Q,
-                ["decision_id", "time", "project_alias", "category", "payload", "rationale",
-                 "status", "expires_at", "daytime_decision", "approver", "rollback"], rows)
-        print("[nightly] 39_待决策事项.csv 追加 %d 条" % len(rows))
+    _enqueue_pending(pending, dry)
 
     # 8) 失败告警
     if not dry and (fails or pending):

@@ -496,130 +496,179 @@ def do_scan(root, keywords, report_dir):
     return 0
 
 
-def do_desensitize(root, rules, strip_images, name_proc, report_dir, backup, dry_run):
-    # 0. 备份
-    if backup and not dry_run:
-        ts = datetime.now().strftime('%Y%m%d_%H%M%S')
-        if os.path.isdir(root):
-            _sep = '/\\'
-            bdir = f"{root.rstrip(_sep)}_备份_{ts}"
-            shutil.copytree(root, bdir)
-        else:
-            bdir = f"{root}_备份_{ts}"
-            shutil.copy2(root, bdir)
-        print(f"[0/4] 已备份 → {bdir}")
-    else:
+class _Logs:
+    """脱敏执行记录容器（正文替换 / 文件名变更 / 图片删除三类日志）。"""
+
+    def __init__(self):
+        self.text = []
+        self.name = []
+        self.img = []
+
+
+def _phase_backup(root, backup, dry_run):
+    """阶段 0：按需在脱敏前生成整目录或单文件备份。"""
+    if not backup or dry_run:
         print("[0/4] 跳过备份" + ("（dry-run）" if dry_run else "（--no-backup）"))
+        return
+    ts = datetime.now().strftime('%Y%m%d_%H%M%S')
+    if os.path.isdir(root):
+        _sep = '/\\'
+        bdir = f"{root.rstrip(_sep)}_备份_{ts}"
+        shutil.copytree(root, bdir)
+    else:
+        bdir = f"{root}_备份_{ts}"
+        shutil.copy2(root, bdir)
+    print(f"[0/4] 已备份 → {bdir}")
 
-    text_log, name_log, img_log = [], [], []
 
-    # 1. 正文替换 / 删图
+def _replace_ooxml(p, root, data, rules, strip_images, dry_run, logs):
+    """OOXML（docx/xlsx 及 zip 化的 doc/xls）正文替换与图片删除。"""
+    new_data, changed = data, False
+    if rules:
+        try:
+            new_data, m = replace_in_zip_doc(data, rules)
+            changed = changed or m
+        except Exception:
+            pass
+    if strip_images:
+        try:
+            nd, m, removed = strip_images_in_zip_doc(new_data)
+            if m:
+                new_data, changed = nd, True
+                for r in removed:
+                    logs.img.append((os.path.relpath(p, root), r))
+        except Exception:
+            pass
+    if changed and not dry_run:
+        with open(p, 'wb') as fh:
+            fh.write(new_data)
+        logs.text.append((os.path.relpath(p, root), '段落级XML替换' if rules else '', '已写入'))
+
+
+def _replace_ole2(p, root, data, rules, dry_run, logs):
+    """OLE2（doc/xls）等长填充替换，保持文件结构不变。"""
+    if not rules:
+        return
+    new_data, m, counts = replace_ole2_padded(data, rules)
+    if m and not dry_run:
+        with open(p, 'wb') as fh:
+            fh.write(new_data)
+        logs.text.append((os.path.relpath(p, root), 'OLE2等长替换(填充)',
+                         '; '.join(f'{k}→{v}处' for k, v in counts.items())))
+
+
+def _replace_one_target(p, root, rules, strip_images, name_proc, dry_run, logs):
+    """处理单个目标文件：按扩展名分派到 OOXML / OLE2 / ZIP 三条路径。"""
+    ext = p.lower().rsplit('.', 1)[-1]
+    with open(p, 'rb') as fh:
+        data = fh.read()
+    if ext in ('docx', 'xlsx') or (ext in ('doc', 'xls') and is_zip_bytes(data)):
+        _replace_ooxml(p, root, data, rules, strip_images, dry_run, logs)
+    elif ext in ('doc', 'xls'):
+        _replace_ole2(p, root, data, rules, dry_run, logs)
+    elif ext == 'zip':
+        try:
+            process_zip_archive(p, rules if not dry_run else [], strip_images and not dry_run,
+                                name_proc if not dry_run else None,
+                                logs.text, logs.name, logs.img)
+        except Exception as e:
+            print(f"  [警告] zip 处理失败 {p}: {e}")
+
+
+def _phase_replace(root, rules, strip_images, name_proc, dry_run, logs):
+    """阶段 1：遍历目标文件执行正文替换与图片删除。"""
     print("[1/4] 正文替换 + 图片删除" + ("（dry-run，仅统计）" if dry_run else ""))
     for p in iter_targets(root):
-        ext = p.lower().rsplit('.', 1)[-1]
-        with open(p, 'rb') as fh:
-            data = fh.read()
-        if ext in ('docx', 'xlsx') or (ext in ('doc', 'xls') and is_zip_bytes(data)):
-            new_data, changed = data, False
-            if rules:
-                try:
-                    new_data, m = replace_in_zip_doc(data, rules)
-                    changed = changed or m
-                except Exception:
-                    pass
-            if strip_images:
-                try:
-                    nd, m, removed = strip_images_in_zip_doc(new_data)
-                    if m:
-                        new_data, changed = nd, True
-                        for r in removed:
-                            img_log.append((os.path.relpath(p, root), r))
-                except Exception:
-                    pass
-            if changed and not dry_run:
-                with open(p, 'wb') as fh:
-                    fh.write(new_data)
-                text_log.append((os.path.relpath(p, root), '段落级XML替换' if rules else '', '已写入'))
-        elif ext in ('doc', 'xls'):
-            if rules:
-                new_data, m, counts = replace_ole2_padded(data, rules)
-                if m and not dry_run:
-                    with open(p, 'wb') as fh:
-                        fh.write(new_data)
-                    text_log.append((os.path.relpath(p, root), 'OLE2等长替换(填充)',
-                                     '; '.join(f'{k}→{v}处' for k, v in counts.items())))
-        elif ext == 'zip':
-            try:
-                process_zip_archive(p, rules if not dry_run else [], strip_images and not dry_run,
-                                    name_proc if not dry_run else None, text_log, name_log, img_log)
-            except Exception as e:
-                print(f"  [警告] zip 处理失败 {p}: {e}")
-    print(f"  正文替换涉及 {len(text_log)} 项；删除图片部件 {len(img_log)} 个")
+        _replace_one_target(p, root, rules, strip_images, name_proc, dry_run, logs)
+    print(f"  正文替换涉及 {len(logs.text)} 项；删除图片部件 {len(logs.img)} 个")
 
-    # 2. 文件名/目录名脱敏
-    if name_proc and not dry_run:
-        print("[2/4] 文件名/目录名脱敏")
-        file_renames, dir_renames = [], []
-        for dp, dn, fn in os.walk(root):
-            for f in fn:
-                if is_lock(f):
-                    continue
-                nf = name_proc(f)
-                if nf != f:
-                    file_renames.append((os.path.join(dp, f), os.path.join(dp, nf), f, nf))
-            for d in dn:
-                if is_lock(d):
-                    continue
-                nd = name_proc(d)
-                if nd != d:
-                    dir_renames.append((dp.count(os.sep) + 1, os.path.join(dp, d), os.path.join(dp, nd), d, nd))
-        for old_p, new_p, old_n, new_n in file_renames:
-            try:
-                os.rename(old_p, new_p)
-                name_log.append(('文件', os.path.relpath(old_p, root), old_n, new_n))
-            except Exception as e:
-                name_log.append(('文件(失败)', os.path.relpath(old_p, root), old_n, f"{new_n} [错误:{e}]"))
-        for _, old_p, new_p, old_n, new_n in sorted(dir_renames, key=lambda x: -x[0]):
-            try:
-                os.rename(old_p, new_p)
-                name_log.append(('目录', os.path.relpath(old_p, root), old_n, new_n))
-            except Exception as e:
-                name_log.append(('目录(失败)', os.path.relpath(old_p, root), old_n, f"{new_n} [错误:{e}]"))
-        nf = sum(1 for r in name_log if r[0] == '文件')
-        nd = sum(1 for r in name_log if r[0] == '目录')
-        nz = sum(1 for r in name_log if r[0] == 'zip内文件')
-        print(f"  文件:{nf} 目录:{nd} zip内:{nz}")
-    else:
+
+def _collect_renames(root, name_proc):
+    """扫描待重命名的文件与目录（目录附带深度，供倒序处理）。"""
+    file_renames, dir_renames = [], []
+    for dp, dn, fn in os.walk(root):
+        for f in fn:
+            if is_lock(f):
+                continue
+            nf = name_proc(f)
+            if nf != f:
+                file_renames.append((os.path.join(dp, f), os.path.join(dp, nf), f, nf))
+        for d in dn:
+            if is_lock(d):
+                continue
+            nd = name_proc(d)
+            if nd != d:
+                dir_renames.append((dp.count(os.sep) + 1, os.path.join(dp, d),
+                                    os.path.join(dp, nd), d, nd))
+    return file_renames, dir_renames
+
+
+def _apply_renames(root, file_renames, dir_renames, logs):
+    """执行重命名并记录结果（目录按深度倒序，避免父目录先改名）。"""
+    for old_p, new_p, old_n, new_n in file_renames:
+        try:
+            os.rename(old_p, new_p)
+            logs.name.append(('文件', os.path.relpath(old_p, root), old_n, new_n))
+        except Exception as e:
+            logs.name.append(('文件(失败)', os.path.relpath(old_p, root), old_n,
+                              f"{new_n} [错误:{e}]"))
+    for _, old_p, new_p, old_n, new_n in sorted(dir_renames, key=lambda x: -x[0]):
+        try:
+            os.rename(old_p, new_p)
+            logs.name.append(('目录', os.path.relpath(old_p, root), old_n, new_n))
+        except Exception as e:
+            logs.name.append(('目录(失败)', os.path.relpath(old_p, root), old_n,
+                              f"{new_n} [错误:{e}]"))
+
+
+def _phase_rename(root, name_proc, dry_run, logs):
+    """阶段 2：文件名与目录名脱敏。"""
+    if not name_proc or dry_run:
         print("[2/4] 跳过文件名脱敏" + ("（dry-run）" if dry_run else ""))
+        return
+    print("[2/4] 文件名/目录名脱敏")
+    file_renames, dir_renames = _collect_renames(root, name_proc)
+    _apply_renames(root, file_renames, dir_renames, logs)
+    nf = sum(1 for r in logs.name if r[0] == '文件')
+    nd = sum(1 for r in logs.name if r[0] == '目录')
+    nz = sum(1 for r in logs.name if r[0] == 'zip内文件')
+    print(f"  文件:{nf} 目录:{nd} zip内:{nz}")
 
-    # 3. 执行记录
+
+def _phase_records(report_dir, logs):
+    """阶段 3：输出正文替换、文件名变更、图片删除三份执行记录 CSV。"""
     os.makedirs(report_dir, exist_ok=True)
     print("[3/4] 生成执行记录")
-    t_csv = write_csv(os.path.join(report_dir, 'Office脱敏_正文替换执行记录.csv'),
-                      ['文件', '方式', '状态'], text_log + [('合计', f'{len(text_log)}项', '')])
-    n_csv = write_csv(os.path.join(report_dir, 'Office脱敏_文件名变更执行记录.csv'),
-                      ['类型', '路径', '原名', '新名'], name_log)
-    i_csv = write_csv(os.path.join(report_dir, 'Office脱敏_图片删除执行记录.csv'),
-                      ['文件', '已删图片部件'], img_log + [('合计', f'{len(img_log)}个')])
+    write_csv(os.path.join(report_dir, 'Office脱敏_正文替换执行记录.csv'),
+              ['文件', '方式', '状态'], logs.text + [('合计', f'{len(logs.text)}项', '')])
+    write_csv(os.path.join(report_dir, 'Office脱敏_文件名变更执行记录.csv'),
+              ['类型', '路径', '原名', '新名'], logs.name)
+    write_csv(os.path.join(report_dir, 'Office脱敏_图片删除执行记录.csv'),
+              ['文件', '已删图片部件'], logs.img + [('合计', f'{len(logs.img)}个')])
 
-    # 4. 校验
-    print("[4/4] 校验残余敏感词与文件完整性")
-    src_words = sorted({old for old, _ in rules})
-    tgt_words = sorted({new for _, new in rules if new})
+
+def _check_zip_integrity(p, ext, b, corrupt):
+    """对 OOXML/ZIP 容器执行 testzip 完整性校验，异常记入 corrupt。"""
+    if ext not in ('docx', 'xlsx', 'zip') and not (ext in ('doc', 'xls') and is_zip_bytes(b)):
+        return
+    try:
+        z = zipfile.ZipFile(io.BytesIO(b))
+        if z.testzip() is not None:
+            corrupt.append((p, 'testzip失败'))
+        z.close()
+    except Exception as e:
+        corrupt.append((p, str(e)))
+
+
+def _verify_scan(root, src_words, tgt_words):
+    """遍历目标文件，统计源词/目标词命中数并检测容器完整性。"""
     counts = {t: 0 for t in src_words + tgt_words}
     corrupt, detail = [], []
     for p in iter_targets(root):
         ext = p.lower().rsplit('.', 1)[-1]
         with open(p, 'rb') as fh:
             b = fh.read()
-        if ext in ('docx', 'xlsx', 'zip') or (ext in ('doc', 'xls') and is_zip_bytes(b)):
-            try:
-                z = zipfile.ZipFile(io.BytesIO(b))
-                if z.testzip() is not None:
-                    corrupt.append((p, 'testzip失败'))
-                z.close()
-            except Exception as e:
-                corrupt.append((p, str(e)))
+        _check_zip_integrity(p, ext, b, corrupt)
         txt = extract_text(p)
         for t in counts:
             c = txt.count(t)
@@ -628,6 +677,11 @@ def do_desensitize(root, rules, strip_images, name_proc, report_dir, backup, dry
                 i = txt.find(t)
                 detail.append((t, os.path.relpath(p, root),
                                txt[max(0, i - 15):i + len(t) + 15].replace('\n', ' ')))
+    return counts, corrupt, detail
+
+
+def _verify_rows(src_words, tgt_words, counts, corrupt, detail):
+    """组装校验结果 CSV 行：源词清零、目标词注入、完整性、残余样本。"""
     v_rows = []
     for w in src_words:
         v_rows.append([w, counts[w], 0, '已清零' if counts[w] == 0 else f'残留{counts[w]}处'])
@@ -636,19 +690,38 @@ def do_desensitize(root, rules, strip_images, name_proc, report_dir, backup, dry
     v_rows.append(['文件完整性', '全部正常' if not corrupt else f'{len(corrupt)}个损坏', '', ''])
     for d in detail[:50]:
         v_rows.append(['残余', d[0], d[1], d[2]])
-    v_csv = write_csv(os.path.join(report_dir, 'Office脱敏_校验结果.csv'),
-                      ['词', '数量', '预期', '状态/位置'], v_rows)
+    return v_rows
+
+
+def _phase_verify(root, rules, report_dir, dry_run):
+    """阶段 4：校验源词残留与文件完整性，返回退出码（0=通过，1=有残留或损坏）。"""
+    print("[4/4] 校验残余敏感词与文件完整性")
+    src_words = sorted({old for old, _ in rules})
+    tgt_words = sorted({new for _, new in rules if new})
+    counts, corrupt, detail = _verify_scan(root, src_words, tgt_words)
+    v_rows = _verify_rows(src_words, tgt_words, counts, corrupt, detail)
+    write_csv(os.path.join(report_dir, 'Office脱敏_校验结果.csv'),
+              ['词', '数量', '预期', '状态/位置'], v_rows)
     print(f"  源词残留：{ {w: counts[w] for w in src_words} }")
     print(f"  完整性：{'全部正常' if not corrupt else f'{len(corrupt)}个损坏'}")
-    if corrupt:
-        for p, e in corrupt:
-            print(f"    损坏: {p}: {e}")
+    for p, e in corrupt:
+        print(f"    损坏: {p}: {e}")
     print(f"报告目录：{report_dir}")
-    rc = 0
-    if not dry_run:
-        if any(counts[w] for w in src_words) or corrupt:
-            rc = 1
-    return rc
+    if dry_run:
+        return 0
+    if any(counts[w] for w in src_words) or corrupt:
+        return 1
+    return 0
+
+
+def do_desensitize(root, rules, strip_images, name_proc, report_dir, backup, dry_run):
+    """执行 Office 脱敏全流程：0 备份 → 1 正文/图片 → 2 文件名 → 3 记录 → 4 校验。"""
+    logs = _Logs()
+    _phase_backup(root, backup, dry_run)
+    _phase_replace(root, rules, strip_images, name_proc, dry_run, logs)
+    _phase_rename(root, name_proc, dry_run, logs)
+    _phase_records(report_dir, logs)
+    return _phase_verify(root, rules, report_dir, dry_run)
 
 
 def main():

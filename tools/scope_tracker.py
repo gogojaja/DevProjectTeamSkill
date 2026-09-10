@@ -679,18 +679,76 @@ def Versorted(vers):
         return sorted(vers)[-1]
 
 
-def cmd_gate(args):
+def _gate_load_rows():
+    """加载追溯矩阵，处理缺失/异常/为空三种前置失败路径（fail-closed）。
+
+    返回 (rows, exit_code)；exit_code 非 None 时调用方应直接返回该码。
+    """
     if not os.path.isfile(DEFAULT_MATRIX):
         print('   ✗ 未找到追溯矩阵，请先运行: python3 tools/scope_tracker.py init', file=sys.stderr)
-        return 1
+        return None, 1
     try:
         rows = load_rtm(DEFAULT_MATRIX)
     except Exception as e:
         print('   ✗ 追溯矩阵异常（fail-closed）: %s' % e, file=sys.stderr)
-        return 2
+        return None, 2
     if not rows:
         print('   ✗ 追溯矩阵为空', file=sys.stderr)
-        return 1
+        return None, 1
+    return rows, None
+
+
+def _gate_resolve_drift(args, rows, changes):
+    """F4：解析对比基线（未指定则取最新冻结基线）并计算真实漂移。
+
+    返回 (against, drift, diff)。
+    """
+    against = getattr(args, 'against_baseline', None)
+    if not against:
+        frozen = list_baselines()
+        against = Versorted(frozen) if frozen else None
+    drift, diff = 0, None
+    if against:
+        diff = baseline_diff(rows, against, changes)
+        if diff.get('ok'):
+            drift = diff.get('baseline_drift', 0)
+    return against, drift, diff
+
+
+def _gate_print_compliance(change_signals, drift, against, diff):
+    """打印变更合规（F3/F4）概览与未审批明细（蔓延/缩水/优先级降级）。"""
+    print('   ── 变更合规（F3/F4）──')
+    print('   未审批变更触及 Must/基线=%d  缺审批人=%d  超期未决 CR=%d  基线漂移=%d%s'
+          % (change_signals['open_unapproved_must'], change_signals['missing_approver'],
+             change_signals['stale_cr'], drift, ('（对比基线 %s）' % against) if against else '（无冻结基线）'))
+    if not (diff and diff.get('ok')):
+        return
+    if diff['unapproved_added']:
+        print('     ⚠ 未审批新增(蔓延): %s' % ','.join(diff['unapproved_added'][:20]))
+    if diff['unapproved_removed']:
+        print('     ⚠ 未审批删除(缩水): %s' % ','.join(diff['unapproved_removed'][:20]))
+    if diff['unapproved_prio_down']:
+        print('     ⚠ 未审批优先级降级: %s' % '; '.join('%s:%s→%s' % t for t in diff['unapproved_prio_down'][:20]))
+
+
+def _gate_verdict(args, violations, creep, shrink, health, change_signals):
+    """裁决门禁结论：返回「通过 / 警告 / 驳回」。"""
+    allow_open = getattr(args, 'allow_open_changes', False)
+    severe = (len(violations) > args.max_violations or len(shrink) > 0
+              or health < args.min_health)  # v1.1.1：健康分门禁（标准 §8 ≥90）
+    # F3：未审批变更触及 Must/基线 = 严重（scope-change §边界“超范围无审批禁止流转”）；--allow-open-changes 降为警告
+    if change_signals['open_unapproved_must'] > 0 and not allow_open:
+        severe = True
+    warn = (len(creep) > 0 or (0 < len(violations) <= args.max_violations)
+            or change_signals['stale_cr'] > 0 or change_signals['missing_approver'] > 0
+            or (change_signals['open_unapproved_must'] > 0 and allow_open))
+    return '通过' if not severe and not warn else ('驳回' if severe else '警告')
+
+
+def cmd_gate(args):
+    rows, err = _gate_load_rows()
+    if err is not None:
+        return err
     m = compute_metrics(rows)
     violations, ok = consistency_violations(DEFAULT_MATRIX, fail_closed=True)
     if not ok:
@@ -701,40 +759,12 @@ def cmd_gate(args):
     creep, shrink = detect_creep_shrink(rows)
     # F3：变更台账合规信号 + F4：相对已冻结基线的真实漂移
     changes = load_change_ledger()
-    against = getattr(args, 'against_baseline', None)
-    if not against:
-        frozen = list_baselines()
-        against = Versorted(frozen) if frozen else None
-    drift, diff = 0, None
-    if against:
-        diff = baseline_diff(rows, against, changes)
-        if diff.get('ok'):
-            drift = diff.get('baseline_drift', 0)
+    against, drift, diff = _gate_resolve_drift(args, rows, changes)
     change_signals = analyze_change_signals(rows, changes, baseline_drift=drift)
     health = health_score(m, violations, creep, shrink, change_signals)
     print_scorecard(m, violations, creep, shrink, health)
-    print('   ── 变更合规（F3/F4）──')
-    print('   未审批变更触及 Must/基线=%d  缺审批人=%d  超期未决 CR=%d  基线漂移=%d%s'
-          % (change_signals['open_unapproved_must'], change_signals['missing_approver'],
-             change_signals['stale_cr'], drift, ('（对比基线 %s）' % against) if against else '（无冻结基线）'))
-    if diff and diff.get('ok') and (diff['unapproved_added'] or diff['unapproved_removed'] or diff['unapproved_prio_down']):
-        if diff['unapproved_added']:
-            print('     ⚠ 未审批新增(蔓延): %s' % ','.join(diff['unapproved_added'][:20]))
-        if diff['unapproved_removed']:
-            print('     ⚠ 未审批删除(缩水): %s' % ','.join(diff['unapproved_removed'][:20]))
-        if diff['unapproved_prio_down']:
-            print('     ⚠ 未审批优先级降级: %s' % '; '.join('%s:%s→%s' % t for t in diff['unapproved_prio_down'][:20]))
-
-    allow_open = getattr(args, 'allow_open_changes', False)
-    severe = (len(violations) > args.max_violations or len(shrink) > 0
-              or health < args.min_health)  # v1.1.1：健康分门禁（标准 §8 ≥90）
-    # F3：未审批变更触及 Must/基线 = 严重（scope-change §边界“超范围无审批禁止流转”）；--allow-open-changes 降为警告
-    if change_signals['open_unapproved_must'] > 0 and not allow_open:
-        severe = True
-    warn = (len(creep) > 0 or (0 < len(violations) <= args.max_violations)
-            or change_signals['stale_cr'] > 0 or change_signals['missing_approver'] > 0
-            or (change_signals['open_unapproved_must'] > 0 and allow_open))
-    result = '通过' if not severe and not warn else ('驳回' if severe else '警告')
+    _gate_print_compliance(change_signals, drift, against, diff)
+    result = _gate_verdict(args, violations, creep, shrink, health, change_signals)
     detail = '违规%d/蔓延%d/缩水%d/健康%.1f/未审批%d/漂移%d' % (
         len(violations), len(creep), len(shrink), health,
         change_signals['open_unapproved_must'], drift)

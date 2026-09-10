@@ -26,7 +26,7 @@
 #
 # 跨平台: macOS/Linux/python 均可；Windows 用 py -3.11
 # =============================================================================
-import os, sys, re, shutil, glob, subprocess, tempfile, json
+import os, sys, re, shutil, glob, subprocess, tempfile, json, hashlib
 from datetime import datetime, timezone
 sys.stdout.reconfigure(encoding="utf-8")
 
@@ -56,51 +56,84 @@ TOOLS = {
 }
 
 
+# 开关型选项：出现即置 True
+_FLAG_OPTIONS = {
+    "--dry-run": "dry_run",
+    "--gate-desensitize": "gate_only",
+    "--no-extra-globals": "no_extra",
+    "--all-globals": "all_globals",
+    "--verify": "verify",
+    "--register-clients": "register_clients",
+}
+
+# 取值型选项：需后跟一个参数
+_VALUE_OPTIONS = {
+    "--target-dir": "target_root",
+    "--version": "version",
+    "--extra-globals": "extra_list",
+}
+
+_USAGE_LINES = (
+    "用法: publish_production.py [--version <vX.Y.Z>] [--target-dir <dir>] "
+    "[--dry-run] [--gate-desensitize] [--verify] [--register-clients]\n"
+    "      [--no-extra-globals | --extra-globals trae,workbuddy | --all-globals]",
+    "  默认: 除 opencode 全局库外，自动同步到已安装工具(父目录存在)的全局技能目录",
+    "  --no-extra-globals : 仅发布到 opencode 全局库(原行为)",
+    "  --extra-globals    : 显式指定额外全局目标(trae/trae-cn/workbuddy/claude/copilot/agents)",
+    "  --all-globals       : 全部已知工具全局目录(即使未安装也创建)",
+    "  --verify           : 发布后验证消费端文件完整性",
+    "  --register-clients : 发布后自动注册 MCP Server 到已安装工具客户端",
+)
+
+_OPTION_DEFAULTS = {
+    "target_root": None,      # 运行时填 TARGET_ROOT
+    "version": None,
+    "dry_run": False,
+    "gate_only": False,
+    "extra_list": None,
+    "all_globals": False,
+    "no_extra": False,
+    "verify": False,
+    "register_clients": False,
+}
+
+
+def _print_usage():
+    """打印命令行用法说明。"""
+    for line in _USAGE_LINES:
+        print(line)
+
+
+def _coerce_value(flag, raw):
+    """按选项语义转换取值：路径展开、逗号列表拆分，其余原样返回。"""
+    if flag == "--target-dir":
+        return os.path.expanduser(raw)
+    if flag == "--extra-globals":
+        return [x.strip() for x in raw.split(",") if x.strip()]
+    return raw
+
+
 def parse_args(argv):
-    target_root = TARGET_ROOT
-    version = None
-    dry_run = False
-    gate_only = False
-    extra_list = None
-    all_globals = False
-    no_extra = False
-    verify = False
-    register_clients = False
+    """解析命令行参数，返回与历史调用方兼容的 9 元组。"""
+    opts = dict(_OPTION_DEFAULTS)
+    opts["target_root"] = TARGET_ROOT
     i = 0
     while i < len(argv):
         a = argv[i]
-        if a == "--target-dir":
-            target_root = os.path.expanduser(argv[i + 1]); i += 2
-        elif a == "--version":
-            version = argv[i + 1]; i += 2
-        elif a == "--dry-run":
-            dry_run = True; i += 1
-        elif a == "--gate-desensitize":
-            gate_only = True; i += 1
-        elif a == "--no-extra-globals":
-            no_extra = True; i += 1
-        elif a == "--all-globals":
-            all_globals = True; i += 1
-        elif a == "--extra-globals":
-            extra_list = [x.strip() for x in argv[i + 1].split(",") if x.strip()]; i += 2
-        elif a == "--verify":
-            verify = True; i += 1
-        elif a == "--register-clients":
-            register_clients = True; i += 1
+        if a in _FLAG_OPTIONS:
+            opts[_FLAG_OPTIONS[a]] = True
+            i += 1
+        elif a in _VALUE_OPTIONS:
+            opts[_VALUE_OPTIONS[a]] = _coerce_value(a, argv[i + 1])
+            i += 2
         elif a in ("-h", "--help"):
-            print("用法: publish_production.py [--version <vX.Y.Z>] [--target-dir <dir>] "
-                  "[--dry-run] [--gate-desensitize] [--verify] [--register-clients]\n"
-                  "      [--no-extra-globals | --extra-globals trae,workbuddy | --all-globals]")
-            print("  默认: 除 opencode 全局库外，自动同步到已安装工具(父目录存在)的全局技能目录")
-            print("  --no-extra-globals : 仅发布到 opencode 全局库(原行为)")
-            print("  --extra-globals    : 显式指定额外全局目标(trae/trae-cn/workbuddy/claude/copilot/agents)")
-            print("  --all-globals       : 全部已知工具全局目录(即使未安装也创建)")
-            print("  --verify           : 发布后验证消费端文件完整性")
-            print("  --register-clients : 发布后自动注册 MCP Server 到已安装工具客户端")
+            _print_usage()
             sys.exit(0)
         else:
             print(f"未知参数: {a}"); sys.exit(1)
-    return target_root, version, dry_run, gate_only, extra_list, all_globals, no_extra, verify, register_clients
+    return (opts["target_root"], opts["version"], opts["dry_run"], opts["gate_only"],
+            opts["extra_list"], opts["all_globals"], opts["no_extra"], opts["verify"],
+            opts["register_clients"])
 
 
 def read_version():
@@ -383,32 +416,31 @@ def run_desensitize_gate(skills_dir=None, report_path=None):
     return passed
 
 
-def main():
-    target_root, version, dry_run, gate_only, extra_list, all_globals, no_extra, verify, register_clients = parse_args(sys.argv[1:])
-    if version is None:
-        version = read_version()
-    else:
-        # 规范化：去除可能的 'v' 前缀（防止 --version v21.12.0 导致 vv21.12.0）
-        version = version.lstrip('v')
+def _resolve_version(explicit):
+    """解析目标版本号：未显式指定时读源库，否则去除 'v' 前缀（防 vv21.12.0）。"""
+    if explicit is None:
+        return read_version()
+    return explicit.lstrip('v')
 
-    if gate_only:
-        if not run_desensitize_gate():
-            sys.exit(1)
-        sys.exit(0)
 
+def _print_banner(version, target_root):
+    """打印发布头与源库/留档根信息。"""
     print("=" * 60)
     print(f"  生产技能发布 (publish_production v1.0.0)  目标版本: {version}")
     print("=" * 60)
     print(f"源库: {SKILLS_DIR}")
     print(f"留档根: {target_root}")
 
-    # 解析全局生效目标（opencode + 自动发现的 trae/workbuddy 等）
-    g_targets = resolve_global_targets(extra_list, all_globals, no_extra)
+
+def _print_global_targets(g_targets):
+    """打印已解析的全局生效目标清单。"""
     print(f"全局生效目标 ({len(g_targets)}):")
     for n, c in g_targets.items():
         print(f"  - {n}: {c['path']}  (rebuild={c['rebuild']})")
 
-    # 1. 门禁
+
+def _run_release_gates():
+    """发布前门禁：4 项工具门禁 + 脱敏扫描，任一未通过即中止发布。"""
     gates = [
         ("版本一致性", "version"),
         ("闭环执行", "closure"),
@@ -418,131 +450,194 @@ def main():
     for name, key in gates:
         if not run_gate(name, TOOLS[key]):
             print("  发布中止：门禁未通过。"); sys.exit(1)
-
-    # 2. 脱敏扫描
     if not run_desensitize_gate():
         sys.exit(1)
 
-    # 3. 版本目录（不可变留档）
+
+def _build_version_dir(target_root, version, dry_run):
+    """构建不可变版本目录并返回路径；已存在则保留留档不重建。"""
     ver_dir = os.path.join(target_root, f"v{version}")
     print(f"  构建版本目录: {ver_dir} ...")
     if os.path.isdir(ver_dir):
         print("  ~ 该版本目录已存在，跳过重建（保留不可变留档）")
+    elif dry_run:
+        print(f"  (dry-run) 将创建 {ver_dir}")
     else:
-        if dry_run:
-            print(f"  (dry-run) 将创建 {ver_dir}")
-        else:
-            copy_skills_to(ver_dir)
+        copy_skills_to(ver_dir)
+    return ver_dir
 
-    # 4. current 软链（原子切换）+ 回滚指针
+
+def _record_rollback_pointer(current, dry_run):
+    """记录 current 现指向到 .backup/last_production_version.txt，供回滚使用。"""
+    if dry_run or not (os.path.islink(current) or os.path.exists(current)):
+        return
+    prev_target = os.path.basename(os.path.realpath(current)) if os.path.islink(current) else "unknown"
+    backup_dir = os.path.join(ROOT, ".backup")
+    os.makedirs(backup_dir, exist_ok=True)
+    rollback_file = os.path.join(backup_dir, "last_production_version.txt")
+    with open(rollback_file, "w", encoding="utf-8") as f:
+        f.write(prev_target)
+    print(f"  回滚指针已记录: {prev_target} → {rollback_file}")
+
+
+def _create_version_link(tmp_link, version, target_root):
+    """创建指向 v{version} 的软链；Windows 无权建符号链接时回退为目录联接。"""
+    if os.path.islink(tmp_link) or os.path.exists(tmp_link):
+        os.remove(tmp_link)
+    try:
+        os.symlink(f"v{version}", tmp_link)
+    except OSError:
+        if sys.platform != "win32":
+            raise
+        abs_target = os.path.join(target_root, f"v{version}")
+        subprocess.run(["cmd", "/c", "mklink", "/J", tmp_link, abs_target],
+                       check=True, capture_output=True)
+
+
+def _remove_current(current):
+    """移除已存在的 current（软链 / 空目录 / 实体目录三种形态）。"""
+    if not (os.path.exists(current) or os.path.islink(current)):
+        return
+    try:
+        os.remove(current)
+    except OSError:
+        try:
+            os.rmdir(current)
+        except OSError:
+            shutil.rmtree(current)
+
+
+def _switch_current(target_root, version, dry_run):
+    """原子切换 current 软链并返回 current 路径；失败则中止发布。"""
     current = os.path.join(target_root, "current")
     # 回滚指针：记录当前 current 指向，方便回滚
-    if not dry_run and (os.path.islink(current) or os.path.exists(current)):
-        prev_target = os.path.basename(os.path.realpath(current)) if os.path.islink(current) else "unknown"
-        backup_dir = os.path.join(ROOT, ".backup")
-        os.makedirs(backup_dir, exist_ok=True)
-        rollback_file = os.path.join(backup_dir, "last_production_version.txt")
-        with open(rollback_file, "w", encoding="utf-8") as f:
-            f.write(prev_target)
-        print(f"  回滚指针已记录: {prev_target} → {rollback_file}")
+    _record_rollback_pointer(current, dry_run)
     if dry_run:
         print(f"  (dry-run) 将设置 current -> v{version}")
+        return current
+    tmp_link = os.path.join(target_root, f".current.tmp.{os.getpid()}")
+    try:
+        _create_version_link(tmp_link, version, target_root)
+        _remove_current(current)
+        os.replace(tmp_link, current)
+    except OSError as e:
+        print(f"  ✗ 软链切换失败: {e}"); sys.exit(1)
+    return current
+
+
+def _deploy_global(name, cfg, dry_run):
+    """发布到单个全局库：rebuild=True 整库重建，否则精确同步以保护用户其他技能。"""
+    dest = cfg["path"]
+    if dry_run:
+        print(f"  (dry-run) 将部署到 {name} 全局库 {dest} (rebuild={cfg['rebuild']})")
+        return
+    if cfg["rebuild"]:
+        # 整库重建（opencode 专属：假定全局库专用于本仓库）
+        if os.path.isdir(dest):
+            if sys.platform == "win32":
+                subprocess.run(["cmd", "/c", "rmdir", "/s", "/q", dest],
+                               check=True, capture_output=True)
+            else:
+                shutil.rmtree(dest)
+        copy_skills_to(dest)
     else:
-        tmp_link = os.path.join(target_root, f".current.tmp.{os.getpid()}")
-        try:
-            if os.path.islink(tmp_link) or os.path.exists(tmp_link):
-                os.remove(tmp_link)
-            try:
-                os.symlink(f"v{version}", tmp_link)
-            except OSError:
-                if sys.platform == "win32":
-                    abs_target = os.path.join(target_root, f"v{version}")
-                    subprocess.run(["cmd", "/c", "mklink", "/J", tmp_link, abs_target],
-                                   check=True, capture_output=True)
-                else:
-                    raise
-            if os.path.exists(current) or os.path.islink(current):
-                try:
-                    os.remove(current)
-                except OSError:
-                    try:
-                        os.rmdir(current)
-                    except OSError:
-                        shutil.rmtree(current)
-            os.replace(tmp_link, current)
-        except OSError as e:
-            print(f"  ✗ 软链切换失败: {e}"); sys.exit(1)
+        # 精确同步（其他工具：仅清理本仓库发布集子项，保护用户其他全局技能）
+        sync_into(dest)
+    print(f"  ✓ 已发布到 {name} 全局库 {dest}")
 
-    # 5. 发布到全局库（多工具全局生效：opencode + trae/workbuddy 等）
+
+def _check_global_skills():
+    """校验全局库 SKILL_INDEX.md 存在性与角色包目录数（≥9），返回是否全部通过。"""
+    ok = True
+    skill_index = os.path.join(GLOBAL_SKILLS, "SKILL_INDEX.md")
+    if os.path.isfile(skill_index):
+        print(f"  ✓ SKILL_INDEX.md 存在于全局库")
+    else:
+        print(f"  ✗ SKILL_INDEX.md 缺失于全局库: {GLOBAL_SKILLS}")
+        ok = False
+    role_dirs = [d for d in os.listdir(GLOBAL_SKILLS)
+                 if os.path.isdir(os.path.join(GLOBAL_SKILLS, d)) and d.startswith("role-")]
+    if len(role_dirs) >= 9:
+        print(f"  ✓ 角色包目录数: {len(role_dirs)} (≥9)")
+    else:
+        print(f"  ✗ 角色包目录数不足: {len(role_dirs)} (<9)")
+        ok = False
+    return ok
+
+
+def _verify_consumers():
+    """消费端验证（--verify）：全局库不存在仅告警，不视为失败。"""
+    print("\n  [消费端验证]")
+    verify_ok = True
+    if os.path.isdir(GLOBAL_SKILLS):
+        verify_ok = _check_global_skills()
+    else:
+        print(f"  ⚠ 全局库不存在: {GLOBAL_SKILLS} (可能尚未发布)")
+    if verify_ok:
+        print("  消费端验证通过")
+    else:
+        print("  消费端验证存在告警，请检查")
+
+
+def _register_clients(verify):
+    """MCP 客户端自动注册（可选步骤，注册脚本缺失则跳过）。"""
+    print("\n  [MCP 客户端自动注册]")
+    register_script = os.path.join(ROOT, "tools", "register_mcp_client.py")
+    if not os.path.isfile(register_script):
+        print(f"  ~ register_mcp_client.py 不存在，跳过")
+        return
+    cmd = [sys.executable, register_script, "--write"]
+    if verify:
+        cmd.append("--verify")
+    r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, encoding="utf-8", errors="replace")
+    print(r.stdout[:2000] if r.stdout else "")
+    if r.returncode != 0:
+        print(f"  ⚠ 客户端注册有告警: {r.stderr[:500]}")
+
+
+def _print_archive_info(ver_dir, current):
+    """打印留档信息（版本目录 SHA256 与 current 实际指向）。"""
+    print(f"  版本目录: {ver_dir}  SHA256={dir_hash(ver_dir) if os.path.isdir(ver_dir) else '-'}")
+    print(f"  current   -> {os.path.realpath(current) if os.path.exists(current) else '-'}")
+
+
+def main():
+    """发布主流程：版本解析 → 门禁 → 留档 → 软链切换 → 全局部署 → 验证/注册。"""
+    target_root, version, dry_run, gate_only, extra_list, all_globals, no_extra, verify, register_clients = parse_args(sys.argv[1:])
+    version = _resolve_version(version)
+
+    if gate_only:
+        if not run_desensitize_gate():
+            sys.exit(1)
+        sys.exit(0)
+
+    _print_banner(version, target_root)
+
+    # 解析全局生效目标（opencode + 自动发现的 trae/workbuddy 等）
+    g_targets = resolve_global_targets(extra_list, all_globals, no_extra)
+    _print_global_targets(g_targets)
+
+    _run_release_gates()
+
+    ver_dir = _build_version_dir(target_root, version, dry_run)
+    current = _switch_current(target_root, version, dry_run)
+
+    # 发布到全局库（多工具全局生效：opencode + trae/workbuddy 等）
     for name, cfg in g_targets.items():
-        dest = cfg["path"]
-        if dry_run:
-            print(f"  (dry-run) 将部署到 {name} 全局库 {dest} (rebuild={cfg['rebuild']})")
-            continue
-        if cfg["rebuild"]:
-            # 整库重建（opencode 专属：假定全局库专用于本仓库）
-            if os.path.isdir(dest):
-                if sys.platform == "win32":
-                    subprocess.run(["cmd", "/c", "rmdir", "/s", "/q", dest],
-                                   check=True, capture_output=True)
-                else:
-                    shutil.rmtree(dest)
-            copy_skills_to(dest)
-        else:
-            # 精确同步（其他工具：仅清理本仓库发布集子项，保护用户其他全局技能）
-            sync_into(dest)
-        print(f"  ✓ 已发布到 {name} 全局库 {dest}")
+        _deploy_global(name, cfg, dry_run)
 
-    # 5.1 自动更新 MCP 版本清单（单源 + 发布即更新，避免多工具反复同步）
+    # 自动更新 MCP 版本清单（单源 + 发布即更新，避免多工具反复同步）
     emit_mcp_manifest(version, dry_run)
 
     if not dry_run:
-        # 6. 打印留档信息
-        print(f"  版本目录: {ver_dir}  SHA256={dir_hash(ver_dir) if os.path.isdir(ver_dir) else '-'}")
-        print(f"  current   -> {os.path.realpath(current) if os.path.exists(current) else '-'}")
+        _print_archive_info(ver_dir, current)
     print("  发布完成。")
 
-    # 7. 消费端验证（--verify）
     if verify and not dry_run:
-        print("\n  [消费端验证]")
-        verify_ok = True
-        # 检查 opencode 全局库
-        if os.path.isdir(GLOBAL_SKILLS):
-            skill_index = os.path.join(GLOBAL_SKILLS, "SKILL_INDEX.md")
-            if os.path.isfile(skill_index):
-                print(f"  ✓ SKILL_INDEX.md 存在于全局库")
-            else:
-                print(f"  ✗ SKILL_INDEX.md 缺失于全局库: {GLOBAL_SKILLS}")
-                verify_ok = False
-            # 检查角色包目录数
-            role_dirs = [d for d in os.listdir(GLOBAL_SKILLS) if os.path.isdir(os.path.join(GLOBAL_SKILLS, d)) and d.startswith("role-")]
-            if len(role_dirs) >= 9:
-                print(f"  ✓ 角色包目录数: {len(role_dirs)} (≥9)")
-            else:
-                print(f"  ✗ 角色包目录数不足: {len(role_dirs)} (<9)")
-                verify_ok = False
-        else:
-            print(f"  ⚠ 全局库不存在: {GLOBAL_SKILLS} (可能尚未发布)")
-        if verify_ok:
-            print("  消费端验证通过")
-        else:
-            print("  消费端验证存在告警，请检查")
+        _verify_consumers()
 
-    # 8. MCP 客户端自动注册（--register-clients，可选步骤）
     if register_clients and not dry_run:
-        print("\n  [MCP 客户端自动注册]")
-        register_script = os.path.join(ROOT, "tools", "register_mcp_client.py")
-        if os.path.isfile(register_script):
-            cmd = [sys.executable, register_script, "--write"]
-            if verify:
-                cmd.append("--verify")
-            r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, encoding="utf-8", errors="replace")
-            print(r.stdout[:2000] if r.stdout else "")
-            if r.returncode != 0:
-                print(f"  ⚠ 客户端注册有告警: {r.stderr[:500]}")
-        else:
-            print(f"  ~ register_mcp_client.py 不存在，跳过")
+        _register_clients(verify)
 
 if __name__ == "__main__":
-    import hashlib
     main()

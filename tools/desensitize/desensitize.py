@@ -533,7 +533,8 @@ def load_dictionary_rules(rules, csv_path):
 # CLI 主入口
 # =============================================================================
 
-def main():
+def _build_parser():
+    """构建 desensitize CLI 参数解析器（从 main 拆出，降低圈复杂度）。"""
     parser = argparse.ArgumentParser(
         description="文档脱敏工具 — 按 A/B/C 三级扫描和替换敏感信息（对齐 iron_rules.md §3）",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -583,22 +584,17 @@ def main():
     parser.add_argument("--list-rules", action="store_true", help="列出所有当前启用的规则后退出")
     parser.add_argument("--json", action="store_true", help="以 JSON 格式输出统计结果")
 
-    args = parser.parse_args()
+    return parser
 
-    # 列出规则
-    if args.list_rules:
-        _print_rules()
-        return 0
 
-    if not args.target:
-        parser.error("请指定目标文件或目录（或使用 --list-rules 查看规则）")
-
+def _build_rules(args):
+    """按 CLI 参数组装规则集；返回 None 表示参数错误、调用方应以非零码退出。"""
     # 构建规则集
     rules = DEFAULT_RULES
     if args.rules:
         if not os.path.isfile(args.rules):
             print(f"❌ 自定义规则文件不存在: {args.rules}", file=sys.stderr)
-            return 1
+            return None
         rules = load_custom_rules(args.rules)
 
     # 脱敏字典（关键字集，UTF-8 with BOM CSV）
@@ -622,8 +618,11 @@ def main():
             rid: r for rid, r in rules.items()
             if r.get("level", "?") in allowed
         }
+    return rules
 
-    # 扩展名和排除目录
+
+def _build_extensions(args):
+    """合并默认扩展名与 --include-ext 追加项（自动补前导点）。"""
     extensions = set(DEFAULT_EXTENSIONS)
     if args.include_ext:
         for ext in args.include_ext.split(','):
@@ -631,114 +630,86 @@ def main():
             if ext and not ext.startswith('.'):
                 ext = '.' + ext
             extensions.add(ext)
+    return extensions
 
+
+def _build_exclude_dirs(args):
+    """合并默认排除目录与 --exclude-dir 追加项。"""
     exclude_dirs = set(DEFAULT_EXCLUDE_DIRS)
     if args.exclude_dir:
         for d in args.exclude_dir.split(','):
             d = d.strip()
             if d:
                 exclude_dirs.add(d)
+    return exclude_dirs
 
-    # 初始化引擎
-    engine = Desensitizer(rules=rules, extensions=extensions, exclude_dirs=exclude_dirs)
 
-    # 收集文件
-    target_path = Path(args.target)
-    if not target_path.exists():
-        print(f"❌ 目标不存在: {args.target}", file=sys.stderr)
-        return 1
+def _resolve_out_path(args, fp, target_path):
+    """确定单个文件的脱敏输出路径（原地 / 输出目录 / 同目录副本）。"""
+    if args.in_place:
+        return fp
+    if args.output:
+        out_dir = Path(args.output)
+        rel = fp.relative_to(target_path) if target_path.is_dir() else fp.name
+        out_path = out_dir / rel
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        return out_path
+    # 默认：同目录 .desensitized 后缀
+    return fp.with_suffix(fp.suffix + '.desensitized')
 
-    files = engine.collect_files(target_path)
-    if not files:
-        print("⚠ 未找到可处理的文件")
-        return 0
 
-    mode = "扫描" if args.scan else "脱敏"
-    print(f"==============================================")
-    print(f" 文档脱敏工具 (desensitize v1.0.0)")
-    print(f" 模式: {mode} | 目标: {target_path} | 文件数: {len(files)}")
-    print(f"==============================================")
+def _count_levels(findings):
+    """按 A/B/C 级别统计发现条数。"""
+    counts = {}
+    for item in findings:
+        lvl = item["level"]
+        counts[lvl] = counts.get(lvl, 0) + 1
+    return counts
 
-    all_findings = []
-    all_stats = {}
-    processed = 0
 
-    for fp in files:
-        rel_path = str(fp.relative_to(target_path) if target_path.is_dir() else fp.name)
+def _scan_one(engine, content, rel_path):
+    """扫描模式处理单个文件，返回发现列表。"""
+    findings = engine.scan_text(content, source_label=rel_path)
+    if findings:
+        print(f"  📄 {rel_path} — 发现 {len(findings)} 处敏感信息")
+        # 按级别汇总
+        for lvl, cnt in sorted(_count_levels(findings).items()):
+            print(f"       {lvl} 级: {cnt} 处")
+    return findings
 
-        try:
-            with open(fp, 'r', encoding='utf-8') as f:
-                content = f.read()
-        except Exception as e:
-            print(f"  ⚠ 跳过 {rel_path}: 读取失败 ({e})", file=sys.stderr)
-            continue
 
-        # 扫描模式
-        if args.scan:
-            findings = engine.scan_text(content, source_label=rel_path)
-            if findings:
-                all_findings.extend(findings)
-                print(f"  📄 {rel_path} — 发现 {len(findings)} 处敏感信息")
-                # 按级别汇总
-                level_counts = {}
-                for f_item in findings:
-                    lvl = f_item["level"]
-                    level_counts[lvl] = level_counts.get(lvl, 0) + 1
-                for lvl, cnt in sorted(level_counts.items()):
-                    print(f"       {lvl} 级: {cnt} 处")
-            processed += 1
-            continue
+def _desensitize_one(engine, args, content, fp, rel_path, target_path):
+    """脱敏模式处理单个文件，返回 (发现列表, 替换统计)。"""
+    new_content, stats = engine.desensitize_text(content)
+    if not stats:
+        print(f"  ✓ {rel_path} — 无敏感信息")
+        return [], {}
 
-        # 脱敏模式
-        new_content, stats = engine.desensitize_text(content)
+    # 生成扫描发现用于报告
+    findings = engine.scan_text(content, source_label=rel_path)
+    if args.dry_run:
+        print(f"  📄 {rel_path} — 将替换 {sum(stats.values())} 处")
+        return findings, stats
 
-        if stats:
-            for k, v in stats.items():
-                all_stats[k] = all_stats.get(k, 0) + v
+    out_path = _resolve_out_path(args, fp, target_path)
+    with open(out_path, 'w', encoding='utf-8') as f:
+        f.write(new_content)
+    label = out_path.name if not args.output else out_path
+    print(f"  ✅ {rel_path} → {label} ({sum(stats.values())} 处替换)")
+    return findings, stats
 
-            # 生成扫描发现用于报告
-            findings = engine.scan_text(content, source_label=rel_path)
-            all_findings.extend(findings)
 
-            if args.dry_run:
-                print(f"  📄 {rel_path} — 将替换 {sum(stats.values())} 处")
-            else:
-                # 确定输出路径
-                if args.in_place:
-                    out_path = fp
-                elif args.output:
-                    out_dir = Path(args.output)
-                    if target_path.is_dir():
-                        out_path = out_dir / fp.relative_to(target_path)
-                    else:
-                        out_path = out_dir / fp.name
-                    out_path.parent.mkdir(parents=True, exist_ok=True)
-                else:
-                    # 默认：同目录 .desensitized 后缀
-                    out_path = fp.with_suffix(fp.suffix + '.desensitized')
+def _report_path(args):
+    """确定报告输出路径（未指定时按模式与时间戳自动生成）。"""
+    if args.report:
+        return args.report
+    ts = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+    prefix = "scan" if args.scan else "desensitize"
+    return f"{prefix}_report_{ts}.csv"
 
-                with open(out_path, 'w', encoding='utf-8') as f:
-                    f.write(new_content)
-                print(f"  ✅ {rel_path} → {out_path.name if not args.output else out_path} ({sum(stats.values())} 处替换)")
 
-            processed += 1
-        else:
-            if not args.scan:
-                print(f"  ✓ {rel_path} — 无敏感信息")
-            processed += 1
-
-    # 生成报告
-    report_path = args.report
-    if not report_path:
-        ts = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-        prefix = "scan" if args.scan else "desensitize"
-        report_path = f"{prefix}_report_{ts}.csv"
-
-    if all_findings or all_stats:
-        write_report(all_findings, all_stats, report_path)
-        print(f"\n📊 报告已生成: {report_path}")
-
-    # 汇总
+def _print_summary(args, files, processed, all_findings, all_stats, report_path):
+    """打印处理汇总；--json 时追加结构化结果。"""
     total_findings = len(all_findings)
     total_replacements = sum(all_stats.values()) if all_stats else 0
 
@@ -747,10 +718,7 @@ def main():
     if args.scan:
         print(f" 发现敏感信息: {total_findings} 处")
         # 按级别统计
-        level_counts = {}
-        for f in all_findings:
-            lvl = f["level"]
-            level_counts[lvl] = level_counts.get(lvl, 0) + 1
+        level_counts = _count_levels(all_findings)
         for lvl in ["A", "B", "C"]:
             if lvl in level_counts:
                 print(f"    {lvl} 级: {level_counts[lvl]} 处")
@@ -761,7 +729,7 @@ def main():
         import json as _json
         result = {
             "mode": "scan" if args.scan else "desensitize",
-            "target": str(target_path),
+            "target": str(Path(args.target)),
             "files_total": len(files),
             "files_processed": processed,
             "findings_count": total_findings,
@@ -772,11 +740,130 @@ def main():
         }
         print("\n" + _json.dumps(result, ensure_ascii=False, indent=2))
 
+
+def _rel_label(fp, target_path):
+    """计算文件相对于目标的展示路径。"""
+    return str(fp.relative_to(target_path) if target_path.is_dir() else fp.name)
+
+
+def _read_text(fp, rel_path):
+    """读取文件文本；失败时告警并返回 None（调用方跳过该文件）。"""
+    try:
+        with open(fp, 'r', encoding='utf-8') as f:
+            return f.read()
+    except Exception as e:
+        print(f"  ⚠ 跳过 {rel_path}: 读取失败 ({e})", file=sys.stderr)
+        return None
+
+
+def _merge_stats(total, part):
+    """将单文件替换统计累加到总表。"""
+    for k, v in part.items():
+        total[k] = total.get(k, 0) + v
+
+
+def _collect_targets(engine, args):
+    """校验目标路径并收集待处理文件；目标不存在时返回 None。"""
+    target_path = Path(args.target)
+    if not target_path.exists():
+        print(f"❌ 目标不存在: {args.target}", file=sys.stderr)
+        return None
+
+    files = engine.collect_files(target_path)
+    if not files:
+        print("⚠ 未找到可处理的文件")
+        return target_path, files
+
+    mode = "扫描" if args.scan else "脱敏"
+    print(f"==============================================")
+    print(f" 文档脱敏工具 (desensitize v1.0.0)")
+    print(f" 模式: {mode} | 目标: {target_path} | 文件数: {len(files)}")
+    print(f"==============================================")
+    return target_path, files
+
+
+def _process_files(engine, args, files, target_path):
+    """逐文件执行扫描或脱敏，返回 (全部发现, 累计统计, 已处理数)。"""
+    all_findings = []
+    all_stats = {}
+    processed = 0
+
+    for fp in files:
+        rel_path = _rel_label(fp, target_path)
+        content = _read_text(fp, rel_path)
+        if content is None:
+            continue
+
+        # 扫描模式
+        if args.scan:
+            all_findings.extend(_scan_one(engine, content, rel_path))
+        else:
+            # 脱敏模式
+            findings, stats = _desensitize_one(
+                engine, args, content, fp, rel_path, target_path)
+            all_findings.extend(findings)
+            _merge_stats(all_stats, stats)
+        processed += 1
+
+    return all_findings, all_stats, processed
+
+
+def _finalize(args, files, processed, all_findings, all_stats):
+    """生成报告、打印汇总，并按 A 级发现决定退出码。"""
+    # 生成报告
+    report_path = _report_path(args)
+
+    if all_findings or all_stats:
+        write_report(all_findings, all_stats, report_path)
+        print(f"\n📊 报告已生成: {report_path}")
+
+    # 汇总
+    _print_summary(args, files, processed, all_findings, all_stats, report_path)
+
     # 退出码：A 级发现 → 1（告警），B 级及以下 → 0
     a_count = sum(1 for f in all_findings if f["level"] == "A")
     if a_count > 0 and args.scan:
         return 1  # 发现 A 级敏感信息，非零退出码
     return 0
+
+
+def main():
+    """CLI 入口：组装规则 → 初始化引擎 → 逐文件处理 → 报告与汇总。"""
+    parser = _build_parser()
+    args = parser.parse_args()
+
+    # 列出规则
+    if args.list_rules:
+        _print_rules()
+        return 0
+
+    if not args.target:
+        parser.error("请指定目标文件或目录（或使用 --list-rules 查看规则）")
+
+    rules = _build_rules(args)
+    if rules is None:
+        return 1
+
+    # 初始化引擎
+    engine = Desensitizer(
+        rules=rules,
+        extensions=_build_extensions(args),
+        exclude_dirs=_build_exclude_dirs(args),
+    )
+
+    # 收集文件
+    collected = _collect_targets(engine, args)
+    if collected is None:
+        return 1
+
+    target_path, files = collected
+    if not files:
+        return 0
+
+    all_findings, all_stats, processed = _process_files(
+        engine, args, files, target_path)
+
+    return _finalize(args, files, processed, all_findings, all_stats)
 
 
 def _print_rules():

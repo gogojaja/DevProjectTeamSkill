@@ -136,7 +136,86 @@ def watermark_xml_fragments(members):
             and ("header" in n.lower() or "footer" in n.lower() or "document.xml" in n.lower())]
 
 
+def _ancestor_paragraph(node):
+    """自 node 向上回溯到最近的 w:p 祖先；找不到返回 None。"""
+    para = node if node.tag == W_P else node.getparent()
+    while para is not None and para.tag != W_P:
+        para = para.getparent()
+    return para
+
+
+def _collect_textpath_paras(root, text, auto, removed_ids):
+    """收集 v:textpath 文字水印所在段落（命中关键字或 --auto 全清）。"""
+    for tp in root.findall(f".//{V_TEXT}"):
+        if not (auto or (text and text.lower() in tp.get("string", "").lower())):
+            continue
+        para = _ancestor_paragraph(tp)
+        if para is not None:
+            removed_ids.add(id(para))
+
+
+def _is_watermark_shape(shape):
+    """判定 v:shape 是否为水印图形（PowerPlusWaterMarkObject / 水印命名）。"""
+    sid = shape.get("id") or ""
+    sname = shape.get("name") or ""
+    return "Watermark" in sid or "水印" in sname or "Watermark" in sname
+
+
+def _collect_pict_paras(root, text, auto, removed_ids):
+    """收集 w:pict 内 v:shape 图片水印所在段落。"""
+    for pict in root.findall(f".//{W_PICT}"):
+        shape = pict.find(f".//{{{NS['v']}}}shape")
+        if shape is None:
+            continue
+        if not _is_watermark_shape(shape):
+            continue
+        if not (auto or not text):
+            continue
+        para = _ancestor_paragraph(pict)
+        if para is not None:
+            removed_ids.add(id(para))
+
+
+def _strip_paragraphs(root, removed_ids):
+    """从 root 中移除命中段落，返回实际删除数。"""
+    cnt = 0
+    for para in list(root.iter(W_P)):
+        if id(para) in removed_ids:
+            para.getparent().remove(para)
+            cnt += 1
+    return cnt
+
+
+def _process_word_part(members, name, text, auto):
+    """处理单个 word 部件（document / header / footer），返回删除的水印段落数。
+
+    不含 textpath / picture 的部件直接跳过，避免无谓解析开销。
+    """
+    xml = members[name].decode("utf-8")
+    if "textpath" not in xml and "picture" not in xml:
+        return 0
+    root = parse_xml_tolerant(xml)
+    removed_ids = set()
+
+    # 1) v:textpath 文字水印；2) w:pict 内 v:shape 图片水印
+    _collect_textpath_paras(root, text, auto, removed_ids)
+    _collect_pict_paras(root, text, auto, removed_ids)
+
+    if not removed_ids:
+        return 0
+    cnt = _strip_paragraphs(root, removed_ids)
+    if cnt:
+        members[name] = LXML.tostring(root, xml_declaration=True,
+                                      encoding="UTF-8", standalone=True)
+    return cnt
+
+
 def process_word(abspath, text, auto):
+    """移除 docx 文字/图片水印：遍历 document 与页眉页脚部件，命中即删除所在段落。
+
+    Returns:
+        tuple: (删除段落数, 结果说明)
+    """
     members = read_zip(abspath)
     if members is None:
         return 0, "非有效 docx(zip)"
@@ -145,46 +224,7 @@ def process_word(abspath, text, auto):
 
     total = 0
     for name in watermark_xml_fragments(members):
-        xml = members[name].decode("utf-8")
-        if "textpath" not in xml and "picture" not in xml:
-            continue
-        root = parse_xml_tolerant(xml)
-        removed_ids = set()
-
-        # 1) v:textpath 文字水印：命中关键字或 --auto
-        for tp in root.findall(f".//{V_TEXT}"):
-            if auto or (text and text.lower() in tp.get("string", "").lower()):
-                para = tp if tp.tag == W_P else tp.getparent()
-                while para is not None and para.tag != W_P:
-                    para = para.getparent()
-                if para is not None:
-                    removed_ids.add(id(para))
-
-        # 2) w:pict 内 v:shape 图片水印（PowerPlusWaterMarkObject / 水印命名）
-        for pict in root.findall(f".//{W_PICT}"):
-            shape = pict.find(f".//{{{NS['v']}}}shape")
-            if shape is None:
-                continue
-            sid = shape.get("id") or ""
-            sname = shape.get("name") or ""
-            if ("Watermark" in sid or "水印" in sname or "Watermark" in sname) and (auto or not text):
-                para = pict if pict.tag == W_P else pict.getparent()
-                while para is not None and para.tag != W_P:
-                    para = para.getparent()
-                if para is not None:
-                    removed_ids.add(id(para))
-
-        if not removed_ids:
-            continue
-        cnt = 0
-        for para in list(root.iter(W_P)):
-            if id(para) in removed_ids:
-                para.getparent().remove(para)
-                cnt += 1
-        if cnt:
-            members[name] = LXML.tostring(root, xml_declaration=True,
-                                          encoding="UTF-8", standalone=True)
-            total += cnt
+        total += _process_word_part(members, name, text, auto)
     if total:
         write_zip(abspath, members)
     return total, f"删除 {total} 个水印段落" if total else "未发现文字水印"
@@ -584,11 +624,7 @@ def process_file(fp, text, auto, rects, corner, fill, forced, kind=None):
 # CLI
 # ---------------------------------------------------------------------------
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="去水印工具 — Word/PPT/Excel/PDF/图片/纯文本（按格式自动识别处理器）",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
+_EPILOG = """
 示例:
   # Word：打开并删除页眉文字水印（--auto 识别；--text 指定文案）
   python remove_watermark.py report.docx --in-place --auto
@@ -613,7 +649,24 @@ def main():
   # 文本：删除水印印章行/行尾短语
   python remove_watermark.py notes.md --text "内部资料 勿外传"
   python remove_watermark.py log.txt --auto
-""")
+"""
+
+# 目录递归时跳过的版本控制/构建/敏感目录
+_SKIP_DIRS = {".git", ".venv", "__pycache__", "dist", "build", ".secrets"}
+
+# 无论 text_exts 如何配置都按文本处理的核心扩展名
+_CORE_TEXT_EXTS = {".txt", ".md", ".log", ".csv"}
+
+# 已实现的处理器类别
+_VALID_KINDS = {"word", "ppt", "excel", "pdf", "image", "text"}
+
+
+def _build_parser():
+    """构建 CLI 参数解析器。"""
+    parser = argparse.ArgumentParser(
+        description="去水印工具 — Word/PPT/Excel/PDF/图片/纯文本（按格式自动识别处理器）",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=_EPILOG)
     parser.add_argument("target", nargs="?", help="目标文件或目录")
     parser.add_argument("-o", "--output", help="输出目录（默认同目录 _nowater 导出，保留原件）")
     parser.add_argument("--in-place", action="store_true", help="原地修改（危险，先备份；--auto 配合）")
@@ -627,8 +680,11 @@ def main():
     parser.add_argument("--dry-run", action="store_true", help="预览：仅报告将处理的文件，不修改")
     parser.add_argument("--report", help="报告 CSV 路径")
     parser.add_argument("--include-ext", help="额外扩展名（文本，逗号分隔，如 .conf,.properties）")
-    args = parser.parse_args()
+    return parser
 
+
+def _resolve_target(parser, args):
+    """校验参数互斥与目标存在性，返回目标 Path。"""
     if not args.target:
         parser.error("请指定目标文件或目录")
 
@@ -638,79 +694,122 @@ def main():
     target = Path(args.target)
     if not target.exists():
         parser.error(f"目标不存在: {args.target}")
+    return target
 
+
+def _parse_rects(parser, raw_rects):
+    """解析 --rect（PDF 相对 0-1 / 图片像素），可多次指定以包围多个水印。"""
     rects = []
-    for rstr in args.rect:
+    for rstr in raw_rects:
         parts = [p.strip() for p in rstr.split(",")]
         if len(parts) != 4:
             parser.error(f"--rect 需 4 个数字: {rstr}")
         rects.append(tuple(float(p) for p in parts))
+    return rects
 
-    # 文件收集
+
+def _resolve_text_exts(include_ext):
+    """文本扩展名集合 = 内置 TEXT_EXTS + --include-ext 追加项（自动补前导点）。"""
     text_exts = set(TEXT_EXTS)
-    if args.include_ext:
-        for e in args.include_ext.split(","):
-            e = e.strip().lower()
-            if e and not e.startswith("."):
-                e = "." + e
-            text_exts.add(e)
+    if not include_ext:
+        return text_exts
+    for e in include_ext.split(","):
+        e = e.strip().lower()
+        if e and not e.startswith("."):
+            e = "." + e
+        text_exts.add(e)
+    return text_exts
 
-    files = []
+
+def _collect_files(target):
+    """收集待处理文件：单文件直接返回，目录则递归遍历（跳过版本控制与构建目录）。"""
     if target.is_file():
-        files = [target]
-    else:
-        for root, dirs, names in os.walk(target):
-            dirs[:] = [d for d in dirs if d not in {".git", ".venv", "__pycache__", "dist", "build", ".secrets"}]
-            for n in names:
-                files.append(Path(root) / n)
+        return [target]
+    files = []
+    for root, dirs, names in os.walk(target):
+        dirs[:] = [d for d in dirs if d not in _SKIP_DIRS]
+        for n in names:
+            files.append(Path(root) / n)
+    return files
 
-    results = []
-    for fp in files:
-        kind = dispatch_kind(str(fp), args.format)
-        if kind == "text" and not args.format and fp.suffix.lower() not in text_exts and fp.suffix.lower() not in {".txt", ".md", ".log", ".csv"}:
-            continue  # 目录扫描时非文本扩展名跳过，除非强制 text
-        if kind not in {"word", "ppt", "excel", "pdf", "image", "text"}:
-            continue
-        if args.dry_run:
-            results.append({"file": str(fp), "kind": kind, "status": "DRY_RUN", "detail": "预览不修改"})
-            continue
 
-        # 输出策略：原地 or 复制到 -o
-        if args.in_place:
-            work = str(fp)
-        else:
-            out_dir = Path(args.output) if args.output else fp.parent / "_nowater"
-            out_path = out_dir / fp.name if not target.is_dir() else out_dir / fp.relative_to(target)
-            out_path.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(fp, out_path)
-            work = str(out_path)
+def _should_skip(fp, kind, forced, text_exts):
+    """目录遍历过滤：非文本扩展名跳过（除非强制 --format text），未知类别跳过。"""
+    if kind == "text" and not forced:
+        ext = fp.suffix.lower()
+        if ext not in text_exts and ext not in _CORE_TEXT_EXTS:
+            return True   # 目录遍历时非文本扩展名跳过，除非强制 text
+    return kind not in _VALID_KINDS
 
-        try:
-            n, detail = process_file(work, args.text, args.auto, rects, args.corner, args.fill, args.format, kind)
-            if n:
-                status = "OK"
-            else:
-                status = "NO_WATERMARK"
-            results.append({"file": str(fp), "kind": kind, "status": status, "detail": detail, "count": n})
-            print(f"  {'✅' if n else '·'} {fp.name} ({kind}) — {detail}")
-        except Exception as e:
-            results.append({"file": str(fp), "kind": kind, "status": "ERROR", "detail": str(e)})
-            print(f"  ❌ {fp.name} ({kind}) — 失败: {e}")
 
-    # 报告
-    if args.report:
-        with open(args.report, "w", newline="", encoding="utf-8-sig") as f:
-            w = csv.writer(f)
-            w.writerow(["file", "kind", "status", "detail"])
-            for r in results:
-                w.writerow([r["file"], r.get("kind"), r.get("status"), r.get("detail", "")])
-        print(f"\n📊 报告: {args.report}")
+def _resolve_work_path(fp, args, target):
+    """确定实际处理路径：--in-place 用原件，否则复制到输出目录（默认同级 _nowater）。"""
+    if args.in_place:
+        return str(fp)
+    out_dir = Path(args.output) if args.output else fp.parent / "_nowater"
+    out_path = out_dir / fp.name if not target.is_dir() else out_dir / fp.relative_to(target)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(fp, out_path)
+    return str(out_path)
 
+
+def _process_one(fp, kind, args, rects, target):
+    """处理单个文件并返回结果记录；dry-run 只登记不修改，异常归为 ERROR 不中断批处理。"""
+    if args.dry_run:
+        return {"file": str(fp), "kind": kind, "status": "DRY_RUN", "detail": "预览不修改"}
+
+    # 输出策略：原地 or 复制到 -o
+    work = _resolve_work_path(fp, args, target)
+
+    try:
+        n, detail = process_file(work, args.text, args.auto, rects, args.corner, args.fill, args.format, kind)
+        status = "OK" if n else "NO_WATERMARK"
+        print(f"  {'✅' if n else '·'} {fp.name} ({kind}) — {detail}")
+        return {"file": str(fp), "kind": kind, "status": status, "detail": detail, "count": n}
+    except Exception as e:
+        print(f"  ❌ {fp.name} ({kind}) — 失败: {e}")
+        return {"file": str(fp), "kind": kind, "status": "ERROR", "detail": str(e)}
+
+
+def _write_report(path, results):
+    """写出处理报告 CSV（utf-8-sig，供 Excel 直接打开）。"""
+    with open(path, "w", newline="", encoding="utf-8-sig") as f:
+        w = csv.writer(f)
+        w.writerow(["file", "kind", "status", "detail"])
+        for r in results:
+            w.writerow([r["file"], r.get("kind"), r.get("status"), r.get("detail", "")])
+    print(f"\n📊 报告: {path}")
+
+
+def _print_summary(results):
+    """打印处理汇总并返回进程退出码（存在失败项返回 1）。"""
     ok = sum(1 for r in results if r.get("status") == "OK")
     nowm = sum(1 for r in results if r.get("status") == "NO_WATERMARK")
     err = sum(1 for r in results if r.get("status") == "ERROR")
     print(f"\n处理 {len(results)} 个文件：清理 {ok}，无水印 {nowm}，失败 {err}")
     return 1 if err else 0
+
+
+def main():
+    """CLI 主流程：解析参数 → 收集文件 → 逐文件分发处理 → 报告与汇总。"""
+    parser = _build_parser()
+    args = parser.parse_args()
+
+    target = _resolve_target(parser, args)
+    rects = _parse_rects(parser, args.rect)
+    text_exts = _resolve_text_exts(args.include_ext)
+
+    results = []
+    for fp in _collect_files(target):
+        kind = dispatch_kind(str(fp), args.format)
+        if _should_skip(fp, kind, args.format, text_exts):
+            continue
+        results.append(_process_one(fp, kind, args, rects, target))
+
+    if args.report:
+        _write_report(args.report, results)
+
+    return _print_summary(results)
 
 
 if __name__ == "__main__":

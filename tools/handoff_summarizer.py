@@ -78,126 +78,157 @@ def dedupe_lines(lines: list, limit: int = 5) -> list:
     return out
 
 
-def extract_l1_by_rules(full_doc: str, state: dict) -> str:
-    """纯规则摘要（fallback：无模型/模型失败时）——结构化输出 L1 必读核心"""
-    l1_sections = {}
-    # 限定扫描范围：仅 L1 区（修复全文扫描导致的递归膨胀）
-    zone = extract_l1_zone(full_doc)
+L1_SECTION_ORDER = (
+    "项目速览",
+    "当前阶段/角色/任务",
+    "关键风险/阻塞",
+    "下一步唯一动作",
+    "铁律锚点",
+    "关键文件索引",
+    "固化上下文补充",
+)
 
-    # —— 按 ### 子节切分 L1 区（健壮：不依赖脆弱正则，各子节独立取值） ——
-    def split_subsections(doc_zone: str) -> dict:
-        """以 '### 标题' 切分 L1 区 → {标题: [内容行]}"""
-        subs = {}
-        cur_title = None
-        for line in doc_zone.split("\n"):
-            stripped = line.strip()
-            if not stripped:
-                continue
-            if stripped.startswith("### "):
-                cur_title = stripped[4:].strip()
-                subs.setdefault(cur_title, [])
-            elif stripped.startswith("#### "):
-                # 四级子标题作为内容行保留
-                if cur_title:
-                    subs[cur_title].append("- **" + stripped[5:].strip() + "**")
-            elif cur_title and not stripped.startswith("## "):
-                subs[cur_title].append(stripped)
-        return subs
+L1_EMPTY_FALLBACK = "# L1 核心摘要（规则提取）\n\n> 无法提取关键信息，请检查交接文档格式"
+# 硬截断上限（token_standard §7 交接必读预算 2000 token 防护）
+L1_MAX_CHARS = 3000
 
-    subs = split_subsections(zone)
 
-    def sub(name: str, *aliases: str) -> list:
-        for key in (name,) + aliases:
-            if key in subs:
-                return subs[key]
-        return []
+def _split_subsections(doc_zone: str) -> dict:
+    """以 '### 标题' 切分 L1 区 → {标题: [内容行]}（不依赖脆弱正则，各子节独立取值）"""
+    subs = {}
+    cur_title = None
+    for line in doc_zone.split("\n"):
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if stripped.startswith("### "):
+            cur_title = stripped[4:].strip()
+            subs.setdefault(cur_title, [])
+        elif stripped.startswith("#### "):
+            # 四级子标题作为内容行保留
+            if cur_title:
+                subs[cur_title].append("- **" + stripped[5:].strip() + "**")
+        elif cur_title and not stripped.startswith("## "):
+            subs[cur_title].append(stripped)
+    return subs
 
-    # 1. 项目速览
-    overview = sub("项目速览")
-    if overview:
-        l1_sections["项目速览"] = dedupe_lines(overview, 6)
 
-    # 2. 当前阶段/角色/任务边界（兼容旧文档以散行存在的场景）
-    stage_info = sub("当前阶段/角色/任务", "当前角色", "当前任务", "当前任务类型")
+def _sub(subs: dict, name: str, *aliases: str) -> list:
+    """按主名与别名顺序取子节内容行，均未命中时返回空列表。"""
+    for key in (name,) + aliases:
+        if key in subs:
+            return subs[key]
+    return []
+
+
+def _put_if_any(l1_sections: dict, name: str, lines: list) -> None:
+    """仅在内容非空时写入小节，保持与原实现相同的键存在性语义。"""
+    if lines:
+        l1_sections[name] = lines
+
+
+def _collect_overview(subs: dict) -> list:
+    """1. 项目速览"""
+    overview = _sub(subs, "项目速览")
+    return dedupe_lines(overview, 6) if overview else []
+
+
+def _collect_stage_info(subs: dict, zone: str) -> list:
+    """2. 当前阶段/角色/任务（兼容旧文档以散行存在的场景）"""
+    stage_info = _sub(subs, "当前阶段/角色/任务", "当前角色", "当前任务", "当前任务类型")
     if not stage_info:
         # 旧格式：散行「当前阶段：xx」在 L1 区任意位置
         for line in zone.split("\n"):
             stripped = line.strip()
             if re.search(r"(当前阶段|当前角色|当前任务|当前任务类型)\s*[：:]", stripped):
                 stage_info.append(stripped)
-    if stage_info:
-        l1_sections["当前阶段/角色/任务"] = dedupe_lines(stage_info, 6)
+    return dedupe_lines(stage_info, 6) if stage_info else []
 
-    # 3. 关键风险/阻塞
-    risk_lines = sub("关键风险/阻塞", "风险/阻塞")
+
+def _collect_risk(subs: dict) -> list:
+    """3. 关键风险/阻塞（无命中时给出「无阻塞项」占位）"""
+    risk_lines = _sub(subs, "关键风险/阻塞", "风险/阻塞")
     if risk_lines:
         risk_lines = [ln for ln in risk_lines if not ln.startswith("### ") and len(ln) > 4]
     if not risk_lines:
         risk_lines = ["- **无阻塞项**"]
-    l1_sections["关键风险/阻塞"] = dedupe_lines(risk_lines, 3)
+    return dedupe_lines(risk_lines, 3)
 
-    # 4. 下一步唯一动作
-    action_lines = sub("下一步唯一动作", "下一步动作")
+
+def _collect_action(subs: dict) -> list:
+    """4. 下一步唯一动作（无命中时给出「待定」占位）"""
+    action_lines = _sub(subs, "下一步唯一动作", "下一步动作")
     if action_lines:
         action_lines = [ln for ln in action_lines if len(ln) > 3]
-    l1_sections["下一步唯一动作"] = dedupe_lines(action_lines, 3) if action_lines else ["- 待定"]
+    return dedupe_lines(action_lines, 3) if action_lines else ["- 待定"]
 
-    # 5. 铁律锚点
-    iron_lines = sub("铁律锚点")
+
+def _collect_iron(subs: dict) -> list:
+    """5. 铁律锚点（无命中时回退核心三要素）"""
+    iron_lines = _sub(subs, "铁律锚点")
     iron_lines = [ln for ln in iron_lines if not ln.startswith("### ")]
     if not iron_lines:
         iron_lines = ["- **核心**：授权 → 备份 → 留痕"]
-    l1_sections["铁律锚点"] = dedupe_lines(iron_lines, 6)
+    return dedupe_lines(iron_lines, 6)
 
-    # 6. 关键文件索引（精简版）
-    file_lines = sub("关键文件索引")
+
+def _collect_files(subs: dict) -> list:
+    """6. 关键文件索引（仅保留含反引号的表格行，最多 5 条）"""
+    file_lines = _sub(subs, "关键文件索引")
     file_lines = [ln for ln in file_lines if ln.startswith("|") and "`" in ln][:5]
-    if not file_lines:
-        file_lines = ["- 见 L2 完整索引"]
-    l1_sections["关键文件索引"] = file_lines
+    return file_lines if file_lines else ["- 见 L2 完整索引"]
 
-    # 7. 固化上下文补充
-    if state:
-        extra = []
-        if state.get("current_stage"):
-            l1_sections.setdefault("当前阶段/角色/任务", []).append(f"- **当前阶段**：{state['current_stage']}")
-        if state.get("current_role"):
-            l1_sections.setdefault("当前阶段/角色/任务", []).append(f"- **当前角色**：{state['current_role']}")
-        if state.get("current_task"):
-            l1_sections.setdefault("当前阶段/角色/任务", []).append(f"- **当前任务**：{state['current_task']}")
-        if state.get("changes_summary"):
-            extra.append(f"- **本轮变更**：{state['changes_summary'][:200]}")
-        if extra:
-            l1_sections["固化上下文补充"] = extra
 
-    # 组装输出（按固定顺序）
-    order = [
-        "项目速览",
-        "当前阶段/角色/任务",
-        "关键风险/阻塞",
-        "下一步唯一动作",
-        "铁律锚点",
-        "关键文件索引",
-        "固化上下文补充"
-    ]
+def _apply_state_overlay(l1_sections: dict, state: dict) -> None:
+    """7. 固化上下文补充：将 state 中的阶段/角色/任务与本轮变更并入摘要。"""
+    if not state:
+        return
+    stage_fields = (("current_stage", "当前阶段"), ("current_role", "当前角色"),
+                    ("current_task", "当前任务"))
+    present = [(label, state[key]) for key, label in stage_fields if state.get(key)]
+    if present:
+        bucket = l1_sections.setdefault("当前阶段/角色/任务", [])
+        for label, value in present:
+            bucket.append(f"- **{label}**：{value}")
+    if state.get("changes_summary"):
+        l1_sections["固化上下文补充"] = [
+            f"- **本轮变更**：{state['changes_summary'][:200]}"]
 
+
+def _assemble_l1(l1_sections: dict) -> str:
+    """按固定顺序组装 L1 摘要，并施加硬截断。"""
     out = []
-    for sec in order:
-        if sec in l1_sections and l1_sections[sec]:
-            out.append(f"### {sec}")
-            for line in l1_sections[sec]:
-                if not line.startswith("-") and not line.startswith("#"):
-                    out.append(f"- {line}")
-                else:
-                    out.append(line)
-            out.append("")  # 空行分隔
+    for sec in L1_SECTION_ORDER:
+        lines = l1_sections.get(sec)
+        if not lines:
+            continue
+        out.append(f"### {sec}")
+        for line in lines:
+            out.append(line if line.startswith(("-", "#")) else f"- {line}")
+        out.append("")  # 空行分隔
 
-    result = "\n".join(out).strip() if out else "# L1 核心摘要（规则提取）\n\n> 无法提取关键信息，请检查交接文档格式"
-
-    # 硬截断：超过 3000 字符裁剪（token_standard §7 交接必读预算 2000 token 防护）
-    if len(result) > 3000:
-        result = result[:3000].rsplit("\n", 1)[0] + "\n- **（摘要超限，已裁剪）**"
+    result = "\n".join(out).strip() if out else L1_EMPTY_FALLBACK
+    if len(result) > L1_MAX_CHARS:
+        result = result[:L1_MAX_CHARS].rsplit("\n", 1)[0] + "\n- **（摘要超限，已裁剪）**"
     return result
+
+
+def extract_l1_by_rules(full_doc: str, state: dict) -> str:
+    """纯规则摘要（fallback：无模型/模型失败时）——结构化输出 L1 必读核心"""
+    # 限定扫描范围：仅 L1 区（修复全文扫描导致的递归膨胀）
+    zone = extract_l1_zone(full_doc)
+    subs = _split_subsections(zone)
+
+    l1_sections = {}
+    _put_if_any(l1_sections, "项目速览", _collect_overview(subs))
+    _put_if_any(l1_sections, "当前阶段/角色/任务", _collect_stage_info(subs, zone))
+    l1_sections["关键风险/阻塞"] = _collect_risk(subs)
+    l1_sections["下一步唯一动作"] = _collect_action(subs)
+    l1_sections["铁律锚点"] = _collect_iron(subs)
+    l1_sections["关键文件索引"] = _collect_files(subs)
+    _apply_state_overlay(l1_sections, state)
+
+    return _assemble_l1(l1_sections)
 
 
 def generate_with_ollama(prompt: str, model: str = "qwen2.5-coder:7b", timeout: int = 30) -> str:

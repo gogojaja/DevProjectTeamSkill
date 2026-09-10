@@ -193,7 +193,8 @@ def get_active(limit=50):
     return [r for r in rows if r.get("status", "active") != "expired"][-limit:]
 
 
-def main():
+def _build_parser():
+    """构造 CLI 解析器（子命令与参数定义集中于此）。"""
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd")
     a = sub.add_parser("add")
@@ -216,25 +217,32 @@ def main():
     lo = sub.add_parser("load")
     lo.add_argument("--limit", type=int, default=15)
     sub.add_parser("export")
-    args = ap.parse_args()
-    if args.cmd == "add":
-        add(args.type, args.text, args.meta)
-    elif args.cmd == "list":
-        list_entries(args.type, args.limit)
-    elif args.cmd == "query":
-        query(args.keyword, args.type, args.since, args.limit)
-    elif args.cmd == "summarize":
-        summarize()
-    elif args.cmd == "expire":
-        expire(args.days)
-    elif args.cmd == "delete":
-        delete(args.index)
-    elif args.cmd == "load":
-        print(load_context(args.limit))
-    elif args.cmd == "export":
-        export_csv()
-    else:
+    return ap
+
+
+def _dispatch(args, ap):
+    """按子命令分发到处理函数（字典派发，避开长 elif 链）；无子命令时打印帮助。"""
+    handlers = {
+        "add": lambda: add(args.type, args.text, args.meta),
+        "list": lambda: list_entries(args.type, args.limit),
+        "query": lambda: query(args.keyword, args.type, args.since, args.limit),
+        "summarize": summarize,
+        "expire": lambda: expire(args.days),
+        "delete": lambda: delete(args.index),
+        "load": lambda: print(load_context(args.limit)),
+        "export": export_csv,
+    }
+    handler = handlers.get(args.cmd)
+    if handler is None:
         ap.print_help()
+        return
+    handler()
+
+
+def main():
+    ap = _build_parser()
+    args = ap.parse_args()
+    _dispatch(args, ap)
 
 
 if __name__ == "__main__":

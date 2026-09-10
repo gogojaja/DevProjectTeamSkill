@@ -62,9 +62,83 @@ def check_role(role):
             break
     return (ver, foot, chg)
 
-def main():
-    print('版本一致性校验 (version consistency check)')
-    print(f'源: {SKILLS_DIR}')
+def _read(path):
+    """读取 UTF-8 文本（with 管理句柄，避免文件句柄泄漏）。"""
+    with open(path, encoding='utf-8') as fh:
+        return fh.read()
+
+
+def _version_pair(sc):
+    """从 SKILL.md 文本提取（元数据版本, 页脚版本）。"""
+    ver = VRE.search(sc).group(1) if VRE.search(sc) else None
+    foot = FRE.search(sc).group(1) if FRE.search(sc) else None
+    return ver, foot
+
+
+def _check_header(label, ver, foot, width):
+    """通用版本硬门禁：元数据必须等于页脚，返回 hard 增量。"""
+    if not (ver and foot and ver == foot):
+        print(f'  ✗ {label:<{width}} 硬门禁: 元数据={ver} 页脚={foot} 不一致')
+        return 1
+    print(f'  ✓ {label:<{width}} {ver}')
+    return 0
+
+
+def _check_role_header(r, ver, foot, chg):
+    """角色包版本硬门禁 + 变更记录软提示，返回 (hard, soft) 增量。"""
+    if not (ver and foot and ver == foot):
+        print(f'  ✗ {r:<40} 硬门禁: 元数据={ver} 页脚={foot} 不一致')
+        return 1, 0
+    # 软提示：变更记录最新条应含元数据版本
+    if chg and chg != ver:
+        print(f'  ~ {r:<40} 软提示: 变更记录最新={chg} ≠ 元数据={ver}')
+        return 0, 1
+    print(f'  ✓ {r:<40} {ver}')
+    return 0, 0
+
+
+def _check_contract(r, content):
+    """轻量契约校验，返回 hard 增量。
+
+    检查 SKILL.md 正文（跳过 frontmatter）前 1200 字是否包含任务契约要点
+    （正文前部为元数据+变更记录，触发规则/任务入口区通常在 400~900 字处）。
+    """
+    body = content.split('---', 2)[2] if content.startswith('---') else content
+    head = body[:1200]
+    required_keys = ['目标', '触发', '不适用', '输入', '输出', '回退', '失败']
+    if not any(k in head for k in required_keys):
+        print(f'  ✗ {r:<40} 任务契约要点缺失（正文前1200字未包含目标/触发/输入/输出/回退等关键词）')
+        return 1
+    return 0
+
+
+def _scan_domain(ddir, ver, prefix, width):
+    """扫描 domain/*.md 头部版本行，必须与所属 SKILL.md 版本一致，返回 (hard, soft)。"""
+    hard = 0
+    soft = 0
+    for root, _, files in os.walk(ddir):
+        for fn in sorted(files):
+            if not fn.endswith('.md'):
+                continue
+            dp = os.path.join(root, fn)
+            dc = _read(dp)
+            m = DVRE.search(dc)
+            dver = m.group(1) if m else None
+            rel = fn if root == ddir else os.path.relpath(dp, root)
+            dlabel = f'{prefix}/domain/{rel}'
+            if dver is None:
+                print(f'  ~ {dlabel:<{width}} 无版本行（跳过，软提示）')
+                soft += 1
+            elif dver != ver:
+                print(f'  ✗ {dlabel:<{width}} 硬门禁: domain版本={dver} ≠ SKILL版本={ver}')
+                hard += 1
+            else:
+                print(f'  ✓ {dlabel:<{width}} {dver}')
+    return hard, soft
+
+
+def _scan_roles():
+    """扫描全部角色包：版本硬门禁 + 闭环执行门禁 + 任务契约要点。"""
     hard = 0
     soft = 0
     versions = {}
@@ -76,20 +150,12 @@ def main():
             continue
         ver, foot, chg = got
         versions[r] = ver
-        p = os.path.join(SKILLS_DIR, r, 'SKILL.md')
-        content = open(p, encoding='utf-8').read()
+        content = _read(os.path.join(SKILLS_DIR, r, 'SKILL.md'))
 
         # 硬门禁：元数据 == 页脚
-        if not (ver and foot and ver == foot):
-            print(f'  ✗ {r:<40} 硬门禁: 元数据={ver} 页脚={foot} 不一致')
-            hard += 1
-        else:
-            # 软提示：变更记录最新条应含元数据版本
-            if chg and chg != ver:
-                print(f'  ~ {r:<40} 软提示: 变更记录最新={chg} ≠ 元数据={ver}')
-                soft += 1
-            else:
-                print(f'  ✓ {r:<40} {ver}')
+        h, s = _check_role_header(r, ver, foot, chg)
+        hard += h
+        soft += s
 
         # 闭环执行能力门禁：必须具备标准章节和关键要素
         if not check_closure_section(content):
@@ -98,95 +164,79 @@ def main():
         else:
             print(f'  ✓ {r:<40} 闭环执行门禁通过')
 
-        # 轻量契约校验：检查 SKILL.md 正文（跳过 frontmatter）前 1200 字是否包含任务契约要点
-        # （正文前部为元数据+变更记录，触发规则/任务入口区通常在 400~900 字处）
-        body = content.split('---', 2)[2] if content.startswith('---') else content
-        head = body[:1200]
-        required_keys = ['目标', '触发', '不适用', '输入', '输出', '回退', '失败']
-        if not any(k in head for k in required_keys):
-            print(f'  ✗ {r:<40} 任务契约要点缺失（正文前1200字未包含目标/触发/输入/输出/回退等关键词）')
-            hard += 1
+        hard += _check_contract(r, content)
+    return hard, soft, versions
 
-    # 子技能与 domain 明细纳入版本一致性扫描（v21.7.5 扩展）
+
+def _scan_sub_skills():
+    """子技能与 domain 明细纳入版本一致性扫描（v21.7.5 扩展）。"""
+    hard = 0
+    soft = 0
     for sub in SUB_SKILLS:
         sp = os.path.join(SKILLS_DIR, 'dev-project-team-skill', 'skills', sub, 'SKILL.md')
         if not os.path.isfile(sp):
             continue
-        sc = open(sp, encoding='utf-8').read()
-        ver = VRE.search(sc).group(1) if VRE.search(sc) else None
-        foot = FRE.search(sc).group(1) if FRE.search(sc) else None
-        label = f'{sub}.SKILL.md'
-        if not (ver and foot and ver == foot):
-            print(f'  ✗ {label:<36} 硬门禁: 元数据={ver} 页脚={foot} 不一致')
-            hard += 1
-        else:
-            print(f'  ✓ {label:<36} {ver}')
+        ver, foot = _version_pair(_read(sp))
+        hard += _check_header(f'{sub}.SKILL.md', ver, foot, 36)
         # domain/*.md 头部版本行必须与 SKILL.md 版本一致
-        ddir = os.path.join(os.path.dirname(sp), 'domain')
-        for root, _, files in os.walk(ddir):
-            for fn in sorted(files):
-                if not fn.endswith('.md'):
-                    continue
-                dp = os.path.join(root, fn)
-                dc = open(dp, encoding='utf-8').read()
-                dver = DVRE.search(dc).group(1) if DVRE.search(dc) else None
-                dlabel = f'{sub}/domain/{fn if root == ddir else os.path.relpath(dp, root)}'
-                if dver is None:
-                    print(f'  ~ {dlabel:<54} 无版本行（跳过，软提示）')
-                    soft += 1
-                    continue
-                if dver != ver:
-                    print(f'  ✗ {dlabel:<54} 硬门禁: domain版本={dver} ≠ SKILL版本={ver}')
-                    hard += 1
-                else:
-                    print(f'  ✓ {dlabel:<54} {dver}')
+        h, s = _scan_domain(os.path.join(os.path.dirname(sp), 'domain'), ver, sub, 54)
+        hard += h
+        soft += s
+    return hard, soft
 
-    # 独立可部署技能（顶层自包含）纳入版本一致性 + 闭环扫描（阶段A 扩展）
+
+def _scan_standalone():
+    """独立可部署技能（顶层自包含）纳入版本一致性 + 闭环扫描（阶段A 扩展）。"""
+    hard = 0
+    soft = 0
     for name in STANDALONE_SKILLS:
         sp = os.path.join(SKILLS_DIR, name, 'SKILL.md')
         if not os.path.isfile(sp):
             continue
-        sc = open(sp, encoding='utf-8').read()
-        ver = VRE.search(sc).group(1) if VRE.search(sc) else None
-        foot = FRE.search(sc).group(1) if FRE.search(sc) else None
+        sc = _read(sp)
+        ver, foot = _version_pair(sc)
         label = f'{name} (standalone)'
-        if not (ver and foot and ver == foot):
-            print(f'  ✗ {label:<36} 硬门禁: 元数据={ver} 页脚={foot} 不一致')
-            hard += 1
-        else:
-            print(f'  ✓ {label:<36} {ver}')
+        hard += _check_header(label, ver, foot, 36)
         if not check_closure_section(sc):
             print(f'  ✗ {label:<36} 闭环执行门禁未通过：缺少 "闭环执行系统" 或关键要素')
             hard += 1
         ddir = os.path.join(os.path.dirname(sp), 'domain')
         if os.path.isdir(ddir):
-            for root, _, files in os.walk(ddir):
-                for fn in sorted(files):
-                    if not fn.endswith('.md'):
-                        continue
-                    dp = os.path.join(root, fn)
-                    dc = open(dp, encoding='utf-8').read()
-                    dver = DVRE.search(dc).group(1) if DVRE.search(dc) else None
-                    dlabel = f'{name}/domain/{fn}'
-                    if dver is None:
-                        print(f'  ~ {dlabel:<44} 无版本行（跳过，软提示）')
-                        soft += 1
-                        continue
-                    if dver != ver:
-                        print(f'  ✗ {dlabel:<44} 硬门禁: domain版本={dver} ≠ SKILL版本={ver}')
-                        hard += 1
-                    else:
-                        print(f'  ✓ {dlabel:<44} {dver}')
+            h, s = _scan_domain(ddir, ver, name, 44)
+            hard += h
+            soft += s
+    return hard, soft
 
+
+def _report(hard, soft, versions):
+    """打印汇总并按硬门禁结果退出（1=失败，0=通过）。"""
     uniq = sorted(set(v for v in versions.values() if v))
     if len(uniq) > 1:
-        print(f'  · 跨包版本分布: {uniq}（各包独立演进，允许差异）')
+        print(f'  · 跳包版本分布: {uniq}（各包独立演进，允许差异）')
     print('=' * 50)
     if hard:
         print(f'❌ 硬门禁失败: {hard} 项元数据/页脚版本不一致。请统一后重试。')
         sys.exit(1)
     print(f'✅ 硬门禁通过（{soft} 项软提示可人工确认）。')
     sys.exit(0)
+
+
+def main():
+    """版本一致性校验入口：角色包 → 子技能 → 独立技能 → 汇总裁决。"""
+    print('版本一致性校验 (version consistency check)')
+    print(f'源: {SKILLS_DIR}')
+
+    hard, soft, versions = _scan_roles()
+
+    h, s = _scan_sub_skills()
+    hard += h
+    soft += s
+
+    h, s = _scan_standalone()
+    hard += h
+    soft += s
+
+    _report(hard, soft, versions)
 
 if __name__ == '__main__':
     main()
