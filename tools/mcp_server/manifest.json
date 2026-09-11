@@ -1,8 +1,8 @@
 {
   "skill_name": "DevProjectTeamSkill",
-  "released_version": "v21.23.0",
-  "skill_source_version": "v21.23.0",
-  "released_at": "2026-09-09T03:42:46.462015+00:00",
+  "released_version": "v21.24.1",
+  "skill_source_version": "v21.24.1",
+  "released_at": "2026-09-11T00:31:25.999290+00:00",
   "server_entry": "tools\\mcp_server\\skills_mcp_server.py",
   "client_config_snippet": {
     "mcpServers": {

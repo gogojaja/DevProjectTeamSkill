@@ -41,10 +41,34 @@
       "name": "火山方舟 Coding Plan",
       "options": {
         "baseURL": "https://ark.cn-beijing.volces.com/api/coding/v3",
-        "apiKey": "{env:ARK_API_KEY}"
+        "apiKey": "{env:ARK_CODING_API_KEY}"
       },
       "models": {
-        "deepseek-v4-flash": { "name": "DeepSeek V4 Flash (火山 Coding Plan)" }
+        "doubao-seed-2.0-pro": { "name": "Doubao Seed 2.0 Pro (火山 Coding Plan)" },
+        "doubao-seed-2.0-lite": { "name": "Doubao Seed 2.0 Lite (火山 Coding Plan)" }
+      }
+    },
+    "ark-agent": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "火山方舟 Agent Plan",
+      "options": {
+        "baseURL": "https://ark.cn-beijing.volces.com/api/plan/v3",
+        "apiKey": "{env:ARK_AGENT_API_KEY}"
+      },
+      "models": {
+        "doubao-seed-2.0-pro": { "name": "Doubao Seed 2.0 Pro (火山 Agent Plan)" },
+        "doubao-seed-2.0-lite": { "name": "Doubao Seed 2.0 Lite (火山 Agent Plan)" }
+      }
+    },
+    "longcat": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "美团 Longcat",
+      "options": {
+        "baseURL": "https://longcat.chat/platform/api_keys",
+        "apiKey": "{env:LONGCAT_API_KEY}"
+      },
+      "models": {
+        "longcat-chat": { "name": "Longcat Chat" }
       }
     }
   },
